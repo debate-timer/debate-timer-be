@@ -12,10 +12,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set Auth Token
+        run: echo "GH_TOKEN=${{ secrets.PERSONAL_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
       - name: Get Issue Number
         id: get_issue
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           PR_DATA=$(gh pr view ${{ github.event.pull_request.number }} --json headRefName)
           echo "PR_DATA=${PR_DATA}" >> $GITHUB_ENV
@@ -26,16 +27,12 @@ jobs:
 
       - name: Get Issue Details
         id: get_issue_details
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels --jq '{assignees: [.assignees[].login], labels: [.labels[].name]}')
           echo "ISSUE_DATA=${ISSUE_DATA}" >> $GITHUB_ENV
 
       - name: Setting PR
         id: setting_pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ASSIGNEES=$(echo "${ISSUE_DATA}" | jq -r '.assignees | join(",")')
           LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
