@@ -29,7 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels,projectItems --jq '{assignees: [.assignees[].login], labels: [.labels[].name], projects: [.projectItems[].title]}')
+          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels --jq '{assignees: [.assignees[].login], labels: [.labels[].name]')
           echo "ISSUE_DATA=${ISSUE_DATA}" >> $GITHUB_ENV
 
       - name: Setting PR
@@ -39,7 +39,6 @@ jobs:
         run: |
           ASSIGNEES=$(echo "${ISSUE_DATA}" | jq -r '.assignees | join(",")')
           LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
-          PROJECTS=$(echo "${ISSUE_DATA}" | jq -r '.projects | join(",")')
           TEAM_MEMBERS=("unifolio0" "coli-geonwoo" "leegwichan")
           IFS=', ' read -r -a ASSIGNEE_ARRAY <<< "${ASSIGNEES}"
           REVIEWERS=()
