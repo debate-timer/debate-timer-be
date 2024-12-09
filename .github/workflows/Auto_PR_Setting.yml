@@ -29,7 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels --jq '{assignees: [.assignees[].login], labels: [.labels[].name]')
+          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels --jq '{assignees: [.assignees[].login], labels: [.labels[].name]}')
           echo "ISSUE_DATA=${ISSUE_DATA}" >> $GITHUB_ENV
 
       - name: Setting PR
