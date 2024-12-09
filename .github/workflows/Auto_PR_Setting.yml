@@ -28,7 +28,7 @@ jobs:
       - name: Get Issue Details
         id: get_issue_details
         run: |
-          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels --jq '{assignees: [.assignees[].login], labels: [.labels[].name]}')
+          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels,projectItems --jq '{assignees: [.assignees[].login], labels: [.labels[].name], projects: [.projectItems[].title]}')
           echo "ISSUE_DATA=${ISSUE_DATA}" >> $GITHUB_ENV
 
       - name: Setting PR
@@ -36,6 +36,7 @@ jobs:
         run: |
           ASSIGNEES=$(echo "${ISSUE_DATA}" | jq -r '.assignees | join(",")')
           LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
+          PROJECTS=$(echo "${ISSUE_DATA}" | jq -r '.projects | join(",")')
           TEAM_MEMBERS=("unifolio0" "coli-geonwoo" "leegwichan")
           IFS=', ' read -r -a ASSIGNEE_ARRAY <<< "${ASSIGNEES}"
           REVIEWERS=()
@@ -45,4 +46,4 @@ jobs:
             fi
           done
           REVIEWER_LIST=$(IFS=', '; echo "${REVIEWERS[*]}")
-          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${ASSIGNEES}" --add-label "${LABELS}" --add-reviewer "${REVIEWER_LIST}"
+          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${ASSIGNEES}" --add-label "${LABELS}" --add-reviewer "${REVIEWER_LIST}" --add-project "${PROJECTS}"
