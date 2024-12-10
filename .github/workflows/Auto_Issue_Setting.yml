@@ -1,0 +1,14 @@
+name: Auto Issue Setting
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-assign issue creator
+        uses: pozil/auto-assign-issue@v2
+        with:
+          assignees: ${{ github.actor }}
