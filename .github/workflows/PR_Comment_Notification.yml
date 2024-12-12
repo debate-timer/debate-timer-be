@@ -7,93 +7,58 @@ on:
     types: [ submitted ]
 
 jobs:
-  notify-discord-comment:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+  notify-discord:
     runs-on: ubuntu-latest
 
     steps:
       - name: Set Environment Variables
-        env:
-          TITLE: ${{ github.event.issue.title }}
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
-          echo "COMMENT_BODY= 🤚백엔드 친구들 모여라~ 🔊" >> $GITHUB_ENV
-          echo "USERNAME=망나뇽" >> $GITHUB_ENV
+          echo "USERNAME=디코봇" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
+
+      - name: Set Environment Variables for PR Comments
+        if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+        run: |
+          echo "COMMENT_AUTHOR=${{ github.event.comment.user.login }}" >> $GITHUB_ENV
+          echo "PR_URL=${{ github.event.issue.pull_request.html_url }}" >> $GITHUB_ENV
+          echo "AUTHOR_URL=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
+          echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "COMMENT_BODY=${{ github.event.issue.title }}" >> $GITHUB_ENV
+
+      - name: Set Environment Variables for PR Review Comment
+        if: ${{ contains(github.event.review.body, '/noti') }}
+        run: |
+          echo "COMMENT_AUTHOR=${{ github.event.review.user.login }}" >> $GITHUB_ENV
+          echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
+          echo "AUTHOR_URL=${{ github.event.review.user.avatar_url }}" >> $GITHUB_ENV
+          echo "CONTENT=$(echo '${{ github.event.review.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "COMMENT_BODY=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+
+      - name: Set Environment Variables for Issue
+        if: ${{ !github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+        run: |
+          echo "COMMENT_AUTHOR=${{ github.event.comment.user.login }}" >> $GITHUB_ENV
+          echo "PR_URL=${{ github.event.issue.html_url }}" >> $GITHUB_ENV
+          echo "AUTHOR_URL=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
+          echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "COMMENT_BODY=${{ github.event.issue.title }}" >> $GITHUB_ENV
 
       - name: Notify Discord
         env:
-          COMMENT_BODY: ${{ env.COMMENT_BODY }}
-          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
-          PR_URL: ${{ github.event.issue.pull_request.html_url }}
-          AUTHOR_URL: ${{ github.event.comment.user.avatar_url }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
-          CONTENT: ${{ github.event.comment.body }}
+          COMMENT_BODY: ${{ env.COMMENT_BODY }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
+          COMMENT_AUTHOR: ${{ env.COMMENT_AUTHOR }}
+          PR_URL: ${{ env.PR_URL }}
+          AUTHOR_URL: ${{ env.AUTHOR_URL }}
+          CONTENT: ${{ env.CONTENT }}
         run: |
+          CONTENT_DECODED=$(echo "$CONTENT" | base64 --decode)
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \
-              --arg content "$CONTENT" \
-              --arg description "$COMMENT_BODY" \
-              --arg username "$USERNAME" \
-              --arg avatar_url "$AVATAR_URL" \
-              --arg title "Pull Request Command" \
-              --arg url "$PR_URL" \
-              --arg author_url "$AUTHOR_URL" \
-              --arg author_name "$COMMENT_AUTHOR" \
-              --arg color "5814783" \
-              --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-              '{
-                content: $content,
-                username: $username,
-                avatar_url: $avatar_url,
-                embeds: [{
-                  title: $title,
-                  url: $url,
-                  author: {
-                    name: $author_name,
-                    icon_url: $author_url
-                  },
-                  description: $description,
-                  color: ($color | tonumber),
-                  timestamp: $timestamp
-                }]
-              }')
-
-            curl -X POST -H "Content-Type: application/json" -d "$JSON_PAYLOAD" "$WEB_HOOK"
-          else
-            echo "No matching title found. Skipping notification."
-          fi
-
-  notify-discord-review:
-    if: ${{ contains(github.event.review.body, '/noti') }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set Environment Variables
-        env:
-          TITLE: ${{ github.event.issue.title }}
-        run: |
-          echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
-          echo "COMMENT_BODY= 🤚백엔드 친구들 모여라~ 🔊" >> $GITHUB_ENV
-          echo "USERNAME=망나뇽" >> $GITHUB_ENV
-          echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
-
-      - name: Notify Discord
-        env:
-          COMMENT_BODY: ${{ env.COMMENT_BODY }}
-          COMMENT_AUTHOR: ${{ github.event.review.user.login }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          AUTHOR_URL: ${{ github.event.review.user.avatar_url }}
-          AVATAR_URL: ${{ env.AVATAR_URL }}
-          CONTENT: ${{ github.event.review.body }}
-          USERNAME: ${{ env.USERNAME }}
-          WEB_HOOK: ${{ env.WEB_HOOK }}
-        run: |
-          if [ -n "$WEB_HOOK" ]; then
-            JSON_PAYLOAD=$(jq -n \
-              --arg content "$CONTENT" \
+              --arg content "$CONTENT_DECODED" \
               --arg description "$COMMENT_BODY" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
