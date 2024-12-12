@@ -11,4 +11,5 @@ jobs:
       - name: Auto-assign issue creator
         uses: pozil/auto-assign-issue@v2
         with:
+          repo-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           assignees: ${{ github.actor }}
