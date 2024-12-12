@@ -45,6 +45,7 @@ jobs:
           echo "COMMENT_BODY=${{ github.event.issue.title }}" >> $GITHUB_ENV
 
       - name: Notify Discord
+        if: ${{ env.COMMENT_AUTHOR && env.PR_URL && env.AUTHOR_URL && env.CONTENT && env.COMMENT_BODY }}
         env:
           AVATAR_URL: ${{ env.AVATAR_URL }}
           COMMENT_BODY: ${{ env.COMMENT_BODY }}
