@@ -44,6 +44,11 @@ jacoco {
     toolVersion = '0.8.9'
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
 jacocoTestReport {
     dependsOn test
     reports {
@@ -59,9 +64,8 @@ jacocoTestReport {
             ])
         }))
     }
-}
 
-tasks.named('test') {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
+    onlyIf {
+        return System.getenv('TEST_REPORT') == 'true'
+    }
 }
