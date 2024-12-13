@@ -18,8 +18,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -33,7 +31,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: ${{ github.workspace }}/backend/build/test-results/**/*.xml
+          files: ${{ github.workspace }}/build/test-results/**/*.xml
 
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v4
