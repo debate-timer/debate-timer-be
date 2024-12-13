@@ -18,8 +18,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant Permission
+        run: chmod +x ./gradlew
 
       - name: Clean And Test With Gradle
         run: ./gradlew clean test
