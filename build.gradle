@@ -51,6 +51,14 @@ jacocoTestReport {
         csv.required.set(false)
         html.required.set(false)
     }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/debatetimer/**/dto/**"
+            ])
+        }))
+    }
 }
 
 tasks.named('test') {
