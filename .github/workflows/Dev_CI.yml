@@ -1,9 +1,6 @@
 name: dev-ci
 
 on:
-  push:
-    branches:
-      - chore/#20
   pull_request:
     branches:
       - develop
