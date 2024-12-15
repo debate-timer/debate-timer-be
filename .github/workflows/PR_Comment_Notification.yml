@@ -25,6 +25,7 @@ jobs:
           echo "AUTHOR_URL=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
           echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
           echo "COMMENT_BODY=${{ github.event.issue.title }}" >> $GITHUB_ENV
+          echo "TITLE=Pull Request" >> $GITHUB_ENV
 
       - name: Set Environment Variables for PR Review Comment
         if: ${{ contains(github.event.review.body, '/noti') }}
@@ -34,6 +35,7 @@ jobs:
           echo "AUTHOR_URL=${{ github.event.review.user.avatar_url }}" >> $GITHUB_ENV
           echo "CONTENT=$(echo '${{ github.event.review.body }}' | base64 -w 0)" >> $GITHUB_ENV
           echo "COMMENT_BODY=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+          echo "TITLE=Pull Request" >> $GITHUB_ENV
 
       - name: Set Environment Variables for Issue
         if: ${{ !github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
@@ -43,6 +45,7 @@ jobs:
           echo "AUTHOR_URL=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
           echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
           echo "COMMENT_BODY=${{ github.event.issue.title }}" >> $GITHUB_ENV
+          echo "TITLE=Issue" >> $GITHUB_ENV
 
       - name: Notify Discord
         if: ${{ env.COMMENT_AUTHOR && env.PR_URL && env.AUTHOR_URL && env.CONTENT && env.COMMENT_BODY }}
@@ -55,6 +58,7 @@ jobs:
           PR_URL: ${{ env.PR_URL }}
           AUTHOR_URL: ${{ env.AUTHOR_URL }}
           CONTENT: ${{ env.CONTENT }}
+          TITLE: ${{ env.TITLE }}
         run: |
           CONTENT_DECODED=$(echo "$CONTENT" | base64 --decode)
           if [ -n "$WEB_HOOK" ]; then
@@ -63,7 +67,7 @@ jobs:
               --arg description "$COMMENT_BODY" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
-              --arg title "Pull Request Command" \
+              --arg title "$TITLE" \
               --arg url "$PR_URL" \
               --arg author_url "$AUTHOR_URL" \
               --arg author_name "$COMMENT_AUTHOR" \
