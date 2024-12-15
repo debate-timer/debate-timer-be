@@ -8,7 +8,9 @@ on:
     branches:
       - develop
 
-#permissions: write-all
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   build-and-push:
