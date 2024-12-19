@@ -22,14 +22,16 @@ public class ParliamentaryTimeBox {
     private int sequence;
 
     @Column(name = "stance", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Stance stance;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @Column(name = "time", nullable = false)
     private int time;
 
-    @Column(name = "speaker", nullable = false)
+    @Column(name = "speaker")
     private int speaker;
 }
