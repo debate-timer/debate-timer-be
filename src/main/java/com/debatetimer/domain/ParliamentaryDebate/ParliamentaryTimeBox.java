@@ -1,5 +1,6 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.ParliamentaryDebate;
 
+import com.debatetimer.domain.Stance;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public class ParliamentaryTimeBox {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private ParliamentaryType parliamentaryType;
 
     @Column(name = "time", nullable = false)
     private int time;

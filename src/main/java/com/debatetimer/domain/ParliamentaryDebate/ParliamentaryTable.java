@@ -1,5 +1,6 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.ParliamentaryDebate;
 
+import com.debatetimer.domain.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

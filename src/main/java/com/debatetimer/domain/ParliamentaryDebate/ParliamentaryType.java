@@ -1,9 +1,9 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.ParliamentaryDebate;
 
 import lombok.Getter;
 
 @Getter
-public enum Type {
+public enum ParliamentaryType {
 
     OPENING("입론"),
     REBUTTAL("반론"),
@@ -14,7 +14,7 @@ public enum Type {
 
     private final String name;
 
-    Type(String name) {
+    ParliamentaryType(String name) {
         this.name = name;
     }
 }
