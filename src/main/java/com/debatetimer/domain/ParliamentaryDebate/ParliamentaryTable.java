@@ -2,6 +2,7 @@ package com.debatetimer.domain.ParliamentaryDebate;
 
 import com.debatetimer.domain.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,16 +16,20 @@ public class ParliamentaryTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "name", nullable = false)
+    @NotNull
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "agenda", nullable = false)
+    @NotNull
+    @Column(name = "agenda")
     private String agenda;
 
-    @Column(name = "duration", nullable = false)
+    @NotNull
+    @Column(name = "duration")
     private int duration;
 }

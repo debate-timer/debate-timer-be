@@ -2,6 +2,7 @@ package com.debatetimer.domain.ParliamentaryDebate;
 
 import com.debatetimer.domain.Stance;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,22 +16,28 @@ public class ParliamentaryTimeBox {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "table_id", nullable = false)
+    @JoinColumn(name = "table_id")
     private ParliamentaryTable parliamentaryTable;
 
-    @Column(name = "sequence", nullable = false)
+    @NotNull
+    @Column(name = "sequence")
     private int sequence;
 
-    @Column(name = "stance", nullable = false)
+    @NotNull
+    @Column(name = "stance")
     @Enumerated(EnumType.STRING)
     private Stance stance;
 
-    @Column(name = "type", nullable = false)
+    @NotNull
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private ParliamentaryType parliamentaryType;
 
-    @Column(name = "time", nullable = false)
+    @NotNull
+    @Column(name = "time")
     private int time;
 
     @Column(name = "speaker")
