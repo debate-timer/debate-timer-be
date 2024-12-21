@@ -1,5 +1,6 @@
 package com.debatetimer.swagger.annotation;
 
+import com.debatetimer.controller.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +15,7 @@ import org.springframework.http.ProblemDetail;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
         responseCode = "404",
-        content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
 )
 public @interface ErrorCode404 {
 

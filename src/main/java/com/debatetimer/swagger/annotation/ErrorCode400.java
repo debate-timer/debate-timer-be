@@ -1,5 +1,6 @@
 package com.debatetimer.swagger.annotation;
 
+import com.debatetimer.controller.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,7 +16,7 @@ import org.springframework.http.ProblemDetail;
 @ApiResponse(
         responseCode = "400",
         description = "클라이언트 입력 오류",
-        content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
 )
 public @interface ErrorCode400 {
 
