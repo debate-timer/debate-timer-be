@@ -45,4 +45,23 @@ public class ParliamentaryTimeBox {
     private int time;
 
     private Integer speaker;
+
+    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, BoxType type, int time, Integer speaker) {
+        validate(sequence, time);
+        this.parliamentaryTable = parliamentaryTable;
+        this.sequence = sequence;
+        this.stance = stance;
+        this.type = type;
+        this.time = time;
+        this.speaker = speaker;
+    }
+
+    private void validate(int sequence, int time) {
+        if (sequence <= 0) {
+            throw new IllegalArgumentException("순서는 양수만 가능합니다");
+        }
+        if (time <= 0) {
+            throw new IllegalArgumentException("시간은 양수만 가능합니다");
+        }
+    }
 }

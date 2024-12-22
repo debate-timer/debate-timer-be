@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParliamentaryTable {
 
+    private static final String NAME_REGEX = "^[a-zA-Z가-힣]+$";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,4 +37,21 @@ public class ParliamentaryTable {
 
     @NotNull
     private int duration;
+
+    public ParliamentaryTable(Member member, String name, String agenda, int duration) {
+        validate(name, duration);
+        this.member = member;
+        this.name = name;
+        this.agenda = agenda;
+        this.duration = duration;
+    }
+
+    private void validate(String name, int duration) {
+        if (name.isEmpty() || name.length() > 20) {
+            throw new IllegalArgumentException("테이블 이름은 1자 이상 20자 이하여야 합니다");
+        }
+        if (!name.matches(NAME_REGEX)) {
+            throw new IllegalArgumentException("테이블 이름은 영문/한글만 가능합니다");
+        }
+    }
 }
