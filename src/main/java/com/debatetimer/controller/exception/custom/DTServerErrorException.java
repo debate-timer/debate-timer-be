@@ -1,10 +1,10 @@
 package com.debatetimer.controller.exception.custom;
 
-import org.springframework.http.HttpStatus;
+import com.debatetimer.controller.exception.errorcode.ServerErrorCode;
 
 public class DTServerErrorException extends DTException {
 
-    public DTServerErrorException(String message) {
-        super(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    public DTServerErrorException(ServerErrorCode serverErrorCode) {
+        super(serverErrorCode.getMessage(), serverErrorCode.getStatus());
     }
 }
