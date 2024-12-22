@@ -1,5 +1,6 @@
 package com.debatetimer.domain.ParliamentaryDebate;
 
+import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,7 +39,7 @@ public class ParliamentaryTimeBox {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ParliamentaryType type;
+    private BoxType type;
 
     @NotNull
     private int time;

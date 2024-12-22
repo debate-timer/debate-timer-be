@@ -1,9 +1,9 @@
-package com.debatetimer.domain.ParliamentaryDebate;
+package com.debatetimer.domain;
 
 import lombok.Getter;
 
 @Getter
-public enum ParliamentaryType {
+public enum BoxType {
 
     OPENING,
     REBUTTAL,
