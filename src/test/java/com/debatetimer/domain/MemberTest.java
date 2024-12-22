@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MemberTest {
+
     @Nested
     class Validate {
 
