@@ -22,14 +22,11 @@ public class ParliamentaryTable {
     private Member member;
 
     @NotNull
-    @Column(name = "name")
     private String name;
 
     @NotNull
-    @Column(name = "agenda")
     private String agenda;
 
     @NotNull
-    @Column(name = "duration")
     private int duration;
 }

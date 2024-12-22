@@ -16,30 +16,24 @@ public class ParliamentaryTimeBox {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id")
     private ParliamentaryTable parliamentaryTable;
 
     @NotNull
-    @Column(name = "sequence")
     private int sequence;
 
     @NotNull
-    @Column(name = "stance")
     @Enumerated(EnumType.STRING)
     private Stance stance;
 
     @NotNull
-    @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private ParliamentaryType parliamentaryType;
+    private ParliamentaryType type;
 
     @NotNull
-    @Column(name = "time")
     private int time;
 
-    @Column(name = "speaker")
-    private int speaker;
+    private Integer speaker;
 }

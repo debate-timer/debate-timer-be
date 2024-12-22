@@ -16,6 +16,5 @@ public class Member {
     private Long id;
 
     @NotNull
-    @Column(name = "nickname")
     private String nickname;
 }
