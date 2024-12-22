@@ -53,5 +53,8 @@ public class ParliamentaryTable {
         if (!name.matches(NAME_REGEX)) {
             throw new IllegalArgumentException("테이블 이름은 영문/한글만 가능합니다");
         }
+        if (duration <= 0) {
+            throw new IllegalArgumentException("시간은 양수만 가능합니다");
+        }
     }
 }
