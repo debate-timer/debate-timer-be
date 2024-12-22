@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 public class ParliamentaryTable {
 
     private static final String NAME_REGEX = "^[a-zA-Z가-힣]+$";
+    public static final int NAME_MAX_LENGTH = 20;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,8 +48,8 @@ public class ParliamentaryTable {
     }
 
     private void validate(String name, int duration) {
-        if (name.isEmpty() || name.length() > 20) {
-            throw new IllegalArgumentException("테이블 이름은 1자 이상 20자 이하여야 합니다");
+        if (name.isEmpty() || name.length() > NAME_MAX_LENGTH) {
+            throw new IllegalArgumentException(String.format("테이블 이름은 1자 이상 %d자 이하여야 합니다", NAME_MAX_LENGTH));
         }
         if (!name.matches(NAME_REGEX)) {
             throw new IllegalArgumentException("테이블 이름은 영문/한글만 가능합니다");

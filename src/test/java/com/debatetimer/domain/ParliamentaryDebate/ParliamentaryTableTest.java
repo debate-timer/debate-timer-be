@@ -14,12 +14,12 @@ class ParliamentaryTableTest {
     class Validate {
 
         @ParameterizedTest
-        @ValueSource(ints = {0, 21})
+        @ValueSource(ints = {0, ParliamentaryTable.NAME_MAX_LENGTH + 1})
         void 테이블_이름은_1자_이상_20자_이하여야_한다(int length) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, "f".repeat(length), "agenda", 10))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("테이블 이름은 1자 이상 20자 이하여야 합니다");
+                    .hasMessage(String.format("테이블 이름은 1자 이상 %d자 이하여야 합니다", ParliamentaryTable.NAME_MAX_LENGTH));
         }
 
         @ParameterizedTest
