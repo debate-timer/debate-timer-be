@@ -15,7 +15,7 @@ class ParliamentaryTableTest {
 
         @ParameterizedTest
         @ValueSource(ints = {0, ParliamentaryTable.NAME_MAX_LENGTH + 1})
-        void 테이블_이름은_1자_이상_20자_이하여야_한다(int length) {
+        void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, "f".repeat(length), "agenda", 10))
                     .isInstanceOf(IllegalArgumentException.class)
