@@ -7,16 +7,13 @@ import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.controller.exception.errorcode.ErrorCode;
 import com.debatetimer.controller.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -25,16 +22,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException exception) {
-        String exceptionMessage = exception.getAllErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(" | "));
-        log.warn("message: {}", exceptionMessage);
-        return toResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
-    }
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindingException(BindException exception) {
@@ -63,21 +50,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException exception) {
+            HttpRequestMethodNotSupportedException exception
+    ) {
         log.warn("message: {}", exception.getMessage());
         return toResponse(ClientErrorCode.METHOD_NOT_SUPPORTED);
     }
 
-    @ExceptionHandler()
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(
-            HttpMediaTypeNotSupportedException exception) {
+            HttpMediaTypeNotSupportedException exception
+    ) {
         log.warn("message: {}", exception.getMessage());
         return toResponse(ClientErrorCode.MEDIA_TYPE_NOT_SUPPORTED);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception) {
-        return toResponse(ClientErrorCode.FIELD_ERROR);
+        return toResponse(ClientErrorCode.NO_RESOURCE_FOUND);
     }
 
     @ExceptionHandler(DTClientErrorException.class)
