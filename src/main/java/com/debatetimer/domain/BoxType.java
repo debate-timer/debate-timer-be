@@ -1,8 +1,5 @@
 package com.debatetimer.domain;
 
-import lombok.Getter;
-
-@Getter
 public enum BoxType {
 
     OPENING,
