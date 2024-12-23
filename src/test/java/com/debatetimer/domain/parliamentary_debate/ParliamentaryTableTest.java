@@ -1,4 +1,4 @@
-package com.debatetimer.domain.ParliamentaryDebate;
+package com.debatetimer.domain.parliamentary_debate;
 
 import com.debatetimer.domain.Member;
 import org.junit.jupiter.api.Nested;
