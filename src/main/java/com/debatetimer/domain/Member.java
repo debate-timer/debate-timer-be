@@ -31,7 +31,7 @@ public class Member {
 
     private void validate(String nickname) {
         if (nickname.isEmpty() || nickname.length() > NICKNAME_MAX_LENGTH) {
-            throw new IllegalArgumentException(String.format("닉네임은 1자 이상 %d자 이하여야 합니다", NICKNAME_MAX_LENGTH));
+            throw new IllegalArgumentException("닉네임은 1자 이상 %d자 이하여야 합니다".formatted(NICKNAME_MAX_LENGTH));
         }
         if (!nickname.matches(NICKNAME_REGEX)) {
             throw new IllegalArgumentException("닉네임은 영문/한글만 가능합니다");

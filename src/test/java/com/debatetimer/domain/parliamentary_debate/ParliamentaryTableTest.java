@@ -19,7 +19,7 @@ class ParliamentaryTableTest {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, "f".repeat(length), "agenda", 10))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage(String.format("테이블 이름은 1자 이상 %d자 이하여야 합니다", ParliamentaryTable.NAME_MAX_LENGTH));
+                    .hasMessage("테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(ParliamentaryTable.NAME_MAX_LENGTH));
         }
 
         @ParameterizedTest
