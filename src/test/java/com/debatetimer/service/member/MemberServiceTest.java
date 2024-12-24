@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.debatetimer.BaseServiceTest;
 import com.debatetimer.controller.member.dto.MemberCreateRequest;
 import com.debatetimer.controller.member.dto.MemberCreateResponse;
+import com.debatetimer.controller.member.dto.TableResponses;
+import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.parliamentary_debate.ParliamentaryTable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,21 @@ class MemberServiceTest extends BaseServiceTest {
                     () -> assertThat(actual.nickname()).isEqualTo("커찬"),
                     () -> assertThat(memberRepository.count()).isEqualTo(1L)
             );
+        }
+    }
+
+    @Nested
+    class GetTables {
+
+        @Test
+        void 회원의_전체_토론_시간표를_조회한다() {
+            Member member = memberRepository.save(new Member("커찬"));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
+
+            TableResponses response = memberService.getTables(member.getId());
+
+            assertThat(response.tables()).hasSize(2);
         }
     }
 }
