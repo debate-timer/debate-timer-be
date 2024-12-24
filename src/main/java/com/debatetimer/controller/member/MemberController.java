@@ -15,17 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberController {
+public class MemberController implements MemberControllerSwagger{
 
     private final MemberService memberService;
 
+    @Override
     @GetMapping("/api/table")
     public TableResponses getTables(@RequestParam Long memberId) {
         return memberService.getTables(memberId);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @Override
     @PostMapping("/api/member")
+    @ResponseStatus(HttpStatus.CREATED)
     public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request) {
         return memberService.createMember(request);
     }
