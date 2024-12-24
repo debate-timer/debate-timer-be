@@ -1,6 +1,6 @@
 package com.debatetimer.domain.parliamentary_debate;
 
-import com.debatetimer.domain.Member;
+import com.debatetimer.domain.member.Member;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

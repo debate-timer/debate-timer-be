@@ -1,6 +1,6 @@
 package com.debatetimer.domain.parliamentary_debate;
 
-import com.debatetimer.domain.Member;
+import com.debatetimer.domain.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

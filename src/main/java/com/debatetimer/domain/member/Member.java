@@ -1,4 +1,4 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.member;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
