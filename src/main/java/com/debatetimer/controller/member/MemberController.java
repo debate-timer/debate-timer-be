@@ -19,14 +19,14 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping("/api/table")
+    public TableResponses getTables(@RequestParam Long memberId) {
+        return memberService.getTables(memberId);
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/member")
     public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request) {
         return memberService.createMember(request);
-    }
-
-    @GetMapping("/api/table")
-    public TableResponses getTables(@RequestParam Long memberId) {
-        return memberService.getTables(memberId);
     }
 }
