@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParliamentaryTable {
 
-    private static final String NAME_REGEX = "^[a-zA-Z가-힣\\s]+$";
+    private static final String NAME_REGEX = "^[a-zA-Z가-힣 ]+$";
     public static final int NAME_MAX_LENGTH = 20;
 
     @Id

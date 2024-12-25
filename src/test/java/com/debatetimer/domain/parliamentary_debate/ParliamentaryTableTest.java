@@ -40,7 +40,7 @@ class ParliamentaryTableTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"abc12", "가나다12"})
+        @ValueSource(strings = {"abc12", "가나다12", "abc\tde"})
         void 허용된_글자_이외의_문자는_불가능하다(String name) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, name, "agenda", 10))
