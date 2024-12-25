@@ -27,9 +27,10 @@ class MemberServiceTest extends BaseServiceTest {
 
             MemberCreateResponse actual = memberService.createMember(request);
 
+            long memberCount = memberRepository.count();
             assertAll(
-                    () -> assertThat(actual.nickname()).isEqualTo("커찬"),
-                    () -> assertThat(memberRepository.count()).isEqualTo(1L)
+                    () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
+                    () -> assertThat(memberCount).isEqualTo(1L)
             );
         }
     }

@@ -30,7 +30,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .statusCode(201)
                     .extract().as(MemberCreateResponse.class);
 
-            assertThat(response.nickname()).isEqualTo("커찬");
+            assertThat(response.nickname()).isEqualTo(request.nickname());
         }
     }
 
