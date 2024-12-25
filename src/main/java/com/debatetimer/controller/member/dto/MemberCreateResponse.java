@@ -4,7 +4,6 @@ import com.debatetimer.domain.member.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record MemberCreateResponse(
-
         @Schema(description = "멤버 아이디", example = "1")
         long id,
 

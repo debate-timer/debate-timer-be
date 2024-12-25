@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public record TableResponses(
-
         @ArraySchema(schema = @Schema(description = "테이블들", implementation = TableResponse.class))
         List<TableResponse> tables
 ) {

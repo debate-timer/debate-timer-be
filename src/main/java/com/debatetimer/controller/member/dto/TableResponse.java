@@ -4,7 +4,6 @@ import com.debatetimer.domain.parliamentary_debate.ParliamentaryTable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record TableResponse(
-
         @Schema(description = "테이블 이름", example = "테이블1")
         String name,
 
