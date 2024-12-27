@@ -14,7 +14,7 @@ public record TimeBoxResponse(
         int time,
 
         @Schema(description = "발언자 번호", example = "1", nullable = true)
-        Integer speakerNumber //TODO Long으로 변환은 어떤지?
+        Integer speakerNumber
 ) {
 
     public TimeBoxResponse(ParliamentaryTimeBox parliamentaryTimeBox) {
