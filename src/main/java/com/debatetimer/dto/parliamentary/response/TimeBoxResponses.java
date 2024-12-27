@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public record TimeBoxResponses(
         @ArraySchema(schema = @Schema(description = "테이블들", implementation = TimeBoxResponse.class))
-        List<TimeBoxResponse> table
+        List<TimeBoxResponse> timeBoxes
 ) {
 
         public static TimeBoxResponses toResponses(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {

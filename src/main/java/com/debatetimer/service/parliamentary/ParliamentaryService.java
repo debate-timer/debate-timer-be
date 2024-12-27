@@ -11,6 +11,8 @@ import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class ParliamentaryService {
 
     private final ParliamentaryTableRepository tableRepository;
     private final ParliamentaryTimeBoxRepository timeBoxRepository;
+    private final EntityManager entityManager;
 
     @Transactional
     public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Member member) {
@@ -62,6 +65,7 @@ public class ParliamentaryService {
         ParliamentaryTable table = findOwnedTable(member, tableId);
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        entityManager.clear();
         tableRepository.delete(table);
     }
 
