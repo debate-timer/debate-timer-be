@@ -1,6 +1,6 @@
 package com.debatetimer.controller.member.dto;
 
-import com.debatetimer.domain.parliamentary_debate.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;

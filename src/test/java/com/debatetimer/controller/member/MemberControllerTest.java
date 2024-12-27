@@ -7,7 +7,7 @@ import com.debatetimer.controller.member.dto.MemberCreateRequest;
 import com.debatetimer.controller.member.dto.MemberCreateResponse;
 import com.debatetimer.controller.member.dto.TableResponses;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.domain.parliamentary_debate.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;

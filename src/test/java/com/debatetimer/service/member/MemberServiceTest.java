@@ -8,7 +8,7 @@ import com.debatetimer.controller.member.dto.MemberCreateRequest;
 import com.debatetimer.controller.member.dto.MemberCreateResponse;
 import com.debatetimer.controller.member.dto.TableResponses;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.domain.parliamentary_debate.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

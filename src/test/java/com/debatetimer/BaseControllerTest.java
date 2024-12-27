@@ -1,7 +1,7 @@
 package com.debatetimer;
 
 import com.debatetimer.repository.member.MemberRepository;
-import com.debatetimer.repository.parliamentary_debate.ParliamentaryTableRepository;
+import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;

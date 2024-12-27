@@ -1,4 +1,4 @@
-package com.debatetimer.domain.parliamentary_debate;
+package com.debatetimer.domain.parliamentary;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
