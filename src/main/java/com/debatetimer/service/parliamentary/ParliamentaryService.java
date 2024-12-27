@@ -9,7 +9,6 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
-import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import java.util.List;
@@ -23,7 +22,6 @@ public class ParliamentaryService {
 
     private final ParliamentaryTableRepository tableRepository;
     private final ParliamentaryTimeBoxRepository timeBoxRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Member member) {
@@ -42,14 +40,6 @@ public class ParliamentaryService {
     }
 
     @Transactional
-    public void deleteTable(Long tableId, Member member) {
-        ParliamentaryTable table = findOwnedTable(member, tableId);
-        ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
-        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
-        tableRepository.delete(table);
-    }
-
-    @Transactional
     public ParliamentaryTableResponse updateTable(
             ParliamentaryTableCreateRequest tableCreateRequest,
             long tableId,
@@ -65,6 +55,14 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest.table(), existingTable);
 
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
+    }
+
+    @Transactional
+    public void deleteTable(Long tableId, Member member) {
+        ParliamentaryTable table = findOwnedTable(member, tableId);
+        ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
+        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        tableRepository.delete(table);
     }
 
     private ParliamentaryTimeBoxes saveTimeBoxes(
