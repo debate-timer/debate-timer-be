@@ -5,6 +5,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +26,7 @@ public class ParliamentaryController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/table/parliamentary")
     public ParliamentaryTableResponse save(
-            @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
+            @Valid @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
             @AuthMember Member member
     ) {
         return parliamentaryService.save(tableCreateRequest, member);
@@ -43,7 +44,7 @@ public class ParliamentaryController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/api/table/parliamentary/{tableId}")
     public ParliamentaryTableResponse updateTable(
-            @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
+            @Valid @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
