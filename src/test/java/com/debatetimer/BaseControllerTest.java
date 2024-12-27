@@ -1,6 +1,7 @@
 package com.debatetimer;
 
 import com.debatetimer.config.FixtureGeneratorConfig;
+import com.debatetimer.fixture.DtoGenerator;
 import com.debatetimer.fixture.FixtureGenerator;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
@@ -33,4 +34,6 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected FixtureGenerator fixtureGenerator;
+
+    protected DtoGenerator dtoGenerator = new DtoGenerator();
 }
