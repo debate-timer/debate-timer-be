@@ -5,7 +5,6 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,14 +15,13 @@ public class DtoGenerator {
         return new TableInfoCreateRequest(tableName, "PARLIAMENTARY", "주제");
     }
 
-    public TimeBoxCreateRequests generateTimeBoxCreateRequests() {
-        List<TimeBoxCreateRequest> timeBoxCreateRequests = new ArrayList<>(
+    public List<TimeBoxCreateRequest> generateTimeBoxCreateRequests() {
+        return new ArrayList<>(
                 Arrays.asList(
                         generateTimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 180),
                         generateTimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 180)
                 )
         );
-        return new TimeBoxCreateRequests(timeBoxCreateRequests);
     }
 
     public TimeBoxCreateRequest generateTimeBoxCreateRequest(Stance stance, BoxType boxType, int time) {
@@ -32,7 +30,7 @@ public class DtoGenerator {
 
     public ParliamentaryTableCreateRequest generateParliamentaryTableCreateRequest(String tableName) {
         TableInfoCreateRequest tableInfoCreateRequest = generateTableInfoCreateRequest(tableName);
-        TimeBoxCreateRequests timeBoxCreateRequests = generateTimeBoxCreateRequests();
+        List<TimeBoxCreateRequest> timeBoxCreateRequests = generateTimeBoxCreateRequests();
         return new ParliamentaryTableCreateRequest(tableInfoCreateRequest, timeBoxCreateRequests);
     }
 }

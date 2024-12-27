@@ -8,10 +8,11 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
+import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = fixtureGenerator.generateMember("비토");
             ParliamentaryTableCreateRequest bitoTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest("비토 테이블");
             TableInfoCreateRequest requestTableInfo = bitoTableRequest.info();
-            TimeBoxCreateRequests requestTimeBoxes = bitoTableRequest.table();
+            List<TimeBoxCreateRequest> requestTimeBoxes = bitoTableRequest.table();
 
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
@@ -38,7 +39,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.info().name()).isEqualTo(requestTableInfo.name()),
-                    () -> assertThat(response.table().timeBoxes()).hasSize(requestTimeBoxes.timeBoxCreateRequests().size())
+                    () -> assertThat(response.table()).hasSize(requestTimeBoxes.size())
             );
         }
     }
@@ -63,7 +64,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
-                    () -> assertThat(response.table().timeBoxes()).hasSize(2)
+                    () -> assertThat(response.table()).hasSize(2)
             );
         }
     }
@@ -77,7 +78,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
             ParliamentaryTableCreateRequest renewTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
             TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
-            TimeBoxCreateRequests renewTimeBoxes = renewTableRequest.table();
+            List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
 
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
@@ -91,7 +92,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
                     () -> assertThat(response.info().name()).isEqualTo(renewTableInfo.name()),
-                    () -> assertThat(response.table().timeBoxes()).hasSize(renewTimeBoxes.timeBoxCreateRequests().size())
+                    () -> assertThat(response.table()).hasSize(renewTimeBoxes.size())
             );
         }
     }

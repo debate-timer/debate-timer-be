@@ -7,12 +7,10 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ public class ParliamentaryService {
         ParliamentaryTable table = tableCreateRequest.toTable(member);
         ParliamentaryTable savedTable = tableRepository.save(table);
 
-        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest.table(), savedTable);
+        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new ParliamentaryTableResponse(savedTable, savedTimeBoxes);
     }
 
@@ -55,7 +53,7 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(existingTable);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
 
-        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest.table(), existingTable);
+        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
 
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
@@ -70,10 +68,10 @@ public class ParliamentaryService {
     }
 
     private ParliamentaryTimeBoxes saveTimeBoxes(
-            TimeBoxCreateRequests timeBoxCreateRequests,
+            ParliamentaryTableCreateRequest tableCreateRequest,
             ParliamentaryTable table
     ) {
-        ParliamentaryTimeBoxes timeBoxes = timeBoxCreateRequests.toTimeBoxes(table);
+        ParliamentaryTimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<ParliamentaryTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
         return new ParliamentaryTimeBoxes(savedTimeBoxes);
     }

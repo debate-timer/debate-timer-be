@@ -11,7 +11,7 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
+import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTableCreateRequest chanTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("커찬의 토론 테이블");
             TableInfoCreateRequest requestTableInfo = chanTableRequest.info();
-            TimeBoxCreateRequests requestTimeBoxes = chanTableRequest.table();
+            List<TimeBoxCreateRequest> requestTimeBoxes = chanTableRequest.table();
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(savedTableResponse.id());
@@ -40,8 +40,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(foundTable.get().getName()).isEqualTo(requestTableInfo.name()),
-                    () -> assertThat(foundTable.get().getDuration()).isEqualTo(requestTimeBoxes.sumOfTime()),
-                    () -> assertThat(foundTimeBoxes).hasSize(2)
+                    () -> assertThat(foundTimeBoxes).hasSize(requestTimeBoxes.size())
             );
         }
     }
@@ -60,7 +59,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(foundResponse.table().timeBoxes()).hasSize(2)
+                    () -> assertThat(foundResponse.table()).hasSize(2)
             );
         }
 
@@ -85,14 +84,14 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
             ParliamentaryTableCreateRequest renewTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
             TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
-            TimeBoxCreateRequests renewTimeBoxes = renewTableRequest.table();
+            List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
 
             ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
             assertAll(
                     () -> assertThat(updatedTable.id()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.info().name()).isEqualTo(renewTableInfo.name()),
-                    () -> assertThat(updatedTable.table().timeBoxes()).hasSize(renewTimeBoxes.timeBoxCreateRequests().size())
+                    () -> assertThat(updatedTable.table()).hasSize(renewTimeBoxes.size())
             );
         }
 
