@@ -1,4 +1,4 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.member;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;

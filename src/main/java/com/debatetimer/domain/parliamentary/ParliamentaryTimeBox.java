@@ -1,4 +1,4 @@
-package com.debatetimer.domain.parliamentary_debate;
+package com.debatetimer.domain.parliamentary;
 
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
