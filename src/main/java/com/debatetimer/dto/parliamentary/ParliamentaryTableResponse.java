@@ -2,6 +2,7 @@ package com.debatetimer.dto.parliamentary;
 
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.table.TableInfoResponse;
 import com.debatetimer.dto.parliamentary.timebox.TimeBoxResponses;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +21,7 @@ public record ParliamentaryTableResponse(
 
     public ParliamentaryTableResponse(
             ParliamentaryTable parliamentaryTable,
-            List<ParliamentaryTimeBox> parliamentaryTimeBoxes
+            ParliamentaryTimeBoxes parliamentaryTimeBoxes
     ) {
         this(
                 parliamentaryTable.getId(),

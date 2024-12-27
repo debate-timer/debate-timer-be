@@ -1,6 +1,6 @@
 package com.debatetimer.dto.parliamentary.timebox;
 
-import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -11,8 +11,9 @@ public record TimeBoxResponses(
         List<TimeBoxResponse> table
 ) {
 
-        public static TimeBoxResponses toResponses(List<ParliamentaryTimeBox> parliamentaryTimeBoxes) {
-                return parliamentaryTimeBoxes.stream()
+        public static TimeBoxResponses toResponses(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
+                return parliamentaryTimeBoxes.getTimeBoxes()
+                        .stream()
                         .map(TimeBoxResponse::new)
                         .collect(Collectors.collectingAndThen(Collectors.toList(), TimeBoxResponses::new));
         }
