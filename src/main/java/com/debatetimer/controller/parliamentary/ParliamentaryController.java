@@ -38,6 +38,16 @@ public class ParliamentaryController {
         return parliamentaryService.findTable(tableId, memberId);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/api/table/parliamentary/{tableId}")
+    public ParliamentaryTableResponse updateTable(
+            @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
+            @PathVariable Long tableId,
+            @RequestParam Long memberId
+    ) {
+        return parliamentaryService.updateTable(tableCreateRequest, tableId, memberId);
+    }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/api/table/parliamentary/{tableId}")
     public void deleteTable(
