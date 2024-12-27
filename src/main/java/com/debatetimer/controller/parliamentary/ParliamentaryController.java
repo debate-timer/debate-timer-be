@@ -1,5 +1,7 @@
 package com.debatetimer.controller.parliamentary;
 
+import com.debatetimer.domain.auth.AuthMember;
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,18 +25,18 @@ public class ParliamentaryController {
     @PostMapping("/api/table/parliamentary")
     public ParliamentaryTableResponse save(
             @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
-            @RequestParam Long memberId
+            @AuthMember Member member
     ) {
-        return parliamentaryService.save(tableCreateRequest, memberId);
+        return parliamentaryService.save(tableCreateRequest, member);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/api/table/parliamentary/{tableId}")
     public ParliamentaryTableResponse getTable(
             @PathVariable Long tableId,
-            @RequestParam Long memberId
+            @AuthMember Member member
     ) {
-        return parliamentaryService.findTable(tableId, memberId);
+        return parliamentaryService.findTable(tableId, member);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -43,18 +44,18 @@ public class ParliamentaryController {
     public ParliamentaryTableResponse updateTable(
             @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
             @PathVariable Long tableId,
-            @RequestParam Long memberId
+            @AuthMember Member member
     ) {
-        return parliamentaryService.updateTable(tableCreateRequest, tableId, memberId);
+        return parliamentaryService.updateTable(tableCreateRequest, tableId, member);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/api/table/parliamentary/{tableId}")
     public void deleteTable(
             @PathVariable Long tableId,
-            @RequestParam Long memberId
+            @AuthMember Member member
     ) {
-        parliamentaryService.deleteTable(tableId, memberId);
+        parliamentaryService.deleteTable(tableId, member);
     }
 
 

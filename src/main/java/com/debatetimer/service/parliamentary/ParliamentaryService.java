@@ -7,7 +7,6 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequests;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.repository.member.MemberRepository;
@@ -27,9 +26,7 @@ public class ParliamentaryService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Long memberId) {
-        Member member = memberRepository.getById(memberId);
-
+    public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Member member) {
         ParliamentaryTable table = tableCreateRequest.toTable(member);
         ParliamentaryTable savedTable = tableRepository.save(table);
 
@@ -38,15 +35,15 @@ public class ParliamentaryService {
     }
 
     @Transactional(readOnly = true)
-    public ParliamentaryTableResponse findTable(long tableId, long memberId) {
-        ParliamentaryTable table = findOwnedTable(tableId, memberId); //TODO getByMemberIdAndTableId
+    public ParliamentaryTableResponse findTable(long tableId, Member member) {
+        ParliamentaryTable table = findOwnedTable(member, tableId);
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
     @Transactional
-    public void deleteTable(Long tableId, long memberId) {
-        ParliamentaryTable table = findOwnedTable(tableId, memberId);
+    public void deleteTable(Long tableId, Member member) {
+        ParliamentaryTable table = findOwnedTable(member, tableId);
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
@@ -56,10 +53,9 @@ public class ParliamentaryService {
     public ParliamentaryTableResponse updateTable(
             ParliamentaryTableCreateRequest tableCreateRequest,
             long tableId,
-            long memberId
+            Member member
     ) {
-        ParliamentaryTable existingTable = findOwnedTable(tableId, memberId);
-        Member member = memberRepository.getById(memberId);
+        ParliamentaryTable existingTable = findOwnedTable(member, tableId);
         ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
@@ -80,16 +76,9 @@ public class ParliamentaryService {
         return new ParliamentaryTimeBoxes(savedTimeBoxes);
     }
 
-    private ParliamentaryTable findOwnedTable(long memberId, long tableId) {
-        ParliamentaryTable table = tableRepository.getById(tableId);
-        validateTableOwn(memberId, table);
-        return table;
-    }
-
-    private void validateTableOwn(long memberId, ParliamentaryTable table) {
-        if (!table.isOwn(memberId)) {
-            throw new DTClientErrorException(ClientErrorCode.TABLE_OWNER_MISMATCHED);
-        }
+    private ParliamentaryTable findOwnedTable(Member member, long tableId) {
+        return tableRepository.findByIdAndMemberId(tableId, member.getId())
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_TABLE_NOT_FOUND));
     }
 
     private ParliamentaryTimeBoxes findTimeBoxes(ParliamentaryTable table) {

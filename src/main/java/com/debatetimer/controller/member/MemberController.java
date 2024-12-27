@@ -1,5 +1,7 @@
 package com.debatetimer.controller.member;
 
+import com.debatetimer.domain.auth.AuthMember;
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.TableResponses;
@@ -21,8 +23,8 @@ public class MemberController implements MemberControllerSwagger{
 
     @Override
     @GetMapping("/api/table")
-    public TableResponses getTables(@RequestParam Long memberId) {
-        return memberService.getTables(memberId);
+    public TableResponses getTables(@AuthMember Member member) {
+        return memberService.getTables(member.getId());
     }
 
     @Override
