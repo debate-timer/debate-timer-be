@@ -15,8 +15,8 @@ public record TimeBoxCreateRequests(
 ) {
 
     public ParliamentaryTimeBoxes toTimeBoxes(ParliamentaryTable parliamentaryTable) {
-        return IntStream.range(0, timeBoxCreateRequests.size()) // 0부터 시작
-                .mapToObj(i -> timeBoxCreateRequests.get(i).toTimeBox(parliamentaryTable, i + 1)) // i + 1로 순번 처리
+        return IntStream.range(0, timeBoxCreateRequests.size())
+                .mapToObj(i -> timeBoxCreateRequests.get(i).toTimeBox(parliamentaryTable, i + 1))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), ParliamentaryTimeBoxes::new));
     }
 
