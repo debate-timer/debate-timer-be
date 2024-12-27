@@ -46,20 +46,28 @@ public class ParliamentaryService {
     }
 
     public ParliamentaryTableResponse findTable(long tableId, long memberId) {
-        ParliamentaryTable table = tableRepository.getById(tableId);
+        ParliamentaryTable table = tableRepository.getById(tableId); //TODO getByMemberIdAndTableId
         validateTableOwn(memberId, table);
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
+    }
+
+    public void deleteTable(Long tableId, Long memberId) {
+        ParliamentaryTable table = tableRepository.getById(tableId);
+        validateTableOwn(memberId, table);
+        ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(table);
+        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        tableRepository.delete(table);
+    }
+
+    private ParliamentaryTimeBoxes findTimeBoxes(ParliamentaryTable table) {
+        List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(table);
+        return new ParliamentaryTimeBoxes(timeBoxes);
     }
 
     private void validateTableOwn(long memberId, ParliamentaryTable table) {
         if (!table.isOwn(memberId)) {
             throw new DTClientErrorException(ClientErrorCode.TABLE_OWNER_MISMATCHED);
         }
-    }
-
-    private ParliamentaryTimeBoxes findTimeBoxes(ParliamentaryTable table) {
-        List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(table);
-        return new ParliamentaryTimeBoxes(timeBoxes);
     }
 }

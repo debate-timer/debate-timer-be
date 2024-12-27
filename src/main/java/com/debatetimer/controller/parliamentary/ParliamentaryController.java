@@ -5,6 +5,7 @@ import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,15 @@ public class ParliamentaryController {
             @RequestParam Long memberId
     ) {
         return parliamentaryService.findTable(tableId, memberId);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/api/table/parliamentary/{tableId}")
+    public void deleteTable(
+            @PathVariable Long tableId,
+            @RequestParam Long memberId
+    ) {
+        parliamentaryService.deleteTable(tableId, memberId);
     }
 
 
