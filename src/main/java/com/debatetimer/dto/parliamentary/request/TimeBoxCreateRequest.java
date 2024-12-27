@@ -1,5 +1,9 @@
 package com.debatetimer.dto.parliamentary.request;
 
+import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.Stance;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record TimeBoxCreateRequest(
@@ -15,5 +19,16 @@ public record TimeBoxCreateRequest(
         @Schema(description = "발언자 번호", example = "1", nullable = true)
         Integer speakerNumber //TODO Long으로 변환은 어떤지?
 ) {
+
+    public ParliamentaryTimeBox toTimeBox(ParliamentaryTable parliamentaryTable, int sequence) {
+        return new ParliamentaryTimeBox(
+                parliamentaryTable,
+                sequence,
+                Stance.valueOf(stance),
+                BoxType.valueOf(type),
+                time,
+                speakerNumber
+        );
+    }
 
 }
