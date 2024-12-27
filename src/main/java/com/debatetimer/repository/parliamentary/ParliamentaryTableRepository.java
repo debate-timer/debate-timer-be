@@ -10,10 +10,5 @@ public interface ParliamentaryTableRepository extends JpaRepository<Parliamentar
 
     List<ParliamentaryTable> findAllByMember(Member member);
 
-    default ParliamentaryTable getById(Long id) {
-        //TODO ClientError로 수정
-        return findById(id).orElseThrow(() -> new IllegalArgumentException("해당 테이블이 존재하지 않습니다"));
-    }
-
     Optional<ParliamentaryTable> findByIdAndMemberId(long id, long memberId);
 }

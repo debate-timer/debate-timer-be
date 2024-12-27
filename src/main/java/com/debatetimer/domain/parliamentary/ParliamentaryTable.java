@@ -60,10 +60,6 @@ public class ParliamentaryTable {
         }
     }
 
-    public boolean isOwn(long memberId) {
-        return Objects.equals(this.member.getId(), memberId);
-    }
-
     public void update(ParliamentaryTable renewTable) {
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
