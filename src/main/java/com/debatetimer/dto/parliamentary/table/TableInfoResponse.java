@@ -1,5 +1,7 @@
 package com.debatetimer.dto.parliamentary.table;
 
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.dto.member.TableType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record TableInfoResponse(
@@ -13,4 +15,7 @@ public record TableInfoResponse(
         String agenda
 ) {
 
+    public TableInfoResponse(ParliamentaryTable parliamentaryTable) {
+        this(parliamentaryTable.getName(), TableType.PARLIAMENTARY.name(), parliamentaryTable.getAgenda());
+    }
 }
