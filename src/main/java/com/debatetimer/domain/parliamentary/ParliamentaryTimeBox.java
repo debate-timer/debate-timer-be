@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ParliamentaryTimeBox {
+public class ParliamentaryTimeBox implements Comparable<ParliamentaryTimeBox> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,5 +63,10 @@ public class ParliamentaryTimeBox {
         if (time <= 0) {
             throw new IllegalArgumentException("시간은 양수만 가능합니다");
         }
+    }
+
+    @Override
+    public int compareTo(ParliamentaryTimeBox o) {
+        return Integer.compare(getSequence(), o.getSequence());
     }
 }
