@@ -29,20 +29,12 @@ public class ParliamentaryService {
     @Transactional
     public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Long memberId) {
         Member member = memberRepository.getById(memberId);
-        int debateDuration = tableCreateRequest.table().sumOfTime();
 
-        ParliamentaryTable savedTable = saveTable(tableCreateRequest.info(), member, debateDuration);
+        ParliamentaryTable table = tableCreateRequest.toTable(member);
+        ParliamentaryTable savedTable = tableRepository.save(table);
+
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest.table(), savedTable);
         return new ParliamentaryTableResponse(savedTable, savedTimeBoxes);
-    }
-
-    private ParliamentaryTable saveTable(
-            TableInfoCreateRequest tableInfoCreateRequest,
-            Member member,
-            int debateDuration
-    ) {
-        ParliamentaryTable table = tableInfoCreateRequest.toTable(member, debateDuration);
-        return tableRepository.save(table);
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +60,7 @@ public class ParliamentaryService {
     ) {
         ParliamentaryTable existingTable = findOwnedTable(tableId, memberId);
         Member member = memberRepository.getById(memberId);
-        int debateDuration = tableCreateRequest.table().sumOfTime();
-        ParliamentaryTable renewedTable = tableCreateRequest.info().toTable(member, debateDuration);
+        ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
         ParliamentaryTimeBoxes timeBoxes = findTimeBoxes(existingTable);
