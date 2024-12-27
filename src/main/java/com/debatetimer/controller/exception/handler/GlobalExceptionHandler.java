@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DTClientErrorException.class)
-    public ResponseEntity<ErrorResponse> handleClientException(DTServerErrorException exception) {
+    public ResponseEntity<ErrorResponse> handleClientException(DTClientErrorException exception) {
         log.warn("message: {}", exception.getMessage());
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
