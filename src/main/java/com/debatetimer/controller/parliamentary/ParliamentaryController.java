@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ParliamentaryController {
+public class ParliamentaryController implements ParliamentaryControllerSwagger {
 
     private final ParliamentaryService parliamentaryService;
 
