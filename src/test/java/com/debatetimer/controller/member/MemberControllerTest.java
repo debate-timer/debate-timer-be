@@ -3,9 +3,9 @@ package com.debatetimer.controller.member;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.debatetimer.BaseControllerTest;
-import com.debatetimer.controller.member.dto.MemberCreateRequest;
-import com.debatetimer.controller.member.dto.MemberCreateResponse;
-import com.debatetimer.controller.member.dto.TableResponses;
+import com.debatetimer.dto.member.MemberCreateRequest;
+import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import io.restassured.RestAssured;

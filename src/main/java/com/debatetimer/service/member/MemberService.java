@@ -1,8 +1,8 @@
 package com.debatetimer.service.member;
 
-import com.debatetimer.controller.member.dto.MemberCreateRequest;
-import com.debatetimer.controller.member.dto.MemberCreateResponse;
-import com.debatetimer.controller.member.dto.TableResponses;
+import com.debatetimer.dto.member.MemberCreateRequest;
+import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.repository.member.MemberRepository;

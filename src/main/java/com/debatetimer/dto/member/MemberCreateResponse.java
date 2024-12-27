@@ -1,4 +1,4 @@
-package com.debatetimer.controller.member.dto;
+package com.debatetimer.dto.member;
 
 import com.debatetimer.domain.member.Member;
 import io.swagger.v3.oas.annotations.media.Schema;

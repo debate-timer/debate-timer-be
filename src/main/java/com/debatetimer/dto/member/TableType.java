@@ -1,4 +1,4 @@
-package com.debatetimer.controller.member.dto;
+package com.debatetimer.dto.member;
 
 public enum TableType {
 
