@@ -26,16 +26,16 @@ public class ParliamentaryService {
     private final MemberRepository memberRepository;
 
     public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Long memberId) {
-        TimeBoxCreateRequests timeBoxCreateRequests = tableCreateRequest.table();
         Member member = memberRepository.getById(memberId);
-        int duration = timeBoxCreateRequests.sumOfTime();
-        ParliamentaryTable savedTable = saveTable(tableCreateRequest.info(), member, duration);
-        saveTimeBoxes(timeBoxCreateRequests, savedTable);
+        int debateDuration = tableCreateRequest.table().sumOfTime();
+
+        ParliamentaryTable savedTable = saveTable(tableCreateRequest.info(), member, debateDuration);
+        saveTimeBoxes(tableCreateRequest.table(), savedTable);
         return findTable(savedTable.getId(), memberId);
     }
 
-    private ParliamentaryTable saveTable(TableInfoCreateRequest tableInfoCreateRequest, Member member, int duration) {
-        ParliamentaryTable table = tableInfoCreateRequest.toTable(member, duration);
+    private ParliamentaryTable saveTable(TableInfoCreateRequest tableInfoCreateRequest, Member member, int debateDuration) {
+        ParliamentaryTable table = tableInfoCreateRequest.toTable(member, debateDuration);
         return tableRepository.save(table);
     }
 
