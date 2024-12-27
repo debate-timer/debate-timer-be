@@ -13,6 +13,8 @@ public enum ClientErrorCode implements ErrorCode {
     METHOD_NOT_SUPPORTED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."),
     MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 미디어 타입입니다."),
     ALREADY_DISCONNECTED(HttpStatus.BAD_REQUEST, "이미 클라이언트에서 요청이 종료되었습니다."),
+
+    TABLE_OWNER_MISMATCHED(HttpStatus.BAD_REQUEST, "테이블을 소유한 회원이 아닙니다")
     ;
 
     private final HttpStatus status;

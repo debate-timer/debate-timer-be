@@ -8,4 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ParliamentaryTableRepository extends JpaRepository<ParliamentaryTable, Long> {
 
     List<ParliamentaryTable> findAllByMember(Member member);
+
+    default ParliamentaryTable getById(Long id) {
+        //TODO ClientError로 수정
+        return findById(id).orElseThrow(() -> new IllegalArgumentException("해당 테이블이 존재하지 않습니다"));
+    }
 }
