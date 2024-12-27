@@ -24,11 +24,11 @@ public record ParliamentaryTableResponse(
         this(
                 parliamentaryTable.getId(),
                 new TableInfoResponse(parliamentaryTable),
-                toResponse(parliamentaryTimeBoxes)
+                toTimeBoxResponses(parliamentaryTimeBoxes)
         );
     }
 
-    private static List<TimeBoxResponse> toResponse(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
+    private static List<TimeBoxResponse> toTimeBoxResponses(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
         return parliamentaryTimeBoxes.getTimeBoxes()
                 .stream()
                 .map(TimeBoxResponse::new)
