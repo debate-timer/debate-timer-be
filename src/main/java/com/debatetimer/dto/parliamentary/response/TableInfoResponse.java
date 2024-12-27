@@ -1,4 +1,4 @@
-package com.debatetimer.dto.parliamentary.table;
+package com.debatetimer.dto.parliamentary.response;
 
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.member.TableType;

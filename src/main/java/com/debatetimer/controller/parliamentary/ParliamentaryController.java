@@ -1,7 +1,6 @@
 package com.debatetimer.controller.parliamentary;
 
-import com.debatetimer.dto.member.TableResponses;
-import com.debatetimer.dto.parliamentary.ParliamentaryTableResponse;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

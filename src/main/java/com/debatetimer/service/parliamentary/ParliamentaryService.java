@@ -5,7 +5,7 @@ import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
-import com.debatetimer.dto.parliamentary.ParliamentaryTableResponse;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import java.util.List;

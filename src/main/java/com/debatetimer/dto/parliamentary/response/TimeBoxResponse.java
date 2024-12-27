@@ -1,4 +1,4 @@
-package com.debatetimer.dto.parliamentary.timebox;
+package com.debatetimer.dto.parliamentary.response;
 
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import io.swagger.v3.oas.annotations.media.Schema;
