@@ -1,15 +1,24 @@
 package com.debatetimer.domain.member;
 
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MemberTest {
 
     @Nested
     class Validate {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"a bc가다", "가나 다ab"})
+        void 닉네임은_영문과_한글_띄어쓰기만_가능하다(String nickname) {
+            assertThatCode(() -> new Member(nickname))
+                    .doesNotThrowAnyException();
+        }
 
         @ParameterizedTest
         @ValueSource(ints = {0, Member.NICKNAME_MAX_LENGTH + 1})
