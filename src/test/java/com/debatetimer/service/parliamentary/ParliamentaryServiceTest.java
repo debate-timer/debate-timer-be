@@ -89,7 +89,6 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
-
             assertAll(
                     () -> assertThat(updatedTable.id()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.info().name()).isEqualTo(renewTableInfo.name()),
