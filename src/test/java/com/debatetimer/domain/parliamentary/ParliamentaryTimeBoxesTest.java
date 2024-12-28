@@ -29,5 +29,4 @@ class ParliamentaryTimeBoxesTest {
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }
     }
-
 }

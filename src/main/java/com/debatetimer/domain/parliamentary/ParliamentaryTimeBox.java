@@ -46,7 +46,8 @@ public class ParliamentaryTimeBox implements Comparable<ParliamentaryTimeBox> {
 
     private Integer speaker;
 
-    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, BoxType type, int time, Integer speaker) {
+    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, BoxType type,
+                                int time, Integer speaker) {
         validate(sequence, time, stance, type);
         this.parliamentaryTable = parliamentaryTable;
         this.sequence = sequence;
@@ -64,7 +65,7 @@ public class ParliamentaryTimeBox implements Comparable<ParliamentaryTimeBox> {
             throw new IllegalArgumentException("시간은 양수만 가능합니다");
         }
 
-        if(!boxType.isAvailable(stance)){
+        if (!boxType.isAvailable(stance)) {
             throw new IllegalArgumentException("타임박스 유형과 일치하지 않는 입장입니다.");
         }
     }
