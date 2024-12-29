@@ -13,7 +13,7 @@ public record ParliamentaryTableResponse(
         @Schema(description = "테이블 기본 정보", implementation = TableInfoResponse.class)
         TableInfoResponse info,
 
-        @ArraySchema(schema = @Schema(description = "테이블들", implementation = TimeBoxResponse.class))
+        @ArraySchema(schema = @Schema(description = "타임박스들", implementation = TimeBoxResponse.class))
         List<TimeBoxResponse> table
 ) {
 
