@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ParliamentaryTimeBox implements Comparable<ParliamentaryTimeBox> {
+public class ParliamentaryTimeBox {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,10 +68,5 @@ public class ParliamentaryTimeBox implements Comparable<ParliamentaryTimeBox> {
         if (!boxType.isAvailable(stance)) {
             throw new IllegalArgumentException("타임박스 유형과 일치하지 않는 입장입니다.");
         }
-    }
-
-    @Override
-    public int compareTo(ParliamentaryTimeBox o) {
-        return Integer.compare(getSequence(), o.getSequence());
     }
 }
