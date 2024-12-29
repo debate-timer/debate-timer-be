@@ -11,10 +11,6 @@ public record TableInfoCreateRequest(
         @NotBlank
         String name,
 
-        @Schema(description = "토론 유형", example = "PARLIAMENTARY")
-        @NotBlank
-        String type,
-
         @Schema(description = "토론 주제", example = "촉법소년 연령 인하")
         @NotNull
         String agenda

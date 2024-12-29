@@ -12,7 +12,7 @@ import java.util.List;
 public class DtoGenerator {
 
     public TableInfoCreateRequest generateTableInfoCreateRequest(String tableName) {
-        return new TableInfoCreateRequest(tableName, "PARLIAMENTARY", "주제");
+        return new TableInfoCreateRequest(tableName, "주제");
     }
 
     public List<TimeBoxCreateRequest> generateTimeBoxCreateRequests() {
