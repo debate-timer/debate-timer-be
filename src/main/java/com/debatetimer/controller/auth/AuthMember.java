@@ -1,4 +1,4 @@
-package com.debatetimer.domain.auth;
+package com.debatetimer.controller.auth;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

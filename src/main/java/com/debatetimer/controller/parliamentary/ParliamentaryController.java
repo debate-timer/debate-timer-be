@@ -1,6 +1,6 @@
 package com.debatetimer.controller.parliamentary;
 
-import com.debatetimer.domain.auth.AuthMember;
+import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;

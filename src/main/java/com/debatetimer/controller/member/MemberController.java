@@ -1,6 +1,6 @@
 package com.debatetimer.controller.member;
 
-import com.debatetimer.domain.auth.AuthMember;
+import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
