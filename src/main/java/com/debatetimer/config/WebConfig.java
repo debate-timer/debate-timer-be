@@ -1,6 +1,5 @@
 package com.debatetimer.config;
 
-import com.debatetimer.controller.argumentresolver.AuthMemberArgumentResolver;
 import com.debatetimer.repository.member.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

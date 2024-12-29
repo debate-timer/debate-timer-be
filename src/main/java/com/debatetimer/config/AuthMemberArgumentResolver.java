@@ -1,15 +1,13 @@
-package com.debatetimer.controller.argumentresolver;
+package com.debatetimer.config;
 
 import com.debatetimer.controller.exception.custom.DTClientErrorException;
 import com.debatetimer.controller.exception.custom.DTException;
 import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.domain.auth.AuthMember;
 import com.debatetimer.repository.member.MemberRepository;
-import com.debatetimer.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
