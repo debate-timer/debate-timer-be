@@ -35,7 +35,7 @@ public class ParliamentaryService {
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTable(long tableId, Member member) {
-        ParliamentaryTable table = findOwnedTable(member, tableId);
+        ParliamentaryTable table = tableRepository.getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
@@ -46,7 +46,7 @@ public class ParliamentaryService {
             long tableId,
             Member member
     ) {
-        ParliamentaryTable existingTable = findOwnedTable(member, tableId);
+        ParliamentaryTable existingTable = tableRepository.getOwnerTable(tableId, member.getId());
         ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
@@ -60,7 +60,7 @@ public class ParliamentaryService {
 
     @Transactional
     public void deleteTable(Long tableId, Member member) {
-        ParliamentaryTable table = findOwnedTable(member, tableId);
+        ParliamentaryTable table = tableRepository.getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
         entityManager.clear();
@@ -74,10 +74,5 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<ParliamentaryTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
         return new ParliamentaryTimeBoxes(savedTimeBoxes);
-    }
-
-    private ParliamentaryTable findOwnedTable(Member member, long tableId) {
-        return tableRepository.findByIdAndMemberId(tableId, member.getId())
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_TABLE_NOT_FOUND));
     }
 }
