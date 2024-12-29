@@ -57,7 +57,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .queryParam("memberId", bito.getId())
-                    .when().get("/api/table/parliamentary/" + bitoTable.getId())
+                    .pathParam("tableId", bitoTable.getId())
+                    .when().get("/api/table/parliamentary/{tableId}")
                     .then().log().all()
                     .statusCode(200)
                     .extract().as(ParliamentaryTableResponse.class);
