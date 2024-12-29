@@ -77,7 +77,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         void 의회식_토론_테이블을_업데이트한다() {
             Member bito = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            ParliamentaryTableCreateRequest renewTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
+            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
             TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
             List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
 
