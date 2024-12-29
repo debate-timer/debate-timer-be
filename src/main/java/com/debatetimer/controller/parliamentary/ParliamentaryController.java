@@ -23,8 +23,8 @@ public class ParliamentaryController implements ParliamentaryControllerSwagger {
 
     private final ParliamentaryService parliamentaryService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/table/parliamentary")
+    @ResponseStatus(HttpStatus.CREATED)
     public ParliamentaryTableResponse save(
             @Valid @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
             @AuthMember Member member
@@ -32,8 +32,8 @@ public class ParliamentaryController implements ParliamentaryControllerSwagger {
         return parliamentaryService.save(tableCreateRequest, member);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/api/table/parliamentary/{tableId}")
+    @ResponseStatus(HttpStatus.OK)
     public ParliamentaryTableResponse getTable(
             @PathVariable Long tableId,
             @AuthMember Member member
@@ -41,8 +41,8 @@ public class ParliamentaryController implements ParliamentaryControllerSwagger {
         return parliamentaryService.findTable(tableId, member);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/api/table/parliamentary/{tableId}")
+    @ResponseStatus(HttpStatus.OK)
     public ParliamentaryTableResponse updateTable(
             @Valid @RequestBody ParliamentaryTableCreateRequest tableCreateRequest,
             @PathVariable Long tableId,
@@ -51,8 +51,8 @@ public class ParliamentaryController implements ParliamentaryControllerSwagger {
         return parliamentaryService.updateTable(tableCreateRequest, tableId, member);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/api/table/parliamentary/{tableId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTable(
             @PathVariable Long tableId,
             @AuthMember Member member
