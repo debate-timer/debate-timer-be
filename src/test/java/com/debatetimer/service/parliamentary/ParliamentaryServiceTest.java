@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class ParliamentaryServiceTest extends BaseServiceTest {
 
     @Autowired
-    ParliamentaryService parliamentaryService;
+    private ParliamentaryService parliamentaryService;
 
     @Nested
     class save {
