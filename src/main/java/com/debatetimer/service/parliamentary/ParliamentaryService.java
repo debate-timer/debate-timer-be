@@ -52,9 +52,7 @@ public class ParliamentaryService {
 
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
-
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
-
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
 
