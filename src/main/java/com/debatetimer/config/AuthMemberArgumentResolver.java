@@ -34,7 +34,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         try {
             Long memberId = Long.parseLong(webRequest.getParameter("memberId"));
             return memberRepository.getById(memberId);
-        } catch (DTException exception) {
+        } catch (DTException | NumberFormatException exception) {
             log.warn(exception.getMessage());
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
