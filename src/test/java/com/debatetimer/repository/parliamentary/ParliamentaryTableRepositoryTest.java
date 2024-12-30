@@ -49,7 +49,7 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
         }
 
         @Test
-        void 특정_아이디의_테이블이_없으면_에러를_발생_시킨다() {
+        void 특정_아이디의_테이블이_없으면_에러를_발생시킨다() {
             assertThatThrownBy(() -> tableRepository.getById(1L))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());

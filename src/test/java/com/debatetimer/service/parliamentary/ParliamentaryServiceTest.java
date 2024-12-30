@@ -29,9 +29,10 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     class save {
 
         @Test
-        void 의회식_토론_테이블을_생성_한다() {
+        void 의회식_토론_테이블을_생성한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
-            ParliamentaryTableCreateRequest chanTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("커찬의 토론 테이블");
+            ParliamentaryTableCreateRequest chanTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
+                    "커찬의 토론 테이블");
             TableInfoCreateRequest requestTableInfo = chanTableRequest.info();
             List<TimeBoxCreateRequest> requestTimeBoxes = chanTableRequest.table();
 
@@ -50,7 +51,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     class findTable {
 
         @Test
-        void 의회식_토론_테이블을_조회_한다() {
+        void 의회식_토론_테이블을_조회한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
             fixtureGenerator.generateParliamentaryTimeBox(chanTable, 1);
@@ -65,7 +66,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 회원_소유가_아닌_테이블_조회_시_예외_발생() {
+        void 회원_소유가_아닌_테이블_조회_시_예외를_발생시킨다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
@@ -80,14 +81,16 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     class updateTable {
 
         @Test
-        void 의회식_토론_테이블을_수정_한다() {
+        void 의회식_토론_테이블을_수정한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTableCreateRequest renewTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
+            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
+                    "새로운 테이블");
             TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
             List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
 
-            ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
+            ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest,
+                    chanTable.getId(), chan);
 
             assertAll(
                     () -> assertThat(updatedTable.id()).isEqualTo(chanTable.getId()),
@@ -97,11 +100,12 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 회원_소유가_아닌_테이블_수정_시_예외_발생() {
+        void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTableCreateRequest renewTableRequest =  dtoGenerator.generateParliamentaryTableCreateRequest("새로운 테이블");
+            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
+                    "새로운 테이블");
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), coli))
                     .isInstanceOf(DTClientErrorException.class)
@@ -113,7 +117,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     class deleteTable {
 
         @Test
-        void 의회식_토론_테이블을_삭제_한다() {
+        void 의회식_토론_테이블을_삭제한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
             fixtureGenerator.generateParliamentaryTimeBox(chanTable, 1);
@@ -131,7 +135,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 회원_소유가_아닌_테이블_삭제_시_예외_발생() {
+        void 회원_소유가_아닌_테이블_삭제_시_예외를_발생시킨다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
