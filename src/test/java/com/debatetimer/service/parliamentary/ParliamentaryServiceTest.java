@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseServiceTest;
 import com.debatetimer.controller.exception.custom.DTClientErrorException;
+import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
@@ -71,7 +72,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> parliamentaryService.findTable(chanTable.getId(), coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage("회원님의 토론 테이블을 찾을 수 없습니다.");
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 
@@ -104,7 +105,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage("회원님의 토론 테이블을 찾을 수 없습니다.");
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 
@@ -137,7 +138,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTable.getId(), coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage("회원님의 토론 테이블을 찾을 수 없습니다.");
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 }

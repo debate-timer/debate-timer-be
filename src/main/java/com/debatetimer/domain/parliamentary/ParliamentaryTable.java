@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -63,5 +64,9 @@ public class ParliamentaryTable {
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
         this.duration = renewTable.getDuration();
+    }
+
+    public boolean isOwner(long memberId) {
+        return Objects.equals(this.member.getId(), memberId);
     }
 }

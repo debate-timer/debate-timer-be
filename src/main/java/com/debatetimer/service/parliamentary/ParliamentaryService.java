@@ -35,7 +35,7 @@ public class ParliamentaryService {
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTable(long tableId, Member member) {
-        ParliamentaryTable table = tableRepository.getOwnerTable(tableId, member.getId());
+        ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
@@ -46,7 +46,7 @@ public class ParliamentaryService {
             long tableId,
             Member member
     ) {
-        ParliamentaryTable existingTable = tableRepository.getOwnerTable(tableId, member.getId());
+        ParliamentaryTable existingTable = getOwnerTable(tableId, member.getId());
         ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
@@ -60,7 +60,7 @@ public class ParliamentaryService {
 
     @Transactional
     public void deleteTable(Long tableId, Member member) {
-        ParliamentaryTable table = tableRepository.getOwnerTable(tableId, member.getId());
+        ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
         entityManager.clear();
@@ -74,5 +74,17 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<ParliamentaryTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
         return new ParliamentaryTimeBoxes(savedTimeBoxes);
+    }
+
+    private ParliamentaryTable getOwnerTable(long tableId, long memberId) {
+        ParliamentaryTable foundTable = tableRepository.getById(tableId);
+        validateOwn(foundTable, memberId);
+        return foundTable;
+    }
+
+    private void validateOwn(ParliamentaryTable table, long memberId) {
+        if (!table.isOwner(memberId)) {
+            throw new DTClientErrorException(ClientErrorCode.NOT_TABLE_OWNER);
+        }
     }
 }

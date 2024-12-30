@@ -12,10 +12,8 @@ public interface ParliamentaryTableRepository extends JpaRepository<Parliamentar
 
     List<ParliamentaryTable> findAllByMember(Member member);
 
-    default ParliamentaryTable getOwnerTable(long tableId, long memberId) {
-        return findByIdAndMemberId(tableId, memberId)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_TABLE_NOT_FOUND));
+    default ParliamentaryTable getById(long tableId) {
+        return findById(tableId)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
     }
-
-    Optional<ParliamentaryTable> findByIdAndMemberId(long id, long memberId);
 }

@@ -36,25 +36,23 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
     }
 
     @Nested
-    class getOwnerTable {
+    class getById {
 
         @Test
-        void 특정_회원의_테이블을_조회한다() {
+        void 특정_아이디의_테이블을_조회한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
 
-            ParliamentaryTable foundChanTable = tableRepository.getOwnerTable(chanTable.getId(), chan.getId());
+            ParliamentaryTable foundChanTable = tableRepository.getById(chanTable.getId());
 
             assertThat(foundChanTable).usingRecursiveComparison().isEqualTo(chanTable);
         }
 
         @Test
-        void 회원의_테이블이_없으면_에러를_발생_시킨다() {
-            Member chan = fixtureGenerator.generateMember("커찬");
-
-            assertThatThrownBy(() -> tableRepository.getOwnerTable(1L, chan.getId()))
+        void 특정_아이디의_테이블이_없으면_에러를_발생_시킨다() {
+            assertThatThrownBy(() -> tableRepository.getById(1L))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.MEMBER_TABLE_NOT_FOUND.getMessage());
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
     }
 }
