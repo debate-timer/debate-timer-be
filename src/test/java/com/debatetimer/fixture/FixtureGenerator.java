@@ -8,7 +8,9 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FixtureGenerator {
 
     private final MemberRepository memberRepository;
