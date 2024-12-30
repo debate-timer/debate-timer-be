@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public class ParliamentaryTimeBoxes {
 
-    private static final Comparator<ParliamentaryTimeBox> TIME_BOX_COMPARATOR = Comparator.comparing(ParliamentaryTimeBox::getSequence);
+    private static final Comparator<ParliamentaryTimeBox> TIME_BOX_COMPARATOR = Comparator
+            .comparing(ParliamentaryTimeBox::getSequence);
 
     private final List<ParliamentaryTimeBox> timeBoxes;
 
