@@ -84,8 +84,9 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .queryParam("memberId", bito.getId())
+                    .pathParam("tableId", bitoTable.getId())
                     .body(renewTableRequest)
-                    .when().put("/api/table/parliamentary/" + bitoTable.getId())
+                    .when().put("/api/table/parliamentary/{tableId}")
                     .then().log().all()
                     .statusCode(200)
                     .extract().as(ParliamentaryTableResponse.class);
@@ -111,7 +112,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .queryParam("memberId", bito.getId())
-                    .when().delete("/api/table/parliamentary/" + bitoTable.getId())
+                    .pathParam("tableId", bitoTable.getId())
+                    .when().delete("/api/table/parliamentary/{tableId}")
                     .then().log().all()
                     .statusCode(204);
         }
