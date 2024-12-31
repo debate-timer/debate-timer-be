@@ -1,4 +1,4 @@
-package com.debatetimer.controller.exception.errorcode;
+package com.debatetimer.exception.errorcode;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

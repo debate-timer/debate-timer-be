@@ -1,6 +1,6 @@
-package com.debatetimer.controller.exception.custom;
+package com.debatetimer.exception.custom;
 
-import com.debatetimer.controller.exception.errorcode.ServerErrorCode;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 
 public class DTServerErrorException extends DTException {
 

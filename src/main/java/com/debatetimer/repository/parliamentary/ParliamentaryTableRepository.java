@@ -1,11 +1,10 @@
 package com.debatetimer.repository.parliamentary;
 
-import com.debatetimer.controller.exception.custom.DTClientErrorException;
-import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ParliamentaryTableRepository extends JpaRepository<ParliamentaryTable, Long> {

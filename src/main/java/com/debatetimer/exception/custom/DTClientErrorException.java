@@ -1,6 +1,6 @@
-package com.debatetimer.controller.exception.custom;
+package com.debatetimer.exception.custom;
 
-import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 
 public class DTClientErrorException extends DTException {
 

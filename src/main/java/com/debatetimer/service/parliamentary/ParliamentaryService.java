@@ -1,13 +1,13 @@
 package com.debatetimer.service.parliamentary;
 
-import com.debatetimer.controller.exception.custom.DTClientErrorException;
-import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import jakarta.persistence.EntityManager;

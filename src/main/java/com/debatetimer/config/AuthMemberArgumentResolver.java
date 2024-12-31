@@ -1,9 +1,9 @@
 package com.debatetimer.config;
 
-import com.debatetimer.controller.exception.custom.DTClientErrorException;
-import com.debatetimer.controller.exception.custom.DTException;
-import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
