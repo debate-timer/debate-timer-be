@@ -1,6 +1,6 @@
 package com.debatetimer.swagger.annotation;
 
-import com.debatetimer.controller.exception.ErrorResponse;
+import com.debatetimer.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

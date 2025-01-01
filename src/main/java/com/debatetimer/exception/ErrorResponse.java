@@ -1,4 +1,4 @@
-package com.debatetimer.controller.exception;
+package com.debatetimer.exception;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

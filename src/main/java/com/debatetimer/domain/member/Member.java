@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
-    private static final String NICKNAME_REGEX = "^[a-zA-Z가-힣]+$";
+    private static final String NICKNAME_REGEX = "^[a-zA-Z가-힣 ]+$";
     public static final int NICKNAME_MAX_LENGTH = 10;
 
     @Id

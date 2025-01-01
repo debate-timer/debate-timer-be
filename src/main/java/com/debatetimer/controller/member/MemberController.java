@@ -1,5 +1,7 @@
 package com.debatetimer.controller.member;
 
+import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.TableResponses;
@@ -9,20 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberController implements MemberControllerSwagger{
+public class MemberController implements MemberControllerSwagger {
 
     private final MemberService memberService;
 
     @Override
     @GetMapping("/api/table")
-    public TableResponses getTables(@RequestParam Long memberId) {
-        return memberService.getTables(memberId);
+    public TableResponses getTables(@AuthMember Member member) {
+        return memberService.getTables(member.getId());
     }
 
     @Override

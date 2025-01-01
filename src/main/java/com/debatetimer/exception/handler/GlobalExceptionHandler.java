@@ -1,11 +1,11 @@
-package com.debatetimer.controller.exception.handler;
+package com.debatetimer.exception.handler;
 
-import com.debatetimer.controller.exception.ErrorResponse;
-import com.debatetimer.controller.exception.custom.DTClientErrorException;
-import com.debatetimer.controller.exception.custom.DTServerErrorException;
-import com.debatetimer.controller.exception.errorcode.ClientErrorCode;
-import com.debatetimer.controller.exception.errorcode.ErrorCode;
-import com.debatetimer.controller.exception.errorcode.ServerErrorCode;
+import com.debatetimer.exception.ErrorResponse;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.ErrorCode;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
