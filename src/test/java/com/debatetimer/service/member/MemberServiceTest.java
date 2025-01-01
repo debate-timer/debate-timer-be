@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseServiceTest;
+import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.TableResponses;
-import com.debatetimer.domain.member.Member;
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,14 +15,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseControllerTest {
 
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setPort() {
-        RestAssured.port = port;
-    }
-
     @Autowired
     protected MemberRepository memberRepository;
 
@@ -34,4 +26,12 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected DtoGenerator dtoGenerator;
+
+    @LocalServerPort
+    private int port;
+
+    @BeforeEach
+    void setPort() {
+        RestAssured.port = port;
+    }
 }

@@ -1,12 +1,12 @@
 package com.debatetimer.domain.parliamentary;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ParliamentaryTimeBoxTest {
 
