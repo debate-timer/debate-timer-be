@@ -1,5 +1,7 @@
 package com.debatetimer.domain.member;
 
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,10 +33,10 @@ public class Member {
 
     private void validate(String nickname) {
         if (nickname.isEmpty() || nickname.length() > NICKNAME_MAX_LENGTH) {
-            throw new IllegalArgumentException("닉네임은 1자 이상 %d자 이하여야 합니다".formatted(NICKNAME_MAX_LENGTH));
+            throw new DTClientErrorException(ClientErrorCode.INVALID_MEMBER_NICKNAME_LENGTH);
         }
         if (!nickname.matches(NICKNAME_REGEX)) {
-            throw new IllegalArgumentException("닉네임은 영문/한글만 가능합니다");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_MEMBER_NICKNAME_FORM);
         }
     }
 }
