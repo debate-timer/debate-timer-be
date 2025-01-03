@@ -43,7 +43,7 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
 
-            ParliamentaryTable foundChanTable = tableRepository.getById(chanTable.getId());
+            ParliamentaryTable foundChanTable = tableRepository.getById(chanTable.getId().longValue());
 
             assertThat(foundChanTable).usingRecursiveComparison().isEqualTo(chanTable);
         }
