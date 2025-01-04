@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseControllerTest;
+import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
@@ -24,15 +26,20 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         @Test
         void 토론_테이블을_생성한다() {
             Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTableCreateRequest bitoTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "비토 테이블");
-            TableInfoCreateRequest requestTableInfo = bitoTableRequest.info();
-            List<TimeBoxCreateRequest> requestTimeBoxes = bitoTableRequest.table();
+            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
+            List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+            );
+            ParliamentaryTableCreateRequest tableCreateRequest = new ParliamentaryTableCreateRequest(
+                    requestTableInfo,
+                    requestTimeBoxes
+            );
 
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .queryParam("memberId", bito.getId())
-                    .body(bitoTableRequest)
+                    .body(tableCreateRequest)
                     .when().post("/api/table/parliamentary")
                     .then().log().all()
                     .statusCode(201)
@@ -76,12 +83,17 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
-            Member bito = fixtureGenerator.generateMember("커찬");
+            Member bito = fixtureGenerator.generateMember("비토");
             ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "새로운 테이블");
-            TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
-            List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
+            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
+            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+            );
+            ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
+                    renewTableInfo,
+                    renewTimeBoxes
+            );
 
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)

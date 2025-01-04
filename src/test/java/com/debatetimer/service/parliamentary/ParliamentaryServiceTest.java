@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseServiceTest;
+import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
@@ -31,10 +33,15 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
-            ParliamentaryTableCreateRequest chanTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "커찬의 토론 테이블");
-            TableInfoCreateRequest requestTableInfo = chanTableRequest.info();
-            List<TimeBoxCreateRequest> requestTimeBoxes = chanTableRequest.table();
+            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("커찬의 테이블", "주제");
+            List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+            );
+            ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
+                    requestTableInfo,
+                    requestTimeBoxes
+            );
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(savedTableResponse.id());
@@ -84,10 +91,15 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 의회식_토론_테이블을_수정한다() {
             Member chan = fixtureGenerator.generateMember("커찬");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "새로운 테이블");
-            TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
-            List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
+            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("커찬 테이블", "주제");
+            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+            );
+            ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
+                    renewTableInfo,
+                    renewTimeBoxes
+            );
 
             ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest,
                     chanTable.getId(), chan);
@@ -104,8 +116,15 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "새로운 테이블");
+            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("새로운 테이블", "주제");
+            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+            );
+            ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
+                    renewTableInfo,
+                    renewTimeBoxes
+            );
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), coli))
                     .isInstanceOf(DTClientErrorException.class)
