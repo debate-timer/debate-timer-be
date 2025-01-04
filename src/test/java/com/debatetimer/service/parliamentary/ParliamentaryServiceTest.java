@@ -77,8 +77,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
+            long chanTableId = chanTable.getId();
 
-            assertThatThrownBy(() -> parliamentaryService.findTable(chanTable.getId(), coli))
+            assertThatThrownBy(() -> parliamentaryService.findTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
@@ -116,6 +117,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
+            long chanTableId = chanTable.getId();
             TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("새로운 테이블", "주제");
             List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
                     new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
@@ -126,7 +128,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
                     renewTimeBoxes
             );
 
-            assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), coli))
+            assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
@@ -158,8 +160,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = fixtureGenerator.generateMember("커찬");
             Member coli = fixtureGenerator.generateMember("콜리");
             ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
+            Long chanTableId = chanTable.getId();
 
-            assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTable.getId(), coli))
+            assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
