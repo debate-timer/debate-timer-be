@@ -21,14 +21,14 @@ class ParliamentaryTimeBoxRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 특정_테이블의_타임박스를_모두_조회한다() {
-            Member chan = fixtureGenerator.generateMember("커찬");
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            ParliamentaryTimeBox chanBox1 = fixtureGenerator.generateParliamentaryTimeBox(chanTable, 1);
-            ParliamentaryTimeBox chanBox2 = fixtureGenerator.generateParliamentaryTimeBox(chanTable, 2);
-            ParliamentaryTimeBox bitoBox1 = fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
-            ParliamentaryTimeBox bitoBox2 = fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
+            Member chan = memberGenerator.generate("커찬");
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable chanTable = tableGenerator.generate(chan);
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            ParliamentaryTimeBox chanBox1 = timeBoxGenerator.generate(chanTable, 1);
+            ParliamentaryTimeBox chanBox2 = timeBoxGenerator.generate(chanTable, 2);
+            ParliamentaryTimeBox bitoBox1 = timeBoxGenerator.generate(bitoTable, 2);
+            ParliamentaryTimeBox bitoBox2 = timeBoxGenerator.generate(bitoTable, 2);
 
             List<ParliamentaryTimeBox> foundBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(
                     chanTable);

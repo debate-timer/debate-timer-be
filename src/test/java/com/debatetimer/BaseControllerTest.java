@@ -1,6 +1,8 @@
 package com.debatetimer;
 
-import com.debatetimer.fixture.FixtureGenerator;
+import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.fixture.ParliamentaryTableGenerator;
+import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import io.restassured.RestAssured;
@@ -21,7 +23,13 @@ public abstract class BaseControllerTest {
     protected ParliamentaryTableRepository parliamentaryTableRepository;
 
     @Autowired
-    protected FixtureGenerator fixtureGenerator;
+    protected MemberGenerator memberGenerator;
+
+    @Autowired
+    protected ParliamentaryTableGenerator tableGenerator;
+
+    @Autowired
+    protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
 
     @LocalServerPort
     private int port;

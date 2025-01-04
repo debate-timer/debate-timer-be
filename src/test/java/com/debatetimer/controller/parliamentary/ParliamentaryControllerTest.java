@@ -25,7 +25,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 토론_테이블을_생성한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
+            Member bito = memberGenerator.generate("비토");
             TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
             List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
                     new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
@@ -57,10 +57,10 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_테이블을_조회한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 1);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            timeBoxGenerator.generate(bitoTable, 1);
+            timeBoxGenerator.generate(bitoTable, 2);
 
             ParliamentaryTableResponse response = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
@@ -83,8 +83,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
             List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
                     new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
@@ -118,10 +118,10 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_삭제한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 1);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            timeBoxGenerator.generate(bitoTable, 1);
+            timeBoxGenerator.generate(bitoTable, 2);
 
             RestAssured.given().log().all()
                     .contentType(ContentType.JSON)

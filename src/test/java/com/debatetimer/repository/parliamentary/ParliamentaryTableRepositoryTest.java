@@ -23,11 +23,11 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 특정_회원의_테이블만_조회한다() {
-            Member chan = fixtureGenerator.generateMember("커찬");
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable chanTable1 = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTable chanTable2 = fixtureGenerator.generateParliamentaryTable(chan);
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
+            Member chan = memberGenerator.generate("커찬");
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable chanTable1 = tableGenerator.generate(chan);
+            ParliamentaryTable chanTable2 = tableGenerator.generate(chan);
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
 
             List<ParliamentaryTable> foundKeoChanTables = tableRepository.findAllByMember(chan);
 
@@ -40,8 +40,8 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 특정_아이디의_테이블을_조회한다() {
-            Member chan = fixtureGenerator.generateMember("커찬");
-            ParliamentaryTable chanTable = fixtureGenerator.generateParliamentaryTable(chan);
+            Member chan = memberGenerator.generate("커찬");
+            ParliamentaryTable chanTable = tableGenerator.generate(chan);
 
             ParliamentaryTable foundChanTable = tableRepository.getById(chanTable.getId());
 
