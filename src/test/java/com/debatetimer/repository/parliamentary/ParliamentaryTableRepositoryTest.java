@@ -19,7 +19,7 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
     private ParliamentaryTableRepository tableRepository;
 
     @Nested
-    class findAllByMember {
+    class FindAllByMember {
 
         @Test
         void 특정_회원의_테이블만_조회한다() {
@@ -36,7 +36,7 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
     }
 
     @Nested
-    class getById {
+    class GetById {
 
         @Test
         void 특정_아이디의_테이블을_조회한다() {

@@ -17,7 +17,7 @@ class ParliamentaryTimeBoxRepositoryTest extends BaseRepositoryTest {
     private ParliamentaryTimeBoxRepository parliamentaryTimeBoxRepository;
 
     @Nested
-    class findAllByParliamentaryTable {
+    class FindAllByParliamentaryTable {
 
         @Test
         void 특정_테이블의_타임박스를_모두_조회한다() {
@@ -30,7 +30,8 @@ class ParliamentaryTimeBoxRepositoryTest extends BaseRepositoryTest {
             ParliamentaryTimeBox bitoBox1 = fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
             ParliamentaryTimeBox bitoBox2 = fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
 
-            List<ParliamentaryTimeBox> foundBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(chanTable);
+            List<ParliamentaryTimeBox> foundBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(
+                    chanTable);
 
             assertThat(foundBoxes).containsExactly(chanBox1, chanBox2);
         }

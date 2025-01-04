@@ -19,12 +19,13 @@ import org.junit.jupiter.api.Test;
 class ParliamentaryControllerTest extends BaseControllerTest {
 
     @Nested
-    class save {
+    class CreateTable {
 
         @Test
         void 토론_테이블을_생성한다() {
             Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTableCreateRequest bitoTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest("비토 테이블");
+            ParliamentaryTableCreateRequest bitoTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
+                    "비토 테이블");
             TableInfoCreateRequest requestTableInfo = bitoTableRequest.info();
             List<TimeBoxCreateRequest> requestTimeBoxes = bitoTableRequest.table();
 
@@ -45,7 +46,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class getTable {
+    class ReadTable {
 
         @Test
         void 의회식_테이블을_조회한다() {
@@ -71,7 +72,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class updateTable {
+    class UpdateTable {
 
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
@@ -101,7 +102,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class deleteTable {
+    class DeleteTable {
 
         @Test
         void 의회식_토론_테이블을_삭제한다() {

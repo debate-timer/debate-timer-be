@@ -26,7 +26,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     private ParliamentaryService parliamentaryService;
 
     @Nested
-    class save {
+    class CreateTable {
 
         @Test
         void 의회식_토론_테이블을_생성한다() {
@@ -48,7 +48,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class findTable {
+    class ReadTable {
 
         @Test
         void 의회식_토론_테이블을_조회한다() {
@@ -78,7 +78,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class updateTable {
+    class UpdateTable {
 
         @Test
         void 의회식_토론_테이블을_수정한다() {
@@ -114,7 +114,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class deleteTable {
+    class DeleteTable {
 
         @Test
         void 의회식_토론_테이블을_삭제한다() {
