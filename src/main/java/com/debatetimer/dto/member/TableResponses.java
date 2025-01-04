@@ -1,14 +1,9 @@
 package com.debatetimer.dto.member;
 
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
-public record TableResponses(
-        @ArraySchema(schema = @Schema(description = "테이블들", implementation = TableResponse.class))
-        List<TableResponse> tables
-) {
+public record TableResponses(List<TableResponse> tables) {
 
     public static TableResponses from(List<ParliamentaryTable> parliamentaryTables) {
         return new TableResponses(toTableResponses(parliamentaryTables));
