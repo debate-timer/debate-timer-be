@@ -24,6 +24,7 @@ class MemberControllerTest extends BaseControllerTest {
     class CreateMember {
 
         private final RestDocumentationFilter document = document("member/create")
+                .description("멤버 생성")
                 .requestBodyField(
                         fieldWithPath("nickname").type(STRING).description("멤버 닉네임")
                 )
@@ -52,6 +53,7 @@ class MemberControllerTest extends BaseControllerTest {
     class getTables {
 
         private final RestDocumentationFilter document = document("member/table")
+                .description("멤버의 토론 시간표 조회")
                 .queryParameter(
                         parameterWithName("memberId").description("멤버 ID")
                 ).responseBodyField(

@@ -39,10 +39,16 @@ public class RestDocumentationFilterBuilder {
 
     private final String identifier;
     private final List<Snippet> snippets;
+    private String description;
 
     public RestDocumentationFilterBuilder(String identifier) {
         this.identifier = identifier;
         this.snippets = new ArrayList<>();
+    }
+
+    public RestDocumentationFilterBuilder description(String description) {
+        this.description = description;
+        return this;
     }
 
     public RestDocumentationFilterBuilder pathParameter(ParameterDescriptor... descriptors) {
@@ -76,6 +82,13 @@ public class RestDocumentationFilterBuilder {
     }
 
     public RestDocumentationFilter build() {
-        return document(identifier, REQUEST_PREPROCESSOR, RESPONSE_PREPROCESSOR, snippets.toArray(Snippet[]::new));
+        return document(identifier,
+                description,
+                description,
+                false,
+                false,
+                REQUEST_PREPROCESSOR,
+                RESPONSE_PREPROCESSOR,
+                snippets.toArray(Snippet[]::new));
     }
 }
