@@ -3,6 +3,8 @@ package com.debatetimer.domain.member;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -23,16 +25,16 @@ class MemberTest {
         @ValueSource(ints = {0, Member.NICKNAME_MAX_LENGTH + 1})
         void 닉네임은_정해진_길이_이내여야_한다(int length) {
             assertThatThrownBy(() -> new Member("f".repeat(length)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("닉네임은 1자 이상 %d자 이하여야 합니다".formatted(Member.NICKNAME_MAX_LENGTH));
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_MEMBER_NICKNAME_LENGTH.getMessage());
         }
 
         @ParameterizedTest
         @ValueSource(strings = {"abc12", "가나다12"})
         void 닉네임은_영문과_한글만_가능하다(String nickname) {
             assertThatThrownBy(() -> new Member(nickname))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("닉네임은 영문/한글만 가능합니다");
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_MEMBER_NICKNAME_FORM.getMessage());
         }
     }
 }

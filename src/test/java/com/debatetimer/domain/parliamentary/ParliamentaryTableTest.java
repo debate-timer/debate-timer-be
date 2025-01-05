@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,8 +28,8 @@ class ParliamentaryTableTest {
         void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, "f".repeat(length), "agenda", 10))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(ParliamentaryTable.NAME_MAX_LENGTH));
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
 
         @ParameterizedTest
@@ -35,8 +37,8 @@ class ParliamentaryTableTest {
         void 테이블_이름은_적어도_한_자_있어야_한다(String name) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, name, "agenda", 10))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(ParliamentaryTable.NAME_MAX_LENGTH));
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
 
         @ParameterizedTest
@@ -44,8 +46,8 @@ class ParliamentaryTableTest {
         void 허용된_글자_이외의_문자는_불가능하다(String name) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, name, "agenda", 10))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("테이블 이름은 영문/한글만 가능합니다");
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_FORM.getMessage());
         }
 
         @ParameterizedTest
@@ -53,8 +55,8 @@ class ParliamentaryTableTest {
         void 테이블_시간은_양수만_가능하다(int duration) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, "name", "agenda", duration))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("시간은 양수만 가능합니다");
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TABLE_TIME.getMessage());
         }
     }
 }

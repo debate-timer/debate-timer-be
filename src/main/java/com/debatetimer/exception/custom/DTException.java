@@ -8,7 +8,7 @@ public abstract class DTException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-    public DTException(String message, HttpStatus httpStatus) {
+    protected DTException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }
