@@ -35,8 +35,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("커찬");
             TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("커찬의 테이블", "주제");
             List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
                     requestTableInfo,
@@ -94,8 +94,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("커찬 테이블", "주제");
             List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     renewTableInfo,
@@ -120,8 +120,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             long chanTableId = chanTable.getId();
             TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("새로운 테이블", "주제");
             List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     renewTableInfo,

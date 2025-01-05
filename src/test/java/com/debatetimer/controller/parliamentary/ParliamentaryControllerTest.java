@@ -28,8 +28,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("비토");
             TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
             List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest tableCreateRequest = new ParliamentaryTableCreateRequest(
                     requestTableInfo,
@@ -87,8 +87,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
             List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS.name(), BoxType.OPENING.name(), 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS.name(), BoxType.OPENING.name(), 3, 1)
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     renewTableInfo,
