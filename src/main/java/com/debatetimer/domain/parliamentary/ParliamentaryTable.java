@@ -1,6 +1,8 @@
 package com.debatetimer.domain.parliamentary;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -50,13 +52,13 @@ public class ParliamentaryTable {
 
     private void validate(String name, int duration) {
         if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
-            throw new IllegalArgumentException("테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(NAME_MAX_LENGTH));
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
         }
         if (!name.matches(NAME_REGEX)) {
-            throw new IllegalArgumentException("테이블 이름은 영문/한글만 가능합니다");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_FORM);
         }
         if (duration <= 0) {
-            throw new IllegalArgumentException("시간은 양수만 가능합니다");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
         }
     }
 

@@ -2,6 +2,8 @@ package com.debatetimer.domain.parliamentary;
 
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -59,14 +61,14 @@ public class ParliamentaryTimeBox {
 
     private void validate(int sequence, int time, Stance stance, BoxType boxType) {
         if (sequence <= 0) {
-            throw new IllegalArgumentException("순서는 양수만 가능합니다");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
         }
         if (time <= 0) {
-            throw new IllegalArgumentException("시간은 양수만 가능합니다");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
         }
 
         if (!boxType.isAvailable(stance)) {
-            throw new IllegalArgumentException("타임박스 유형과 일치하지 않는 입장입니다.");
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
         }
     }
 }
