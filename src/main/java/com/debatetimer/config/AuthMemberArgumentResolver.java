@@ -32,7 +32,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             WebDataBinderFactory binderFactory
     ) {
         try {
-            Long memberId = Long.parseLong(webRequest.getParameter("memberId"));
+            long memberId = Long.parseLong(webRequest.getParameter("memberId"));
             return memberRepository.getById(memberId);
         } catch (DTException | NumberFormatException exception) {
             log.warn(exception.getMessage());
