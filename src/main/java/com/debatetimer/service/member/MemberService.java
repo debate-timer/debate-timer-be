@@ -20,8 +20,8 @@ public class MemberService {
     private final ParliamentaryTableRepository parliamentaryTableRepository;
 
     @Transactional(readOnly = true)
-    public TableResponses getTables(long memberId) {
-        Member member = memberRepository.getById(memberId);
+    public TableResponses getTables(Long memberId) {
+        Member member = memberRepository.getById(memberId.longValue());
         List<ParliamentaryTable> parliamentaryTable = parliamentaryTableRepository.findAllByMember(member);
         return TableResponses.from(parliamentaryTable);
     }

@@ -11,11 +11,11 @@ import jakarta.validation.constraints.Positive;
 public record TimeBoxCreateRequest(
         @Schema(description = "입장", example = "PROS")
         @NotBlank
-        String stance,
+        Stance stance,
 
         @Schema(description = "발언 유형", example = "OPENING")
         @NotBlank
-        String type,
+        BoxType type,
 
         @Schema(description = "발언 시간(초)", example = "175")
         @Positive
@@ -26,13 +26,6 @@ public record TimeBoxCreateRequest(
 ) {
 
     public ParliamentaryTimeBox toTimeBox(ParliamentaryTable parliamentaryTable, int sequence) {
-        return new ParliamentaryTimeBox(
-                parliamentaryTable,
-                sequence,
-                Stance.valueOf(stance),
-                BoxType.valueOf(type),
-                time,
-                speakerNumber
-        );
+        return new ParliamentaryTimeBox(parliamentaryTable, sequence, stance, type, time, speakerNumber);
     }
 }
