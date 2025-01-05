@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class ParliamentaryControllerTest extends BaseControllerTest {
 
     @Nested
-    class CreateTable {
+    class Save {
 
         @Test
         void 토론_테이블을_생성한다() {
@@ -53,7 +53,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class ReadTable {
+    class GetTable {
 
         @Test
         void 의회식_테이블을_조회한다() {
