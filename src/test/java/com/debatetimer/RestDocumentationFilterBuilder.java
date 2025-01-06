@@ -8,6 +8,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
@@ -38,16 +39,23 @@ public class RestDocumentationFilterBuilder {
     );
 
     private final String identifier;
+    private final ResourceSnippetParametersBuilder resourceBuilder;
     private final List<Snippet> snippets;
-    private String description;
 
     public RestDocumentationFilterBuilder(String identifier) {
         this.identifier = identifier;
+        this.resourceBuilder = new ResourceSnippetParametersBuilder();
         this.snippets = new ArrayList<>();
     }
 
+    public RestDocumentationFilterBuilder tag(String tag) {
+        resourceBuilder.tag(tag);
+        return this;
+    }
+
     public RestDocumentationFilterBuilder description(String description) {
-        this.description = description;
+        resourceBuilder.description(description)
+                .summary(description);
         return this;
     }
 
@@ -82,13 +90,12 @@ public class RestDocumentationFilterBuilder {
     }
 
     public RestDocumentationFilter build() {
-        return document(identifier,
-                description,
-                description,
-                false,
-                false,
+        return document(
+                identifier,
+                resourceBuilder,
                 REQUEST_PREPROCESSOR,
                 RESPONSE_PREPROCESSOR,
-                snippets.toArray(Snippet[]::new));
+                snippets.toArray(Snippet[]::new)
+        );
     }
 }

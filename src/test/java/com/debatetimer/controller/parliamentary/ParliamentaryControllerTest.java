@@ -28,6 +28,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     class save {
 
         private final RestDocumentationFilter document = document("table/create")
+                .tag("Parliamentary Table API")
                 .description("새로운 의회식 토론 시간표 생성")
                 .queryParameter(
                         parameterWithName("memberId").description("멤버 ID")
@@ -83,6 +84,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         private final RestDocumentationFilter document = document("table/get")
                 .description("의회식 토론 시간표 조회")
+                .tag("Parliamentary Table API")
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
                 )
@@ -128,6 +130,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     class updateTable {
 
         private final RestDocumentationFilter document = document("table/put")
+                .tag("Parliamentary Table API")
                 .description("의회식 토론 시간표 수정")
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
@@ -188,6 +191,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     class deleteTable {
 
         private final RestDocumentationFilter document = document("table/delete")
+                .tag("Parliamentary Table API")
                 .description("의회식 토론 시간표 삭제")
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
