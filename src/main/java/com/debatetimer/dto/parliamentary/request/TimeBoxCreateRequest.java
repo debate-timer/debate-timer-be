@@ -9,10 +9,10 @@ import jakarta.validation.constraints.Positive;
 
 public record TimeBoxCreateRequest(
         @NotBlank
-        String stance,
+        Stance stance,
 
         @NotBlank
-        String type,
+        BoxType type,
 
         @Positive
         int time,
@@ -21,13 +21,6 @@ public record TimeBoxCreateRequest(
 ) {
 
     public ParliamentaryTimeBox toTimeBox(ParliamentaryTable parliamentaryTable, int sequence) {
-        return new ParliamentaryTimeBox(
-                parliamentaryTable,
-                sequence,
-                Stance.valueOf(stance),
-                BoxType.valueOf(type),
-                time,
-                speakerNumber
-        );
+        return new ParliamentaryTimeBox(parliamentaryTable, sequence, stance, type, time, speakerNumber);
     }
 }

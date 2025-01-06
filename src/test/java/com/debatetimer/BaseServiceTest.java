@@ -1,7 +1,8 @@
 package com.debatetimer;
 
-import com.debatetimer.fixture.DtoGenerator;
-import com.debatetimer.fixture.FixtureGenerator;
+import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.fixture.ParliamentaryTableGenerator;
+import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
@@ -23,8 +24,11 @@ public abstract class BaseServiceTest {
     protected ParliamentaryTimeBoxRepository timeBoxRepository;
 
     @Autowired
-    protected FixtureGenerator fixtureGenerator;
+    protected MemberGenerator memberGenerator;
 
     @Autowired
-    protected DtoGenerator dtoGenerator;
+    protected ParliamentaryTableGenerator tableGenerator;
+
+    @Autowired
+    protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
 }
