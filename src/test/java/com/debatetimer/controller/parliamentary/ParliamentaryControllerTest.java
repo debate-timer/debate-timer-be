@@ -10,12 +10,15 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 import com.debatetimer.BaseControllerTest;
+import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +28,7 @@ import org.springframework.restdocs.restassured.RestDocumentationFilter;
 class ParliamentaryControllerTest extends BaseControllerTest {
 
     @Nested
-    class save {
+    class Save {
 
         private final RestDocumentationFilter document = document("table/create")
                 .tag("Parliamentary Table API")
@@ -58,16 +61,21 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 토론_테이블을_생성한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTableCreateRequest bitoTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "비토 테이블");
-            TableInfoCreateRequest requestTableInfo = bitoTableRequest.info();
-            List<TimeBoxCreateRequest> requestTimeBoxes = bitoTableRequest.table();
+            Member bito = memberGenerator.generate("비토");
+            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
+            List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+            );
+            ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
+                    requestTableInfo,
+                    requestTimeBoxes
+            );
 
             ParliamentaryTableResponse response = given(document)
                     .contentType(ContentType.JSON)
                     .queryParam("memberId", bito.getId())
-                    .body(bitoTableRequest)
+                    .body(request)
                     .when().post("/api/table/parliamentary")
                     .then().statusCode(201)
                     .extract().as(ParliamentaryTableResponse.class);
@@ -106,10 +114,10 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_테이블을_조회한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 1);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            timeBoxGenerator.generate(bitoTable, 1);
+            timeBoxGenerator.generate(bitoTable, 2);
 
             ParliamentaryTableResponse response = given(document)
                     .contentType(ContentType.JSON)
@@ -163,12 +171,17 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
-            Member bito = fixtureGenerator.generateMember("커찬");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            ParliamentaryTableCreateRequest renewTableRequest = dtoGenerator.generateParliamentaryTableCreateRequest(
-                    "새로운 테이블");
-            TableInfoCreateRequest renewTableInfo = renewTableRequest.info();
-            List<TimeBoxCreateRequest> renewTimeBoxes = renewTableRequest.table();
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
+            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
+                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+            );
+            ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
+                    renewTableInfo,
+                    renewTimeBoxes
+            );
 
             ParliamentaryTableResponse response = given(document)
                     .contentType(ContentType.JSON)
@@ -203,10 +216,10 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_삭제한다() {
-            Member bito = fixtureGenerator.generateMember("비토");
-            ParliamentaryTable bitoTable = fixtureGenerator.generateParliamentaryTable(bito);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 1);
-            fixtureGenerator.generateParliamentaryTimeBox(bitoTable, 2);
+            Member bito = memberGenerator.generate("비토");
+            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            timeBoxGenerator.generate(bitoTable, 1);
+            timeBoxGenerator.generate(bitoTable, 2);
 
             given(document)
                     .contentType(ContentType.JSON)
