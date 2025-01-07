@@ -369,5 +369,4 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                     .then().statusCode(errorCode.getStatus().value());
         }
     }
-
 }

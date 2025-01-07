@@ -121,8 +121,6 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .then().statusCode(200);
         }
 
-
-
         @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"})
         @ParameterizedTest
         void 테이블_조회_실패(ClientErrorCode errorCode) {
