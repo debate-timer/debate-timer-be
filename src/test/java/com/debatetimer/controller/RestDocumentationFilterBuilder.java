@@ -1,4 +1,4 @@
-package com.debatetimer;
+package com.debatetimer.controller;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -23,6 +23,7 @@ import org.springframework.restdocs.snippet.Snippet;
 
 public class RestDocumentationFilterBuilder {
 
+    private static final String IDENTIFIER_DELIMITER = "/";
     private static final OperationRequestPreprocessor REQUEST_PREPROCESSOR = Preprocessors.preprocessRequest(
             Preprocessors.prettyPrint(),
             Preprocessors.modifyHeaders()
@@ -39,13 +40,22 @@ public class RestDocumentationFilterBuilder {
     );
 
     private final String identifier;
-    private final ResourceSnippetParametersBuilder resourceBuilder;
     private final List<Snippet> snippets;
+    private ResourceSnippetParametersBuilder resourceBuilder;
 
     public RestDocumentationFilterBuilder(String identifier) {
         this.identifier = identifier;
         this.resourceBuilder = new ResourceSnippetParametersBuilder();
         this.snippets = new ArrayList<>();
+    }
+
+    public RestDocumentationFilterBuilder(String identifierPrefix, String identifier) {
+        this(identifierPrefix + IDENTIFIER_DELIMITER + identifier);
+    }
+
+    public RestDocumentationFilterBuilder tag(Tag tag) {
+        resourceBuilder.tag(tag.getDisplayName());
+        return this;
     }
 
     public RestDocumentationFilterBuilder tag(String tag) {
@@ -86,6 +96,17 @@ public class RestDocumentationFilterBuilder {
 
     public RestDocumentationFilterBuilder responseBodyField(FieldDescriptor... descriptors) {
         snippets.add(responseFields(descriptors));
+        return this;
+    }
+
+    public RestDocumentationFilterBuilder request(RestDocumentationRequest request) {
+        resourceBuilder = request.getResourceBuilder();
+        snippets.addAll(request.getSnippets());
+        return this;
+    }
+
+    public RestDocumentationFilterBuilder response(RestDocumentationResponse response) {
+        snippets.addAll(response.getSnippets());
         return this;
     }
 

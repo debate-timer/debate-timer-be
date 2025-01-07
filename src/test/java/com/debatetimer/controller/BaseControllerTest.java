@@ -1,5 +1,6 @@
-package com.debatetimer;
+package com.debatetimer.controller;
 
+import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
@@ -16,12 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured.RestAssuredRestDocumentationConfigurer;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
-@ExtendWith({DataBaseCleaner.class, RestDocumentationExtension.class})
+@ExtendWith(DataBaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseControllerTest {
 
@@ -46,24 +44,15 @@ public abstract class BaseControllerTest {
     private RequestSpecification spec;
 
     @BeforeEach
-    void setEnvironment(RestDocumentationContextProvider restDocumentation) {
+    void setEnvironment() {
         RestAssured.port = port;
-
-        RestAssuredRestDocumentationConfigurer webConfigurer =
-                RestAssuredRestDocumentation.documentationConfiguration(restDocumentation);
         spec = new RequestSpecBuilder()
-                .addFilter(webConfigurer)
                 .addFilter(new RequestLoggingFilter())
                 .addFilter(new ResponseLoggingFilter())
                 .build();
     }
 
-    protected RestDocumentationFilterBuilder document(String identifier) {
-        return new RestDocumentationFilterBuilder(identifier);
-    }
-
-    protected RequestSpecification given(RestDocumentationFilter documentationFilter) {
-        return RestAssured.given(spec)
-                .filter(documentationFilter);
+    protected RequestSpecification given() {
+        return RestAssured.given(spec);
     }
 }

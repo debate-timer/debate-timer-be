@@ -1,5 +1,11 @@
-package com.debatetimer;
+package com.debatetimer.controller;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+
+import com.debatetimer.domain.member.Member;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
@@ -24,7 +30,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseDocumentTest {
 
-    protected static String EXIST_MEMBER_ID = "1";
+    protected static long EXIST_MEMBER_ID = 123L;
+    protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, "존재하는 멤버");
+
+    protected static RestDocumentationResponse ERROR_RESPONSE = new RestDocumentationResponse()
+            .responseBodyField(
+                    fieldWithPath("message").type(STRING).description("에러 메시지")
+            );
 
     @MockitoBean
     private MemberRepository memberRepository;
@@ -42,8 +54,12 @@ public abstract class BaseDocumentTest {
 
     @BeforeEach
     void setEnvironment(RestDocumentationContextProvider restDocumentation) {
-        RestAssured.port = port;
+        setRestAssured(restDocumentation);
+        setLoginMember();
+    }
 
+    private void setRestAssured(RestDocumentationContextProvider restDocumentation) {
+        RestAssured.port = port;
         RestAssuredRestDocumentationConfigurer webConfigurer =
                 RestAssuredRestDocumentation.documentationConfiguration(restDocumentation);
         spec = new RequestSpecBuilder()
@@ -53,8 +69,24 @@ public abstract class BaseDocumentTest {
                 .build();
     }
 
-    protected RestDocumentationFilterBuilder document(String identifier) {
-        return new RestDocumentationFilterBuilder(identifier);
+    private void setLoginMember() {
+        when(memberRepository.getById(EXIST_MEMBER_ID)).thenReturn(EXIST_MEMBER);
+    }
+
+    protected RestDocumentationRequest request() {
+        return new RestDocumentationRequest();
+    }
+
+    protected RestDocumentationResponse response() {
+        return new RestDocumentationResponse();
+    }
+
+    protected RestDocumentationFilterBuilder document(String identifierPrefix, int status) {
+        return new RestDocumentationFilterBuilder(identifierPrefix, Integer.toString(status));
+    }
+
+    protected RestDocumentationFilterBuilder document(String identifierPrefix, ClientErrorCode errorCode) {
+        return new RestDocumentationFilterBuilder(identifierPrefix, errorCode.name());
     }
 
     protected RequestSpecification given(RestDocumentationFilter documentationFilter) {
