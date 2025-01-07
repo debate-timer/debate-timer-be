@@ -1,23 +1,14 @@
 package com.debatetimer.controller;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
-import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Snippet;
 
@@ -43,7 +34,7 @@ public class RestDocumentationFilterBuilder {
     private final List<Snippet> snippets;
     private ResourceSnippetParametersBuilder resourceBuilder;
 
-    public RestDocumentationFilterBuilder(String identifier) {
+    private RestDocumentationFilterBuilder(String identifier) {
         this.identifier = identifier;
         this.resourceBuilder = new ResourceSnippetParametersBuilder();
         this.snippets = new ArrayList<>();
@@ -51,52 +42,6 @@ public class RestDocumentationFilterBuilder {
 
     public RestDocumentationFilterBuilder(String identifierPrefix, String identifier) {
         this(identifierPrefix + IDENTIFIER_DELIMITER + identifier);
-    }
-
-    public RestDocumentationFilterBuilder tag(Tag tag) {
-        resourceBuilder.tag(tag.getDisplayName());
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder tag(String tag) {
-        resourceBuilder.tag(tag);
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder description(String description) {
-        resourceBuilder.description(description)
-                .summary(description);
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder pathParameter(ParameterDescriptor... descriptors) {
-        snippets.add(pathParameters(descriptors));
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder queryParameter(ParameterDescriptor... descriptors) {
-        snippets.add(queryParameters(descriptors));
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder requestHeader(HeaderDescriptor... descriptors) {
-        snippets.add(requestHeaders(descriptors));
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder requestBodyField(FieldDescriptor... descriptors) {
-        snippets.add(requestFields(descriptors));
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder responseHeader(HeaderDescriptor... descriptors) {
-        snippets.add(responseHeaders(descriptors));
-        return this;
-    }
-
-    public RestDocumentationFilterBuilder responseBodyField(FieldDescriptor... descriptors) {
-        snippets.add(responseFields(descriptors));
-        return this;
     }
 
     public RestDocumentationFilterBuilder request(RestDocumentationRequest request) {
