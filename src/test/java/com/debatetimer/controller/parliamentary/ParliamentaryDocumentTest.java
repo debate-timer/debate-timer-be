@@ -87,7 +87,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             when(parliamentaryService.save(eq(request), any())).thenReturn(response);
 
-            var document = document("table/create", 201)
+            var document = document("parliamentary/post", 201)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -121,7 +121,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             when(parliamentaryService.save(eq(request), any())).thenThrow(new DTClientErrorException(errorCode));
 
-            var document = document("table/create", errorCode)
+            var document = document("parliamentary/post", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -175,7 +175,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             when(parliamentaryService.findTable(eq(tableId), any())).thenReturn(response);
 
-            var document = document("table/get", 200)
+            var document = document("parliamentary/get", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -195,7 +195,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             when(parliamentaryService.findTable(eq(tableId), any())).thenThrow(new DTClientErrorException(errorCode));
 
-            var document = document("table/get", errorCode)
+            var document = document("parliamentary/get", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -266,7 +266,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             when(parliamentaryService.updateTable(eq(request), eq(tableId), any())).thenReturn(response);
 
-            var document = document("table/post", 200)
+            var document = document("parliamentary/put", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -305,7 +305,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             when(parliamentaryService.updateTable(eq(request), eq(tableId), any()))
                     .thenThrow(new DTClientErrorException(errorCode));
 
-            var document = document("table/post", errorCode)
+            var document = document("parliamentary/put", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -339,7 +339,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             doNothing().when(parliamentaryService).deleteTable(eq(tableId), any());
 
-            var document = document("table/delete", 204)
+            var document = document("parliamentary/delete", 204)
                     .request(requestDocument)
                     .build();
 
@@ -357,7 +357,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).deleteTable(eq(tableId), any());
 
-            var document = document("table/delete", 204)
+            var document = document("parliamentary/delete", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
