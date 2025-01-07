@@ -109,7 +109,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             ));
             when(memberService.getTables(EXIST_MEMBER_ID)).thenReturn(response);
 
-            var document = document("member/create", 200)
+            var document = document("member/table", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -128,7 +128,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 테이블_조회_실패(ClientErrorCode errorCode) {
             when(memberService.getTables(EXIST_MEMBER_ID)).thenThrow(new DTClientErrorException(errorCode));
 
-            var document = document("member/create", 200)
+            var document = document("member/table", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
