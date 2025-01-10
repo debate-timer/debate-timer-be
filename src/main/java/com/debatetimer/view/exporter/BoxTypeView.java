@@ -4,8 +4,10 @@ import com.debatetimer.domain.BoxType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.util.stream.Stream;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum BoxTypeView {
     OPENING_VIEW(BoxType.OPENING, "입론"),
