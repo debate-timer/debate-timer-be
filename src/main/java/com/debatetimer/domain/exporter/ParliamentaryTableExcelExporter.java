@@ -60,6 +60,8 @@ public class ParliamentaryTableExcelExporter {
     private static final int AGENDA_HEADER_ROW_NUMBER = 3;
     private static final int TABLE_HEADER_ROW_NUMBER = 5;
     private static final int TIME_BOX_FIRST_ROW_NUMBER = 6;
+    private static final int END_COLUMN_NUMBER = 3;
+    private static final int WIDTH_SIZE = 10000;
 
     private final ParliamentaryTableExportMessageResolver messageResolver;
 
@@ -113,8 +115,7 @@ public class ParliamentaryTableExcelExporter {
 
         createTableHeader(sheet, TABLE_HEADER_ROW_NUMBER);
         createTimeBoxRows(timeBoxes, sheet);
-
-        setColumnWidth(sheet, 3, 10000);
+        setColumnWidth(sheet);
         return workbook;
     }
 
@@ -141,9 +142,9 @@ public class ParliamentaryTableExcelExporter {
         cell.setCellValue(value);
     }
 
-    private void setColumnWidth(Sheet sheet, int columnNumber, int widthSize) {
-        for (int i = 0; i < columnNumber; i++) {
-            sheet.setColumnWidth(i, widthSize);
+    private void setColumnWidth(Sheet sheet) {
+        for (int i = 0; i < END_COLUMN_NUMBER; i++) {
+            sheet.setColumnWidth(i, WIDTH_SIZE);
         }
     }
 
