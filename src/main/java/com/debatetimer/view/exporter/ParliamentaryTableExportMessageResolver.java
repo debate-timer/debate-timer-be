@@ -20,7 +20,6 @@ public class ParliamentaryTableExportMessageResolver {
         if (timeBox.getType() == BoxType.TIME_OUT) {
             return defaultMessage;
         }
-
         return defaultMessage
                 + SLASH
                 + resolveSpeakerMessage(timeBox.getSpeaker());
