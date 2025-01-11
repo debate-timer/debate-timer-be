@@ -7,3 +7,6 @@ springdoc:
     path: /docs/swagger
     url: /docs/openapi3.yaml
     disable-swagger-default-url: true
+    filter: true
+    persist-authorization: true
+    display-request-duration: true
