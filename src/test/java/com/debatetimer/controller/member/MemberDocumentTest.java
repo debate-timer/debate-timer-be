@@ -32,7 +32,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
-                .description("멤버 생성")
+                .summary("멤버 생성")
                 .requestBodyField(
                         fieldWithPath("nickname").type(STRING).description("멤버 닉네임")
                 );
@@ -88,7 +88,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
-                .description("멤버의 토론 시간표 조회")
+                .summary("멤버의 토론 시간표 조회")
                 .queryParameter(
                         parameterWithName("memberId").description("멤버 ID")
                 );

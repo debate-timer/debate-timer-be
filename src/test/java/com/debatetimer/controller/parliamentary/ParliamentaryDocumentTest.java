@@ -40,7 +40,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
-                .description("새로운 의회식 토론 시간표 생성")
+                .summary("새로운 의회식 토론 시간표 생성")
                 .queryParameter(
                         parameterWithName("memberId").description("멤버 ID")
                 )
@@ -139,7 +139,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
     class GetTable {
 
         private final RestDocumentationRequest requestDocument = request()
-                .description("의회식 토론 시간표 조회")
+                .summary("의회식 토론 시간표 조회")
                 .tag(Tag.PARLIAMENTARY_API)
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
@@ -214,7 +214,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
-                .description("의회식 토론 시간표 수정")
+                .summary("의회식 토론 시간표 수정")
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
                 )
@@ -325,7 +325,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
-                .description("의회식 토론 시간표 삭제")
+                .summary("의회식 토론 시간표 삭제")
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
                 )

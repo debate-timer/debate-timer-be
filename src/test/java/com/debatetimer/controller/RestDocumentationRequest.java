@@ -28,9 +28,8 @@ public class RestDocumentationRequest {
         return this;
     }
 
-    public RestDocumentationRequest description(String description) {
-        resourceBuilder.description(description)
-                .summary(description);
+    public RestDocumentationRequest summary(String summary) {
+        resourceBuilder.summary(summary);
         return this;
     }
 
