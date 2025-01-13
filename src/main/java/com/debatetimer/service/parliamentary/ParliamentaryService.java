@@ -51,7 +51,7 @@ public class ParliamentaryService {
         existingTable.update(renewedTable);
 
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
@@ -60,7 +60,7 @@ public class ParliamentaryService {
     public void deleteTable(Long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         entityManager.clear();
         tableRepository.delete(table);
     }
