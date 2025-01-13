@@ -1,4 +1,4 @@
-package com.debatetimer;
+package com.debatetimer.repository;
 
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
