@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Rest Docs
+/src/main/resources/static/docs/openapi3.yaml

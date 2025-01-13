@@ -26,6 +26,12 @@ public class Member {
     @NotNull
     private String nickname;
 
+    public Member(long id, String nickname) {
+        validate(nickname);
+        this.id = id;
+        this.nickname = nickname;
+    }
+
     public Member(String nickname) {
         validate(nickname);
         this.nickname = nickname;
