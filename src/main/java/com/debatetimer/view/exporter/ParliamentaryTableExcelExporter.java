@@ -1,16 +1,5 @@
 package com.debatetimer.view.exporter;
 
-import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
-import static org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT;
-import static org.apache.poi.ss.usermodel.IndexedColors.BLACK;
-import static org.apache.poi.ss.usermodel.IndexedColors.CORAL;
-import static org.apache.poi.ss.usermodel.IndexedColors.CORNFLOWER_BLUE;
-import static org.apache.poi.ss.usermodel.IndexedColors.GREY_50_PERCENT;
-import static org.apache.poi.ss.usermodel.IndexedColors.LIGHT_CORNFLOWER_BLUE;
-import static org.apache.poi.ss.usermodel.IndexedColors.LIGHT_YELLOW;
-import static org.apache.poi.ss.usermodel.IndexedColors.ROSE;
-import static org.apache.poi.ss.usermodel.IndexedColors.WHITE;
-
 import com.debatetimer.domain.Stance;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
@@ -87,19 +76,22 @@ public class ParliamentaryTableExcelExporter {
     }
 
     private static void initializeFont(Workbook workbook) {
-        NORMAL = createFont(workbook, false, BLACK);
-        BOLD = createFont(workbook, true, BLACK);
-        BOLD_AND_WHITE = createFont(workbook, true, WHITE);
+        NORMAL = createFont(workbook, false, IndexedColors.BLACK);
+        BOLD = createFont(workbook, true, IndexedColors.BLACK);
+        BOLD_AND_WHITE = createFont(workbook, true, IndexedColors.WHITE);
     }
 
     private static void initializeStyle(Workbook workbook) {
-        HEADER_STYLE = createGroundColor(workbook, LIGHT_YELLOW, BOLD, LEFT);
-        HEADER_CELL_STYLE = createGroundColor(workbook, LIGHT_YELLOW, NORMAL, LEFT);
-        PROS_HEADER_STYLE = createGroundColor(workbook, CORNFLOWER_BLUE, BOLD, CENTER);
-        CONS_HEADER_STYLE = createGroundColor(workbook, CORAL, BOLD, CENTER);
-        PROS_STYLE = createGroundColor(workbook, LIGHT_CORNFLOWER_BLUE, NORMAL, CENTER);
-        CONS_STYLE = createGroundColor(workbook, ROSE, NORMAL, CENTER);
-        NEUTRAL_STYLE = createGroundColor(workbook, GREY_50_PERCENT, BOLD_AND_WHITE, CENTER);
+        HEADER_STYLE = createGroundColor(workbook, IndexedColors.LIGHT_YELLOW, BOLD, HorizontalAlignment.LEFT);
+        HEADER_CELL_STYLE = createGroundColor(workbook, IndexedColors.LIGHT_YELLOW, NORMAL, HorizontalAlignment.LEFT);
+        PROS_HEADER_STYLE = createGroundColor(workbook, IndexedColors.CORNFLOWER_BLUE, BOLD,
+                HorizontalAlignment.CENTER);
+        CONS_HEADER_STYLE = createGroundColor(workbook, IndexedColors.CORAL, BOLD, HorizontalAlignment.CENTER);
+        PROS_STYLE = createGroundColor(workbook, IndexedColors.LIGHT_CORNFLOWER_BLUE, NORMAL,
+                HorizontalAlignment.CENTER);
+        CONS_STYLE = createGroundColor(workbook, IndexedColors.ROSE, NORMAL, HorizontalAlignment.CENTER);
+        NEUTRAL_STYLE = createGroundColor(workbook, IndexedColors.GREY_50_PERCENT, BOLD_AND_WHITE,
+                HorizontalAlignment.CENTER);
     }
 
     public Workbook export(ParliamentaryTableResponse parliamentaryTableResponse) {
