@@ -12,9 +12,9 @@ import static org.apache.poi.ss.usermodel.IndexedColors.ROSE;
 import static org.apache.poi.ss.usermodel.IndexedColors.WHITE;
 
 import com.debatetimer.domain.Stance;
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
-import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
+import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
+import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -102,15 +102,18 @@ public class ParliamentaryTableExcelExporter {
         NEUTRAL_STYLE = createGroundColor(workbook, GREY_50_PERCENT, BOLD_AND_WHITE, CENTER);
     }
 
-    public Workbook export(ParliamentaryTable table, ParliamentaryTimeBoxes timeBoxes) {
+    public Workbook export(ParliamentaryTableResponse parliamentaryTableResponse) {
+        TableInfoResponse tableInfo = parliamentaryTableResponse.info();
+        List<TimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
+
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet(table.getName());
+        Sheet sheet = workbook.createSheet(tableInfo.name());
         initializeFont(workbook);
         initializeStyle(workbook);
 
-        createHeader(sheet, NAME_HEADER_ROW_NUMBER, NAME_HEADER, table.getName());
+        createHeader(sheet, NAME_HEADER_ROW_NUMBER, NAME_HEADER, tableInfo.name());
         createHeader(sheet, TYPE_HEADER_ROW_NUMBER, TYPE_HEADER, PARLIAMENTARY_HEADER_BODY);
-        createHeader(sheet, AGENDA_HEADER_ROW_NUMBER, AGENDA_HEADER, table.getAgenda());
+        createHeader(sheet, AGENDA_HEADER_ROW_NUMBER, AGENDA_HEADER, tableInfo.agenda());
 
         createTableHeader(sheet, TABLE_HEADER_ROW_NUMBER);
         createTimeBoxRows(timeBoxes, sheet);
@@ -147,21 +150,21 @@ public class ParliamentaryTableExcelExporter {
         }
     }
 
-    private void createTimeBoxRows(ParliamentaryTimeBoxes timeBoxes, Sheet sheet) {
-        List<ParliamentaryTimeBox> timeBoxeList = timeBoxes.getTimeBoxes();
-        for (int i = 0; i < timeBoxeList.size(); i++) {
-            createTimeBoxRow(sheet, i + TIME_BOX_FIRST_ROW_NUMBER, timeBoxeList.get(i));
+    private void createTimeBoxRows(List<TimeBoxResponse> timeBoxes, Sheet sheet) {
+        for (int i = 0; i < timeBoxes.size(); i++) {
+            createTimeBoxRow(sheet, i + TIME_BOX_FIRST_ROW_NUMBER, timeBoxes.get(i));
         }
     }
 
-    private void createTimeBoxRow(Sheet sheet, int rowNumber, ParliamentaryTimeBox timeBox) {
+    private void createTimeBoxRow(Sheet sheet, int rowNumber, TimeBoxResponse timeBox) {
         Row row = sheet.createRow(rowNumber);
         String timeBoxMessage = messageResolver.resolveBoxMessage(timeBox);
-        if (timeBox.getStance() == Stance.NEUTRAL) {
+        Stance stance = Stance.valueOf(timeBox.stance());
+        if (stance == Stance.NEUTRAL) {
             createNeutralRow(sheet, row, rowNumber, timeBoxMessage);
             return;
         }
-        createProsOrConsRow(row, timeBox.getStance(), timeBoxMessage);
+        createProsOrConsRow(row, stance, timeBoxMessage);
     }
 
     private void createNeutralRow(Sheet sheet, Row row, int index, String message) {
