@@ -43,6 +43,8 @@ public class ParliamentaryTableExcelExporter {
     private static final String PROS_HEADER = "찬성";
     private static final String CONS_HEADER = "반대";
 
+    private static final int PROS_COLUMN_NUMBER = 0;
+    private static final int CONS_COLUMN_NUMBER = 1;
     private static final int NAME_HEADER_ROW_NUMBER = 1;
     private static final int TYPE_HEADER_ROW_NUMBER = 2;
     private static final int AGENDA_HEADER_ROW_NUMBER = 3;
@@ -126,8 +128,8 @@ public class ParliamentaryTableExcelExporter {
 
     private void createTableHeader(Sheet sheet, int rowNumber) {
         Row row = sheet.createRow(rowNumber);
-        createCell(row, 0, PROS_HEADER, PROS_HEADER_STYLE);
-        createCell(row, 1, CONS_HEADER, CONS_HEADER_STYLE);
+        createCell(row, PROS_COLUMN_NUMBER, PROS_HEADER, PROS_HEADER_STYLE);
+        createCell(row, CONS_COLUMN_NUMBER, CONS_HEADER, CONS_HEADER_STYLE);
     }
 
     private void createCell(Row row, int index, String value, CellStyle style) {
@@ -152,33 +154,36 @@ public class ParliamentaryTableExcelExporter {
         Row row = sheet.createRow(rowNumber);
         String timeBoxMessage = messageResolver.resolveBoxMessage(timeBox);
         Stance stance = Stance.valueOf(timeBox.stance());
-        if (stance == Stance.NEUTRAL) {
-            createNeutralRow(sheet, row, rowNumber, timeBoxMessage);
-            return;
+        createRowByStance(sheet, row, stance, rowNumber, timeBoxMessage);
+    }
+
+    private void createRowByStance(Sheet sheet, Row row, Stance stance, int index, String message) {
+        switch (stance) {
+            case NEUTRAL:
+                Cell neturalCell = row.createCell(0);
+                neturalCell.setCellStyle(NEUTRAL_STYLE);
+                neturalCell.setCellValue(message);
+                sheet.addMergedRegion(new CellRangeAddress(index, index, 0, 1)); // A1:B1 셀 병합
+                break;
+
+            case PROS:
+                setProsAndConsCellstyle(row);
+                Cell prosCell = row.getCell(PROS_COLUMN_NUMBER);
+                prosCell.setCellValue(message);
+                break;
+
+            case CONS:
+                setProsAndConsCellstyle(row);
+                Cell consCell = row.getCell(CONS_COLUMN_NUMBER);
+                consCell.setCellValue(message);
+                break;
         }
-        createProsOrConsRow(row, stance, timeBoxMessage);
     }
 
-    private void createNeutralRow(Sheet sheet, Row row, int index, String message) {
-        Cell neturalCell = row.createCell(0);
-        neturalCell.setCellStyle(NEUTRAL_STYLE);
-        neturalCell.setCellValue(message);
-        sheet.addMergedRegion(new CellRangeAddress(index, index, 0, 1)); // A1:B1 셀 병합
-    }
-
-    private void createProsOrConsRow(Row row, Stance stance, String message) {
-        Cell prosCell = row.createCell(0);
+    private void setProsAndConsCellstyle(Row row) {
+        Cell prosCell = row.createCell(PROS_COLUMN_NUMBER);
         prosCell.setCellStyle(PROS_STYLE);
-
-        Cell consCell = row.createCell(1);
+        Cell consCell = row.createCell(CONS_COLUMN_NUMBER);
         consCell.setCellStyle(CONS_STYLE);
-
-        if (stance == Stance.PROS) {
-            prosCell.setCellValue(message);
-        }
-
-        if (stance == Stance.CONS) {
-            consCell.setCellValue(message);
-        }
     }
 }
