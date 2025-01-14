@@ -109,7 +109,7 @@ public class ParliamentaryTableExcelExporter {
         createHeader(sheet, TYPE_HEADER_ROW_NUMBER, TYPE_HEADER, PARLIAMENTARY_HEADER_BODY);
         createHeader(sheet, AGENDA_HEADER_ROW_NUMBER, AGENDA_HEADER, tableInfo.agenda());
 
-        createTableHeader(sheet, TABLE_HEADER_ROW_NUMBER);
+        createTableHeader(sheet);
         createTimeBoxRows(timeBoxes, sheet);
         setColumnWidth(sheet);
         return workbook;
@@ -126,8 +126,8 @@ public class ParliamentaryTableExcelExporter {
         createCell(row, 1, headerBody, HEADER_CELL_STYLE);
     }
 
-    private void createTableHeader(Sheet sheet, int rowNumber) {
-        Row row = sheet.createRow(rowNumber);
+    private void createTableHeader(Sheet sheet) {
+        Row row = sheet.createRow(TABLE_HEADER_ROW_NUMBER);
         createCell(row, PROS_COLUMN_NUMBER, PROS_HEADER, PROS_HEADER_STYLE);
         createCell(row, CONS_COLUMN_NUMBER, CONS_HEADER, CONS_HEADER_STYLE);
     }
