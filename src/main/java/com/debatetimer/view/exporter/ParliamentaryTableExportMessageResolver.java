@@ -10,8 +10,8 @@ public class ParliamentaryTableExportMessageResolver {
     private static final String SPEAKER_SUFFIX = "번 토론자";
     private static final String MINUTES_MESSAGE = "분";
     private static final String SECOND_MESSAGE = "초";
-    private static final String LEFT_PARENTHESIS = "(";
-    private static final String RIGHT_PARENTHESIS = ")";
+    private static final String TIME_MESSAGE_PREFIX = "(";
+    private static final String TIME_MESSAGE_SUFFIX = ")";
     private static final String SLASH = "/";
     private static final String SPACE = " ";
 
@@ -29,9 +29,7 @@ public class ParliamentaryTableExportMessageResolver {
     private String resolveDefaultMessage(TimeBoxResponse timeBox) {
         BoxType boxType = BoxType.valueOf(timeBox.type());
         return BoxTypeView.mapView(boxType)
-                + LEFT_PARENTHESIS
-                + resolveTimeMessage(timeBox.time())
-                + RIGHT_PARENTHESIS;
+                + resolveTimeMessage(timeBox.time());
     }
 
     private String resolveTimeMessage(int totalSecond) {
@@ -42,7 +40,9 @@ public class ParliamentaryTableExportMessageResolver {
         if (second != 0) {
             message += SPACE + second + SECOND_MESSAGE;
         }
-        return message;
+        return TIME_MESSAGE_PREFIX
+                + message
+                + TIME_MESSAGE_SUFFIX;
     }
 
     private String resolveSpeakerMessage(int speakerNumber) {
