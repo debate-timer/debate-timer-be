@@ -1,4 +1,4 @@
-package com.debatetimer.domain.exporter;
+package com.debatetimer.view.exporter;
 
 import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
 import static org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT;
@@ -15,7 +15,6 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
-import com.debatetimer.view.exporter.ParliamentaryTableExportMessageResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
