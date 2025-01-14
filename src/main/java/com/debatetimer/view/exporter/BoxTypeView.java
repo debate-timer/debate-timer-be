@@ -1,8 +1,8 @@
 package com.debatetimer.view.exporter;
 
 import com.debatetimer.domain.BoxType;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public enum BoxTypeView {
         return Stream.of(values())
                 .filter(value -> value.boxType == target)
                 .findAny()
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TYPE))
+                .orElseThrow(() -> new DTServerErrorException(ServerErrorCode.EXCEL_EXPORT_ERROR))
                 .viewMessage;
     }
 }

@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.domain.BoxType;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,8 +29,8 @@ class BoxTypeViewTest {
             BoxType mockBoxType = Mockito.mock(BoxType.class);
 
             assertThatThrownBy(() -> BoxTypeView.mapView(mockBoxType))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TYPE.getMessage());
+                    .isInstanceOf(DTServerErrorException.class)
+                    .hasMessage(ServerErrorCode.EXCEL_EXPORT_ERROR.getMessage());
         }
     }
 }
