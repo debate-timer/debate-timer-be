@@ -20,8 +20,13 @@ class BoxTypeViewTest {
         @ParameterizedTest
         @EnumSource(value = BoxTypeView.class)
         void 타임박스_타입과_일치하는_메시지를_반환한다(BoxTypeView boxTypeView) {
-            assertThat(BoxTypeView.mapView(boxTypeView.getBoxType()))
-                    .isEqualTo(boxTypeView.getViewMessage());
+            BoxType mappedBoxType = boxTypeView.getBoxType();
+            String expectedMessage = boxTypeView.getViewMessage();
+
+            String actualMappedMessage = BoxTypeView.mapView(mappedBoxType);
+
+            assertThat(actualMappedMessage)
+                    .isEqualTo(expectedMessage);
         }
 
         @Test
