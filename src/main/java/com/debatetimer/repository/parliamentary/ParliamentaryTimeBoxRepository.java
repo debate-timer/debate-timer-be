@@ -15,9 +15,8 @@ public interface ParliamentaryTimeBoxRepository extends Repository<Parliamentary
 
     ParliamentaryTimeBox save(ParliamentaryTimeBox timeBox);
 
-    @Transactional
-    @Modifying
     @Query("DELETE FROM ParliamentaryTimeBox ptb WHERE ptb IN :timeBoxes")
+    @Modifying(clearAutomatically = true)
     void deleteAll(List<ParliamentaryTimeBox> timeBoxes);
 
     default ParliamentaryTimeBoxes findTableTimeBoxes(ParliamentaryTable table) {
