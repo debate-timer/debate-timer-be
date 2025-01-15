@@ -1,5 +1,6 @@
-package com.debatetimer;
+package com.debatetimer.service;
 
+import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;

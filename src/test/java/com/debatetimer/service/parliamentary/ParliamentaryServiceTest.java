@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.BaseServiceTest;
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
@@ -16,6 +15,7 @@ import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.service.BaseServiceTest;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
