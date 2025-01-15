@@ -10,16 +10,16 @@ import org.springframework.data.repository.Repository;
 
 public interface ParliamentaryTableRepository extends Repository<ParliamentaryTable, Long> {
 
-    Optional<ParliamentaryTable> findById(long id);
-
-    List<ParliamentaryTable> findAllByMember(Member member);
-
     ParliamentaryTable save(ParliamentaryTable parliamentaryTable);
 
-    void delete(ParliamentaryTable table);
+    Optional<ParliamentaryTable> findById(long id);
 
     default ParliamentaryTable getById(long tableId) {
         return findById(tableId)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
     }
+
+    List<ParliamentaryTable> findAllByMember(Member member);
+
+    void delete(ParliamentaryTable table);
 }

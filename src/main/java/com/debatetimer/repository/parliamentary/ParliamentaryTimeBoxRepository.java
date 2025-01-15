@@ -11,18 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ParliamentaryTimeBoxRepository extends Repository<ParliamentaryTimeBox, Long> {
 
-    List<ParliamentaryTimeBox> findAllByParliamentaryTable(ParliamentaryTable table);
-
     ParliamentaryTimeBox save(ParliamentaryTimeBox timeBox);
-
-    @Query("DELETE FROM ParliamentaryTimeBox ptb WHERE ptb IN :timeBoxes")
-    @Modifying(clearAutomatically = true)
-    void deleteAll(List<ParliamentaryTimeBox> timeBoxes);
-
-    default ParliamentaryTimeBoxes findTableTimeBoxes(ParliamentaryTable table) {
-        List<ParliamentaryTimeBox> timeBoxes = findAllByParliamentaryTable(table);
-        return new ParliamentaryTimeBoxes(timeBoxes);
-    }
 
     @Transactional
     default List<ParliamentaryTimeBox> saveAll(List<ParliamentaryTimeBox> timeBoxes) {
@@ -30,4 +19,15 @@ public interface ParliamentaryTimeBoxRepository extends Repository<Parliamentary
                 .map(this::save)
                 .toList();
     }
+
+    List<ParliamentaryTimeBox> findAllByParliamentaryTable(ParliamentaryTable table);
+
+    default ParliamentaryTimeBoxes findTableTimeBoxes(ParliamentaryTable table) {
+        List<ParliamentaryTimeBox> timeBoxes = findAllByParliamentaryTable(table);
+        return new ParliamentaryTimeBoxes(timeBoxes);
+    }
+
+    @Query("DELETE FROM ParliamentaryTimeBox ptb WHERE ptb IN :timeBoxes")
+    @Modifying(clearAutomatically = true)
+    void deleteAll(List<ParliamentaryTimeBox> timeBoxes);
 }

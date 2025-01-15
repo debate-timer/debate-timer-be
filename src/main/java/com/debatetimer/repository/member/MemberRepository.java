@@ -8,9 +8,9 @@ import org.springframework.data.repository.Repository;
 
 public interface MemberRepository extends Repository<Member, Long> {
 
-    Optional<Member> findById(long id);
-
     Member save(Member member);
+
+    Optional<Member> findById(long id);
 
     default Member getById(long id) {
         return findById(id)
