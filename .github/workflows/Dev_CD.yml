@@ -55,16 +55,16 @@ jobs:
           name: app-artifact
           path: ~/app
 
-      - name: Kill process using port 8080
-        run: |
-          PID=$(sudo lsof -t -i:8080)
-          echo "P = $PID"
-          if [ -n "$PID" ]; then
-            echo "Killing process with PID: $PID"
-            sudo kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail"
-          else
-            echo "No process is using port 8080"
-          fi
+      #      - name: Kill process using port 8080
+      #        run: |
+      #          PID=$(sudo lsof -t -i:8080)
+      #          echo "P = $PID"
+      #          if [ -n "$PID" ]; then
+      #            echo "Killing process with PID: $PID"
+      #            sudo kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail"
+      #          else
+      #            echo "No process is using port 8080"
+      #          fi
 
       - name: Find JAR file
         run: |
