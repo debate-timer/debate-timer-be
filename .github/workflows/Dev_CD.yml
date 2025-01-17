@@ -3,7 +3,6 @@ name: dev-cd
 on:
   push:
     branches:
-      - "chore/#57"
       - "develop"
 
 jobs:
@@ -14,7 +13,7 @@ jobs:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
         with:
-          ref: "chore/#57"
+          ref: "develop"
 
       - name: Setting dev-secret.yml
         run: |

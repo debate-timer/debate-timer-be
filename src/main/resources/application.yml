@@ -10,9 +10,3 @@ springdoc:
     filter: true
     persist-authorization: true
     display-request-duration: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, environment
