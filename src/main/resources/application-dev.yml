@@ -1,9 +1,11 @@
 spring:
+  config:
+    import: dev-secret.yml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${ DEV_DB_HOST }:3306/${ DEV_DB_DATABASE_NAME }
-    username: ${ DEV_DB_USERNAME }
-    password: ${ DEV_DB_PASSWORD }
+    url: jdbc:mysql://${secret.datasource.url}:${secret.datasource.port}/${secret.datasource.database}?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&autoReconnect=true&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false
+    username: ${secret.datasource.username}
+    password: ${secret.datasource.password}
   jpa:
     show-sql: true
     properties:
