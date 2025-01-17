@@ -66,6 +66,24 @@ jobs:
       #            echo "No process is using port 8080"
       #          fi
 
+      - name: Kill process
+        run: |
+          PID=$(sudo lsof -t -i:8080)
+          echo "PID=$PID"
+
+          if [ -n "$PID" ]; then
+            echo "Killing process with PID: $PID"
+
+            if sudo kill -15 "$PID"; then
+              echo "terminate $PID success"
+            else
+              echo "terminate $PID fail"
+              exit 1  # 실패하면 exit 1
+            fi
+          else
+            echo "No process is using port 8080"
+          fi
+
       - name: Find JAR file
         run: |
           JAR_FILE=$(find /home/ubuntu/app -maxdepth 1 -name "*.jar" -print -quit)
