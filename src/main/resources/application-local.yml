@@ -1,18 +1,14 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:database
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${ DEV_DB_HOST }:3306/${ DEV_DB_DATABASE_NAME }
+    username: ${ DEV_DB_USERNAME }
+    password: ${ DEV_DB_PASSWORD }
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     defer-datasource-initialization: true
