@@ -64,7 +64,7 @@ jobs:
           echo "DISCORD_CONTENT=$(echo $content | base64 -w 0)" >> $GITHUB_ENV
 
       - name: Notify Discord
-        if: ${{ env.POST_URL && env.DISCORD_CONTENT && env.WEB_HOOK }}
+        if: ${{ env.WEB_HOOK && env.POST_URL && env.DISCORD_CONTENT }}
         env:
           DISCORD_CONTENT: ${{ env.DISCORD_CONTENT }}
           COMMENT_AUTHOR: ${{ env.COMMENT_AUTHOR }}
