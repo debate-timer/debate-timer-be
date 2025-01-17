@@ -60,7 +60,7 @@ jobs:
           PID=$(sudo lsof -t -i:8080)
           if [ -n "$PID" ]; then
             echo "Killing process with PID: $PID"
-            sudo kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail" exit 1
+            sudo kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail"
           else
             echo "No process is using port 8080"
           fi
