@@ -57,7 +57,7 @@ jobs:
 
       - name: Kill process using port 8080
         run: |
-          PID=$(lsof -t -i:8080)
+          PID=$(sudo lsof -t -i:8080)
           if [ -n "$PID" ]; then
             echo "Killing process with PID: $PID"
             kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail"
