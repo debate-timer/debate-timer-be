@@ -1,0 +1,80 @@
+name: dev-cd
+
+on:
+  push:
+    branches:
+      - "chore/#57"
+      - "develop"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
+      DEV_DB_DATABASE_NAME: ${{ secrets.DEV_DB_DATABASE_NAME }}
+      DEV_DB_USERNAME: ${{ secrets.DEV_DB_USERNAME }}
+      DEV_DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
+
+    steps:
+      - name: Checkout Develop Branch
+        uses: actions/checkout@v4
+        with:
+          ref: "develop"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: bootJar with Gradle
+        run: ./gradlew bootJar
+
+      - name: Change artifact file name
+        run: mv build/libs/*.jar build/libs/app.jar
+
+      - name: Upload artifact file
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact
+          path: ./backend/build/libs/app.jar
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: dev
+
+    steps:
+      - name: Download artifact file
+        uses: actions/download-artifact@v4
+        with:
+          name: app-artifact
+          path: ~/app
+
+      - name: Kill process using port 8080
+        run: |
+          PID=$(lsof -t -i:8080)
+          if [ -n "$PID" ]; then
+            echo "Killing process with PID: $PID"
+            kill -15 "$PID" && echo "terminate $PID success" || echo "terminate $PID fail"
+          else
+            echo "No process is using port 8080"
+          fi
+
+      - name: Find JAR file
+        run: |
+          JAR_FILE=$(find /home/ubuntu/app -maxdepth 1 -name "*.jar" -print -quit)
+          
+          if [ -z "$JAR_FILE" ]; then
+            echo "No JAR file found in /home/ubuntu/app."
+            exit 1
+          else
+            echo "Found JAR file: $JAR_FILE"
+            echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+          fi
+
+      - name: Start application
+        run: |
+          sudo nohup java -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -Dserver.port=8080 -jar ${{ env.JAR_FILE }} > /dev/null 2>&1 &
+          echo "Application started successfully in the background."
