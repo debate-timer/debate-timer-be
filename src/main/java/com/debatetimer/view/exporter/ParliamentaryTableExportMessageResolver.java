@@ -12,7 +12,7 @@ public class ParliamentaryTableExportMessageResolver {
     private static final String SECOND_MESSAGE = "초";
     private static final String TIME_MESSAGE_PREFIX = "(";
     private static final String TIME_MESSAGE_SUFFIX = ")";
-    private static final String SLASH = "/";
+    private static final String MESSAGE_DELIMITER = "/";
     private static final String SPACE = " ";
 
     public String resolveBoxMessage(TimeBoxResponse timeBox) {
@@ -22,7 +22,7 @@ public class ParliamentaryTableExportMessageResolver {
             return defaultMessage;
         }
         return defaultMessage
-                + SLASH
+                + MESSAGE_DELIMITER
                 + resolveSpeakerMessage(timeBox.speakerNumber());
     }
 
