@@ -150,7 +150,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(chanTable);
 
             assertAll(
-                    () -> assertThat(foundTable).isNotPresent(),
+                    () -> assertThat(foundTable).isEmpty(),
                     () -> assertThat(timeBoxes).isEmpty()
             );
         }

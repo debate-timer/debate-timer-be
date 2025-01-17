@@ -9,6 +9,7 @@ import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.BaseServiceTest;
+import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,10 @@ class MemberServiceTest extends BaseServiceTest {
 
             MemberCreateResponse actual = memberService.createMember(request);
 
-            long memberCount = memberRepository.count();
+            Optional<Member> foundMember = memberRepository.findById(actual.id());
             assertAll(
                     () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
-                    () -> assertThat(memberCount).isEqualTo(1L)
+                    () -> assertThat(foundMember).isPresent()
             );
         }
     }
