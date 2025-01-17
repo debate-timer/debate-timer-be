@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: local
+    default: dev
 
 springdoc:
   swagger-ui:
