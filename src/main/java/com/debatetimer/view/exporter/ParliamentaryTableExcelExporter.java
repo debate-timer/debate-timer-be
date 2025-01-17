@@ -153,7 +153,7 @@ public class ParliamentaryTableExcelExporter {
     private void createTimeBoxRow(Sheet sheet, int rowNumber, TimeBoxResponse timeBox) {
         Row row = sheet.createRow(rowNumber);
         String timeBoxMessage = messageResolver.resolveBoxMessage(timeBox);
-        Stance stance = Stance.valueOf(timeBox.stance());
+        Stance stance = timeBox.stance();
         createRowByStance(sheet, row, stance, rowNumber, timeBoxMessage);
     }
 

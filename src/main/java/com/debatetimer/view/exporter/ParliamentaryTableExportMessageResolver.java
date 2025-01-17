@@ -17,7 +17,7 @@ public class ParliamentaryTableExportMessageResolver {
 
     public String resolveBoxMessage(TimeBoxResponse timeBox) {
         String defaultMessage = resolveDefaultMessage(timeBox);
-        BoxType type = BoxType.valueOf(timeBox.type());
+        BoxType type = timeBox.type();
         if (type == BoxType.TIME_OUT) {
             return defaultMessage;
         }
@@ -27,7 +27,7 @@ public class ParliamentaryTableExportMessageResolver {
     }
 
     private String resolveDefaultMessage(TimeBoxResponse timeBox) {
-        BoxType boxType = BoxType.valueOf(timeBox.type());
+        BoxType boxType = timeBox.type();
         return BoxTypeView.mapView(boxType)
                 + resolveTimeMessage(timeBox.time());
     }
