@@ -10,7 +10,6 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class ParliamentaryService {
 
     private final ParliamentaryTableRepository tableRepository;
     private final ParliamentaryTimeBoxRepository timeBoxRepository;
-    private final EntityManager entityManager;
 
     @Transactional
     public ParliamentaryTableResponse save(ParliamentaryTableCreateRequest tableCreateRequest, Member member) {
@@ -51,7 +49,7 @@ public class ParliamentaryService {
         existingTable.update(renewedTable);
 
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
@@ -60,8 +58,7 @@ public class ParliamentaryService {
     public void deleteTable(Long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        timeBoxRepository.deleteAllInBatch(timeBoxes.getTimeBoxes());
-        entityManager.clear();
+        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 

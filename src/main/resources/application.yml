@@ -3,16 +3,10 @@ spring:
     default: local
 
 springdoc:
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  api-docs:
-    path: /api-docs
   swagger-ui:
+    path: /docs/swagger
+    url: /docs/openapi3.yaml
     disable-swagger-default-url: true
-    display-request-duration: true
-    operations-sorter: alpha
-    enabled: true
-    persist-authorization: true
     filter: true
-  override-with-generic-response: false
-
+    persist-authorization: true
+    display-request-duration: true

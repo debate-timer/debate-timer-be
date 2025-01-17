@@ -3,7 +3,9 @@ package com.debatetimer.domain.parliamentary;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 public class ParliamentaryTimeBoxes {
 
@@ -13,7 +15,8 @@ public class ParliamentaryTimeBoxes {
     private final List<ParliamentaryTimeBox> timeBoxes;
 
     public ParliamentaryTimeBoxes(List<ParliamentaryTimeBox> timeBoxes) {
-        timeBoxes.sort(TIME_BOX_COMPARATOR);
-        this.timeBoxes = timeBoxes;
+        this.timeBoxes = timeBoxes.stream()
+                .sorted(TIME_BOX_COMPARATOR)
+                .toList();
     }
 }
