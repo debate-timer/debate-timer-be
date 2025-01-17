@@ -77,7 +77,13 @@ jobs:
             echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
           fi
 
-      - name: Start application
+      - name: Start application with environment variables
         run: |
-          sudo nohup java -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -Dserver.port=8080 -jar ${{ env.JAR_FILE }} > /dev/null 2>&1 &
+          sudo nohup java -Dspring.profiles.active=dev \
+          -Duser.timezone=Asia/Seoul \ 
+          -Dserver.port=8080 \
+          -Dspring.datasource.url=jdbc:mysql://${DEV_DB_HOST}:3306/${DEV_DB_DATABASE_NAME} \
+          -Dspring.datasource.username=${DEV_DB_USERNAME} \
+          -Dspring.datasource.password=${DEV_DB_PASSWORD} \
+          -jar ~/app/app.jar > /dev/null 2>&1 &
           echo "Application started successfully in the background."
