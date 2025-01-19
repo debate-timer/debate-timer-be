@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "main"
-      - "chore/#59"
 
 jobs:
   build:
@@ -14,7 +13,7 @@ jobs:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
         with:
-          ref: "chore/#59"
+          ref: "main"
 
       - name: Setting prod-secret.yml
         run: |
