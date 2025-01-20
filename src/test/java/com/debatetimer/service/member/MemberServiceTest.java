@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.Optional;
@@ -24,13 +24,13 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 회원를_생성한다() {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            MemberInfo request = new MemberInfo("커찬");
 
             MemberCreateResponse actual = memberService.createMember(request);
 
             Optional<Member> foundMember = memberRepository.findById(actual.id());
             assertAll(
-                    () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
+                    () -> assertThat(actual.nickname()).isEqualTo(request.name()),
                     () -> assertThat(foundMember).isPresent()
             );
         }
