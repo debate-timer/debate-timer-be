@@ -11,8 +11,8 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
-import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponse;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.dto.member.TableType;
@@ -45,7 +45,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 회원_생성_성공() {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            MemberInfo request = new MemberInfo("커찬");
             MemberCreateResponse response = new MemberCreateResponse(1L, "커찬");
             when(memberService.createMember(request)).thenReturn(response);
 
@@ -67,7 +67,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         )
         @ParameterizedTest
         void 회원_생성_실패(ClientErrorCode errorCode) {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            MemberInfo request = new MemberInfo("커찬");
             when(memberService.createMember(request)).thenThrow(new DTClientErrorException(errorCode));
 
             var document = document("member/create", errorCode)
