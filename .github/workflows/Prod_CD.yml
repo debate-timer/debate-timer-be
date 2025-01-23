@@ -28,6 +28,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Clean And Test With Gradle
+        run: ./gradlew clean test
+
       - name: bootJar with Gradle
         run: ./gradlew bootJar --info
 
