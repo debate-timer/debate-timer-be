@@ -46,7 +46,7 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
-    
+
     // Excel Export
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'org.apache.poi:poi:5.2.3'
