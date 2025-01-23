@@ -4,14 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - chore/#59
-
-#permissions:
-#  contents: read
-#  checks: write
-#  pull-requests: write
 
 jobs:
   build-and-push:
