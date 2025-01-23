@@ -4,18 +4,17 @@ on:
   pull_request:
     branches:
       - main
+      - chore/#59
 
-permissions:
-  contents: read
-  checks: write
-  pull-requests: write
+#permissions:
+#  contents: read
+#  checks: write
+#  pull-requests: write
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     timeout-minutes: 3
-    env:
-      TEST_REPORT: true
 
     steps:
       - uses: actions/checkout@v4
@@ -34,28 +33,3 @@ jobs:
 
       - name: Clean And Test With Gradle
         run: ./gradlew clean test
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: ${{ github.workspace }}/build/test-results/**/*.xml
-
-      - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v4
-        if: always()
-        with:
-          report_paths: ${{ github.workspace }}/build/test-results/**/*.xml
-
-      - name: Report test Coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.6.1
-        if: always()
-        with:
-          title: 📝 Test Coverage Report
-          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
-          update-comment: true
-          debug-mode: true
