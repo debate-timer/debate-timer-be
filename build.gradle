@@ -1,0 +1,108 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+
+    // Rest Docs & Swagger
+    id 'com.epages.restdocs-api-spec' version '0.18.2'
+    id 'org.hidetake.swagger.generator' version '2.18.2'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Rest Docs & Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
+    testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
+
+    // Excel Export
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.poi:poi:5.2.3'
+}
+
+bootJar {
+    dependsOn("openapi3")
+}
+
+jacoco {
+    toolVersion = '0.8.9'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(false)
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/debatetimer/**/dto/**"
+            ])
+        }))
+    }
+
+    onlyIf {
+        return System.getenv('TEST_REPORT') == 'true'
+    }
+}
+
+generateSwaggerUI {
+    dependsOn("openapi3")
+
+    delete(fileTree("src/main/resources/static/docs/") {
+        exclude(".gitkeep")
+    })
+    copy {
+        from("build/resources/main/static/docs/")
+        into("src/main/resources/static/docs/")
+    }
+}
+
+openapi3 {
+    server = "http://localhost:8080"
+    title = "토론 타이머 API"
+    description = "토론 타이머 API"
+    version = "0.0.1"
+    format = "yaml"
+    outputDirectory = "build/resources/main/static/docs"
+}
