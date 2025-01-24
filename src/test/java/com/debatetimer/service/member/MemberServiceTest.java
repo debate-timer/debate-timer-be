@@ -34,6 +34,16 @@ class MemberServiceTest extends BaseServiceTest {
                     () -> assertThat(foundMember).isPresent()
             );
         }
+
+        @Test
+        void 기존_닉네임을_가진_회원이_있다면_해당_회원을_반환한다() {
+            Member existedMember = memberGenerator.generate("커찬");
+            MemberCreateRequest request = new MemberCreateRequest("커찬");
+
+            MemberCreateResponse actual = memberService.createMember(request);
+
+            assertThat(actual.id()).isEqualTo(existedMember.getId());
+        }
     }
 
     @Nested
