@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: test
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:database
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+cors:
+  origin: http://test.debate-timer.com
