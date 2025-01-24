@@ -16,4 +16,6 @@ public interface MemberRepository extends Repository<Member, Long> {
         return findById(id)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_NOT_FOUND));
     }
+
+    Optional<Member> findByNickname(String nickname);
 }
