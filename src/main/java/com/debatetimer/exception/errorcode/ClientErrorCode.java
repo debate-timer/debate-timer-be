@@ -20,7 +20,7 @@ public enum ClientErrorCode implements ErrorCode {
     ),
     INVALID_TABLE_NAME_FORM(
             HttpStatus.BAD_REQUEST,
-            "테이블 이름은 영문/한글만 가능합니다"
+            "테이블 이름은 영문/한글/숫자/띄어쓰기만 가능합니다"
     ),
     INVALID_TABLE_TIME(HttpStatus.BAD_REQUEST, "시간은 양수만 가능합니다"),
 
