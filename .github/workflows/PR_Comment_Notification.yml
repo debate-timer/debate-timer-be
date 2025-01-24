@@ -14,7 +14,6 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
-          echo "${{ toJson(github.event.pull_request.base) }}"
 
       - name: Set Environment Variables for Issue
         if: ${{ !github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
