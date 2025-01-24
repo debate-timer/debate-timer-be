@@ -30,7 +30,7 @@ public class MemberService {
     public MemberCreateResponse createMember(MemberCreateRequest request) {
         // TODO OAuth 로직 들어오면서 수정 예정
         Member member = memberRepository.findByNickname(request.nickname())
-                .orElse(memberRepository.save(request.toMember()));
+                .orElseGet(() -> memberRepository.save(request.toMember()));
         return new MemberCreateResponse(member);
     }
 }
