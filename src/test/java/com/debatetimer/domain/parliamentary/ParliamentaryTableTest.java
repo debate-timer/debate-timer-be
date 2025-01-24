@@ -16,8 +16,8 @@ class ParliamentaryTableTest {
     class Validate {
 
         @ParameterizedTest
-        @ValueSource(strings = {"a bc가다", "가나 다ab"})
-        void 테이블_이름은_영문과_한글_띄어쓰기만_가능하다(String name) {
+        @ValueSource(strings = {"a bc가다9", "가0나 다ab"})
+        void 테이블_이름은_영문과_한글_숫자_띄어쓰기만_가능하다(String name) {
             Member member = new Member("member");
             assertThatCode(() -> new ParliamentaryTable(member, name, "agenda", 10))
                     .doesNotThrowAnyException();
@@ -42,7 +42,7 @@ class ParliamentaryTableTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"abc12", "가나다12", "abc\tde"})
+        @ValueSource(strings = {"abc@", "가나다*", "abc\tde"})
         void 허용된_글자_이외의_문자는_불가능하다(String name) {
             Member member = new Member("member");
             assertThatThrownBy(() -> new ParliamentaryTable(member, name, "agenda", 10))
