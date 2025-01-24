@@ -14,3 +14,6 @@ spring:
     hibernate:
       ddl-auto: update
     defer-datasource-initialization: true
+
+cors:
+  origin: ${secret.cors.origin}

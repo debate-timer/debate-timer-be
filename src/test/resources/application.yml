@@ -1,13 +1,18 @@
 spring:
+  profiles:
+    active: test
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:database
     username: sa
     password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   jpa:
     show-sql: true
     properties:
@@ -18,4 +23,4 @@ spring:
     defer-datasource-initialization: true
 
 cors:
-  origin: *
+  origin: http://test.debate-timer.com
