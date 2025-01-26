@@ -98,16 +98,16 @@ class ParliamentaryServiceTest extends BaseServiceTest {
                     )
             );
 
-            ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(
-                    renewTableRequest,
-                    chanTable.getId(),
-                    chan
-            );
+            parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
+
+            Optional<ParliamentaryTable> updatedTable = parliamentaryTableRepository.findById(chanTable.getId());
+            List<ParliamentaryTimeBox> updatedTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(
+                    updatedTable.get());
 
             assertAll(
-                    () -> assertThat(updatedTable.id()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(updatedTable.info().name()).isEqualTo(renewTableRequest.info().name()),
-                    () -> assertThat(updatedTable.table()).hasSize(renewTableRequest.table().size())
+                    () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
+                    () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
             );
         }
 
