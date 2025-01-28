@@ -1,6 +1,7 @@
 package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
+import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
@@ -16,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 @ExtendWith(DataBaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,6 +36,9 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
+
+    @Autowired
+    protected HeaderGenerator headerGenerator;
 
     @LocalServerPort
     private int port;
