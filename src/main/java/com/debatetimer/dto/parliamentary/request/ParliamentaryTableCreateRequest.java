@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 public record ParliamentaryTableCreateRequest(TableInfoCreateRequest info, List<TimeBoxCreateRequest> table) {
 
     public ParliamentaryTable toTable(Member member) {
-        return info.toTable(member, sumOfTime());
+        return info.toTable(member, sumOfTime(), info.warningBell(), info().finishBell());
     }
 
     private int sumOfTime() {

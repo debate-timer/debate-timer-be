@@ -38,8 +38,8 @@ class MemberControllerTest extends BaseControllerTest {
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberRepository.save(new Member("커찬"));
-            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
-            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800, false, false));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900, false, false));
 
             TableResponses response = given()
                     .contentType(ContentType.JSON)

@@ -34,21 +34,16 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("커찬");
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("커찬의 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(savedTableResponse.id());
             List<ParliamentaryTimeBox> foundTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(foundTable.get());
 
-            assertAll(
-                    () -> assertThat(foundTable.get().getName()).isEqualTo(chanTableRequest.info().name()),
-                    () -> assertThat(foundTimeBoxes).hasSize(chanTableRequest.table().size())
-            );
+            assertAll(() -> assertThat(foundTable.get().getName()).isEqualTo(chanTableRequest.info().name()),
+                    () -> assertThat(foundTimeBoxes).hasSize(chanTableRequest.table().size()));
         }
     }
 
@@ -64,10 +59,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             ParliamentaryTableResponse foundResponse = parliamentaryService.findTable(chanTable.getId(), chan);
 
-            assertAll(
-                    () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(foundResponse.table()).hasSize(2)
-            );
+            assertAll(() -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
+                    () -> assertThat(foundResponse.table()).hasSize(2));
         }
 
         @Test
@@ -77,9 +70,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
 
-            assertThatThrownBy(() -> parliamentaryService.findTable(chanTableId, coli))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+            assertThatThrownBy(() -> parliamentaryService.findTable(chanTableId, coli)).isInstanceOf(
+                    DTClientErrorException.class).hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 
@@ -91,12 +83,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("커찬");
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("커찬의 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
             parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
@@ -104,11 +93,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             List<ParliamentaryTimeBox> updatedTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(
                     updatedTable.get());
 
-            assertAll(
-                    () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
+            assertAll(() -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
-                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
-            );
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size()));
         }
 
         @Test
@@ -118,16 +105,13 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("새로운 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("새로운 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
-            assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+            assertThatThrownBy(
+                    () -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli)).isInstanceOf(
+                    DTClientErrorException.class).hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 
@@ -146,10 +130,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(chanTable.getId());
             List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(chanTable);
 
-            assertAll(
-                    () -> assertThat(foundTable).isEmpty(),
-                    () -> assertThat(timeBoxes).isEmpty()
-            );
+            assertAll(() -> assertThat(foundTable).isEmpty(), () -> assertThat(timeBoxes).isEmpty());
         }
 
         @Test
@@ -159,9 +140,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             Long chanTableId = chanTable.getId();
 
-            assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+            assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli)).isInstanceOf(
+                    DTClientErrorException.class).hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
     }
 }

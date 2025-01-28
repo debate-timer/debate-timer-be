@@ -10,10 +10,13 @@ public record TableInfoCreateRequest(
         String name,
 
         @NotNull
-        String agenda
+        String agenda,
+
+        boolean warningBell,
+        boolean finishBell
 ) {
 
-    public ParliamentaryTable toTable(Member member, int duration) {
-        return new ParliamentaryTable(member, name, agenda, duration);
+    public ParliamentaryTable toTable(Member member, int duration, boolean warningBell, boolean finishBell) {
+        return new ParliamentaryTable(member, name, agenda, duration, warningBell, finishBell);
     }
 }
