@@ -46,7 +46,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                 )
                 .requestBodyField(
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
-                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.nickname").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
@@ -59,7 +59,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
-                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.nickname").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
@@ -152,7 +152,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
-                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.nickname").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
@@ -223,7 +223,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                 )
                 .requestBodyField(
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
-                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.nickname").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
@@ -236,7 +236,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
-                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.nickname").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),

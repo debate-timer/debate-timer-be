@@ -54,7 +54,7 @@ class ParliamentaryTableTest {
         @ValueSource(ints = {0, -1, -60})
         void 테이블_시간은_양수만_가능하다(int duration) {
             Member member = new Member("member");
-            assertThatThrownBy(() -> new ParliamentaryTable(member, "name", "agenda", duration))
+            assertThatThrownBy(() -> new ParliamentaryTable(member, "nickname", "agenda", duration))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_TIME.getMessage());
         }

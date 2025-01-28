@@ -2,9 +2,8 @@ package com.debatetimer.config;
 
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.custom.DTException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.repository.member.MemberRepository;
+import com.debatetimer.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -17,7 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final MemberRepository memberRepository;
+    private final AuthService authService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -31,13 +30,11 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-        try {
-            long memberId = Long.parseLong(webRequest.getParameter("memberId"));
-            return memberRepository.getById(memberId);
-        } catch (DTException | NumberFormatException exception) {
-            log.warn(exception.getMessage());
+        String accessToken = webRequest.getHeader("Authorization");
+        if (accessToken == null) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
+        return authService.getMember(accessToken);
     }
 }
 
