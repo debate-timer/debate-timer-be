@@ -1,29 +1,25 @@
 package com.debatetimer.controller.member;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-
 import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
-import com.debatetimer.dto.member.MemberCreateResponse;
-import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.dto.member.TableResponse;
-import com.debatetimer.dto.member.TableResponses;
-import com.debatetimer.dto.member.TableType;
+import com.debatetimer.dto.member.*;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.http.HttpHeaders;
+
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 public class MemberDocumentTest extends BaseDocumentTest {
 
@@ -89,8 +85,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
                 .summary("멤버의 토론 시간표 조회")
-                .queryParameter(
-                        parameterWithName("memberId").description("멤버 ID")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
@@ -116,8 +112,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
-                    .contentType(ContentType.JSON)
-                    .queryParam("memberId", EXIST_MEMBER_ID)
+                    .headers(existMemberHeaders)
                     .when().get("/api/table")
                     .then().statusCode(200);
         }

@@ -2,7 +2,7 @@ package com.debatetimer.client;
 
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.dto.member.OAuthTokenResponse;
+import com.debatetimer.dto.member.OAuthToken;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -20,19 +20,19 @@ public class OAuthClient {
         this.oauthProperties = oauthProperties;
     }
 
-    public OAuthTokenResponse requestToken(MemberCreateRequest request) {
+    public OAuthToken requestToken(MemberCreateRequest request) {
         return restClient.post()
                 .uri("https://oauth2.googleapis.com/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(oauthProperties.createTokenRequestBody(request))
                 .retrieve()
-                .body(OAuthTokenResponse.class);
+                .body(OAuthToken.class);
     }
 
-    public MemberInfo requestMemberInfo(OAuthTokenResponse response) {
+    public MemberInfo requestMemberInfo(OAuthToken response) {
         return restClient.get()
                 .uri("https://www.googleapis.com/oauth2/v3/userinfo")
-                .header("Authorization", "Bearer " + response.access_token())
+                .headers(headers -> headers.setBearerAuth(response.access_token()))
                 .retrieve()
                 .body(MemberInfo.class);
     }
