@@ -33,14 +33,12 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("커찬");
-            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("커찬의 테이블", "주제");
-            List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
-                    requestTableInfo,
-                    requestTimeBoxes
+                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
+                    List.of(
+                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                    )
             );
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
@@ -48,8 +46,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             List<ParliamentaryTimeBox> foundTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(foundTable.get());
 
             assertAll(
-                    () -> assertThat(foundTable.get().getName()).isEqualTo(requestTableInfo.name()),
-                    () -> assertThat(foundTimeBoxes).hasSize(requestTimeBoxes.size())
+                    () -> assertThat(foundTable.get().getName()).isEqualTo(chanTableRequest.info().name()),
+                    () -> assertThat(foundTimeBoxes).hasSize(chanTableRequest.table().size())
             );
         }
     }
@@ -92,23 +90,24 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 의회식_토론_테이블을_수정한다() {
             Member chan = memberGenerator.generate("커찬");
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
-            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("커찬 테이블", "주제");
-            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    renewTableInfo,
-                    renewTimeBoxes
+                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
+                    List.of(
+                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                    )
             );
 
-            ParliamentaryTableResponse updatedTable = parliamentaryService.updateTable(renewTableRequest,
-                    chanTable.getId(), chan);
+            parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
+
+            Optional<ParliamentaryTable> updatedTable = parliamentaryTableRepository.findById(chanTable.getId());
+            List<ParliamentaryTimeBox> updatedTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(
+                    updatedTable.get());
 
             assertAll(
-                    () -> assertThat(updatedTable.id()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(updatedTable.info().name()).isEqualTo(renewTableInfo.name()),
-                    () -> assertThat(updatedTable.table()).hasSize(renewTimeBoxes.size())
+                    () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
+                    () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
             );
         }
 
@@ -118,14 +117,12 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member coli = memberGenerator.generate("콜리");
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
-            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("새로운 테이블", "주제");
-            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    renewTableInfo,
-                    renewTimeBoxes
+                    new TableInfoCreateRequest("새로운 테이블", "주제"),
+                    List.of(
+                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                    )
             );
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli))
