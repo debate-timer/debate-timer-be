@@ -1,8 +1,5 @@
 package com.debatetimer.controller.parliamentary;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
@@ -13,9 +10,14 @@ import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import io.restassured.http.ContentType;
-import java.util.List;
+import io.restassured.http.Headers;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ParliamentaryControllerTest extends BaseControllerTest {
 
@@ -32,10 +34,11 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
+            Headers headers = headerGenerator.generateAccessToken(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .body(request)
                     .when().post("/api/table/parliamentary")
                     .then().statusCode(201)
@@ -57,11 +60,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessToken(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .when().get("/api/table/parliamentary/{tableId}")
                     .then().statusCode(200)
                     .extract().as(ParliamentaryTableResponse.class);
@@ -89,11 +93,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                     renewTableInfo,
                     renewTimeBoxes
             );
+            Headers headers = headerGenerator.generateAccessToken(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .body(renewTableRequest)
                     .when().put("/api/table/parliamentary/{tableId}")
                     .then().statusCode(200)
@@ -116,11 +121,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessToken(bito);
 
             given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .when().delete("/api/table/parliamentary/{tableId}")
                     .then().statusCode(204);
         }
