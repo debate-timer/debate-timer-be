@@ -5,7 +5,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.dto.member.OAuthTokenResponse;
+import com.debatetimer.dto.member.OAuthToken;
 import com.debatetimer.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     public MemberInfo getMemberInfo(MemberCreateRequest request) {
-        OAuthTokenResponse oauthTokenResponse = oauthClient.requestToken(request);
-        return oauthClient.requestMemberInfo(oauthTokenResponse);
+        OAuthToken oauthToken = oauthClient.requestToken(request);
+        return oauthClient.requestMemberInfo(oauthToken);
     }
 
     public JwtTokenResponse createToken(MemberInfo memberInfo) {
