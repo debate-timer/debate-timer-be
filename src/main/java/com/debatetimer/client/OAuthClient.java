@@ -4,6 +4,7 @@ import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthTokenResponse;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -20,14 +21,10 @@ public class OAuthClient {
     }
 
     public OAuthTokenResponse requestToken(MemberCreateRequest request) {
-        return restClient.put()
-                .uri(uriBuilder -> uriBuilder.path("https://oauth2.googleapis.com/token")
-                        .queryParam("code", request.code())
-                        .queryParam("client_id", oauthProperties.getClientId())
-                        .queryParam("client_secret", oauthProperties.getClientSecret())
-                        .queryParam("redirect_uri", oauthProperties.getRedirectUri())
-                        .queryParam("grant_type", "authorization_code")
-                        .build())
+        return restClient.post()
+                .uri("https://oauth2.googleapis.com/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(oauthProperties.createTokenRequestBody(request))
                 .retrieve()
                 .body(OAuthTokenResponse.class);
     }
@@ -35,7 +32,7 @@ public class OAuthClient {
     public MemberInfo requestMemberInfo(OAuthTokenResponse response) {
         return restClient.get()
                 .uri("https://www.googleapis.com/oauth2/v3/userinfo")
-                .header("Authorization", "Bearer " + response.accessToken())
+                .header("Authorization", "Bearer " + response.access_token())
                 .retrieve()
                 .body(MemberInfo.class);
     }
