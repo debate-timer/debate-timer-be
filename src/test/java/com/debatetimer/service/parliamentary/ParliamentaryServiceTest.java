@@ -137,7 +137,10 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(chanTable.getId());
             List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(chanTable);
 
-            assertAll(() -> assertThat(foundTable).isEmpty(), () -> assertThat(timeBoxes).isEmpty());
+            assertAll(
+                    () -> assertThat(foundTable).isEmpty(),
+                    () -> assertThat(timeBoxes).isEmpty()
+            );
         }
 
         @Test
