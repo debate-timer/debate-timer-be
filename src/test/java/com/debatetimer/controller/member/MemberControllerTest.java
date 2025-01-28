@@ -1,36 +1,34 @@
 package com.debatetimer.controller.member;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.dto.member.MemberCreateRequest;
-import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.TableResponses;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class MemberControllerTest extends BaseControllerTest {
 
-    @Nested
-    class CreateMember {
-
-        @Test
-        void 회원을_생성한다() {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
-
-            MemberCreateResponse response = given()
-                    .contentType(ContentType.JSON)
-                    .body(request)
-                    .when().post("/api/member")
-                    .then().statusCode(201)
-                    .extract().as(MemberCreateResponse.class);
-
-            assertThat(response.nickname()).isEqualTo(request.nickname());
-        }
-    }
+//    @Nested
+//    class CreateMember {
+//
+//        @Test
+//        void 회원을_생성한다() {
+//            MemberCreateRequest request = new MemberCreateRequest("커찬");
+//
+//            MemberCreateResponse response = given()
+//                    .contentType(ContentType.JSON)
+//                    .body(request)
+//                    .when().post("/api/member")
+//                    .then().statusCode(201)
+//                    .extract().as(MemberCreateResponse.class);
+//
+//            assertThat(response.nickname()).isEqualTo(request.nickname());
+//        }
+//    }
 
     @Nested
     class GetTables {

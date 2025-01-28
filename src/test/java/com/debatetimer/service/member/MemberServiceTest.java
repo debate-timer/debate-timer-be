@@ -30,7 +30,7 @@ class MemberServiceTest extends BaseServiceTest {
 
             Optional<Member> foundMember = memberRepository.findById(actual.id());
             assertAll(
-                    () -> assertThat(actual.nickname()).isEqualTo(request.name()),
+                    () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
                     () -> assertThat(foundMember).isPresent()
             );
         }

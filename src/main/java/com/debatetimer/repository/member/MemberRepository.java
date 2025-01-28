@@ -19,4 +19,9 @@ public interface MemberRepository extends Repository<Member, Long> {
     }
 
     Optional<Member> findByNickname(String nickname);
+
+    default Member getByNickname(String nickname) {
+        return findByNickname(nickname)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_NOT_FOUND));
+    }
 }
