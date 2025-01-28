@@ -2,7 +2,6 @@ package com.debatetimer.service.member;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.repository.member.MemberRepository;
@@ -28,8 +27,8 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberCreateResponse createMember(MemberInfo memberInfo) {
-        Member member = memberRepository.save(memberInfo.toMember());
-        return new MemberCreateResponse(member);
+    public void createMember(MemberInfo memberInfo) {
+        memberRepository.findByNickname(memberInfo.nickname())
+                .orElseGet(() -> memberRepository.save(memberInfo.toMember()));
     }
 }
