@@ -1,7 +1,13 @@
 package com.debatetimer.client;
 
+import com.debatetimer.dto.member.MemberCreateRequest;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")
@@ -21,5 +27,19 @@ public class OAuthProperties {
         this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
         this.grantType = grantType;
+    }
+
+    public MultiValueMap<String, String> createTokenRequestBody(MemberCreateRequest request) {
+        String code = request.code();
+        String decode = URLDecoder.decode(code, StandardCharsets.UTF_8);
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", grantType);
+        map.add("client_id", clientId);
+        map.add("redirect_uri", redirectUri);
+        map.add("code", decode);
+        map.add("client_secret", clientSecret);
+
+        return map;
     }
 }

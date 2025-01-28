@@ -1,4 +1,7 @@
 package com.debatetimer.dto.member;
 
-public record OAuthTokenResponse(String accessToken) {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record OAuthTokenResponse(String access_token) {
 }
