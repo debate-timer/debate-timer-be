@@ -37,5 +37,3 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         return authService.getMember(accessToken);
     }
 }
-
-

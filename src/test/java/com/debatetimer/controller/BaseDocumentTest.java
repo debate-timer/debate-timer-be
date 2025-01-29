@@ -2,22 +2,22 @@ package com.debatetimer.controller;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.fixture.HeaderGenerator;
-import com.debatetimer.repository.member.MemberRepository;
+import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
@@ -35,6 +35,8 @@ public abstract class BaseDocumentTest {
 
     protected static long EXIST_MEMBER_ID = 123L;
     protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, "존재하는 멤버");
+    protected static String EXIST_MEMBER_TOKEN = "dflskgnkds";
+    protected static Headers EXIST_MEMBER_HEADER = new Headers(new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_TOKEN));
 
     protected static RestDocumentationResponse ERROR_RESPONSE = new RestDocumentationResponse()
             .responseBodyField(
@@ -42,18 +44,13 @@ public abstract class BaseDocumentTest {
             );
 
     @MockitoBean
-    private MemberRepository memberRepository;
-
-    @MockitoBean
     protected MemberService memberService;
 
     @MockitoBean
     protected ParliamentaryService parliamentaryService;
 
-    @Autowired
-    private HeaderGenerator headerGenerator;
-
-    protected Headers existMemberHeaders;
+    @MockitoBean
+    protected AuthService authService;
 
     @LocalServerPort
     private int port;
@@ -64,7 +61,6 @@ public abstract class BaseDocumentTest {
     void setEnvironment(RestDocumentationContextProvider restDocumentation) {
         setRestAssured(restDocumentation);
         setLoginMember();
-        setHeaders();
     }
 
     private void setRestAssured(RestDocumentationContextProvider restDocumentation) {
@@ -79,11 +75,7 @@ public abstract class BaseDocumentTest {
     }
 
     private void setLoginMember() {
-        when(memberRepository.getById(EXIST_MEMBER_ID)).thenReturn(EXIST_MEMBER);
-    }
-
-    private void setHeaders() {
-        existMemberHeaders = headerGenerator.generateAccessToken(EXIST_MEMBER);
+        when(authService.getMember(EXIST_MEMBER_TOKEN)).thenReturn(EXIST_MEMBER);
     }
 
     protected RestDocumentationRequest request() {

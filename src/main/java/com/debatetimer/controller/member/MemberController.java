@@ -12,11 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,4 +35,17 @@ public class MemberController {
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
         response.addHeader(HttpHeaders.SET_COOKIE, jwtTokenResponse.refreshToken());
     }
+
+//    @PostMapping("/api/member/reissue")
+//    public void reissueAccessToken(HttpServletRequest httpServletRequest) {
+//        cookieResolver.checkLoginRequired(httpServletRequest);
+//
+//        String refreshToken = cookieResolver.extractRefreshToken(httpServletRequest);
+//        String accessToken = authService.reissueAccessToken(refreshToken);
+//
+//        ResponseCookie accessTokenCookie = cookieProvider.createAccessTokenCookie(accessToken);
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+//                .build();
+//    }
 }
