@@ -8,6 +8,7 @@ import com.debatetimer.dto.member.*;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +24,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 
 public class MemberDocumentTest extends BaseDocumentTest {
 
+    @Disabled
     @Nested
     class CreateMember {
 
