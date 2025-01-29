@@ -17,6 +17,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberControllerTest extends BaseControllerTest {
 
     @Nested
+    class GetTables {
+
+        @Test
+        void 회원의_전체_토론_시간표를_조회한다() {
+            Member member = memberGenerator.generate("커찬");
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
+
+            Headers headers = headerGenerator.generateAccessTokenHeader(member);
+
+            TableResponses response = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headers)
+                    .when().get("/api/table")
+                    .then().statusCode(200)
+                    .extract().as(TableResponses.class);
+
+            assertThat(response.tables()).hasSize(2);
+        }
+    }
+
+    @Nested
     class CreateMember {
 
         @Disabled
@@ -36,24 +58,34 @@ class MemberControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class GetTables {
+    class ReissueAccessToken {
 
         @Test
-        void 회원의_전체_토론_시간표를_조회한다() {
-            Member member = memberGenerator.generate("커찬");
-            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
-            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
+        void 토큰을_갱신한다() {
+            Member bito = memberGenerator.generate("비토");
+            String refreshToken = tokenGenerator.generateRefreshToken(bito.getNickname());
 
-            Headers headers = headerGenerator.generateAccessTokenHeader(member);
+            given()
+                    .cookie("refreshToken", refreshToken)
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(200);
+        }
+    }
 
-            TableResponses response = given()
-                    .contentType(ContentType.JSON)
+    @Nested
+    class Logout {
+
+        @Test
+        void 로그아웃한다() {
+            Member bito = memberGenerator.generate("비토");
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            String refreshToken = tokenGenerator.generateRefreshToken(bito.getNickname());
+
+            given()
+                    .cookie("refreshToken", refreshToken)
                     .headers(headers)
-                    .when().get("/api/table")
-                    .then().statusCode(200)
-                    .extract().as(TableResponses.class);
-
-            assertThat(response.tables()).hasSize(2);
+                    .when().post("/api/member/logout")
+                    .then().statusCode(204);
         }
     }
 }
