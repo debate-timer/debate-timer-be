@@ -27,7 +27,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
         }
 
         @Test
-        void 기한이_만료된_토큰이면_예외를_반환시킨다() {
+        void 기한이_만료된_토큰이면_예외를_발생시킨다() {
             String expiredToken = tokenGenerator.generateExpiredToken();
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveAccessToken(expiredToken))
@@ -57,7 +57,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
         }
 
         @Test
-        void 기한이_만료된_토큰이면_예외를_반환시킨다() {
+        void 기한이_만료된_토큰이면_예외를_발생시킨다() {
             String expiredToken = tokenGenerator.generateExpiredToken();
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveRefreshToken(expiredToken))
