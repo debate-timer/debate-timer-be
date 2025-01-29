@@ -3,16 +3,14 @@ package com.debatetimer.controller.member;
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.dto.member.MemberCreateRequest;
-import com.debatetimer.dto.member.MemberCreateResponse;
-import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.dto.member.*;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 
 class MemberControllerTest extends BaseControllerTest {
 
@@ -41,19 +39,19 @@ class MemberControllerTest extends BaseControllerTest {
     @Nested
     class CreateMember {
 
-        @Disabled
         @Test
         void 회원을_생성한다() {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            MemberCreateRequest request = new MemberCreateRequest("gnkldsnglnksl");
+            OAuthToken oAuthToken = new OAuthToken("accessToken");
+            MemberInfo memberInfo = new MemberInfo("비토");
+            doReturn(oAuthToken).when(oAuthClient).requestToken(request);
+            doReturn(memberInfo).when(oAuthClient).requestMemberInfo(oAuthToken);
 
-            MemberCreateResponse response = given()
+            given()
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/member")
-                    .then().statusCode(201)
-                    .extract().as(MemberCreateResponse.class);
-
-            assertThat(response.nickname()).isEqualTo(request.code());
+                    .then().statusCode(201);
         }
     }
 

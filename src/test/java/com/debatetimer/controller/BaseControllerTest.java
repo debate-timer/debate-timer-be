@@ -1,6 +1,7 @@
 package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
+import com.debatetimer.client.OAuthClient;
 import com.debatetimer.fixture.*;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ExtendWith(DataBaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,6 +44,9 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected TokenGenerator tokenGenerator;
+
+    @MockitoBean
+    protected OAuthClient oAuthClient;
 
     @LocalServerPort
     private int port;
