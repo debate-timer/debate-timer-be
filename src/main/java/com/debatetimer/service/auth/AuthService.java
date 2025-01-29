@@ -6,6 +6,8 @@ import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,5 +43,12 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(memberInfo);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberInfo);
         return new JwtTokenResponse(accessToken, newRefreshToken);
+    }
+
+    public void logout(Member member, String refreshToken) {
+        String nickname = jwtTokenResolver.resolveRefreshToken(refreshToken);
+        if (!member.getNickname().equals(nickname)) {
+            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
+        }
     }
 }

@@ -16,10 +16,14 @@ public class CookieService {
     private final JwtTokenProperties jwtTokenProperties;
 
     public Cookie createRefreshTokenCookie(String token) {
-        return cookieProvider.createCookie("refreshToken", token, jwtTokenProperties.getRefreshTokenExpirationMillis());
+        return cookieProvider.createCookie(REFRESH_TOKEN_COOKIE_NAME, token, jwtTokenProperties.getRefreshTokenExpirationMillis());
     }
 
     public String extractRefreshToken(Cookie[] cookies) {
         return cookieExtractor.extractCookie(REFRESH_TOKEN_COOKIE_NAME, cookies);
+    }
+
+    public Cookie deleteRefreshTokenCookie() {
+        return cookieProvider.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
     }
 }

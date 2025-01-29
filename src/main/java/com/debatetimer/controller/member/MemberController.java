@@ -51,4 +51,14 @@ public class MemberController {
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
         response.addCookie(refreshTokenCookie);
     }
+
+    @PostMapping("/api/member/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@AuthMember Member member, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = cookieService.extractRefreshToken(request.getCookies());
+        authService.logout(member, refreshToken);
+        Cookie deletedRefreshTokenCookie = cookieService.deleteRefreshTokenCookie();
+
+        response.addCookie(deletedRefreshTokenCookie);
+    }
 }
