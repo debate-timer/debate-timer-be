@@ -17,8 +17,8 @@ public class CookieGenerator {
         this.cookieProvider = cookieProvider;
     }
 
-    public Cookie[] generateRefreshCookie(String nickname) {
-        String refreshToken = jwtTokenProvider.createRefreshToken(new MemberInfo(nickname));
+    public Cookie[] generateRefreshCookie(String nickname, String email) {
+        String refreshToken = jwtTokenProvider.createRefreshToken(new MemberInfo(nickname, email));
         return generateCookie("refreshToken", refreshToken, 100000);
     }
 

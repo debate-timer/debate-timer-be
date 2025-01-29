@@ -17,14 +17,14 @@ class MemberTest {
         @ParameterizedTest
         @ValueSource(strings = {"a bc가다", "가나 다ab"})
         void 닉네임은_영문과_한글_띄어쓰기만_가능하다(String nickname) {
-            assertThatCode(() -> new Member(nickname))
+            assertThatCode(() -> new Member(nickname, "default@gmail.com"))
                     .doesNotThrowAnyException();
         }
 
         @ParameterizedTest
         @ValueSource(ints = {0, Member.NICKNAME_MAX_LENGTH + 1})
         void 닉네임은_정해진_길이_이내여야_한다(int length) {
-            assertThatThrownBy(() -> new Member("f".repeat(length)))
+            assertThatThrownBy(() -> new Member("f".repeat(length), "default@gmail.com"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_MEMBER_NICKNAME_LENGTH.getMessage());
         }
@@ -32,7 +32,7 @@ class MemberTest {
         @ParameterizedTest
         @ValueSource(strings = {"abc12", "가나다12"})
         void 닉네임은_영문과_한글만_가능하다(String nickname) {
-            assertThatThrownBy(() -> new Member(nickname))
+            assertThatThrownBy(() -> new Member(nickname, "default@gmail.com"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_MEMBER_NICKNAME_FORM.getMessage());
         }

@@ -24,21 +24,21 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 회원를_생성한다() {
-            MemberInfo request = new MemberInfo("커찬");
+            MemberInfo request = new MemberInfo("커찬", "default@gmail.com");
 
             MemberCreateResponse actual = memberService.createMember(request);
 
             Optional<Member> foundMember = memberRepository.findById(actual.id());
             assertAll(
-                    () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
+                    () -> assertThat(actual.email()).isEqualTo(request.email()),
                     () -> assertThat(foundMember).isPresent()
             );
         }
 
         @Test
         void 기존_닉네임을_가진_회원이_있다면_해당_회원을_반환한다() {
-            Member existedMember = memberGenerator.generate("커찬");
-            MemberInfo request = new MemberInfo("커찬");
+            Member existedMember = memberGenerator.generate("커찬", "default@gmail.com");
+            MemberInfo request = new MemberInfo("커찬", "default@gmail.com");
 
             MemberCreateResponse actual = memberService.createMember(request);
 
@@ -51,7 +51,7 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
-            Member member = memberRepository.save(new Member("커찬"));
+            Member member = memberRepository.save(new Member("커찬", "default@gmail.com"));
             parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
             parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
 

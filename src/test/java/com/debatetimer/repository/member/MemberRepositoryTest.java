@@ -21,14 +21,14 @@ class MemberRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 아이디에_해당하는_멤버를_반환한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("비토", "default@gmail.com");
 
             assertThat(memberRepository.getById(bito.getId()).getId()).isEqualTo(bito.getId());
         }
 
         @Test
         void 아이디에_해당하는_멤버가_없으면_예외를_발생시킨다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("비토", "default@gmail.com");
 
             assertThatThrownBy(() -> memberRepository.getById(bito.getId() + 1))
                     .isInstanceOf(DTClientErrorException.class)
@@ -41,16 +41,16 @@ class MemberRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 닉네임에_해당하는_멤버를_반환한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("비토", "bito@gmail.com");
 
-            assertThat(memberRepository.getByNickname(bito.getNickname()).getId()).isEqualTo(bito.getId());
+            assertThat(memberRepository.getByEmail(bito.getEmail()).getId()).isEqualTo(bito.getId());
         }
 
         @Test
         void 닉네임에_해당하는_멤버가_없으면_예외를_발생시킨다() {
-            memberGenerator.generate("비토");
+            memberGenerator.generate("비토", "default@gmail.com");
 
-            assertThatThrownBy(() -> memberRepository.getByNickname("비토아님"))
+            assertThatThrownBy(() -> memberRepository.getByEmail("notbito@gmail.com"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.MEMBER_NOT_FOUND.getMessage());
         }

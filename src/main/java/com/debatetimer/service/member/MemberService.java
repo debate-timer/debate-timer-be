@@ -28,7 +28,7 @@ public class MemberService {
 
     @Transactional
     public MemberCreateResponse createMember(MemberInfo memberInfo) {
-        Member member = memberRepository.findByNickname(memberInfo.nickname())
+        Member member = memberRepository.findByEmail(memberInfo.email())
                 .orElseGet(() -> memberRepository.save(memberInfo.toMember()));
         return new MemberCreateResponse(member);
     }

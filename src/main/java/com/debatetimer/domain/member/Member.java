@@ -2,6 +2,7 @@ package com.debatetimer.domain.member;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,15 +27,21 @@ public class Member {
     @NotNull
     private String nickname;
 
-    public Member(long id, String nickname) {
+    @Column(unique = true)
+    @NotNull
+    private String email;
+
+    public Member(long id, String nickname, String email) {
         validate(nickname);
         this.id = id;
         this.nickname = nickname;
+        this.email = email;
     }
 
-    public Member(String nickname) {
+    public Member(String nickname, String email) {
         validate(nickname);
         this.nickname = nickname;
+        this.email = email;
     }
 
     private void validate(String nickname) {
