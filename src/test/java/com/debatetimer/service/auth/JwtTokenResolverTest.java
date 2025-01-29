@@ -34,6 +34,15 @@ class JwtTokenResolverTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.EXPIRED_TOKEN.getMessage());
         }
+
+        @Test
+        void 액세스_토큰이_아니면_예외를_발생시킨다() {
+            String refreshToken = tokenGenerator.generateRefreshToken("바토");
+
+            assertThatThrownBy(() -> jwtTokenResolver.resolveAccessToken(refreshToken))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
+        }
     }
 
     @Nested
@@ -54,6 +63,15 @@ class JwtTokenResolverTest extends BaseServiceTest {
             assertThatThrownBy(() -> jwtTokenResolver.resolveRefreshToken(expiredToken))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.EXPIRED_TOKEN.getMessage());
+        }
+
+        @Test
+        void 리프레시_토큰이_아니면_예외를_발생시킨다() {
+            String accessToken = tokenGenerator.generateAccessToken("바토");
+
+            assertThatThrownBy(() -> jwtTokenResolver.resolveRefreshToken(accessToken))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
         }
     }
 }
