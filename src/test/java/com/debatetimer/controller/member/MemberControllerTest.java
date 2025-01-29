@@ -44,7 +44,7 @@ class MemberControllerTest extends BaseControllerTest {
             parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800));
             parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900));
 
-            Headers headers = headerGenerator.generateAccessToken(member);
+            Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             TableResponses response = given()
                     .contentType(ContentType.JSON)

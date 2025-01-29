@@ -33,7 +33,7 @@ public class JwtTokenResolver {
             validateTokenType(claims, tokenType);
             return claims.getSubject();
         } catch (ExpiredJwtException exception) {
-            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
+            throw new DTClientErrorException(ClientErrorCode.EXPIRED_TOKEN);
         } catch (JwtException exception) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }

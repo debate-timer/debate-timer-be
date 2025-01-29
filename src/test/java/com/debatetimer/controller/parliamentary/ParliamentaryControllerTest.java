@@ -34,7 +34,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            Headers headers = headerGenerator.generateAccessToken(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
@@ -60,7 +60,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
-            Headers headers = headerGenerator.generateAccessToken(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
@@ -93,7 +93,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                     renewTableInfo,
                     renewTimeBoxes
             );
-            Headers headers = headerGenerator.generateAccessToken(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
@@ -121,7 +121,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
-            Headers headers = headerGenerator.generateAccessToken(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()
                     .contentType(ContentType.JSON)
