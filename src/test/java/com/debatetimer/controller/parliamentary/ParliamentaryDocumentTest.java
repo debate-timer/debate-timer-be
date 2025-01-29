@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -48,6 +49,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
@@ -61,6 +64,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
@@ -71,7 +76,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         @Test
         void 의회식_테이블_생성_성공() {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블 1", "토론 주제"),
+                    new TableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -79,7 +84,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 1", "토론 주제"),
+                    new TableInfoResponse("비토 테이블 1", "토론 주제", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -113,7 +118,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 의회식_테이블_생성_실패(ClientErrorCode errorCode) {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블 1", "토론 주제"),
+                    new TableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -154,6 +159,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
@@ -167,7 +174,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 1", "토론 주제"),
+                    new TableInfoResponse("비토 테이블 1", "토론 주제", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -225,6 +232,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
@@ -238,6 +247,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
                         fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
@@ -250,7 +261,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long memberId = 4L;
             long tableId = 5L;
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2"),
+                    new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 300, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)
@@ -258,7 +269,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 2", "토론 주제 2"),
+                    new TableInfoResponse("비토 테이블 2", "토론 주제 2", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 300, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 300, 1)
@@ -296,7 +307,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long memberId = 4L;
             long tableId = 5L;
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2"),
+                    new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 300, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)

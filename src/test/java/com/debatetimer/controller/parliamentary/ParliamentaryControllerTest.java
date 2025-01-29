@@ -26,7 +26,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         void 의회식_테이블을_생성한다() {
             Member bito = memberGenerator.generate("비토");
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블", "주제"),
+                    new TableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -81,7 +81,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("비토");
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블", "주제"),
+                    new TableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
                             new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
