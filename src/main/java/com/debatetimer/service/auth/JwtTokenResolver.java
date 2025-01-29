@@ -16,13 +16,21 @@ public class JwtTokenResolver {
     private final JwtTokenProperties jwtTokenProperties;
 
     public String resolveAccessToken(String accessToken) {
+        return resolveToken(accessToken, TokenType.ACCESS_TOKEN);
+    }
+
+    public String resolveRefreshToken(String refreshToken) {
+        return resolveToken(refreshToken, TokenType.REFRESH_TOKEN);
+    }
+
+    private String resolveToken(String token, TokenType tokenType) {
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(jwtTokenProperties.getSecretKey())
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody();
-            validateTokenType(claims, TokenType.ACCESS_TOKEN);
+            validateTokenType(claims, tokenType);
             return claims.getSubject();
         } catch (ExpiredJwtException exception) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);

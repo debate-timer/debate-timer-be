@@ -34,4 +34,12 @@ public class AuthService {
         String nickname = jwtTokenResolver.resolveAccessToken(accessToken);
         return memberRepository.getByNickname(nickname);
     }
+
+    public JwtTokenResponse reissueToken(String refreshToken) {
+        String nickname = jwtTokenResolver.resolveRefreshToken(refreshToken);
+        MemberInfo memberInfo = new MemberInfo(nickname);
+        String accessToken = jwtTokenProvider.createAccessToken(memberInfo);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberInfo);
+        return new JwtTokenResponse(accessToken, newRefreshToken);
+    }
 }
