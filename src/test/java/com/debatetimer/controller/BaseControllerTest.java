@@ -2,7 +2,12 @@ package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.OAuthClient;
-import com.debatetimer.fixture.*;
+import com.debatetimer.fixture.CookieGenerator;
+import com.debatetimer.fixture.HeaderGenerator;
+import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.fixture.ParliamentaryTableGenerator;
+import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
+import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import io.restassured.RestAssured;
