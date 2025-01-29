@@ -1,8 +1,10 @@
 package com.debatetimer.controller;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
+import com.debatetimer.service.cookie.CookieService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import io.restassured.RestAssured;
@@ -12,6 +14,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.specification.RequestSpecification;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,8 +38,12 @@ public abstract class BaseDocumentTest {
 
     protected static long EXIST_MEMBER_ID = 123L;
     protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, "존재하는 멤버");
-    protected static String EXIST_MEMBER_TOKEN = "dflskgnkds";
-    protected static Headers EXIST_MEMBER_HEADER = new Headers(new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_TOKEN));
+    protected static String EXIST_MEMBER_ACCESS_TOKEN = "dflskgnkds";
+    protected static String EXIST_MEMBER_REFRESH_TOKEN = "dfsfsdgrs";
+    protected static JwtTokenResponse EXIST_MEMBER_TOKEN_RESPONSE = new JwtTokenResponse(EXIST_MEMBER_ACCESS_TOKEN, EXIST_MEMBER_REFRESH_TOKEN);
+    protected static Headers EXIST_MEMBER_HEADER = new Headers(new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_ACCESS_TOKEN));
+    protected static Cookie EXIST_MEMBER_COOKIE = new Cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN);
+    protected static Cookie DELETE_MEMBER_COOKIE = new Cookie("refreshToken", "");
 
     protected static RestDocumentationResponse ERROR_RESPONSE = new RestDocumentationResponse()
             .responseBodyField(
@@ -51,6 +58,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected AuthService authService;
+
+    @MockitoBean
+    protected CookieService cookieService;
 
     @LocalServerPort
     private int port;
@@ -75,7 +85,7 @@ public abstract class BaseDocumentTest {
     }
 
     private void setLoginMember() {
-        when(authService.getMember(EXIST_MEMBER_TOKEN)).thenReturn(EXIST_MEMBER);
+        when(authService.getMember(EXIST_MEMBER_ACCESS_TOKEN)).thenReturn(EXIST_MEMBER);
     }
 
     protected RestDocumentationRequest request() {
