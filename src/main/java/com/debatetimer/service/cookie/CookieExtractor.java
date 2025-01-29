@@ -1,5 +1,7 @@
 package com.debatetimer.service.cookie;
 
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,6 @@ public class CookieExtractor {
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findAny()
                 .map(Cookie::getValue)
-                .orElseThrow();
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER));
     }
 }
