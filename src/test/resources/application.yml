@@ -24,3 +24,8 @@ spring:
 
 cors:
   origin: http://test.debate-timer.com
+
+jwt:
+  secret_key: testtesttesttesttesttesttesttest
+  access_token_expiration_millis: 5000
+  refresh_token_expiration_millis: 10000
