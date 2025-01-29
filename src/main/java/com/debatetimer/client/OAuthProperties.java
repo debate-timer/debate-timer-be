@@ -1,13 +1,12 @@
 package com.debatetimer.client;
 
 import com.debatetimer.dto.member.MemberCreateRequest;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")

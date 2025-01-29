@@ -1,5 +1,9 @@
 package com.debatetimer.controller;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -28,10 +32,6 @@ import org.springframework.restdocs.restassured.RestAssuredRestDocumentationConf
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseDocumentTest {
@@ -41,8 +41,10 @@ public abstract class BaseDocumentTest {
     protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, EXIST_MEMBER_NICKNAME);
     protected static String EXIST_MEMBER_ACCESS_TOKEN = "dflskgnkds";
     protected static String EXIST_MEMBER_REFRESH_TOKEN = "dfsfsdgrs";
-    protected static JwtTokenResponse EXIST_MEMBER_TOKEN_RESPONSE = new JwtTokenResponse(EXIST_MEMBER_ACCESS_TOKEN, EXIST_MEMBER_REFRESH_TOKEN);
-    protected static Headers EXIST_MEMBER_HEADER = new Headers(new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_ACCESS_TOKEN));
+    protected static JwtTokenResponse EXIST_MEMBER_TOKEN_RESPONSE = new JwtTokenResponse(EXIST_MEMBER_ACCESS_TOKEN,
+            EXIST_MEMBER_REFRESH_TOKEN);
+    protected static Headers EXIST_MEMBER_HEADER = new Headers(
+            new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_ACCESS_TOKEN));
     protected static Cookie EXIST_MEMBER_COOKIE = new Cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN);
     protected static Cookie DELETE_MEMBER_COOKIE = new Cookie("refreshToken", "");
 

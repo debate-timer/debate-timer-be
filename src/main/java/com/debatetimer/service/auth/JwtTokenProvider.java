@@ -2,10 +2,9 @@ package com.debatetimer.service.auth;
 
 import com.debatetimer.dto.member.MemberInfo;
 import io.jsonwebtoken.Jwts;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
