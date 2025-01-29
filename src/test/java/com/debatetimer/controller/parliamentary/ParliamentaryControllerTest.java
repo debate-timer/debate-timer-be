@@ -83,14 +83,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         void 의회식_토론_테이블을_업데이트한다() {
             Member bito = memberGenerator.generate("비토", "default@gmail.com");
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
-            TableInfoCreateRequest renewTableInfo = new TableInfoCreateRequest("비토 테이블", "주제");
-            List<TimeBoxCreateRequest> renewTimeBoxes = List.of(
-                    new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                    new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    renewTableInfo,
-                    renewTimeBoxes
+                    new TableInfoCreateRequest("비토 테이블", "주제"),
+                    List.of(
+                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                    )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
@@ -105,8 +103,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
-                    () -> assertThat(response.info().name()).isEqualTo(renewTableInfo.name()),
-                    () -> assertThat(response.table()).hasSize(renewTimeBoxes.size())
+                    () -> assertThat(response.info().name()).isEqualTo(renewTableRequest.info().name()),
+                    () -> assertThat(response.table()).hasSize(renewTableRequest.table().size())
             );
         }
     }
