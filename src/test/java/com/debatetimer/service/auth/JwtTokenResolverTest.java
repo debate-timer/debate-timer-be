@@ -19,11 +19,11 @@ class JwtTokenResolverTest extends BaseServiceTest {
     class ResolveAccessToken {
 
         @Test
-        void 액세스_토큰에서_닉네임을_가져온다() {
-            String nickname = "비토";
-            String accessToken = tokenGenerator.generateAccessToken(nickname);
+        void 액세스_토큰에서_이메일을_가져온다() {
+            String email = "bito@gmail.com";
+            String accessToken = tokenGenerator.generateAccessToken("bito", email);
 
-            assertThat(jwtTokenResolver.resolveAccessToken(accessToken)).isEqualTo(nickname);
+            assertThat(jwtTokenResolver.resolveAccessToken(accessToken)).isEqualTo(email);
         }
 
         @Test
@@ -37,7 +37,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
 
         @Test
         void 액세스_토큰이_아니면_예외를_발생시킨다() {
-            String refreshToken = tokenGenerator.generateRefreshToken("바토");
+            String refreshToken = tokenGenerator.generateRefreshToken("비토", "bito@gmail.com");
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveAccessToken(refreshToken))
                     .isInstanceOf(DTClientErrorException.class)
@@ -49,11 +49,11 @@ class JwtTokenResolverTest extends BaseServiceTest {
     class ResolveRefreshToken {
 
         @Test
-        void 리프레시_토큰에서_닉네임을_가져온다() {
-            String nickname = "비토";
-            String accessToken = tokenGenerator.generateRefreshToken(nickname);
+        void 리프레시_토큰에서_이메일을_가져온다() {
+            String email = "bito@gmail.com";
+            String accessToken = tokenGenerator.generateRefreshToken("bito", email);
 
-            assertThat(jwtTokenResolver.resolveRefreshToken(accessToken)).isEqualTo(nickname);
+            assertThat(jwtTokenResolver.resolveRefreshToken(accessToken)).isEqualTo(email);
         }
 
         @Test
@@ -67,7 +67,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
 
         @Test
         void 리프레시_토큰이_아니면_예외를_발생시킨다() {
-            String accessToken = tokenGenerator.generateAccessToken("바토");
+            String accessToken = tokenGenerator.generateAccessToken("바토", "default@gmail.com");
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveRefreshToken(accessToken))
                     .isInstanceOf(DTClientErrorException.class)

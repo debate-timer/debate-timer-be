@@ -33,21 +33,22 @@ public class AuthService {
     }
 
     public Member getMember(String accessToken) {
-        String nickname = jwtTokenResolver.resolveAccessToken(accessToken);
-        return memberRepository.getByNickname(nickname);
+        String email = jwtTokenResolver.resolveAccessToken(accessToken);
+        return memberRepository.getByEmail(email);
     }
 
     public JwtTokenResponse reissueToken(String refreshToken) {
-        String nickname = jwtTokenResolver.resolveRefreshToken(refreshToken);
-        MemberInfo memberInfo = new MemberInfo(nickname);
+        String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
+        Member member = memberRepository.getByEmail(email);
+        MemberInfo memberInfo = new MemberInfo(member.getNickname(), email);
         String accessToken = jwtTokenProvider.createAccessToken(memberInfo);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberInfo);
         return new JwtTokenResponse(accessToken, newRefreshToken);
     }
 
     public void logout(Member member, String refreshToken) {
-        String nickname = jwtTokenResolver.resolveRefreshToken(refreshToken);
-        if (!member.getNickname().equals(nickname)) {
+        String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
+        if (!member.getEmail().equals(email)) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
     }

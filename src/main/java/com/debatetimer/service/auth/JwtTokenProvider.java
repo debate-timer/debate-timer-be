@@ -26,7 +26,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expirationMillis);
         return Jwts.builder()
-                .setSubject(memberInfo.nickname())
+                .setSubject(memberInfo.email())
                 .setIssuedAt(now)
                 .setExpiration(expiredDate)
                 .claim("type", tokenType.name())
