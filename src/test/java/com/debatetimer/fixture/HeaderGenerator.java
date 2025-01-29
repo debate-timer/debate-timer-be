@@ -17,7 +17,7 @@ public class HeaderGenerator {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public Headers generateAccessToken(Member member) {
+    public Headers generateAccessTokenHeader(Member member) {
         String accessToken = jwtTokenProvider.createAccessToken(new MemberInfo(member.getNickname()));
         return new Headers(new Header(HttpHeaders.AUTHORIZATION, accessToken));
     }
