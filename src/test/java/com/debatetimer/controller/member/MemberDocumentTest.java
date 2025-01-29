@@ -129,7 +129,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", EXIST_MEMBER_ID)
+                    .headers(EXIST_MEMBER_HEADER)
                     .when().get("/api/table")
                     .then().statusCode(errorCode.getStatus().value());
         }
