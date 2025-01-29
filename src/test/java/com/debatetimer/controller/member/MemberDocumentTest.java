@@ -8,7 +8,6 @@ import com.debatetimer.dto.member.*;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +25,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 
 public class MemberDocumentTest extends BaseDocumentTest {
 
-    @Disabled
     @Nested
     class CreateMember {
 
@@ -34,7 +32,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 .tag(Tag.MEMBER_API)
                 .summary("멤버 생성")
                 .requestBodyField(
-                        fieldWithPath("nickname").type(STRING).description("멤버 닉네임")
+                        fieldWithPath("code").type(STRING).description("인가 코드")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
@@ -45,9 +43,11 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 회원_생성_성공() {
-            MemberInfo request = new MemberInfo("커찬");
-            MemberCreateResponse response = new MemberCreateResponse(1L, "커찬");
-            when(memberService.createMember(request)).thenReturn(response);
+            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
+            MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_NICKNAME);
+            doReturn(response).when(memberService).createMember(any());
+            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).createToken(any());
+            doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
 
             var document = document("member/create", 201)
                     .request(requestDocument)
@@ -67,8 +67,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
         )
         @ParameterizedTest
         void 회원_생성_실패(ClientErrorCode errorCode) {
-            MemberInfo request = new MemberInfo("커찬");
-            when(memberService.createMember(request)).thenThrow(new DTClientErrorException(errorCode));
+            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
+            when(memberService.createMember(any())).thenThrow(new DTClientErrorException(errorCode));
 
             var document = document("member/create", errorCode)
                     .request(requestDocument)

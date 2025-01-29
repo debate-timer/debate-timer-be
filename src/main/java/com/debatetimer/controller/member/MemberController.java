@@ -2,10 +2,7 @@ package com.debatetimer.controller.member;
 
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.dto.member.JwtTokenResponse;
-import com.debatetimer.dto.member.MemberCreateRequest;
-import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.dto.member.*;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.cookie.CookieService;
 import com.debatetimer.service.member.MemberService;
@@ -32,14 +29,15 @@ public class MemberController {
 
     @PostMapping("/api/member")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createMember(@RequestBody MemberCreateRequest request, HttpServletResponse response) {
+    public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request, HttpServletResponse response) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
-        memberService.createMember(memberInfo);
+        MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
         JwtTokenResponse jwtTokenResponse = authService.createToken(memberInfo);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
         response.addCookie(refreshTokenCookie);
+        return memberCreateResponse;
     }
 
     @PostMapping("/api/member/reissue")
