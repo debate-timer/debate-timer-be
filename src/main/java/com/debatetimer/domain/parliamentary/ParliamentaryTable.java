@@ -39,7 +39,6 @@ public class ParliamentaryTable {
     @NotNull
     private String agenda;
 
-    @NotNull
     private int duration;
 
     private boolean warningBell;
