@@ -7,11 +7,10 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -1,5 +1,18 @@
 package com.debatetimer.controller.parliamentary;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+
 import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
@@ -15,26 +28,12 @@ import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 public class ParliamentaryDocumentTest extends BaseDocumentTest {
 

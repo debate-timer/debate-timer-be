@@ -1,10 +1,9 @@
 package com.debatetimer.service.auth;
 
 import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import javax.crypto.SecretKey;
 
 @Getter
 @ConfigurationProperties(prefix = "jwt")

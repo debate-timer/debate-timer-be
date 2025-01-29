@@ -4,10 +4,9 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.service.auth.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TokenGenerator {

@@ -1,5 +1,8 @@
 package com.debatetimer.controller.parliamentary;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
@@ -11,13 +14,9 @@ import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ParliamentaryControllerTest extends BaseControllerTest {
 

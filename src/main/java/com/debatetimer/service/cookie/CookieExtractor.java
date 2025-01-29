@@ -3,9 +3,8 @@ package com.debatetimer.service.cookie;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.servlet.http.Cookie;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CookieExtractor {
