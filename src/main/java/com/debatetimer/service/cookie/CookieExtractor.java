@@ -15,6 +15,6 @@ public class CookieExtractor {
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findAny()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER));
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.EMPTY_COOKIE));
     }
 }
