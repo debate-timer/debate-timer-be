@@ -7,6 +7,7 @@ import com.debatetimer.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -30,7 +31,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-        String accessToken = webRequest.getHeader("Authorization");
+        String accessToken = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if (accessToken == null) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
