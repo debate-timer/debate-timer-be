@@ -35,12 +35,18 @@ public class MemberDocumentTest extends BaseDocumentTest {
     @Nested
     class CreateMember {
 
-        private final RestDocumentationRequest requestDocument = request().tag(Tag.MEMBER_API).summary("멤버 생성")
-                .requestBodyField(fieldWithPath("code").type(STRING).description("인가 코드"));
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("멤버 생성")
+                .requestBodyField(
+                        fieldWithPath("code").type(STRING).description("인가 코드")
+                );
 
-        private final RestDocumentationResponse responseDocument = response().responseBodyField(
-                fieldWithPath("id").type(NUMBER).description("멤버 ID"),
-                fieldWithPath("email").type(STRING).description("멤버 이메일"));
+        private final RestDocumentationResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("id").type(NUMBER).description("멤버 ID"),
+                        fieldWithPath("email").type(STRING).description("멤버 이메일")
+                );
 
         @Test
         void 회원_생성_성공() {
@@ -52,16 +58,23 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();
 
-            given(document).contentType(ContentType.JSON).body(request).when().post("/api/member").then()
-                    .statusCode(201);
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/member")
+                    .then().statusCode(201);
         }
     }
 
     @Nested
     class GetTables {
 
-        private final RestDocumentationRequest requestDocument = request().tag(Tag.MEMBER_API).summary("멤버의 토론 시간표 조회")
-                .requestHeader(headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰"));
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("멤버의 토론 시간표 조회")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
 
         private final RestDocumentationResponse responseDocument = response().responseBodyField(
                 fieldWithPath("tables").type(ARRAY).description("멤버의 토론 테이블들"),
@@ -74,12 +87,19 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 테이블_조회_성공() {
             TableResponses response = new TableResponses(
                     List.of(new TableResponse(1L, "토론 테이블 1", TableType.PARLIAMENTARY, 1800),
-                            new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, 2000)));
+                            new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, 2000))
+            );
             when(memberService.getTables(EXIST_MEMBER_ID)).thenReturn(response);
 
-            var document = document("member/table", 200).request(requestDocument).response(responseDocument).build();
+            var document = document("member/table", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
 
-            given(document).headers(EXIST_MEMBER_HEADER).when().get("/api/table").then().statusCode(200);
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .when().get("/api/table")
+                    .then().statusCode(200);
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"})
@@ -87,31 +107,50 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 테이블_조회_실패(ClientErrorCode errorCode) {
             when(memberService.getTables(EXIST_MEMBER_ID)).thenThrow(new DTClientErrorException(errorCode));
 
-            var document = document("member/table", errorCode).request(requestDocument).response(ERROR_RESPONSE)
+            var document = document("member/table", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
                     .build();
 
-            given(document).contentType(ContentType.JSON).headers(EXIST_MEMBER_HEADER).when().get("/api/table").then()
-                    .statusCode(errorCode.getStatus().value());
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .when().get("/api/table")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
     @Nested
     class ReissueAccessToken {
-        private final RestDocumentationRequest requestDocument = request().tag(Tag.MEMBER_API).summary("토큰 갱신")
-                .requestCookie(cookieWithName("refreshToken").description("리프레시 토큰"));
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("토큰 갱신")
+                .requestCookie(
+                        cookieWithName("refreshToken").description("리프레시 토큰")
+                );
 
-        private final RestDocumentationResponse responseDocument = response().responseHeader(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰"))
-                .responseCookie(cookieWithName("refreshToken").description("리프레시 토큰"));
+        private final RestDocumentationResponse responseDocument = response()
+                .responseHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .responseCookie(
+                        cookieWithName("refreshToken").description("리프레시 토큰")
+                );
 
         @Test
         void 토큰_갱신_성공() {
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).reissueToken(any());
             doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
 
-            var document = document("member/logout", 204).request(requestDocument).response(responseDocument).build();
+            var document = document("member/logout", 204)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
 
-            given(document).headers(EXIST_MEMBER_HEADER).cookie("refreshToken").when().post("/api/member/reissue")
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/reissue")
                     .then().statusCode(200);
         }
 
@@ -120,11 +159,15 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 토큰_갱신_실패_쿠키_추출(ClientErrorCode errorCode) {
             doThrow(new DTClientErrorException(errorCode)).when(cookieService).extractRefreshToken(any());
 
-            var document = document("member/reissue", errorCode).request(requestDocument).response(ERROR_RESPONSE)
+            var document = document("member/reissue", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
                     .build();
 
-            given(document).cookie("refreshToken").when().post("/api/member/reissue").then()
-                    .statusCode(errorCode.getStatus().value());
+            given(document)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(errorCode.getStatus().value());
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"EXPIRED_TOKEN", "UNAUTHORIZED_MEMBER"})
@@ -132,29 +175,44 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 토큰_갱신_실패_토큰_갱신(ClientErrorCode errorCode) {
             doThrow(new DTClientErrorException(errorCode)).when(authService).reissueToken(any());
 
-            var document = document("member/reissue", errorCode).request(requestDocument).response(ERROR_RESPONSE)
+            var document = document("member/reissue", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
                     .build();
 
-            given(document).cookie("refreshToken").when().post("/api/member/reissue").then()
-                    .statusCode(errorCode.getStatus().value());
+            given(document)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
     @Nested
     class Logout {
 
-        private final RestDocumentationRequest requestDocument = request().tag(Tag.MEMBER_API).summary("로그아웃")
-                .requestHeader(headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰"))
-                .requestCookie(cookieWithName("refreshToken").description("리프레시 토큰"));
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("로그아웃")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .requestCookie(
+                        cookieWithName("refreshToken").description("리프레시 토큰")
+                );
 
         @Test
         void 로그아웃_성공() {
             doReturn(DELETE_MEMBER_COOKIE).when(cookieService).deleteRefreshTokenCookie();
 
-            var document = document("member/logout", 204).request(requestDocument).build();
+            var document = document("member/logout", 204)
+                    .request(requestDocument)
+                    .build();
 
-            given(document).headers(EXIST_MEMBER_HEADER).cookie("refreshToken").when().post("/api/member/logout").then()
-                    .statusCode(204);
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/logout")
+                    .then().statusCode(204);
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_COOKIE"})
@@ -162,11 +220,16 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 로그아웃_실패_쿠키_추출(ClientErrorCode errorCode) {
             doThrow(new DTClientErrorException(errorCode)).when(cookieService).extractRefreshToken(any());
 
-            var document = document("member/logout", errorCode).request(requestDocument).response(ERROR_RESPONSE)
+            var document = document("member/logout", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
                     .build();
 
-            given(document).headers(EXIST_MEMBER_HEADER).cookie("refreshToken").when().post("/api/member/logout").then()
-                    .statusCode(errorCode.getStatus().value());
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/logout")
+                    .then().statusCode(errorCode.getStatus().value());
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN"})
@@ -174,11 +237,16 @@ public class MemberDocumentTest extends BaseDocumentTest {
         void 로그아웃_실패(ClientErrorCode errorCode) {
             doThrow(new DTClientErrorException(errorCode)).when(authService).logout(any(), any());
 
-            var document = document("member/logout", errorCode).request(requestDocument).response(ERROR_RESPONSE)
+            var document = document("member/logout", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
                     .build();
 
-            given(document).headers(EXIST_MEMBER_HEADER).cookie("refreshToken").when().post("/api/member/logout").then()
-                    .statusCode(errorCode.getStatus().value());
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .cookie("refreshToken")
+                    .when().post("/api/member/logout")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }
