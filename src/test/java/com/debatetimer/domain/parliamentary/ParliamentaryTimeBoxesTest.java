@@ -18,7 +18,7 @@ class ParliamentaryTimeBoxesTest {
 
         @Test
         void 타임박스의_순서에_따라_정렬된다() {
-            Member member = new Member("콜리", "default@gmail.com");
+            Member member = new Member("default@gmail.com");
             ParliamentaryTable testTable = new ParliamentaryTable(member, "토론 테이블", "주제", 1800);
             ParliamentaryTimeBox firstBox = new ParliamentaryTimeBox(testTable, 1, Stance.PROS, BoxType.OPENING, 300,
                     1);

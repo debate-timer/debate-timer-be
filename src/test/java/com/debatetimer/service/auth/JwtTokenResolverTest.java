@@ -21,7 +21,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
         @Test
         void 액세스_토큰에서_이메일을_가져온다() {
             String email = "bito@gmail.com";
-            String accessToken = tokenGenerator.generateAccessToken("bito", email);
+            String accessToken = tokenGenerator.generateAccessToken(email);
 
             assertThat(jwtTokenResolver.resolveAccessToken(accessToken)).isEqualTo(email);
         }
@@ -37,7 +37,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
 
         @Test
         void 액세스_토큰이_아니면_예외를_발생시킨다() {
-            String refreshToken = tokenGenerator.generateRefreshToken("비토", "bito@gmail.com");
+            String refreshToken = tokenGenerator.generateRefreshToken("bito@gmail.com");
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveAccessToken(refreshToken))
                     .isInstanceOf(DTClientErrorException.class)
@@ -51,7 +51,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
         @Test
         void 리프레시_토큰에서_이메일을_가져온다() {
             String email = "bito@gmail.com";
-            String accessToken = tokenGenerator.generateRefreshToken("bito", email);
+            String accessToken = tokenGenerator.generateRefreshToken(email);
 
             assertThat(jwtTokenResolver.resolveRefreshToken(accessToken)).isEqualTo(email);
         }
@@ -67,7 +67,7 @@ class JwtTokenResolverTest extends BaseServiceTest {
 
         @Test
         void 리프레시_토큰이_아니면_예외를_발생시킨다() {
-            String accessToken = tokenGenerator.generateAccessToken("바토", "default@gmail.com");
+            String accessToken = tokenGenerator.generateAccessToken("default@gmail.com");
 
             assertThatThrownBy(() -> jwtTokenResolver.resolveRefreshToken(accessToken))
                     .isInstanceOf(DTClientErrorException.class)

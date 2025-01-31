@@ -40,14 +40,12 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationResponse responseDocument = response().responseBodyField(
                 fieldWithPath("id").type(NUMBER).description("멤버 ID"),
-                fieldWithPath("nickname").type(STRING).description("멤버 닉네임"),
                 fieldWithPath("email").type(STRING).description("멤버 이메일"));
 
         @Test
         void 회원_생성_성공() {
             MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
-            MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_NICKNAME,
-                    EXIST_MEMBER_EMAIL);
+            MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(response).when(memberService).createMember(any());
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).createToken(any());
             doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
@@ -56,20 +54,6 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
             given(document).contentType(ContentType.JSON).body(request).when().post("/api/member").then()
                     .statusCode(201);
-        }
-
-        @EnumSource(value = ClientErrorCode.class, names = {"INVALID_MEMBER_NICKNAME_LENGTH",
-                "INVALID_MEMBER_NICKNAME_FORM"})
-        @ParameterizedTest
-        void 회원_생성_실패(ClientErrorCode errorCode) {
-            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
-            when(memberService.createMember(any())).thenThrow(new DTClientErrorException(errorCode));
-
-            var document = document("member/create", errorCode).request(requestDocument).response(ERROR_RESPONSE)
-                    .build();
-
-            given(document).contentType(ContentType.JSON).body(request).when().post("/api/member").then()
-                    .statusCode(errorCode.getStatus().value());
         }
     }
 

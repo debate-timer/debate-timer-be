@@ -21,8 +21,8 @@ class ParliamentaryTimeBoxRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 특정_테이블의_타임박스를_모두_조회한다() {
-            Member chan = memberGenerator.generate("커찬", "default@gmail.com");
-            Member bito = memberGenerator.generate("비토", "default2@gmail.com");
+            Member chan = memberGenerator.generate("default@gmail.com");
+            Member bito = memberGenerator.generate("default2@gmail.com");
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             ParliamentaryTimeBox chanBox1 = timeBoxGenerator.generate(chanTable, 1);

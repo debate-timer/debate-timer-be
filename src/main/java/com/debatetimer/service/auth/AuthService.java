@@ -39,8 +39,7 @@ public class AuthService {
 
     public JwtTokenResponse reissueToken(String refreshToken) {
         String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
-        Member member = memberRepository.getByEmail(email);
-        MemberInfo memberInfo = new MemberInfo(member.getNickname(), email);
+        MemberInfo memberInfo = new MemberInfo(email);
         String accessToken = jwtTokenProvider.createAccessToken(memberInfo);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberInfo);
         return new JwtTokenResponse(accessToken, newRefreshToken);

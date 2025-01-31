@@ -1,18 +1,11 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ClientErrorCode implements ErrorCode {
-
-    INVALID_MEMBER_NICKNAME_LENGTH(
-            HttpStatus.BAD_REQUEST,
-            "닉네임은 1자 이상 %d자 이하여야 합니다".formatted(Member.NICKNAME_MAX_LENGTH)
-    ),
-    INVALID_MEMBER_NICKNAME_FORM(HttpStatus.BAD_REQUEST, "닉네임은 영문/한글만 가능합니다"),
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,

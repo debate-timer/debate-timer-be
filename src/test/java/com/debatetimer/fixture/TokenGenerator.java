@@ -17,12 +17,12 @@ public class TokenGenerator {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public String generateRefreshToken(String nickname, String email) {
-        return jwtTokenProvider.createRefreshToken(new MemberInfo(nickname, email));
+    public String generateRefreshToken(String email) {
+        return jwtTokenProvider.createRefreshToken(new MemberInfo(email));
     }
 
-    public String generateAccessToken(String nickname, String email) {
-        return jwtTokenProvider.createAccessToken(new MemberInfo(nickname, email));
+    public String generateAccessToken(String email) {
+        return jwtTokenProvider.createAccessToken(new MemberInfo(email));
     }
 
     public String generateExpiredToken() {

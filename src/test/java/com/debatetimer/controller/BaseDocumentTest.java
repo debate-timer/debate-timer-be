@@ -37,9 +37,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 public abstract class BaseDocumentTest {
 
     protected static long EXIST_MEMBER_ID = 123L;
-    protected static String EXIST_MEMBER_NICKNAME = "존재하는 멤버";
     protected static String EXIST_MEMBER_EMAIL = "abcde@gmail.com";
-    protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, EXIST_MEMBER_NICKNAME, EXIST_MEMBER_EMAIL);
+    protected static Member EXIST_MEMBER = new Member(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
     protected static String EXIST_MEMBER_ACCESS_TOKEN = "dflskgnkds";
     protected static String EXIST_MEMBER_REFRESH_TOKEN = "dfsfsdgrs";
     protected static JwtTokenResponse EXIST_MEMBER_TOKEN_RESPONSE = new JwtTokenResponse(EXIST_MEMBER_ACCESS_TOKEN,

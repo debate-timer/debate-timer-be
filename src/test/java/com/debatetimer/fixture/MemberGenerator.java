@@ -13,8 +13,8 @@ public class MemberGenerator {
         this.memberRepository = memberRepository;
     }
 
-    public Member generate(String nickName, String email) {
-        Member member = new Member(nickName, email);
+    public Member generate(String email) {
+        Member member = new Member(email);
         return memberRepository.save(member);
     }
 }
