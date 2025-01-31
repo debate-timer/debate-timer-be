@@ -33,7 +33,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("커찬의 테이블", "주제");
+            TableInfoCreateRequest requestTableInfo = new TableInfoCreateRequest("커찬의 테이블", "주제", true, true);
             List<TimeBoxCreateRequest> requestTimeBoxes = List.of(
                     new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
                     new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
