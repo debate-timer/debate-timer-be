@@ -39,15 +39,27 @@ public class ParliamentaryTable {
     @NotNull
     private String agenda;
 
-    @NotNull
     private int duration;
 
-    public ParliamentaryTable(Member member, String name, String agenda, int duration) {
+    private boolean warningBell;
+
+    private boolean finishBell;
+
+    public ParliamentaryTable(
+            Member member,
+            String name,
+            String agenda,
+            int duration,
+            boolean warningBell,
+            boolean finishBell
+    ) {
         validate(name, duration);
         this.member = member;
         this.name = name;
         this.agenda = agenda;
         this.duration = duration;
+        this.warningBell = warningBell;
+        this.finishBell = finishBell;
     }
 
     private void validate(String name, int duration) {
@@ -66,6 +78,8 @@ public class ParliamentaryTable {
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
         this.duration = renewTable.getDuration();
+        this.warningBell = renewTable.isWarningBell();
+        this.finishBell = renewTable.isFinishBell();
     }
 
     public boolean isOwner(long memberId) {

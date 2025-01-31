@@ -39,12 +39,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
                     new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
             );
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("커찬의 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(savedTableResponse.id());
@@ -96,12 +93,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("커찬의 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("커찬의 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
             parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
@@ -123,12 +117,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             ParliamentaryTable chanTable = tableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("새로운 테이블", "주제"),
-                    List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
-                    )
-            );
+                    new TableInfoCreateRequest("새로운 테이블", "주제", true, true),
+                    List.of(new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)));
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
