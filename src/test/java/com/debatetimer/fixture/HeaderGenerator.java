@@ -2,8 +2,8 @@ package com.debatetimer.fixture;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.service.auth.JwtTokenProvider;
-import com.debatetimer.service.cookie.CookieProvider;
+import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
+import com.debatetimer.controller.tool.cookie.CookieProvider;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import org.springframework.http.HttpHeaders;

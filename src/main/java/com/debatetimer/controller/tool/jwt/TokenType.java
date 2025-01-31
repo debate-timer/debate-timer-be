@@ -1,4 +1,4 @@
-package com.debatetimer.service.auth;
+package com.debatetimer.controller.tool.jwt;
 
 public enum TokenType {
 

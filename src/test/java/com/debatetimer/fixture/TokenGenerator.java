@@ -1,7 +1,7 @@
 package com.debatetimer.fixture;
 
 import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.service.auth.JwtTokenProvider;
+import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;

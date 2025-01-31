@@ -1,6 +1,8 @@
 package com.debatetimer.controller.member;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.controller.tool.cookie.CookieManager;
+import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberCreateRequest;
@@ -8,7 +10,6 @@ import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.auth.AuthService;
-import com.debatetimer.service.cookie.CookieService;
 import com.debatetimer.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,8 @@ public class MemberController {
 
     private final MemberService memberService;
     private final AuthService authService;
-    private final CookieService cookieService;
+    private final CookieManager cookieManager;
+    private final AuthManager authManager;
 
     @GetMapping("/api/table")
     public TableResponses getTables(@AuthMember Member member) {
@@ -40,8 +42,8 @@ public class MemberController {
     public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request, HttpServletResponse response) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
         MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
-        JwtTokenResponse jwtTokenResponse = authService.issueToken(memberInfo);
-        Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+        JwtTokenResponse jwtTokenResponse = authManager.issueToken(memberInfo);
+        Cookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
         response.addCookie(refreshTokenCookie);
@@ -50,9 +52,9 @@ public class MemberController {
 
     @PostMapping("/api/member/reissue")
     public void reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieService.extractRefreshToken(request.getCookies());
-        JwtTokenResponse jwtTokenResponse = authService.reissueToken(refreshToken);
-        Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+        String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
+        JwtTokenResponse jwtTokenResponse = authManager.reissueToken(refreshToken);
+        Cookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
         response.addCookie(refreshTokenCookie);
@@ -61,9 +63,10 @@ public class MemberController {
     @PostMapping("/api/member/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(@AuthMember Member member, HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieService.extractRefreshToken(request.getCookies());
-        authService.logout(member, refreshToken);
-        Cookie deletedRefreshTokenCookie = cookieService.deleteRefreshTokenCookie();
+        String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
+        String email = authManager.resolveRefreshToken(refreshToken);
+        authService.logout(member, email);
+        Cookie deletedRefreshTokenCookie = cookieManager.deleteRefreshTokenCookie();
 
         response.addCookie(deletedRefreshTokenCookie);
     }

@@ -1,4 +1,4 @@
-package com.debatetimer.service.cookie;
+package com.debatetimer.controller.tool.cookie;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Component;

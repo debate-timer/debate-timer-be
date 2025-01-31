@@ -4,11 +4,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
+import com.debatetimer.controller.tool.cookie.CookieManager;
+import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
-import com.debatetimer.service.cookie.CookieService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import io.restassured.RestAssured;
@@ -63,7 +64,10 @@ public abstract class BaseDocumentTest {
     protected AuthService authService;
 
     @MockitoBean
-    protected CookieService cookieService;
+    protected AuthManager authManager;
+
+    @MockitoBean
+    protected CookieManager cookieManager;
 
     @LocalServerPort
     private int port;
@@ -88,7 +92,8 @@ public abstract class BaseDocumentTest {
     }
 
     private void setLoginMember() {
-        doReturn(EXIST_MEMBER).when(authService).getMember(EXIST_MEMBER_ACCESS_TOKEN);
+        doReturn(EXIST_MEMBER_EMAIL).when(authManager).resolveAccessToken(EXIST_MEMBER_ACCESS_TOKEN);
+        doReturn(EXIST_MEMBER).when(authService).getMember(EXIST_MEMBER_EMAIL);
     }
 
     protected RestDocumentationRequest request() {

@@ -1,13 +1,13 @@
-package com.debatetimer.service.cookie;
+package com.debatetimer.controller.tool.cookie;
 
-import com.debatetimer.service.auth.JwtTokenProperties;
+import com.debatetimer.controller.tool.jwt.JwtTokenProperties;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CookieService {
+public class CookieManager {
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 

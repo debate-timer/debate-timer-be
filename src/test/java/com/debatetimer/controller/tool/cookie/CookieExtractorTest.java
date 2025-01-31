@@ -1,4 +1,4 @@
-package com.debatetimer.service.cookie;
+package com.debatetimer.controller.tool.cookie;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -1,4 +1,4 @@
-package com.debatetimer.service.cookie;
+package com.debatetimer.controller.tool.cookie;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;

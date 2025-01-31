@@ -1,6 +1,7 @@
 package com.debatetimer.config;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
@@ -17,6 +18,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
+    private final AuthManager authManager;
     private final AuthService authService;
 
     @Override
@@ -35,6 +37,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         if (accessToken == null) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
-        return authService.getMember(accessToken);
+        String email = authManager.resolveAccessToken(accessToken);
+        return authService.getMember(email);
     }
 }

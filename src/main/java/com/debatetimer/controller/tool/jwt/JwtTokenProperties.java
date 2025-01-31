@@ -1,4 +1,4 @@
-package com.debatetimer.service.auth;
+package com.debatetimer.controller.tool.jwt;
 
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;

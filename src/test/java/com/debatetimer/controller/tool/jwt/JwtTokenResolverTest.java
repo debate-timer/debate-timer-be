@@ -1,4 +1,4 @@
-package com.debatetimer.service.auth;
+package com.debatetimer.controller.tool.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

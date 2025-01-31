@@ -1,4 +1,4 @@
-package com.debatetimer.service.auth;
+package com.debatetimer.controller.tool.jwt;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;

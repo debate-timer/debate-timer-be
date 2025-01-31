@@ -20,11 +20,10 @@ class AuthServiceTest extends BaseServiceTest {
     class GetMember {
 
         @Test
-        void 액세스_토큰에_해당하는_멤버가_있으면_해당_멤버를_반환한다() {
+        void 이메일에_해당하는_멤버가_있으면_해당_멤버를_반환한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            String accessToken = tokenGenerator.generateAccessToken("default@gmail.com");
 
-            assertThat(authService.getMember(accessToken).getId()).isEqualTo(bito.getId());
+            assertThat(authService.getMember(bito.getEmail()).getId()).isEqualTo(bito.getId());
         }
     }
 
@@ -32,11 +31,11 @@ class AuthServiceTest extends BaseServiceTest {
     class Logout {
 
         @Test
-        void 리프레시_토큰과_멤버의_정보가_다르면_예외를_발생시킨다() {
+        void 이메일과_멤버의_정보가_다르면_예외를_발생시킨다() {
             Member bito = memberGenerator.generate("bito@gmail.com");
-            String refreshToken = tokenGenerator.generateRefreshToken("default@gmail.com");
+            String email = "default@gmail.com";
 
-            assertThatThrownBy(() -> authService.logout(bito, refreshToken))
+            assertThatThrownBy(() -> authService.logout(bito, email))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
         }

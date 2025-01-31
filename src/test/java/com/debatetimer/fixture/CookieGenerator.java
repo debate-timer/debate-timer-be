@@ -1,8 +1,8 @@
 package com.debatetimer.fixture;
 
 import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.service.auth.JwtTokenProvider;
-import com.debatetimer.service.cookie.CookieProvider;
+import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
+import com.debatetimer.controller.tool.cookie.CookieProvider;
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Component;
 

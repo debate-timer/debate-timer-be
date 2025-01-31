@@ -52,8 +52,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
             MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(response).when(memberService).createMember(any());
-            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).issueToken(any());
-            doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
+            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(any());
+            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(any());
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();
 
@@ -138,8 +138,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 토큰_갱신_성공() {
-            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).reissueToken(any());
-            doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
+            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).reissueToken(any());
+            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
@@ -156,7 +156,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_COOKIE"})
         @ParameterizedTest
         void 토큰_갱신_실패_쿠키_추출(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(cookieService).extractRefreshToken(any());
+            doThrow(new DTClientErrorException(errorCode)).when(cookieManager).extractRefreshToken(any());
 
             var document = document("member/reissue", errorCode)
                     .request(requestDocument)
@@ -172,7 +172,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"EXPIRED_TOKEN", "UNAUTHORIZED_MEMBER"})
         @ParameterizedTest
         void 토큰_갱신_실패_토큰_갱신(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(authService).reissueToken(any());
+            doThrow(new DTClientErrorException(errorCode)).when(authManager).reissueToken(any());
 
             var document = document("member/reissue", errorCode)
                     .request(requestDocument)
@@ -201,7 +201,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 로그아웃_성공() {
-            doReturn(DELETE_MEMBER_COOKIE).when(cookieService).deleteRefreshTokenCookie();
+            doReturn(DELETE_MEMBER_COOKIE).when(cookieManager).deleteRefreshTokenCookie();
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
@@ -217,7 +217,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_COOKIE"})
         @ParameterizedTest
         void 로그아웃_실패_쿠키_추출(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(cookieService).extractRefreshToken(any());
+            doThrow(new DTClientErrorException(errorCode)).when(cookieManager).extractRefreshToken(any());
 
             var document = document("member/logout", errorCode)
                     .request(requestDocument)
