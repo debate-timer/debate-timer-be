@@ -26,7 +26,7 @@ public class AuthService {
         return oauthClient.requestMemberInfo(oauthToken);
     }
 
-    public JwtTokenResponse createToken(MemberInfo memberInfo) {
+    public JwtTokenResponse issueToken(MemberInfo memberInfo) {
         String accessToken = jwtTokenProvider.createAccessToken(memberInfo);
         String refreshToken = jwtTokenProvider.createRefreshToken(memberInfo);
         return new JwtTokenResponse(accessToken, refreshToken);

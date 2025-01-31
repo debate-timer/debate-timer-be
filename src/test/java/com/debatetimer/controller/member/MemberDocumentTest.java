@@ -47,7 +47,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(response).when(memberService).createMember(any());
-            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).createToken(any());
+            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authService).issueToken(any());
             doReturn(EXIST_MEMBER_COOKIE).when(cookieService).createRefreshTokenCookie(any());
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();

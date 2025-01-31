@@ -40,7 +40,7 @@ public class MemberController {
     public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request, HttpServletResponse response) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
         MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
-        JwtTokenResponse jwtTokenResponse = authService.createToken(memberInfo);
+        JwtTokenResponse jwtTokenResponse = authService.issueToken(memberInfo);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
