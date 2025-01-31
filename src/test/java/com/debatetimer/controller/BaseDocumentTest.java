@@ -1,6 +1,6 @@
 package com.debatetimer.controller;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
@@ -88,7 +88,7 @@ public abstract class BaseDocumentTest {
     }
 
     private void setLoginMember() {
-        when(authService.getMember(EXIST_MEMBER_ACCESS_TOKEN)).thenReturn(EXIST_MEMBER);
+        doReturn(EXIST_MEMBER).when(authService).getMember(EXIST_MEMBER_ACCESS_TOKEN);
     }
 
     protected RestDocumentationRequest request() {

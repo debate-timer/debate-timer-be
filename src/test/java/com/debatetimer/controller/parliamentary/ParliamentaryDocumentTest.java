@@ -3,8 +3,8 @@ package com.debatetimer.controller.parliamentary;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -87,7 +87,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.save(eq(request), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).save(eq(request), any());
 
             var document = document("parliamentary/post", 201)
                     .request(requestDocument)
@@ -121,7 +121,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.save(eq(request), any())).thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).save(eq(request), any());
 
             var document = document("parliamentary/post", errorCode)
                     .request(requestDocument)
@@ -175,7 +175,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.findTable(eq(tableId), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).findTable(eq(tableId), any());
 
             var document = document("parliamentary/get", 200)
                     .request(requestDocument)
@@ -195,7 +195,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         void 의회식_테이블_조회_실패(ClientErrorCode errorCode) {
             long memberId = 4L;
             long tableId = 5L;
-            when(parliamentaryService.findTable(eq(tableId), any())).thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).findTable(eq(tableId), any());
 
             var document = document("parliamentary/get", errorCode)
                     .request(requestDocument)
@@ -266,7 +266,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 300, 1)
                     )
             );
-            when(parliamentaryService.updateTable(eq(request), eq(tableId), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).updateTable(eq(request), eq(tableId), any());
 
             var document = document("parliamentary/put", 200)
                     .request(requestDocument)
@@ -304,8 +304,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)
                     )
             );
-            when(parliamentaryService.updateTable(eq(request), eq(tableId), any()))
-                    .thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService)
+                    .updateTable(eq(request), eq(tableId), any());
 
             var document = document("parliamentary/put", errorCode)
                     .request(requestDocument)

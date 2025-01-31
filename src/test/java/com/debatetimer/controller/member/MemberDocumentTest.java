@@ -3,7 +3,6 @@ package com.debatetimer.controller.member;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
@@ -89,7 +88,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     List.of(new TableResponse(1L, "토론 테이블 1", TableType.PARLIAMENTARY, 1800),
                             new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, 2000))
             );
-            when(memberService.getTables(EXIST_MEMBER_ID)).thenReturn(response);
+            doReturn(response).when(memberService).getTables(EXIST_MEMBER_ID);
 
             var document = document("member/table", 200)
                     .request(requestDocument)
@@ -105,7 +104,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"})
         @ParameterizedTest
         void 테이블_조회_실패(ClientErrorCode errorCode) {
-            when(memberService.getTables(EXIST_MEMBER_ID)).thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(memberService).getTables(EXIST_MEMBER_ID);
 
             var document = document("member/table", errorCode)
                     .request(requestDocument)
