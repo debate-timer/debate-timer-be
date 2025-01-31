@@ -33,4 +33,8 @@ public class Member {
     public Member(String email) {
         this.email = email;
     }
+
+    public boolean isSameMember(String email) {
+        return this.email.equals(email);
+    }
 }

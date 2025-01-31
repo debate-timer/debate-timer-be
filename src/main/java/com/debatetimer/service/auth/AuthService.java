@@ -47,7 +47,7 @@ public class AuthService {
 
     public void logout(Member member, String refreshToken) {
         String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
-        if (!member.getEmail().equals(email)) {
+        if (!member.isSameMember(email)) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
