@@ -16,6 +16,7 @@ import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponse;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.dto.member.TableType;
@@ -50,10 +51,12 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @Test
         void 회원_생성_성공() {
             MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
+            MemberInfo memberInfo = new MemberInfo(EXIST_MEMBER_EMAIL);
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
-            doReturn(response).when(memberService).createMember(any());
-            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(any());
-            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(any());
+            doReturn(memberInfo).when(authService).getMemberInfo(request);
+            doReturn(response).when(memberService).createMember(memberInfo);
+            doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(memberInfo);
+            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(EXIST_MEMBER_REFRESH_TOKEN);
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();
 
