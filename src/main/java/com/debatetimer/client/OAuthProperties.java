@@ -30,13 +30,13 @@ public class OAuthProperties {
 
     public MultiValueMap<String, String> createTokenRequestBody(MemberCreateRequest request) {
         String code = request.code();
-        String decode = URLDecoder.decode(code, StandardCharsets.UTF_8);
+        String decodedVerificationCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", grantType);
         map.add("client_id", clientId);
         map.add("redirect_uri", redirectUri);
-        map.add("code", decode);
+        map.add("code", decodedVerificationCode);
         map.add("client_secret", clientSecret);
 
         return map;
