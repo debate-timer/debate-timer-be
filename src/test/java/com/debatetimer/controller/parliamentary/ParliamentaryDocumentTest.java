@@ -3,8 +3,9 @@ package com.debatetimer.controller.parliamentary;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.http.HttpHeaders;
 
 public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
@@ -42,8 +44,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
                 .summary("새로운 의회식 토론 시간표 생성")
-                .queryParameter(
-                        parameterWithName("memberId").description("멤버 ID")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 )
                 .requestBodyField(
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
@@ -90,7 +92,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.save(eq(request), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).save(eq(request), any());
 
             var document = document("parliamentary/post", 201)
                     .request(requestDocument)
@@ -99,7 +101,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", EXIST_MEMBER_ID)
+                    .headers(EXIST_MEMBER_HEADER)
                     .body(request)
                     .when().post("/api/table/parliamentary")
                     .then().statusCode(201);
@@ -124,7 +126,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.save(eq(request), any())).thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).save(eq(request), any());
 
             var document = document("parliamentary/post", errorCode)
                     .request(requestDocument)
@@ -133,7 +135,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", EXIST_MEMBER_ID)
+                    .headers(EXIST_MEMBER_HEADER)
                     .body(request)
                     .when().post("/api/table/parliamentary")
                     .then().statusCode(errorCode.getStatus().value());
@@ -146,11 +148,11 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .summary("의회식 토론 시간표 조회")
                 .tag(Tag.PARLIAMENTARY_API)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
-                )
-                .queryParameter(
-                        parameterWithName("memberId").description("멤버 ID")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
@@ -180,7 +182,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
-            when(parliamentaryService.findTable(eq(tableId), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).findTable(eq(tableId), any());
 
             var document = document("parliamentary/get", 200)
                     .request(requestDocument)
@@ -189,8 +191,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .queryParam("memberId", memberId)
                     .when().get("/api/table/parliamentary/{tableId}")
                     .then().statusCode(200);
         }
@@ -200,7 +202,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         void 의회식_테이블_조회_실패(ClientErrorCode errorCode) {
             long memberId = 4L;
             long tableId = 5L;
-            when(parliamentaryService.findTable(eq(tableId), any())).thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).findTable(eq(tableId), any());
 
             var document = document("parliamentary/get", errorCode)
                     .request(requestDocument)
@@ -209,8 +211,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .queryParam("memberId", memberId)
                     .when().get("/api/table/parliamentary/{tableId}")
                     .then().statusCode(errorCode.getStatus().value());
         }
@@ -222,11 +224,11 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
                 .summary("의회식 토론 시간표 수정")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
-                )
-                .queryParameter(
-                        parameterWithName("memberId").description("멤버 ID")
                 )
                 .requestBodyField(
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
@@ -275,7 +277,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 300, 1)
                     )
             );
-            when(parliamentaryService.updateTable(eq(request), eq(tableId), any())).thenReturn(response);
+            doReturn(response).when(parliamentaryService).updateTable(eq(request), eq(tableId), any());
 
             var document = document("parliamentary/put", 200)
                     .request(requestDocument)
@@ -284,7 +286,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", memberId)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
                     .body(request)
                     .when().put("/api/table/parliamentary/{tableId}")
@@ -313,8 +315,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)
                     )
             );
-            when(parliamentaryService.updateTable(eq(request), eq(tableId), any()))
-                    .thenThrow(new DTClientErrorException(errorCode));
+            doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService)
+                    .updateTable(eq(request), eq(tableId), any());
 
             var document = document("parliamentary/put", errorCode)
                     .request(requestDocument)
@@ -323,8 +325,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .queryParam("memberId", memberId)
                     .body(request)
                     .when().put("/api/table/parliamentary/{tableId}")
                     .then().statusCode(errorCode.getStatus().value());
@@ -337,11 +339,11 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.PARLIAMENTARY_API)
                 .summary("의회식 토론 시간표 삭제")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
                 .pathParameter(
                         parameterWithName("tableId").description("테이블 ID")
-                )
-                .queryParameter(
-                        parameterWithName("memberId").description("멤버 ID")
                 );
 
         @Test
@@ -355,8 +357,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .queryParam("memberId", memberId)
                     .when().delete("/api/table/parliamentary/{tableId}")
                     .then().statusCode(204);
         }
@@ -374,8 +376,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
+                    .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .queryParam("memberId", memberId)
                     .when().delete("/api/table/parliamentary/{tableId}")
                     .then().statusCode(errorCode.getStatus().value());
         }

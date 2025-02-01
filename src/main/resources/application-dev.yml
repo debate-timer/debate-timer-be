@@ -17,3 +17,14 @@ spring:
 
 cors:
   origin: ${secret.cors.origin}
+
+oauth:
+  client_id: ${secret.oauth.client_id}
+  client_secret: ${secret.oauth.client_secret}
+  redirect_uri: ${secret.oauth.redirect_uri}
+  grant_type: ${secret.oauth.grant_type}
+
+jwt:
+  secret_key: ${secret.secret_key}
+  access_token_expiration_millis: ${secret.access_token_expiration_millis}
+  refresh_token_expiration_millis: ${secret.refresh_token_expiration_millis}

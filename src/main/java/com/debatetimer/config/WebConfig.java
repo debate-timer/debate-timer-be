@@ -1,6 +1,7 @@
 package com.debatetimer.config;
 
-import com.debatetimer.repository.member.MemberRepository;
+import com.debatetimer.controller.tool.jwt.AuthManager;
+import com.debatetimer.service.auth.AuthService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +12,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final MemberRepository memberRepository;
+    private final AuthManager authManager;
+    private final AuthService authService;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(new AuthMemberArgumentResolver(memberRepository));
+        argumentResolvers.add(new AuthMemberArgumentResolver(authManager, authService));
     }
 }

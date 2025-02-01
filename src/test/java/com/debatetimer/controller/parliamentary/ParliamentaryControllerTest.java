@@ -13,6 +13,7 @@ import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import io.restassured.http.ContentType;
+import io.restassured.http.Headers;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_테이블을_생성한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
@@ -32,10 +33,11 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .body(request)
                     .when().post("/api/table/parliamentary")
                     .then().statusCode(201)
@@ -53,15 +55,16 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_테이블을_조회한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .when().get("/api/table/parliamentary/{tableId}")
                     .then().statusCode(200)
                     .extract().as(ParliamentaryTableResponse.class);
@@ -78,7 +81,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블", "주제", true, true),
@@ -87,11 +90,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                             new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
                     )
             );
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .body(renewTableRequest)
                     .when().put("/api/table/parliamentary/{tableId}")
                     .then().statusCode(200)
@@ -110,15 +114,16 @@ class ParliamentaryControllerTest extends BaseControllerTest {
 
         @Test
         void 의회식_토론_테이블을_삭제한다() {
-            Member bito = memberGenerator.generate("비토");
+            Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = tableGenerator.generate(bito);
             timeBoxGenerator.generate(bitoTable, 1);
             timeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()
                     .contentType(ContentType.JSON)
                     .pathParam("tableId", bitoTable.getId())
-                    .queryParam("memberId", bito.getId())
+                    .headers(headers)
                     .when().delete("/api/table/parliamentary/{tableId}")
                     .then().statusCode(204);
         }

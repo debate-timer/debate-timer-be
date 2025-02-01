@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.Optional;
@@ -24,21 +24,21 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 회원를_생성한다() {
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            MemberInfo request = new MemberInfo("default@gmail.com");
 
             MemberCreateResponse actual = memberService.createMember(request);
 
             Optional<Member> foundMember = memberRepository.findById(actual.id());
             assertAll(
-                    () -> assertThat(actual.nickname()).isEqualTo(request.nickname()),
+                    () -> assertThat(actual.email()).isEqualTo(request.email()),
                     () -> assertThat(foundMember).isPresent()
             );
         }
 
         @Test
         void 기존_닉네임을_가진_회원이_있다면_해당_회원을_반환한다() {
-            Member existedMember = memberGenerator.generate("커찬");
-            MemberCreateRequest request = new MemberCreateRequest("커찬");
+            Member existedMember = memberGenerator.generate("default@gmail.com");
+            MemberInfo request = new MemberInfo("default@gmail.com");
 
             MemberCreateResponse actual = memberService.createMember(request);
 
@@ -51,13 +51,9 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
-            Member member = memberRepository.save(new Member("커찬"));
-            parliamentaryTableRepository.save(new ParliamentaryTable(
-                    member, "토론 시간표 A", "주제", 1800, true, true
-            ));
-            parliamentaryTableRepository.save(new ParliamentaryTable(
-                    member, "토론 시간표 B", "주제", 1900, true, true
-            ));
+            Member member = memberRepository.save(new Member("default@gmail.com"));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", 1800, true, true));
+            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", 1900, true, true));
 
             TableResponses response = memberService.getTables(member.getId());
 
