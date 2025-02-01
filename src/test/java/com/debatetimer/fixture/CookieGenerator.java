@@ -1,8 +1,8 @@
 package com.debatetimer.fixture;
 
-import com.debatetimer.dto.member.MemberInfo;
-import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
 import com.debatetimer.controller.tool.cookie.CookieProvider;
+import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
+import com.debatetimer.dto.member.MemberInfo;
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +12,9 @@ public class CookieGenerator {
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieProvider cookieProvider;
 
-    public CookieGenerator(JwtTokenProvider jwtTokenProvider, CookieProvider cookieProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.cookieProvider = cookieProvider;
+    public CookieGenerator() {
+        this.jwtTokenProvider = new JwtTokenProvider(JwtTokenFixture.TEST_TOKEN_PROPERTIES);
+        this.cookieProvider = new CookieProvider();
     }
 
     public Cookie[] generateRefreshCookie(String email) {

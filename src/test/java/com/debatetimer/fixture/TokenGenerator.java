@@ -1,7 +1,7 @@
 package com.debatetimer.fixture;
 
-import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
+import com.debatetimer.dto.member.MemberInfo;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -13,8 +13,8 @@ public class TokenGenerator {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public TokenGenerator(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public TokenGenerator() {
+        this.jwtTokenProvider = new JwtTokenProvider(JwtTokenFixture.TEST_TOKEN_PROPERTIES);
     }
 
     public String generateRefreshToken(String email) {

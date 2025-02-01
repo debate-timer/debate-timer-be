@@ -5,15 +5,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.service.BaseServiceTest;
+import com.debatetimer.fixture.JwtTokenFixture;
+import com.debatetimer.fixture.TokenGenerator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-class JwtTokenResolverTest extends BaseServiceTest {
+class JwtTokenResolverTest {
 
-    @Autowired
+    private TokenGenerator tokenGenerator;
     private JwtTokenResolver jwtTokenResolver;
+
+    @BeforeEach
+    void setUp() {
+        this.tokenGenerator = new TokenGenerator();
+        this.jwtTokenResolver = new JwtTokenResolver(JwtTokenFixture.TEST_TOKEN_PROPERTIES);
+    }
 
     @Nested
     class ResolveAccessToken {

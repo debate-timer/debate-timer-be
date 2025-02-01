@@ -5,16 +5,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.service.BaseServiceTest;
+import com.debatetimer.fixture.CookieGenerator;
 import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-class CookieExtractorTest extends BaseServiceTest {
+class CookieExtractorTest {
 
-    @Autowired
+    private CookieGenerator cookieGenerator;
     private CookieExtractor cookieExtractor;
+
+    @BeforeEach
+    void setUp() {
+        this.cookieGenerator = new CookieGenerator();
+        this.cookieExtractor = new CookieExtractor();
+    }
 
     @Nested
     class ExtractCookie {
