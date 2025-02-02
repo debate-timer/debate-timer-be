@@ -25,6 +25,6 @@ oauth:
   grant_type: ${secret.oauth.grant_type}
 
 jwt:
-  secret_key: ${secret.secret_key}
-  access_token_expiration_millis: ${secret.access_token_expiration_millis}
-  refresh_token_expiration_millis: ${secret.refresh_token_expiration_millis}
+  secret_key: ${secret.jwt.secret_key}
+  access_token_expiration_millis: ${secret.jwt.access_token_expiration_millis}
+  refresh_token_expiration_millis: ${secret.jwt.refresh_token_expiration_millis}
