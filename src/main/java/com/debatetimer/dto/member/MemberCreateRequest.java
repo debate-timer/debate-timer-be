@@ -2,6 +2,9 @@ package com.debatetimer.dto.member;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record MemberCreateRequest(@NotBlank String code) {
+public record MemberCreateRequest(
+        @NotBlank String code,
+        @NotBlank String redirectUrl
+) {
 
 }

@@ -44,7 +44,7 @@ class MemberControllerTest extends BaseControllerTest {
 
         @Test
         void 회원을_생성한다() {
-            MemberCreateRequest request = new MemberCreateRequest("gnkldsnglnksl");
+            MemberCreateRequest request = new MemberCreateRequest("gnkldsnglnksl", "http://redirectUrl");
             OAuthToken oAuthToken = new OAuthToken("accessToken");
             MemberInfo memberInfo = new MemberInfo("default@gmail.com");
             doReturn(oAuthToken).when(oAuthClient).requestToken(request);
