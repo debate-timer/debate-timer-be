@@ -25,7 +25,8 @@ public class GlobalControllerTest extends BaseControllerTest {
                     .when().options("/")
                     .then().statusCode(200)
                     .headers("Access-Control-Allow-Origin", corsOrigin)
-                    .header("Access-Control-Allow-Methods", containsString(allowedMethod));
+                    .header("Access-Control-Allow-Methods", containsString(allowedMethod))
+                    .header("Access-Control-Expose-Headers", containsString("Authorization"));
         }
 
         @Test
