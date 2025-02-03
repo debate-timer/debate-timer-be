@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
@@ -94,6 +95,15 @@ public abstract class BaseDocumentTest {
     private void setLoginMember() {
         doReturn(EXIST_MEMBER_EMAIL).when(authManager).resolveAccessToken(EXIST_MEMBER_ACCESS_TOKEN);
         doReturn(EXIST_MEMBER).when(authService).getMember(EXIST_MEMBER_EMAIL);
+    }
+
+    protected ResponseCookie responseCookie(String token, int maxAge) {
+        return ResponseCookie.from("refreshToken", token)
+                .path("/")
+                .maxAge(maxAge)
+                .sameSite("None")
+                .secure(true)
+                .build();
     }
 
     protected RestDocumentationRequest request() {

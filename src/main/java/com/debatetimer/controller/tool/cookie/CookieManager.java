@@ -3,6 +3,7 @@ package com.debatetimer.controller.tool.cookie;
 import com.debatetimer.controller.tool.jwt.JwtTokenProperties;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,7 @@ public class CookieManager {
     private final CookieExtractor cookieExtractor;
     private final JwtTokenProperties jwtTokenProperties;
 
-    public Cookie createRefreshTokenCookie(String token) {
+    public ResponseCookie createRefreshTokenCookie(String token) {
         return cookieProvider.createCookie(REFRESH_TOKEN_COOKIE_NAME, token,
                 jwtTokenProperties.getRefreshTokenExpirationMillis());
     }
@@ -24,7 +25,7 @@ public class CookieManager {
         return cookieExtractor.extractCookie(REFRESH_TOKEN_COOKIE_NAME, cookies);
     }
 
-    public Cookie deleteRefreshTokenCookie() {
+    public ResponseCookie deleteRefreshTokenCookie() {
         return cookieProvider.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
     }
 }

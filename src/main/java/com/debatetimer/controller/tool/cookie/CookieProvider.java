@@ -1,6 +1,7 @@
 package com.debatetimer.controller.tool.cookie;
 
-import jakarta.servlet.http.Cookie;
+import java.time.Duration;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,17 +9,21 @@ public class CookieProvider {
 
     private static final String PATH = "/";
 
-    public Cookie createCookie(String cookieName, String token, long expirationMillis) {
-        Cookie cookie = new Cookie(cookieName, token);
-        cookie.setMaxAge((int) (expirationMillis / 1000));
-        cookie.setPath(PATH);
-        return cookie;
+    public ResponseCookie createCookie(String cookieName, String token, long expirationMillis) {
+        return ResponseCookie.from(cookieName, token)
+                .maxAge(Duration.ofMillis(expirationMillis))
+                .path(PATH)
+                .sameSite("None")
+                .secure(true)
+                .build();
     }
 
-    public Cookie deleteCookie(String cookieName) {
-        Cookie cookie = new Cookie(cookieName, "");
-        cookie.setMaxAge(0);
-        cookie.setPath(PATH);
-        return cookie;
+    public ResponseCookie deleteCookie(String cookieName) {
+        return ResponseCookie.from(cookieName, "")
+                .maxAge(0)
+                .path(PATH)
+                .sameSite("None")
+                .secure(true)
+                .build();
     }
 }

@@ -11,12 +11,12 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,10 +43,10 @@ public class MemberController {
         MemberInfo memberInfo = authService.getMemberInfo(request);
         MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
         JwtTokenResponse jwtTokenResponse = authManager.issueToken(memberInfo);
-        Cookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+        ResponseCookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
-        response.addCookie(refreshTokenCookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         return memberCreateResponse;
     }
 
@@ -54,10 +54,10 @@ public class MemberController {
     public void reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
         JwtTokenResponse jwtTokenResponse = authManager.reissueToken(refreshToken);
-        Cookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+        ResponseCookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
 
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
-        response.addCookie(refreshTokenCookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
     @PostMapping("/api/member/logout")
@@ -66,8 +66,8 @@ public class MemberController {
         String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
         String email = authManager.resolveRefreshToken(refreshToken);
         authService.logout(member, email);
-        Cookie deletedRefreshTokenCookie = cookieManager.deleteRefreshTokenCookie();
+        ResponseCookie deletedRefreshTokenCookie = cookieManager.deleteRefreshTokenCookie();
 
-        response.addCookie(deletedRefreshTokenCookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, deletedRefreshTokenCookie.toString());
     }
 }

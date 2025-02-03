@@ -57,7 +57,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             doReturn(memberInfo).when(authService).getMemberInfo(request);
             doReturn(response).when(memberService).createMember(memberInfo);
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(memberInfo);
-            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(EXIST_MEMBER_REFRESH_TOKEN);
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager).createRefreshTokenCookie(EXIST_MEMBER_REFRESH_TOKEN);
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();
 
@@ -143,7 +143,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @Test
         void 토큰_갱신_성공() {
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).reissueToken(any());
-            doReturn(EXIST_MEMBER_COOKIE).when(cookieManager).createRefreshTokenCookie(any());
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager).createRefreshTokenCookie(any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
@@ -205,7 +205,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 로그아웃_성공() {
-            doReturn(DELETE_MEMBER_COOKIE).when(cookieManager).deleteRefreshTokenCookie();
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).deleteRefreshTokenCookie();
 
             var document = document("member/logout", 204)
                     .request(requestDocument)

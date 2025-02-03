@@ -4,6 +4,7 @@ import com.debatetimer.controller.tool.cookie.CookieProvider;
 import com.debatetimer.controller.tool.jwt.JwtTokenProvider;
 import com.debatetimer.dto.member.MemberInfo;
 import jakarta.servlet.http.Cookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,8 +24,13 @@ public class CookieGenerator {
     }
 
     public Cookie[] generateCookie(String cookieName, String value, long expirationMills) {
-        Cookie[] cookies = new Cookie[1];
-        cookies[0] = cookieProvider.createCookie(cookieName, value, expirationMills);
-        return cookies;
+        ResponseCookie responseCookie = cookieProvider.createCookie(cookieName, value, expirationMills);
+
+        Cookie servletCookie = new Cookie(responseCookie.getName(), responseCookie.getValue());
+        servletCookie.setMaxAge((int) (expirationMills / 1000));
+        servletCookie.setPath(responseCookie.getPath());
+        servletCookie.setSecure(responseCookie.isSecure());
+        servletCookie.setHttpOnly(responseCookie.isHttpOnly());
+        return new Cookie[]{servletCookie};
     }
 }
