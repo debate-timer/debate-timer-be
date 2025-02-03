@@ -14,17 +14,14 @@ public class OAuthProperties {
 
     private final String clientId;
     private final String clientSecret;
-    private final String redirectUri;
     private final String grantType;
 
     public OAuthProperties(
             String clientId,
             String clientSecret,
-            String redirectUri,
             String grantType) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
         this.grantType = grantType;
     }
 
@@ -35,7 +32,7 @@ public class OAuthProperties {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", grantType);
         map.add("client_id", clientId);
-        map.add("redirect_uri", redirectUri);
+        map.add("redirect_uri", request.redirectUrl());
         map.add("code", decodedVerificationCode);
         map.add("client_secret", clientSecret);
 

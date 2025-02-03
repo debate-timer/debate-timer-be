@@ -39,7 +39,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 .tag(Tag.MEMBER_API)
                 .summary("멤버 생성")
                 .requestBodyField(
-                        fieldWithPath("code").type(STRING).description("인가 코드")
+                        fieldWithPath("code").type(STRING).description("인가 코드"),
+                        fieldWithPath("redirectUrl").type(STRING).description("리다이렉트 URL")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
@@ -50,7 +51,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 회원_생성_성공() {
-            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg");
+            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg", "http://redirectUrl");
             MemberInfo memberInfo = new MemberInfo(EXIST_MEMBER_EMAIL);
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(memberInfo).when(authService).getMemberInfo(request);
