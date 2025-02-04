@@ -19,7 +19,7 @@ class CookieProviderTest {
             String name = "cookieName";
             String token = "tokenValue";
 
-            ResponseCookie cookie = cookieProvider.createCookie(name, token, 100_000);
+            ResponseCookie cookie = cookieProvider.createCookie(name, token, Duration.ofHours(1));
 
             assertThat(cookie.toString())
                     .contains("%s=%s;".formatted(name, token));
@@ -29,7 +29,7 @@ class CookieProviderTest {
         void 클라이언트와_서버가_분리된_환경에서_쿠키가_정상작동하도록_설정한다() {
             CookieProvider cookieProvider = new CookieProvider();
 
-            ResponseCookie cookie = cookieProvider.createCookie("name", "token", 100_000);
+            ResponseCookie cookie = cookieProvider.createCookie("name", "token", Duration.ofHours(1));
 
             assertThat(cookie.toString())
                     .contains("SameSite=None")

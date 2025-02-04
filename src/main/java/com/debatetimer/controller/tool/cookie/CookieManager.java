@@ -20,7 +20,7 @@ public class CookieManager {
         return cookieProvider.createCookie(
                 REFRESH_TOKEN_COOKIE_NAME,
                 token,
-                jwtTokenProperties.getRefreshTokenExpirationMillis()
+                jwtTokenProperties.getRefreshTokenExpiration()
         );
     }
 

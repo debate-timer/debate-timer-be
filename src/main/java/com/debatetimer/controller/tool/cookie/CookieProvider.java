@@ -12,9 +12,9 @@ public class CookieProvider {
     private static final String PATH = "/";
     private static final String SAME_SITE = SameSite.NONE.attributeValue();
 
-    public ResponseCookie createCookie(String cookieName, String token, long expirationMillis) {
+    public ResponseCookie createCookie(String cookieName, String token, Duration expiration) {
         return ResponseCookie.from(cookieName, token)
-                .maxAge(Duration.ofMillis(expirationMillis))
+                .maxAge(expiration)
                 .path(PATH)
                 .sameSite(SAME_SITE)
                 .secure(true)
@@ -23,7 +23,7 @@ public class CookieProvider {
 
     public ResponseCookie deleteCookie(String cookieName) {
         return ResponseCookie.from(cookieName, EMPTY_TOKEN)
-                .maxAge(0)
+                .maxAge(Duration.ZERO)
                 .path(PATH)
                 .sameSite(SAME_SITE)
                 .secure(true)
