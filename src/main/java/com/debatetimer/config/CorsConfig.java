@@ -2,6 +2,7 @@ package com.debatetimer.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -28,7 +29,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         HttpMethod.OPTIONS.name()
                 )
                 .allowCredentials(true)
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .exposedHeaders(HttpHeaders.AUTHORIZATION);
     }
 }
 

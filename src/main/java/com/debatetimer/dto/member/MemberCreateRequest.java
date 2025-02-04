@@ -1,11 +1,10 @@
 package com.debatetimer.dto.member;
 
-import com.debatetimer.domain.member.Member;
 import jakarta.validation.constraints.NotBlank;
 
-public record MemberCreateRequest(@NotBlank String nickname) {
+public record MemberCreateRequest(
+        @NotBlank String code,
+        @NotBlank String redirectUrl
+) {
 
-    public Member toMember() {
-        return new Member(nickname);
-    }
 }

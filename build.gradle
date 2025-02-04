@@ -50,6 +50,11 @@ dependencies {
     // Excel Export
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'org.apache.poi:poi:5.2.3'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
 }
 
 bootJar {
@@ -99,7 +104,20 @@ generateSwaggerUI {
 }
 
 openapi3 {
-    server = "http://localhost:8080"
+    servers = [
+            {
+                url = "https://api.dev.debate-timer.com"
+                description = "Dev Server"
+            },
+            {
+                url = "https://api.prod.debate-timer.com"
+                description = "Prod Server"
+            },
+            {
+                url = "http://localhost:8080"
+                description = "Local Server"
+            }
+    ]
     title = "토론 타이머 API"
     description = "토론 타이머 API"
     version = "0.0.1"

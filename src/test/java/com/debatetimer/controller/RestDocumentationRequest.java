@@ -1,5 +1,6 @@
 package com.debatetimer.controller;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -8,6 +9,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.restdocs.cookies.CookieDescriptor;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
@@ -45,6 +47,11 @@ public class RestDocumentationRequest {
 
     public RestDocumentationRequest requestHeader(HeaderDescriptor... descriptors) {
         snippets.add(requestHeaders(descriptors));
+        return this;
+    }
+
+    public RestDocumentationRequest requestCookie(CookieDescriptor... descriptors) {
+        snippets.add(requestCookies(descriptors));
         return this;
     }
 

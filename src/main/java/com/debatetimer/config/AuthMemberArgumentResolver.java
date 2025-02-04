@@ -1,13 +1,14 @@
 package com.debatetimer.config;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.custom.DTException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.repository.member.MemberRepository;
+import com.debatetimer.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -17,7 +18,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final MemberRepository memberRepository;
+    private final AuthManager authManager;
+    private final AuthService authService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -31,14 +33,11 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-        try {
-            long memberId = Long.parseLong(webRequest.getParameter("memberId"));
-            return memberRepository.getById(memberId);
-        } catch (DTException | NumberFormatException exception) {
-            log.warn(exception.getMessage());
+        String accessToken = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        if (accessToken == null) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
+        String email = authManager.resolveAccessToken(accessToken);
+        return authService.getMember(email);
     }
 }
-
-

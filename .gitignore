@@ -38,3 +38,6 @@ out/
 
 ### Rest Docs
 /src/main/resources/static/docs/openapi3.yaml
+
+### application-local.yml
+/src/main/resources/application-local.yml

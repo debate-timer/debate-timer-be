@@ -17,5 +17,10 @@ public interface MemberRepository extends Repository<Member, Long> {
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_NOT_FOUND));
     }
 
-    Optional<Member> findByNickname(String nickname);
+    Optional<Member> findByEmail(String email);
+
+    default Member getByEmail(String email) {
+        return findByEmail(email)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_NOT_FOUND));
+    }
 }

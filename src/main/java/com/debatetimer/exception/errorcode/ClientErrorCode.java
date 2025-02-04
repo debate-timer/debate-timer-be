@@ -1,18 +1,11 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ClientErrorCode implements ErrorCode {
-
-    INVALID_MEMBER_NICKNAME_LENGTH(
-            HttpStatus.BAD_REQUEST,
-            "닉네임은 1자 이상 %d자 이하여야 합니다".formatted(Member.NICKNAME_MAX_LENGTH)
-    ),
-    INVALID_MEMBER_NICKNAME_FORM(HttpStatus.BAD_REQUEST, "닉네임은 영문/한글만 가능합니다"),
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
@@ -39,6 +32,8 @@ public enum ClientErrorCode implements ErrorCode {
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
+    EMPTY_COOKIE(HttpStatus.UNAUTHORIZED, "쿠키에 값이 없습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
     ;
