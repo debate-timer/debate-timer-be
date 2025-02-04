@@ -34,4 +34,8 @@ public class JwtTokenProvider {
                 .signWith(jwtTokenProperties.getSecretKey())
                 .compact();
     }
+
+    public Duration getRefreshTokenExpiration() {
+        return jwtTokenProperties.getRefreshTokenExpiration();
+    }
 }

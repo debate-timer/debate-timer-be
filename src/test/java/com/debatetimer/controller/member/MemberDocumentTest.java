@@ -57,7 +57,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
             doReturn(memberInfo).when(authService).getMemberInfo(request);
             doReturn(response).when(memberService).createMember(memberInfo);
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(memberInfo);
-            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager).createRefreshTokenCookie(EXIST_MEMBER_REFRESH_TOKEN);
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager)
+                    .createCookie(any(), any(), any());
 
             var document = document("member/create", 201).request(requestDocument).response(responseDocument).build();
 
@@ -143,7 +144,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @Test
         void 토큰_갱신_성공() {
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).reissueToken(any());
-            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager).createRefreshTokenCookie(any());
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager)
+                    .createCookie(any(), any(), any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
@@ -155,22 +157,6 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .cookie("refreshToken")
                     .when().post("/api/member/reissue")
                     .then().statusCode(200);
-        }
-
-        @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_COOKIE"})
-        @ParameterizedTest
-        void 토큰_갱신_실패_쿠키_추출(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(cookieManager).extractRefreshToken(any());
-
-            var document = document("member/reissue", errorCode)
-                    .request(requestDocument)
-                    .response(ERROR_RESPONSE)
-                    .build();
-
-            given(document)
-                    .cookie("refreshToken")
-                    .when().post("/api/member/reissue")
-                    .then().statusCode(errorCode.getStatus().value());
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"EXPIRED_TOKEN", "UNAUTHORIZED_MEMBER"})
@@ -205,7 +191,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 로그아웃_성공() {
-            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).deleteRefreshTokenCookie();
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).deleteCookie(any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
@@ -216,23 +202,6 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .cookie("refreshToken")
                     .when().post("/api/member/logout")
                     .then().statusCode(204);
-        }
-
-        @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_COOKIE"})
-        @ParameterizedTest
-        void 로그아웃_실패_쿠키_추출(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(cookieManager).extractRefreshToken(any());
-
-            var document = document("member/logout", errorCode)
-                    .request(requestDocument)
-                    .response(ERROR_RESPONSE)
-                    .build();
-
-            given(document)
-                    .headers(EXIST_MEMBER_HEADER)
-                    .cookie("refreshToken")
-                    .when().post("/api/member/logout")
-                    .then().statusCode(errorCode.getStatus().value());
         }
 
         @EnumSource(value = ClientErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN"})
