@@ -1,7 +1,6 @@
 package com.debatetimer.controller.tool.cookie;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Nested;
@@ -16,48 +15,20 @@ class CookieProviderTest {
         @Test
         void 쿠키_이름과_값을_설정한다() {
             CookieProvider cookieProvider = new CookieProvider();
-            String name = "cookieName";
-            String token = "tokenValue";
+            String key = "cookieKey";
+            String value = "tokenValue";
 
-            ResponseCookie cookie = cookieProvider.createCookie(name, token, Duration.ofHours(1));
+            ResponseCookie cookie = cookieProvider.createCookie(key, value, Duration.ofHours(1));
 
             assertThat(cookie.toString())
-                    .contains("%s=%s;".formatted(name, token));
+                    .contains("%s=%s;".formatted(key, value));
         }
 
         @Test
         void 클라이언트와_서버가_분리된_환경에서_쿠키가_정상작동하도록_설정한다() {
             CookieProvider cookieProvider = new CookieProvider();
 
-            ResponseCookie cookie = cookieProvider.createCookie("name", "token", Duration.ofHours(1));
-
-            assertThat(cookie.toString())
-                    .contains("SameSite=None")
-                    .contains("Secure");
-        }
-    }
-
-    @Nested
-    class DeleteCookie {
-
-        @Test
-        void 값이_빈_만료된_쿠키를_생성한다() {
-            CookieProvider cookieProvider = new CookieProvider();
-            String name = "cookieName";
-
-            ResponseCookie cookie = cookieProvider.deleteCookie(name);
-
-            assertAll(
-                    () -> assertThat(cookie.getMaxAge()).isEqualTo(Duration.ZERO),
-                    () -> assertThat(cookie.toString()).contains("%s=;".formatted(name))
-            );
-        }
-
-        @Test
-        void 클라이언트와_서버가_분리된_환경에서_쿠키가_정상작동하도록_설정한다() {
-            CookieProvider cookieProvider = new CookieProvider();
-
-            ResponseCookie cookie = cookieProvider.deleteCookie("name");
+            ResponseCookie cookie = cookieProvider.createCookie("key", "value", Duration.ofHours(1));
 
             assertThat(cookie.toString())
                     .contains("SameSite=None")

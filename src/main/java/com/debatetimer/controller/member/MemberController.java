@@ -69,10 +69,10 @@ public class MemberController {
                                        @CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
         String email = authManager.resolveRefreshToken(refreshToken);
         authService.logout(member, email);
-        ResponseCookie deletedRefreshTokenCookie = cookieManager.deleteCookie(REFRESH_TOKEN_COOKIE_KEY);
+        ResponseCookie expiredRefreshTokenCookie = cookieManager.createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY);
 
         return ResponseEntity.noContent()
-                .header(HttpHeaders.SET_COOKIE, deletedRefreshTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, expiredRefreshTokenCookie.toString())
                 .build();
     }
 }

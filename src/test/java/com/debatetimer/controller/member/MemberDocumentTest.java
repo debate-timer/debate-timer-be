@@ -191,7 +191,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
         @Test
         void 로그아웃_성공() {
-            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).deleteCookie(any());
+            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).createExpiredCookie(any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
