@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,7 +39,6 @@ public class MemberController {
     }
 
     @PostMapping("/api/member")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<MemberCreateResponse> createMember(@RequestBody MemberCreateRequest request) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
         MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
@@ -67,7 +65,6 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> logout(@AuthMember Member member,
                                        @CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
         String email = authManager.resolveRefreshToken(refreshToken);
