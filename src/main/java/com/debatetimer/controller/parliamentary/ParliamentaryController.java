@@ -5,9 +5,15 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
+import com.debatetimer.view.exporter.ParliamentaryTableExcelExporter;
 import jakarta.validation.Valid;
+import java.io.ByteArrayOutputStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParliamentaryController {
 
     private final ParliamentaryService parliamentaryService;
+    private final ParliamentaryTableExcelExporter parliamentaryTableExcelExporter;
 
     @PostMapping("/api/table/parliamentary")
     @ResponseStatus(HttpStatus.CREATED)
@@ -58,5 +65,23 @@ public class ParliamentaryController {
             @AuthMember Member member
     ) {
         parliamentaryService.deleteTable(tableId, member);
+    }
+
+    @GetMapping("/api/table/parliamentary/export/{tableId}")
+    public ResponseEntity<byte[]> export(
+            @AuthMember Member member,
+            @PathVariable Long tableId
+    ) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ParliamentaryTableResponse foundTable = parliamentaryService.findTable(tableId, member);
+        parliamentaryTableExcelExporter.export(foundTable, outputStream);
+        ContentDisposition contentDisposition = ContentDisposition.attachment()
+                .filename(foundTable.info().name() + ".xlsx")
+                .build();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .body(outputStream.toByteArray());
     }
 }
