@@ -27,5 +27,5 @@ cors:
 
 jwt:
   secret_key: testtesttesttesttesttesttesttest
-  access_token_expiration_millis: 5000
-  refresh_token_expiration_millis: 10000
+  access_token_expiration: 1h
+  refresh_token_expiration: 1d

@@ -1,7 +1,6 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
-import com.debatetimer.fixture.CookieGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
@@ -37,7 +36,4 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected TokenGenerator tokenGenerator;
-
-    @Autowired
-    protected CookieGenerator cookieGenerator;
 }

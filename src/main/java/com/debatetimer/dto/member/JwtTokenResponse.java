@@ -1,5 +1,7 @@
 package com.debatetimer.dto.member;
 
-public record JwtTokenResponse(String accessToken, String refreshToken) {
+import java.time.Duration;
+
+public record JwtTokenResponse(String accessToken, String refreshToken, Duration refreshExpiration) {
 
 }

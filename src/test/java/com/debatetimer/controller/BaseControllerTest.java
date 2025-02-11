@@ -2,7 +2,6 @@ package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.OAuthClient;
-import com.debatetimer.fixture.CookieGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
@@ -43,9 +42,6 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected HeaderGenerator headerGenerator;
-
-    @Autowired
-    protected CookieGenerator cookieGenerator;
 
     @Autowired
     protected TokenGenerator tokenGenerator;

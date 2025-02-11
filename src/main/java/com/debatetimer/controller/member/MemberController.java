@@ -11,21 +11,22 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+
+    private static final String REFRESH_TOKEN_COOKIE_KEY = "refreshToken";
 
     private final MemberService memberService;
     private final AuthService authService;
@@ -38,36 +39,40 @@ public class MemberController {
     }
 
     @PostMapping("/api/member")
-    @ResponseStatus(HttpStatus.CREATED)
-    public MemberCreateResponse createMember(@RequestBody MemberCreateRequest request, HttpServletResponse response) {
+    public ResponseEntity<MemberCreateResponse> createMember(@RequestBody MemberCreateRequest request) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
         MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
-        JwtTokenResponse jwtTokenResponse = authManager.issueToken(memberInfo);
-        ResponseCookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+        JwtTokenResponse jwtToken = authManager.issueToken(memberInfo);
+        ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
+                jwtToken.refreshToken(), jwtToken.refreshExpiration());
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-        return memberCreateResponse;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.AUTHORIZATION, jwtToken.accessToken())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(memberCreateResponse);
     }
 
     @PostMapping("/api/member/reissue")
-    public void reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
-        JwtTokenResponse jwtTokenResponse = authManager.reissueToken(refreshToken);
-        ResponseCookie refreshTokenCookie = cookieManager.createRefreshTokenCookie(jwtTokenResponse.refreshToken());
+    public ResponseEntity<Void> reissueAccessToken(@CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
+        JwtTokenResponse jwtToken = authManager.reissueToken(refreshToken);
+        ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
+                jwtToken.refreshToken(), jwtToken.refreshExpiration());
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, jwtTokenResponse.accessToken());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, jwtToken.accessToken())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
 
     @PostMapping("/api/member/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@AuthMember Member member, HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieManager.extractRefreshToken(request.getCookies());
+    public ResponseEntity<Void> logout(@AuthMember Member member,
+                                       @CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
         String email = authManager.resolveRefreshToken(refreshToken);
         authService.logout(member, email);
-        ResponseCookie deletedRefreshTokenCookie = cookieManager.deleteRefreshTokenCookie();
+        ResponseCookie expiredRefreshTokenCookie = cookieManager.createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, deletedRefreshTokenCookie.toString());
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, expiredRefreshTokenCookie.toString())
+                .build();
     }
 }
