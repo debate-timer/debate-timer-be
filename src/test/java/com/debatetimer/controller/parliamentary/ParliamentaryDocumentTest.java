@@ -20,6 +20,7 @@ import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
+import com.debatetimer.dto.member.TableType;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
 import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
@@ -65,6 +66,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.type").type(STRING).description("토론 형식"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
                         fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
@@ -86,7 +88,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 1", "토론 주제", true, true),
+                    new TableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -160,6 +162,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.type").type(STRING).description("토론 형식"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
                         fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
@@ -176,7 +179,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 1", "토론 주제", true, true),
+                    new TableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
@@ -248,6 +251,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("id").type(NUMBER).description("테이블 ID"),
                         fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
                         fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.type").type(STRING).description("토론 형식"),
                         fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
                         fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
                         fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
@@ -271,7 +275,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
-                    new TableInfoResponse("비토 테이블 2", "토론 주제 2", true, true),
+                    new TableInfoResponse("비토 테이블 2", TableType.PARLIAMENTARY, "토론 주제 2", true, true),
                     List.of(
                             new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 300, 1),
                             new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 300, 1)
