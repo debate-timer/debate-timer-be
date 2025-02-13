@@ -6,8 +6,8 @@ import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
 import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -100,9 +100,9 @@ public class ParliamentaryTableExcelExporter {
                 HorizontalAlignment.CENTER);
     }
 
-    public ByteArrayOutputStream export(
+    public OutputStream export(
             ParliamentaryTableResponse parliamentaryTableResponse,
-            ByteArrayOutputStream outputStream
+            OutputStream outputStream
     ) {
         TableInfoResponse tableInfo = parliamentaryTableResponse.info();
         List<TimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
@@ -123,7 +123,7 @@ public class ParliamentaryTableExcelExporter {
         return outputStream;
     }
 
-    private void writeToStream(ByteArrayOutputStream outputStream, Workbook workbook) {
+    private void writeToStream(OutputStream outputStream, Workbook workbook) {
         try {
             workbook.write(outputStream);
         } catch (IOException e) {

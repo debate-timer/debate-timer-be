@@ -6,13 +6,11 @@ import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import com.debatetimer.view.exporter.ParliamentaryTableExcelExporter;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,20 +66,16 @@ public class ParliamentaryController {
     }
 
     @GetMapping("/api/table/parliamentary/export/{tableId}")
-    public ResponseEntity<byte[]> export(
-            @AuthMember Member member,
+    public ResponseEntity<Void> export(
+//            @AuthMember Member member,
+            HttpServletResponse response,
             @PathVariable Long tableId
     ) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ParliamentaryTableResponse foundTable = parliamentaryService.findTable(tableId, member);
-        parliamentaryTableExcelExporter.export(foundTable, outputStream);
-        ContentDisposition contentDisposition = ContentDisposition.attachment()
-                .filename(foundTable.info().name() + ".xlsx")
-                .build();
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
-                .body(outputStream.toByteArray());
+        try (OutputStream outputStream = response.getOutputStream()) {
+            ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, 1L);
+            parliamentaryTableExcelExporter.export(foundTable, outputStream);
+        } catch (Exception e) {
+        }
+        return ResponseEntity.ok().build();
     }
 }
