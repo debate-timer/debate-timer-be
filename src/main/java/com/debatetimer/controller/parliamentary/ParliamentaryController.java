@@ -6,10 +6,9 @@ import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import com.debatetimer.view.exporter.ParliamentaryTableExcelExporter;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.OutputStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,16 +65,12 @@ public class ParliamentaryController {
     }
 
     @GetMapping("/api/table/parliamentary/export/{tableId}")
-    public ResponseEntity<Void> export(
-//            @AuthMember Member member,
-            HttpServletResponse response,
+    public ResponseEntity<InputStreamResource> export(
+            @AuthMember Member member,
             @PathVariable Long tableId
     ) {
-        try (OutputStream outputStream = response.getOutputStream()) {
-            ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, 1L);
-            parliamentaryTableExcelExporter.export(foundTable, outputStream);
-        } catch (Exception e) {
-        }
-        return ResponseEntity.ok().build();
+        ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, 1L);
+        InputStreamResource excelStream = parliamentaryTableExcelExporter.export(foundTable);
+        return ResponseEntity.ok(excelStream);
     }
 }

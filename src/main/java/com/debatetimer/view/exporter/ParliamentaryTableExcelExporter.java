@@ -6,8 +6,9 @@ import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
 import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,6 +23,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -100,9 +102,8 @@ public class ParliamentaryTableExcelExporter {
                 HorizontalAlignment.CENTER);
     }
 
-    public OutputStream export(
-            ParliamentaryTableResponse parliamentaryTableResponse,
-            OutputStream outputStream
+    public InputStreamResource export(
+            ParliamentaryTableResponse parliamentaryTableResponse
     ) {
         TableInfoResponse tableInfo = parliamentaryTableResponse.info();
         List<TimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
@@ -119,13 +120,15 @@ public class ParliamentaryTableExcelExporter {
         createTableHeader(sheet);
         createTimeBoxRows(timeBoxes, sheet);
         setColumnWidth(sheet);
-        writeToStream(outputStream, workbook);
-        return outputStream;
+        return writeToInputStream(workbook);
     }
 
-    private void writeToStream(OutputStream outputStream, Workbook workbook) {
-        try {
+    private InputStreamResource writeToInputStream(Workbook workbook) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             workbook.write(outputStream);
+            workbook.close();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            return new InputStreamResource(inputStream);
         } catch (IOException e) {
             throw new DTServerErrorException(ServerErrorCode.EXCEL_EXPORT_ERROR);
         }
