@@ -32,26 +32,33 @@ public abstract class DebateTable {
     @NotNull
     private String agenda;
 
+    private int duration;
+
     private boolean warningBell;
 
     private boolean finishBell;
 
-    protected DebateTable(Member member, String name, String agenda, boolean warningBell, boolean finishBell) {
-        validate(name);
+    protected DebateTable(Member member, String name, String agenda, int duration, boolean warningBell,
+                          boolean finishBell) {
+        validate(name, duration);
 
         this.member = member;
         this.name = name;
         this.agenda = agenda;
+        this.duration = duration;
         this.warningBell = warningBell;
         this.finishBell = finishBell;
     }
 
-    private void validate(String name) {
+    private void validate(String name, int duration) {
         if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
         }
         if (!name.matches(NAME_REGEX)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_FORM);
+        }
+        if (duration <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
         }
     }
 
@@ -60,10 +67,11 @@ public abstract class DebateTable {
     }
 
     protected final void updateTable(DebateTable renewTable) {
-        validate(renewTable.getName());
+        validate(renewTable.getName(), renewTable.getDuration());
 
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
+        this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
     }

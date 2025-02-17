@@ -31,6 +31,10 @@ class ParliamentaryTimeBoxTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
+    }
+
+    @Nested
+    class ValidateStance {
 
         @Test
         void 박스타입에_가능한_입장을_검증한다() {
