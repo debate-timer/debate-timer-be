@@ -1,6 +1,5 @@
 package com.debatetimer.domain.parliamentary;
 
-import com.debatetimer.domain.BoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -41,14 +40,14 @@ public class ParliamentaryTimeBox {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private BoxType type;
+    private ParliamentaryBoxType type;
 
     @NotNull
     private int time;
 
     private Integer speaker;
 
-    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, BoxType type,
+    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, ParliamentaryBoxType type,
                                 int time, Integer speaker) {
         validate(sequence, time, stance, type);
         this.parliamentaryTable = parliamentaryTable;
@@ -59,7 +58,7 @@ public class ParliamentaryTimeBox {
         this.speaker = speaker;
     }
 
-    private void validate(int sequence, int time, Stance stance, BoxType boxType) {
+    private void validate(int sequence, int time, Stance stance, ParliamentaryBoxType boxType) {
         if (sequence <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
         }

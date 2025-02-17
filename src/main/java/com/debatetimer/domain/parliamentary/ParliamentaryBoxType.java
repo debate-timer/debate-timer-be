@@ -1,10 +1,11 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.parliamentary;
 
+import com.debatetimer.domain.Stance;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum BoxType {
+public enum ParliamentaryBoxType {
 
     OPENING(Set.of(Stance.PROS, Stance.CONS)),
     REBUTTAL(Set.of(Stance.PROS, Stance.CONS)),

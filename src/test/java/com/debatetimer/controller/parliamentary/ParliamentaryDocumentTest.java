@@ -18,7 +18,7 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
-import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
@@ -82,16 +82,16 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
                     new TableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
-                            new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxResponse(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxResponse(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             doReturn(response).when(parliamentaryService).save(eq(request), any());
@@ -124,8 +124,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService).save(eq(request), any());
@@ -181,8 +181,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
                     5L,
                     new TableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
-                            new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxResponse(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxResponse(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             doReturn(response).when(parliamentaryService).findTable(eq(tableId), any());
@@ -269,16 +269,16 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 300, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 300, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 300, 1)
                     )
             );
             ParliamentaryTableResponse response = new ParliamentaryTableResponse(
                     5L,
                     new TableInfoResponse("비토 테이블 2", TableType.PARLIAMENTARY, "토론 주제 2", true, true),
                     List.of(
-                            new TimeBoxResponse(Stance.PROS, BoxType.OPENING, 300, 1),
-                            new TimeBoxResponse(Stance.CONS, BoxType.OPENING, 300, 1)
+                            new TimeBoxResponse(Stance.PROS, ParliamentaryBoxType.OPENING, 300, 1),
+                            new TimeBoxResponse(Stance.CONS, ParliamentaryBoxType.OPENING, 300, 1)
                     )
             );
             doReturn(response).when(parliamentaryService).updateTable(eq(request), eq(tableId), any());
@@ -315,8 +315,8 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 300, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 300, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 300, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 300, 1)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(parliamentaryService)
