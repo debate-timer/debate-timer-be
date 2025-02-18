@@ -50,18 +50,6 @@ public abstract class DebateTable {
         this.finishBell = finishBell;
     }
 
-    private void validate(String name, int duration) {
-        if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
-        }
-        if (!name.matches(NAME_REGEX)) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_FORM);
-        }
-        if (duration <= 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
-        }
-    }
-
     public final boolean isOwner(long memberId) {
         return Objects.equals(this.member.getId(), memberId);
     }
@@ -74,5 +62,17 @@ public abstract class DebateTable {
         this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
+    }
+
+    private void validate(String name, int duration) {
+        if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
+        }
+        if (!name.matches(NAME_REGEX)) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_FORM);
+        }
+        if (duration <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
+        }
     }
 }
