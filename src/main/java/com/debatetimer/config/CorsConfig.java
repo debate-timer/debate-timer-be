@@ -22,6 +22,11 @@ public class CorsConfig implements WebMvcConfigurer {
         if (corsOrigin == null || corsOrigin.length == 0) {
             throw new DTInitializationException("CORS Origin 은 적어도 한 개 있어야 합니다");
         }
+        for (String origin : corsOrigin) {
+            if (origin == null || origin.isBlank()) {
+                throw new DTInitializationException("CORS Origin 은 비어있을 수 없습니다");
+            }
+        }
     }
 
     @Override
