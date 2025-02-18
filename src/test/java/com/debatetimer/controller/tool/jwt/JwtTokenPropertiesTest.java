@@ -3,6 +3,7 @@ package com.debatetimer.controller.tool.jwt;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.debatetimer.exception.custom.DTInitializationException;
 import java.time.Duration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class JwtTokenPropertiesTest {
             Duration refreshTokenExpiration = Duration.ofMinutes(5);
 
             assertThatThrownBy(() -> new JwtTokenProperties(emptyKey, accessTokenExpiration, refreshTokenExpiration))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(DTInitializationException.class);
         }
     }
 
@@ -36,9 +37,9 @@ class JwtTokenPropertiesTest {
 
             assertAll(
                     () -> assertThatThrownBy(() -> new JwtTokenProperties(secretKey, null, Duration.ofMinutes(5)))
-                            .isInstanceOf(IllegalArgumentException.class),
+                            .isInstanceOf(DTInitializationException.class),
                     () -> assertThatThrownBy(() -> new JwtTokenProperties(secretKey, Duration.ofMinutes(1), null))
-                            .isInstanceOf(IllegalArgumentException.class)
+                            .isInstanceOf(DTInitializationException.class)
             );
         }
 
@@ -50,10 +51,10 @@ class JwtTokenPropertiesTest {
             assertAll(
                     () -> assertThatThrownBy(
                             () -> new JwtTokenProperties(secretKey, negativeExpiration, Duration.ofMinutes(5)))
-                            .isInstanceOf(IllegalArgumentException.class),
+                            .isInstanceOf(DTInitializationException.class),
                     () -> assertThatThrownBy(
                             () -> new JwtTokenProperties(secretKey, Duration.ofMinutes(1), negativeExpiration))
-                            .isInstanceOf(IllegalArgumentException.class)
+                            .isInstanceOf(DTInitializationException.class)
             );
         }
     }
