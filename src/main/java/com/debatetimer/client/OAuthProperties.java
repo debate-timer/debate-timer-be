@@ -1,15 +1,18 @@
 package com.debatetimer.client;
 
 import com.debatetimer.dto.member.MemberCreateRequest;
+import com.debatetimer.exception.custom.DTInitializationException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")
+@Slf4j
 public class OAuthProperties {
 
     private final String clientId;
@@ -20,9 +23,19 @@ public class OAuthProperties {
             String clientId,
             String clientSecret,
             String grantType) {
+        validate(clientId);
+        validate(clientSecret);
+        validate(grantType);
+
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.grantType = grantType;
+    }
+
+    private void validate(String element) {
+        if (element == null || element.isBlank()) {
+            throw new DTInitializationException("OAuth 구성 요소들이 입력되지 않았습니다");
+        }
     }
 
     public MultiValueMap<String, String> createTokenRequestBody(MemberCreateRequest request) {
