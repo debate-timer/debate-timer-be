@@ -28,7 +28,7 @@ class TimeBasedTableTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {0, ParliamentaryTable.NAME_MAX_LENGTH + 1})
+        @ValueSource(ints = {0, TimeBasedTable.NAME_MAX_LENGTH + 1})
         void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
             Member member = new Member("default@gmail.com");
             assertThatThrownBy(() -> new TimeBasedTable(member, "f".repeat(length), "agenda", 10, true, true))
