@@ -5,14 +5,12 @@ import com.debatetimer.exception.custom.DTInitializationException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")
-@Slf4j
 public class OAuthProperties {
 
     private final String clientId;
