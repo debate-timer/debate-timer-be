@@ -68,10 +68,10 @@ public class ParliamentaryController {
     @GetMapping("/api/table/parliamentary/export/{tableId}")
     @ExcelExport
     public ResponseEntity<InputStreamResource> export(
-//            @AuthMember Member member,
+            @AuthMember Member member,
             @PathVariable Long tableId
     ) {
-        ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, 1L);
+        ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, member.getId());
         InputStreamResource excelStream = parliamentaryTableExcelExporter.export(foundTable);
         return ResponseEntity.ok(excelStream);
     }
