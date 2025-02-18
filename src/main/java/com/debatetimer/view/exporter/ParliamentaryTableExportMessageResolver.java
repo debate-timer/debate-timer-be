@@ -33,15 +33,18 @@ public class ParliamentaryTableExportMessageResolver {
     }
 
     private String resolveTimeMessage(int totalSecond) {
+        StringBuilder messageBuilder = new StringBuilder();
         int minutes = totalSecond / 60;
         int second = totalSecond % 60;
-        String message = minutes + MINUTES_MESSAGE;
 
+        if (minutes != 0) {
+            messageBuilder.append(minutes + MINUTES_MESSAGE + SPACE);
+        }
         if (second != 0) {
-            message += SPACE + second + SECOND_MESSAGE;
+            messageBuilder.append(second + SECOND_MESSAGE);
         }
         return TIME_MESSAGE_PREFIX
-                + message
+                + messageBuilder
                 + TIME_MESSAGE_SUFFIX;
     }
 
