@@ -38,6 +38,13 @@ public class ParliamentaryService {
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
+    @Transactional(readOnly = true)
+    public ParliamentaryTableResponse findTableById(long tableId, long id) {
+        ParliamentaryTable table = getOwnerTable(tableId, id);
+        ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        return new ParliamentaryTableResponse(table, timeBoxes);
+    }
+
     @Transactional
     public ParliamentaryTableResponse updateTable(
             ParliamentaryTableCreateRequest tableCreateRequest,
@@ -82,4 +89,6 @@ public class ParliamentaryService {
             throw new DTClientErrorException(ClientErrorCode.NOT_TABLE_OWNER);
         }
     }
+
+
 }

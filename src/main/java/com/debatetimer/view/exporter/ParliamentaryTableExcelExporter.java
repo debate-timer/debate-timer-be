@@ -4,6 +4,11 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
 import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,6 +23,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -96,7 +102,9 @@ public class ParliamentaryTableExcelExporter {
                 HorizontalAlignment.CENTER);
     }
 
-    public Workbook export(ParliamentaryTableResponse parliamentaryTableResponse) {
+    public InputStreamResource export(
+            ParliamentaryTableResponse parliamentaryTableResponse
+    ) {
         TableInfoResponse tableInfo = parliamentaryTableResponse.info();
         List<TimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
 
@@ -112,7 +120,18 @@ public class ParliamentaryTableExcelExporter {
         createTableHeader(sheet);
         createTimeBoxRows(timeBoxes, sheet);
         setColumnWidth(sheet);
-        return workbook;
+        return writeToInputStream(workbook);
+    }
+
+    private InputStreamResource writeToInputStream(Workbook workbook) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            workbook.write(outputStream);
+            workbook.close();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            return new InputStreamResource(inputStream);
+        } catch (IOException e) {
+            throw new DTServerErrorException(ServerErrorCode.EXCEL_EXPORT_ERROR);
+        }
     }
 
     private void createHeader(
