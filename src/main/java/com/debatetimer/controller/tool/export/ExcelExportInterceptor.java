@@ -6,6 +6,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -35,7 +36,8 @@ public class ExcelExportInterceptor implements HandlerInterceptor {
         }
 
         HandlerMethod handlerMethod = (HandlerMethod) handler;
-        return handlerMethod.hasMethodAnnotation(ExcelExport.class);
+        return handlerMethod.hasMethodAnnotation(ExcelExport.class)
+                && handlerMethod.getBeanType().isAnnotationPresent(RestController.class);
     }
 
     private boolean isPreflight(HttpServletRequest request) {
