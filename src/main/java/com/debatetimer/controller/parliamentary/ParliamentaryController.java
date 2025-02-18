@@ -1,6 +1,7 @@
 package com.debatetimer.controller.parliamentary;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.controller.tool.export.ExcelExport;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
@@ -65,8 +66,9 @@ public class ParliamentaryController {
     }
 
     @GetMapping("/api/table/parliamentary/export/{tableId}")
+    @ExcelExport
     public ResponseEntity<InputStreamResource> export(
-            @AuthMember Member member,
+//            @AuthMember Member member,
             @PathVariable Long tableId
     ) {
         ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, 1L);

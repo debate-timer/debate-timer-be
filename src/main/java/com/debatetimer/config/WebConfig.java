@@ -16,7 +16,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final AuthManager authManager;
     private final AuthService authService;
-    private final ExcelExportInterceptor excelExportInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
@@ -25,7 +24,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(excelExportInterceptor)
-                .addPathPatterns("/api/table/**/export/**");
+        registry.addInterceptor(new ExcelExportInterceptor());
     }
 }
