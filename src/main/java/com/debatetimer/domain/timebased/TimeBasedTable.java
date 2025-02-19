@@ -1,4 +1,4 @@
-package com.debatetimer.domain.parliamentary;
+package com.debatetimer.domain.timebased;
 
 import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.member.Member;
@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ParliamentaryTable extends DebateTable {
+public class TimeBasedTable extends DebateTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public ParliamentaryTable(
+    public TimeBasedTable(
             Member member,
             String name,
             String agenda,
@@ -30,7 +30,7 @@ public class ParliamentaryTable extends DebateTable {
         super(member, name, agenda, duration, warningBell, finishBell);
     }
 
-    public void update(ParliamentaryTable renewTable) {
+    public void update(TimeBasedTable renewTable) {
         updateTable(renewTable);
     }
 }

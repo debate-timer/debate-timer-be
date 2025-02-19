@@ -1,6 +1,6 @@
 package com.debatetimer.view.exporter;
 
-import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +17,8 @@ public class ParliamentaryTableExportMessageResolver {
 
     public String resolveBoxMessage(TimeBoxResponse timeBox) {
         String defaultMessage = resolveDefaultMessage(timeBox);
-        BoxType type = timeBox.type();
-        if (type == BoxType.TIME_OUT) {
+        ParliamentaryBoxType type = timeBox.type();
+        if (type == ParliamentaryBoxType.TIME_OUT) {
             return defaultMessage;
         }
         return defaultMessage
@@ -27,8 +27,8 @@ public class ParliamentaryTableExportMessageResolver {
     }
 
     private String resolveDefaultMessage(TimeBoxResponse timeBox) {
-        BoxType boxType = timeBox.type();
-        return BoxTypeView.mapView(boxType)
+        ParliamentaryBoxType boxType = timeBox.type();
+        return ParliamentaryBoxTypeView.mapView(boxType)
                 + resolveTimeMessage(timeBox.time());
     }
 

@@ -20,6 +20,8 @@ public enum ClientErrorCode implements ErrorCode {
     INVALID_TIME_BOX_SEQUENCE(HttpStatus.BAD_REQUEST, "순서는 양수만 가능합니다"),
     INVALID_TIME_BOX_TIME(HttpStatus.BAD_REQUEST, "시간은 양수만 가능합니다"),
     INVALID_TIME_BOX_STANCE(HttpStatus.BAD_REQUEST, "타임박스 유형과 일치하지 않는 입장입니다."),
+    INVALID_TIME_BOX_FORMAT(HttpStatus.BAD_REQUEST, "타임박스 유형과 일치하지 않는 형식입니다"),
+    INVALID_TIME_BASED_TIME(HttpStatus.BAD_REQUEST, "팀 발언 시간은 개인 발언 시간보다 길어야합니다"),
 
     FIELD_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     URL_PARAMETER_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),

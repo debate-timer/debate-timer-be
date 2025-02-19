@@ -1,6 +1,6 @@
 package com.debatetimer.dto.parliamentary.request;
 
-import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
@@ -12,7 +12,7 @@ public record TimeBoxCreateRequest(
         Stance stance,
 
         @NotBlank
-        BoxType type,
+        ParliamentaryBoxType type,
 
         @Positive
         int time,

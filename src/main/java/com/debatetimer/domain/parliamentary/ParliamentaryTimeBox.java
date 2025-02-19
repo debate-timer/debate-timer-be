@@ -1,6 +1,6 @@
 package com.debatetimer.domain.parliamentary;
 
-import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.DebateTimeBox;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ParliamentaryTimeBox {
+public class ParliamentaryTimeBox extends DebateTimeBox {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,40 +33,32 @@ public class ParliamentaryTimeBox {
     private ParliamentaryTable parliamentaryTable;
 
     @NotNull
-    private int sequence;
-
-    @NotNull
     @Enumerated(EnumType.STRING)
-    private Stance stance;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private BoxType type;
+    private ParliamentaryBoxType type;
 
     @NotNull
     private int time;
 
-    private Integer speaker;
+    public ParliamentaryTimeBox(
+            ParliamentaryTable parliamentaryTable,
+            int sequence,
+            Stance stance,
+            ParliamentaryBoxType type,
+            int time,
+            Integer speaker
+    ) {
+        super(sequence, stance, speaker);
+        validate(time, stance, type);
 
-    public ParliamentaryTimeBox(ParliamentaryTable parliamentaryTable, int sequence, Stance stance, BoxType type,
-                                int time, Integer speaker) {
-        validate(sequence, time, stance, type);
         this.parliamentaryTable = parliamentaryTable;
-        this.sequence = sequence;
-        this.stance = stance;
         this.type = type;
         this.time = time;
-        this.speaker = speaker;
     }
 
-    private void validate(int sequence, int time, Stance stance, BoxType boxType) {
-        if (sequence <= 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
-        }
+    private void validate(int time, Stance stance, ParliamentaryBoxType boxType) {
         if (time <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
         }
-
         if (!boxType.isAvailable(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
         }
