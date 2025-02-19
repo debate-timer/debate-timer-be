@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DebateTimeBox {
 
-    @NotNull
     private int sequence;
 
     @NotNull
