@@ -2,6 +2,7 @@ package com.debatetimer.client;
 
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.exception.custom.DTInitializationException;
+import com.debatetimer.exception.errorcode.InitializationErrorCode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class OAuthProperties {
 
     private void validate(String element) {
         if (element == null || element.isBlank()) {
-            throw new DTInitializationException("OAuth 구성 요소들이 입력되지 않았습니다");
+            throw new DTInitializationException(InitializationErrorCode.OAUTH_PROPERTIES_EMPTY);
         }
     }
 
