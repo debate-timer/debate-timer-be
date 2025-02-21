@@ -25,6 +25,11 @@ spring:
 cors:
   origin: http://test.debate-timer.com
 
+oauth:
+  client_id: oauth_client_id
+  client_secret: oauth_client_secret
+  grant_type: oauth_grant_type
+
 jwt:
   secret_key: testtesttesttesttesttesttesttest
   access_token_expiration: 1h

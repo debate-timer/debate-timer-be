@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public enum ClientErrorCode implements ErrorCode {
+public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,

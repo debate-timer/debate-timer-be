@@ -1,5 +1,7 @@
 package com.debatetimer.controller.tool.jwt;
 
+import com.debatetimer.exception.custom.DTInitializationException;
+import com.debatetimer.exception.errorcode.InitializationErrorCode;
 import io.jsonwebtoken.security.Keys;
 import java.time.Duration;
 import javax.crypto.SecretKey;
@@ -26,16 +28,16 @@ public class JwtTokenProperties {
 
     private void validate(String secretKey) {
         if (secretKey == null || secretKey.isBlank()) {
-            throw new IllegalArgumentException("secretKey가 입력되지 않았습니다");
+            throw new DTInitializationException(InitializationErrorCode.JWT_SECRET_KEY_EMPTY);
         }
     }
 
     private void validate(Duration expiration) {
         if (expiration == null) {
-            throw new IllegalArgumentException("토큰 만료 기간이 입력되지 않았습니다");
+            throw new DTInitializationException(InitializationErrorCode.JWT_TOKEN_DURATION_EMPTY);
         }
         if (expiration.isZero() || expiration.isNegative()) {
-            throw new IllegalArgumentException("토큰 만료 기간은 양수이어야 합니다");
+            throw new DTInitializationException(InitializationErrorCode.JWT_TOKEN_DURATION_INVALID);
         }
     }
 
