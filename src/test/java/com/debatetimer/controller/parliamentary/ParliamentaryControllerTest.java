@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.domain.BoxType;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
@@ -29,8 +29,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -86,8 +86,8 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     new TableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, BoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, BoxType.OPENING, 3, 1)
+                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
