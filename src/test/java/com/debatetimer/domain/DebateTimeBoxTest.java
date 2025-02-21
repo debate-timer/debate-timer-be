@@ -15,8 +15,8 @@ class DebateTimeBoxTest {
     @Nested
     class Validate {
 
-        @ParameterizedTest
         @ValueSource(ints = {0, -1})
+        @ParameterizedTest
         void 순서는_양수만_가능하다(int sequence) {
             assertThatThrownBy(() -> new DebateTimeBoxTestObject(sequence, Stance.CONS, 1))
                     .isInstanceOf(DTClientErrorException.class)
@@ -31,8 +31,8 @@ class DebateTimeBoxTest {
                     .doesNotThrowAnyException();
         }
 
-        @ParameterizedTest
         @ValueSource(ints = {0, -1})
+        @ParameterizedTest
         void 발표자_번호는_양수만_가능하다(int speaker) {
             assertThatThrownBy(() -> new DebateTimeBoxTestObject(1, Stance.CONS, speaker))
                     .isInstanceOf(DTClientErrorException.class)

@@ -16,8 +16,8 @@ class ParliamentaryTimeBoxTest {
     @Nested
     class Validate {
 
-        @ParameterizedTest
         @ValueSource(ints = {0, -1})
+        @ParameterizedTest
         void 시간은_양수만_가능하다(int time) {
             ParliamentaryTable table = new ParliamentaryTable();
             assertThatThrownBy(

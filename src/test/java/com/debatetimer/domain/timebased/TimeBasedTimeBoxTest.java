@@ -16,8 +16,8 @@ class TimeBasedTimeBoxTest {
     @Nested
     class Validate {
 
-        @ParameterizedTest
         @ValueSource(ints = {0, -1})
+        @ParameterizedTest
         void 시간은_양수만_가능하다(int time) {
             TimeBasedTable table = new TimeBasedTable();
 
@@ -88,7 +88,9 @@ class TimeBasedTimeBoxTest {
             int timePerTeam = 60;
             int timePerSpeaking = 59;
 
-            assertThatCode(() -> new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, timePerTeam, timePerSpeaking, 1))
+            assertThatCode(
+                    () -> new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, timePerTeam,
+                            timePerSpeaking, 1))
                     .doesNotThrowAnyException();
         }
 
@@ -98,7 +100,9 @@ class TimeBasedTimeBoxTest {
             int timePerTeam = 60;
             int timePerSpeaking = 61;
 
-            assertThatThrownBy(() -> new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, timePerTeam, timePerSpeaking, 1))
+            assertThatThrownBy(
+                    () -> new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, timePerTeam,
+                            timePerSpeaking, 1))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
         }
