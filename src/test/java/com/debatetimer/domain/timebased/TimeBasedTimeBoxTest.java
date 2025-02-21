@@ -8,18 +8,21 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TimeBasedTimeBoxTest {
 
     @Nested
     class Validate {
 
-        @Test
-        void 시간은_양수만_가능하다() {
+        @ParameterizedTest
+        @ValueSource(ints = {0, -1})
+        void 시간은_양수만_가능하다(int time) {
             TimeBasedTable table = new TimeBasedTable();
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBox(table, 1, Stance.CONS, TimeBasedBoxType.OPENING, 0, 1))
+                    () -> new TimeBasedTimeBox(table, 1, Stance.CONS, TimeBasedBoxType.OPENING, time, 1))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }

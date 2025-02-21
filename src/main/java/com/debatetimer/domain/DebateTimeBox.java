@@ -24,16 +24,23 @@ public abstract class DebateTimeBox {
     private Integer speaker;
 
     public DebateTimeBox(int sequence, Stance stance, Integer speaker) {
-        validate(sequence);
+        validateSequence(sequence);
+        validateSpeakerNumber(speaker);
 
         this.sequence = sequence;
         this.stance = stance;
         this.speaker = speaker;
     }
 
-    private void validate(int sequence) {
+    private void validateSequence(int sequence) {
         if (sequence <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
+        }
+    }
+
+    private void validateSpeakerNumber(Integer speaker) {
+        if (speaker != null && speaker <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
         }
     }
 }

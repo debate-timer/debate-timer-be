@@ -8,17 +8,20 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ParliamentaryTimeBoxTest {
 
     @Nested
     class Validate {
 
-        @Test
-        void 시간은_양수만_가능하다() {
+        @ParameterizedTest
+        @ValueSource(ints = {0, -1})
+        void 시간은_양수만_가능하다(int time) {
             ParliamentaryTable table = new ParliamentaryTable();
             assertThatThrownBy(
-                    () -> new ParliamentaryTimeBox(table, 1, Stance.CONS, ParliamentaryBoxType.OPENING, 0, 1))
+                    () -> new ParliamentaryTimeBox(table, 1, Stance.CONS, ParliamentaryBoxType.OPENING, time, 1))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
