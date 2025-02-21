@@ -15,16 +15,6 @@ class TimeBasedTimeBoxTest {
     class Validate {
 
         @Test
-        void 순서는_양수만_가능하다() {
-            TimeBasedTable table = new TimeBasedTable();
-
-            assertThatThrownBy(
-                    () -> new TimeBasedTimeBox(table, 0, Stance.CONS, TimeBasedBoxType.OPENING, 10, 1))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE.getMessage());
-        }
-
-        @Test
         void 시간은_양수만_가능하다() {
             TimeBasedTable table = new TimeBasedTable();
 

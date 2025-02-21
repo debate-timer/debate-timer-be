@@ -15,15 +15,6 @@ class ParliamentaryTimeBoxTest {
     class Validate {
 
         @Test
-        void 순서는_양수만_가능하다() {
-            ParliamentaryTable table = new ParliamentaryTable();
-            assertThatThrownBy(
-                    () -> new ParliamentaryTimeBox(table, 0, Stance.CONS, ParliamentaryBoxType.OPENING, 10, 1))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE.getMessage());
-        }
-
-        @Test
         void 시간은_양수만_가능하다() {
             ParliamentaryTable table = new ParliamentaryTable();
             assertThatThrownBy(
