@@ -5,7 +5,9 @@ import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
 import com.debatetimer.repository.time_based.TimeBasedTimeBoxRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TimeBasedTimeBoxGenerator {
 
     private final TimeBasedTimeBoxRepository timeBasedTimeBoxRepository;
