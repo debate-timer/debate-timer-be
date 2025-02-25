@@ -1,6 +1,7 @@
 package com.debatetimer.dto.member;
 
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.timebased.TimeBasedTable;
 
 public record TableResponse(long id, String name, TableType type, int duration) {
 
@@ -10,6 +11,15 @@ public record TableResponse(long id, String name, TableType type, int duration) 
                 parliamentaryTable.getName(),
                 TableType.PARLIAMENTARY,
                 parliamentaryTable.getDuration()
+        );
+    }
+
+    public TableResponse(TimeBasedTable timeBasedTable) {
+        this(
+                timeBasedTable.getId(),
+                timeBasedTable.getName(),
+                TableType.TIME_BASED,
+                timeBasedTable.getDuration()
         );
     }
 }
