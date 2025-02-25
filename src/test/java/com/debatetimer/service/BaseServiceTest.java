@@ -4,10 +4,13 @@ import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
-import com.debatetimer.fixture.TokenGenerator;
+import com.debatetimer.fixture.TimeBasedTableGenerator;
+import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
+import com.debatetimer.repository.time_based.TimeBasedTableRepository;
+import com.debatetimer.repository.time_based.TimeBasedTimeBoxRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,17 +26,26 @@ public abstract class BaseServiceTest {
     protected ParliamentaryTableRepository parliamentaryTableRepository;
 
     @Autowired
-    protected ParliamentaryTimeBoxRepository timeBoxRepository;
+    protected ParliamentaryTimeBoxRepository parliamentaryTimeBoxRepository;
+
+    @Autowired
+    protected TimeBasedTableRepository timeBasedTableRepository;
+
+    @Autowired
+    protected TimeBasedTimeBoxRepository timeBasedTimeBoxRepository;
 
     @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
-    protected ParliamentaryTableGenerator tableGenerator;
+    protected ParliamentaryTableGenerator parliamentaryTableGenerator;
 
     @Autowired
-    protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
+    protected ParliamentaryTimeBoxGenerator parliamentaryTimeBoxGenerator;
 
     @Autowired
-    protected TokenGenerator tokenGenerator;
+    protected TimeBasedTableGenerator timeBasedTableGenerator;
+
+    @Autowired
+    protected TimeBasedTimeBoxGenerator timeBasedTimeBoxGenerator;
 }

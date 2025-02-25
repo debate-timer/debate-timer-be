@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
@@ -33,7 +33,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTableInfoCreateRequest requestTableInfo = new ParliamentaryTableInfoCreateRequest("커찬의 테이블", "주제", true, true);
+            ParliamentaryTableInfoCreateRequest requestTableInfo = new ParliamentaryTableInfoCreateRequest("커찬의 테이블",
+                    "주제", true, true);
             List<ParliamentaryTimeBoxCreateRequest> requestTimeBoxes = List.of(
                     new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
                     new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
@@ -45,7 +46,8 @@ class ParliamentaryServiceTest extends BaseServiceTest {
 
             ParliamentaryTableResponse savedTableResponse = parliamentaryService.save(chanTableRequest, chan);
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(savedTableResponse.id());
-            List<ParliamentaryTimeBox> foundTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(foundTable.get());
+            List<ParliamentaryTimeBox> foundTimeBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(
+                    foundTable.get());
 
             assertAll(
                     () -> assertThat(foundTable.get().getName()).isEqualTo(chanTableRequest.info().name()),
@@ -60,9 +62,9 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
-            timeBoxGenerator.generate(chanTable, 1);
-            timeBoxGenerator.generate(chanTable, 2);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
+            parliamentaryTimeBoxGenerator.generate(chanTable, 1);
+            parliamentaryTimeBoxGenerator.generate(chanTable, 2);
 
             ParliamentaryTableResponse foundResponse = parliamentaryService.findTable(chanTable.getId(), chan);
 
@@ -76,7 +78,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_조회_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> parliamentaryService.findTable(chanTableId, coli))
@@ -91,7 +93,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_수정한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     new ParliamentaryTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
@@ -100,7 +102,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             parliamentaryService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
             Optional<ParliamentaryTable> updatedTable = parliamentaryTableRepository.findById(chanTable.getId());
-            List<ParliamentaryTimeBox> updatedTimeBoxes = timeBoxRepository.findAllByParliamentaryTable(
+            List<ParliamentaryTimeBox> updatedTimeBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(
                     updatedTable.get());
 
             assertAll(
@@ -114,7 +116,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
                     new ParliamentaryTableInfoCreateRequest("새로운 테이블", "주제", true, true),
@@ -133,14 +135,15 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
-            timeBoxGenerator.generate(chanTable, 1);
-            timeBoxGenerator.generate(chanTable, 2);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
+            parliamentaryTimeBoxGenerator.generate(chanTable, 1);
+            parliamentaryTimeBoxGenerator.generate(chanTable, 2);
 
             parliamentaryService.deleteTable(chanTable.getId(), chan);
 
             Optional<ParliamentaryTable> foundTable = parliamentaryTableRepository.findById(chanTable.getId());
-            List<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findAllByParliamentaryTable(chanTable);
+            List<ParliamentaryTimeBox> timeBoxes = parliamentaryTimeBoxRepository.findAllByParliamentaryTable(
+                    chanTable);
 
             assertAll(
                     () -> assertThat(foundTable).isEmpty(),
@@ -152,7 +155,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_삭제_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            ParliamentaryTable chanTable = tableGenerator.generate(chan);
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
             Long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli))

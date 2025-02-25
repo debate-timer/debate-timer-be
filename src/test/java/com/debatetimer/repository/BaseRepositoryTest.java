@@ -3,6 +3,8 @@ package com.debatetimer.repository;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
+import com.debatetimer.fixture.TimeBasedTableGenerator;
+import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -19,4 +21,10 @@ public abstract class BaseRepositoryTest {
 
     @Autowired
     protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
+
+    @Autowired
+    protected TimeBasedTableGenerator timeBasedTableGenerator;
+
+    @Autowired
+    protected TimeBasedTimeBoxGenerator timeBasedTimeBoxGenerator;
 }
