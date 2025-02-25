@@ -37,9 +37,7 @@ public class TimeBasedTimeBox extends DebateTimeBox {
     private TimeBasedBoxType type;
 
     private Integer time;
-
     private Integer timePerTeam;
-
     private Integer timePerSpeaking;
 
     public TimeBasedTimeBox(

@@ -5,7 +5,6 @@ import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 
 public record TimeBasedTimeBoxCreateRequest(
         @NotBlank
@@ -14,14 +13,9 @@ public record TimeBasedTimeBoxCreateRequest(
         @NotBlank
         TimeBasedBoxType type,
 
-        @Positive
-        int time,
-
-        @Positive
-        int timePerTeam,
-
-        @Positive
-        int timePerSpeaking,
+        Integer time,
+        Integer timePerTeam,
+        Integer timePerSpeaking,
 
         Integer speakerNumber
 ) {
@@ -34,7 +28,7 @@ public record TimeBasedTimeBoxCreateRequest(
         return new TimeBasedTimeBox(timeBasedTable, sequence, stance, type, time, speakerNumber);
     }
 
-    public int time() {
+    public Integer time() {
         if (type.isTimeBased()) {
             return timePerTeam;
         }
