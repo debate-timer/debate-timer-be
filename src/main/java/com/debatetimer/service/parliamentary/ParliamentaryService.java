@@ -89,6 +89,4 @@ public class ParliamentaryService {
             throw new DTClientErrorException(ClientErrorCode.NOT_TABLE_OWNER);
         }
     }
-
-
 }

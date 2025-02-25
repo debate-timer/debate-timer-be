@@ -7,7 +7,7 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
-public record TimeBoxCreateRequest(
+public record ParliamentaryTimeBoxCreateRequest(
         @NotBlank
         Stance stance,
 

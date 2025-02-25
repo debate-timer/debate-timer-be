@@ -5,7 +5,7 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record TableInfoCreateRequest(
+public record ParliamentaryTableInfoCreateRequest(
         @NotBlank
         String name,
 

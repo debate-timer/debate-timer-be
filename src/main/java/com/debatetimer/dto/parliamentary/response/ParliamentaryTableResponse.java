@@ -4,7 +4,8 @@ import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import java.util.List;
 
-public record ParliamentaryTableResponse(long id, TableInfoResponse info, List<TimeBoxResponse> table) {
+public record ParliamentaryTableResponse(long id, ParliamentaryTableInfoResponse info,
+                                         List<ParliamentaryTimeBoxResponse> table) {
 
     public ParliamentaryTableResponse(
             ParliamentaryTable parliamentaryTable,
@@ -12,15 +13,16 @@ public record ParliamentaryTableResponse(long id, TableInfoResponse info, List<T
     ) {
         this(
                 parliamentaryTable.getId(),
-                new TableInfoResponse(parliamentaryTable),
+                new ParliamentaryTableInfoResponse(parliamentaryTable),
                 toTimeBoxResponses(parliamentaryTimeBoxes)
         );
     }
 
-    private static List<TimeBoxResponse> toTimeBoxResponses(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
+    private static List<ParliamentaryTimeBoxResponse> toTimeBoxResponses(
+            ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
         return parliamentaryTimeBoxes.getTimeBoxes()
                 .stream()
-                .map(TimeBoxResponse::new)
+                .map(ParliamentaryTimeBoxResponse::new)
                 .toList();
     }
 }

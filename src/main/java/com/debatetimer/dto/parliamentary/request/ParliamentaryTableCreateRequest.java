@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public record ParliamentaryTableCreateRequest(TableInfoCreateRequest info, List<TimeBoxCreateRequest> table) {
+public record ParliamentaryTableCreateRequest(ParliamentaryTableInfoCreateRequest info, List<ParliamentaryTimeBoxCreateRequest> table) {
 
     public ParliamentaryTable toTable(Member member) {
         return info.toTable(member, sumOfTime(), info.warningBell(), info().finishBell());
@@ -15,7 +15,7 @@ public record ParliamentaryTableCreateRequest(TableInfoCreateRequest info, List<
 
     private int sumOfTime() {
         return table.stream()
-                .mapToInt(TimeBoxCreateRequest::time)
+                .mapToInt(ParliamentaryTimeBoxCreateRequest::time)
                 .sum();
     }
 
