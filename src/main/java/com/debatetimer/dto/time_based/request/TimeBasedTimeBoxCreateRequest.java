@@ -33,4 +33,11 @@ public record TimeBasedTimeBoxCreateRequest(
         }
         return new TimeBasedTimeBox(timeBasedTable, sequence, stance, type, time, speakerNumber);
     }
+
+    public int time() {
+        if (type.isTimeBased()) {
+            return timePerTeam;
+        }
+        return time;
+    }
 }

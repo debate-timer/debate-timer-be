@@ -14,7 +14,6 @@ public record TimeBasedTableCreateRequest(TimeBasedTableInfoCreateRequest info,
         return info.toTable(member, sumOfTime());
     }
 
-    //TODO
     private int sumOfTime() {
         return table.stream()
                 .mapToInt(TimeBasedTimeBoxCreateRequest::time)
