@@ -6,6 +6,8 @@ import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
+import com.debatetimer.fixture.TimeBasedTableGenerator;
+import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
 import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.time_based.TimeBasedTableRepository;
@@ -35,10 +37,16 @@ public abstract class BaseControllerTest {
     protected MemberGenerator memberGenerator;
 
     @Autowired
-    protected ParliamentaryTableGenerator tableGenerator;
+    protected ParliamentaryTableGenerator parliamentaryTableGenerator;
 
     @Autowired
-    protected ParliamentaryTimeBoxGenerator timeBoxGenerator;
+    protected ParliamentaryTimeBoxGenerator parliamentaryTimeBoxGenerator;
+
+    @Autowired
+    protected TimeBasedTableGenerator timeBasedTableGenerator;
+
+    @Autowired
+    protected TimeBasedTimeBoxGenerator timeBasedTimeBoxGenerator;
 
     @Autowired
     protected HeaderGenerator headerGenerator;
