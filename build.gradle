@@ -22,6 +22,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 repositories {
@@ -55,6 +59,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
+
+    // Logging
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 }
 
 bootJar {
