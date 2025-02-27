@@ -58,6 +58,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)"),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)"),
                         fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
                 );
 
@@ -74,6 +76,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)"),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)"),
                         fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
                 );
 
@@ -81,17 +85,17 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
         void 시간총량제_테이블_생성_성공() {
             TimeBasedTableCreateRequest request = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
-                    List.of(
-                            new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 3, 1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.CONS, TimeBasedBoxType.OPENING, 3, 1)
-                    )
-            );
+                    List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0,
+                                    1),
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180,
+                                    60,
+                                    1)));
             TimeBasedTableResponse response = new TimeBasedTableResponse(
                     5L,
                     new TimeBasedTableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
-                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 3, 1),
-                            new TimeBasedTimeBoxResponse(Stance.CONS, TimeBasedBoxType.OPENING, 3, 1)
+                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0, 1),
+                            new TimeBasedTimeBoxResponse(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180, 60, 1)
                     )
             );
             doReturn(response).when(timeBasedService).save(eq(request), any());
@@ -126,11 +130,11 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
         void 시간총량제_테이블_생성_실패(ClientErrorCode errorCode) {
             TimeBasedTableCreateRequest request = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("비토 테이블 1", "토론 주제", true, true),
-                    List.of(
-                            new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 3, 1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.CONS, TimeBasedBoxType.OPENING, 3, 1)
-                    )
-            );
+                    List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0,
+                                    1),
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180,
+                                    60,
+                                    1)));
             doThrow(new DTClientErrorException(errorCode)).when(timeBasedService).save(eq(request), any());
 
             var document = document("time_based/post", errorCode)
@@ -173,6 +177,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)"),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)"),
                         fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
                 );
 
@@ -183,8 +189,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     5L,
                     new TimeBasedTableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
                     List.of(
-                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 3, 1),
-                            new TimeBasedTimeBoxResponse(Stance.CONS, TimeBasedBoxType.OPENING, 3, 1)
+                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0, 1),
+                            new TimeBasedTimeBoxResponse(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180, 60, 1)
                     )
             );
             doReturn(response).when(timeBasedService).findTable(eq(tableId), any());
@@ -244,6 +250,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)"),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)"),
                         fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
                 );
 
@@ -260,6 +268,8 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].type").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)"),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)"),
                         fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
                 );
 
@@ -268,17 +278,17 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             TimeBasedTableCreateRequest request = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
-                    List.of(
-                            new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 300, 1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.CONS, TimeBasedBoxType.OPENING, 300, 1)
-                    )
-            );
+                    List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0,
+                                    1),
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180,
+                                    60,
+                                    1)));
             TimeBasedTableResponse response = new TimeBasedTableResponse(
                     5L,
                     new TimeBasedTableInfoResponse("비토 테이블 2", TableType.PARLIAMENTARY, "토론 주제 2", true, true),
                     List.of(
-                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 300, 1),
-                            new TimeBasedTimeBoxResponse(Stance.CONS, TimeBasedBoxType.OPENING, 300, 1)
+                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0, 1),
+                            new TimeBasedTimeBoxResponse(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180, 60, 1)
                     )
             );
             doReturn(response).when(timeBasedService).updateTable(eq(request), eq(tableId), any());
@@ -315,11 +325,11 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             TimeBasedTableCreateRequest request = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("비토 테이블 2", "토론 주제 2", true, true),
-                    List.of(
-                            new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 300, 1),Z
-                            new TimeBasedTimeBoxCreateRequest(Stance.CONS, TimeBasedBoxType.OPENING, 300, 1)
-                    )
-            );
+                    List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, 0, 0,
+                                    1),
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 0, 180,
+                                    60,
+                                    1)));
             doThrow(new DTClientErrorException(errorCode)).when(timeBasedService)
                     .updateTable(eq(request), eq(tableId), any());
 
@@ -332,7 +342,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
-                    .body(request)````````````````````````````````````````````````````                                                                                                                                                                                                                                                                                                                                                                                                                              AZX
+                    .body(request)
                     .when().patch("/api/table/time-based/{tableId}")
                     .then().statusCode(errorCode.getStatus().value());
         }

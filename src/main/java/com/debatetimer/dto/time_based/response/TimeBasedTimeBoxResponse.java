@@ -5,7 +5,7 @@ import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
 
 public record TimeBasedTimeBoxResponse(Stance stance, TimeBasedBoxType type, Integer time, Integer timePerTeam,
-                                       Integer TimePerSpeaking, Integer speakerNumber) {
+                                       Integer timePerSpeaking, Integer speakerNumber) {
 
     public TimeBasedTimeBoxResponse(TimeBasedTimeBox timeBasedTimeBox) {
         this(timeBasedTimeBox.getStance(),
