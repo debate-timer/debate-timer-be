@@ -36,9 +36,6 @@ public class ParliamentaryTimeBox extends DebateTimeBox {
     @Enumerated(EnumType.STRING)
     private ParliamentaryBoxType type;
 
-    @NotNull
-    private int time;
-
     public ParliamentaryTimeBox(
             ParliamentaryTable parliamentaryTable,
             int sequence,
@@ -47,18 +44,14 @@ public class ParliamentaryTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, speaker);
-        validate(time, stance, type);
+        super(sequence, stance, time, speaker);
+        validate(stance, type);
 
         this.parliamentaryTable = parliamentaryTable;
         this.type = type;
-        this.time = time;
     }
 
-    private void validate(int time, Stance stance, ParliamentaryBoxType boxType) {
-        if (time <= 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
-        }
+    private void validate(Stance stance, ParliamentaryBoxType boxType) {
         if (!boxType.isAvailable(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
         }

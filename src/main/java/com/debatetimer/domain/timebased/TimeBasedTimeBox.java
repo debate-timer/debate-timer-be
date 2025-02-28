@@ -36,7 +36,6 @@ public class TimeBasedTimeBox extends DebateTimeBox {
     @Enumerated(EnumType.STRING)
     private TimeBasedBoxType type;
 
-    private Integer time;
     private Integer timePerTeam;
     private Integer timePerSpeaking;
 
@@ -48,14 +47,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, speaker);
-        validateTime(time);
+        super(sequence, stance, time, speaker);
         validateStance(stance, type);
         validateNotTimeBasedType(type);
 
         this.timeBasedTable = timeBasedTable;
         this.type = type;
-        this.time = time;
     }
 
     public TimeBasedTimeBox(
@@ -63,12 +60,14 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int sequence,
             Stance stance,
             TimeBasedBoxType type,
+            int time,
             int timePerTeam,
             int timePerSpeaking,
             Integer speaker
     ) {
-        super(sequence, stance, speaker);
+        super(sequence, stance, time, speaker);
         validateTime(timePerTeam, timePerSpeaking);
+        validateTimeBasedTime(time, timePerTeam);
         validateStance(stance, type);
         validateTimeBasedType(type);
 
@@ -89,6 +88,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
+        }
+    }
+
+    private void validateTimeBasedTime(int time, int timePerTeam) {
+        if (time != timePerTeam * 2) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE);
         }
     }
 

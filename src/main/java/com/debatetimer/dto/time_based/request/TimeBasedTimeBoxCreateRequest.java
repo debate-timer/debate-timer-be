@@ -13,7 +13,7 @@ public record TimeBasedTimeBoxCreateRequest(
         @NotBlank
         TimeBasedBoxType type,
 
-        Integer time,
+        int time,
         Integer timePerTeam,
         Integer timePerSpeaking,
         Integer speakerNumber
@@ -21,7 +21,7 @@ public record TimeBasedTimeBoxCreateRequest(
 
     public TimeBasedTimeBox toTimeBox(TimeBasedTable timeBasedTable, int sequence) {
         if (type.isTimeBased()) {
-            return new TimeBasedTimeBox(timeBasedTable, sequence, stance, type, timePerTeam, timePerSpeaking,
+            return new TimeBasedTimeBox(timeBasedTable, sequence, stance, type, time, timePerTeam, timePerSpeaking,
                     speakerNumber);
         }
         return new TimeBasedTimeBox(timeBasedTable, sequence, stance, type, time, speakerNumber);
