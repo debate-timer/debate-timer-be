@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 
 public record TableResponses(List<TableResponse> tables) {
 
-    public static TableResponses from(List<ParliamentaryTable> parliamentaryTables,
-                                      List<TimeBasedTable> timeBasedTables) {
-        return new TableResponses(toTableResponses(parliamentaryTables, timeBasedTables));
+    public TableResponses(List<ParliamentaryTable> parliamentaryTables,
+                          List<TimeBasedTable> timeBasedTables) {
+        this(toTableResponses(parliamentaryTables, timeBasedTables));
     }
 
     private static List<TableResponse> toTableResponses(List<ParliamentaryTable> parliamentaryTables,

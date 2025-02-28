@@ -27,7 +27,7 @@ public class MemberService {
         Member member = memberRepository.getById(memberId);
         List<ParliamentaryTable> parliamentaryTables = parliamentaryTableRepository.findAllByMember(member);
         List<TimeBasedTable> timeBasedTables = timeBasedTableRepository.findAllByMember(member);
-        return TableResponses.from(parliamentaryTables, timeBasedTables);
+        return new TableResponses(parliamentaryTables, timeBasedTables);
     }
 
     @Transactional
