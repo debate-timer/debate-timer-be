@@ -16,12 +16,7 @@ public record TimeBasedTableCreateRequest(TimeBasedTableInfoCreateRequest info,
 
     private int sumOfTime() {
         return table.stream()
-                .mapToInt(request -> {
-                    if (request.type().isTimeBased()) {
-                        return request.timePerTeam();
-                    }
-                    return request.time();
-                })
+                .mapToInt(TimeBasedTimeBoxCreateRequest::time)
                 .sum();
     }
 
