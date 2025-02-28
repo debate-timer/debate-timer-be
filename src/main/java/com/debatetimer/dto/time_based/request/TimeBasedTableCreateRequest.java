@@ -1,8 +1,8 @@
 package com.debatetimer.dto.time_based.request;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;
-import com.debatetimer.domain.timebased.TimeBasedTimeBoxes;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,9 +20,9 @@ public record TimeBasedTableCreateRequest(TimeBasedTableInfoCreateRequest info,
                 .sum();
     }
 
-    public TimeBasedTimeBoxes toTimeBoxes(TimeBasedTable timeBasedTable) {
+    public TimeBoxes toTimeBoxes(TimeBasedTable timeBasedTable) {
         return IntStream.range(0, table.size())
                 .mapToObj(i -> table.get(i).toTimeBox(timeBasedTable, i + 1))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), TimeBasedTimeBoxes::new));
+                .collect(Collectors.collectingAndThen(Collectors.toList(), TimeBoxes::new));
     }
 }

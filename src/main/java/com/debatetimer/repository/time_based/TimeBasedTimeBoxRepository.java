@@ -1,8 +1,8 @@
 package com.debatetimer.repository.time_based;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
-import com.debatetimer.domain.timebased.TimeBasedTimeBoxes;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,9 +22,9 @@ public interface TimeBasedTimeBoxRepository extends Repository<TimeBasedTimeBox,
 
     List<TimeBasedTimeBox> findAllByTimeBasedTable(TimeBasedTable table);
 
-    default TimeBasedTimeBoxes findTableTimeBoxes(TimeBasedTable table) {
+    default TimeBoxes findTableTimeBoxes(TimeBasedTable table) {
         List<TimeBasedTimeBox> timeBoxes = findAllByTimeBasedTable(table);
-        return new TimeBasedTimeBoxes(timeBoxes);
+        return new TimeBoxes(timeBoxes);
     }
 
     @Query("DELETE FROM TimeBasedTimeBox ptb WHERE ptb IN :timeBoxes")

@@ -1,9 +1,9 @@
 package com.debatetimer.service.parliamentary;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
-import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -27,21 +27,21 @@ public class ParliamentaryService {
         ParliamentaryTable table = tableCreateRequest.toTable(member);
         ParliamentaryTable savedTable = tableRepository.save(table);
 
-        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new ParliamentaryTableResponse(savedTable, savedTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
-        ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTableById(long tableId, long id) {
         ParliamentaryTable table = getOwnerTable(tableId, id);
-        ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
@@ -55,27 +55,27 @@ public class ParliamentaryService {
         ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
-        ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
-        ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private ParliamentaryTimeBoxes saveTimeBoxes(
+    private TimeBoxes saveTimeBoxes(
             ParliamentaryTableCreateRequest tableCreateRequest,
             ParliamentaryTable table
     ) {
-        ParliamentaryTimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
+        TimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<ParliamentaryTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new ParliamentaryTimeBoxes(savedTimeBoxes);
+        return new TimeBoxes(savedTimeBoxes);
     }
 
     private ParliamentaryTable getOwnerTable(long tableId, long memberId) {

@@ -1,14 +1,15 @@
 package com.debatetimer.dto.time_based.response;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.timebased.TimeBasedTable;
-import com.debatetimer.domain.timebased.TimeBasedTimeBoxes;
+import com.debatetimer.domain.timebased.TimeBasedTimeBox;
 import java.util.List;
 
 public record TimeBasedTableResponse(long id, TimeBasedTableInfoResponse info, List<TimeBasedTimeBoxResponse> table) {
 
     public TimeBasedTableResponse(
             TimeBasedTable timeBasedTable,
-            TimeBasedTimeBoxes timeBasedTimeBoxes
+            TimeBoxes timeBasedTimeBoxes
     ) {
         this(
                 timeBasedTable.getId(),
@@ -17,8 +18,9 @@ public record TimeBasedTableResponse(long id, TimeBasedTableInfoResponse info, L
         );
     }
 
-    private static List<TimeBasedTimeBoxResponse> toTimeBoxResponses(TimeBasedTimeBoxes timeBasedTimeBoxes) {
-        return timeBasedTimeBoxes.getTimeBoxes()
+    private static List<TimeBasedTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
+        List<TimeBasedTimeBox> timeBasedTimeBoxes = (List<TimeBasedTimeBox>) timeBoxes.getTimeBoxes();
+        return timeBasedTimeBoxes
                 .stream()
                 .map(TimeBasedTimeBoxResponse::new)
                 .toList();

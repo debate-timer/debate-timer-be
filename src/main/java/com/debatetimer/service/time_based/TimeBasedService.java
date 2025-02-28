@@ -1,9 +1,9 @@
 package com.debatetimer.service.time_based;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
-import com.debatetimer.domain.timebased.TimeBasedTimeBoxes;
 import com.debatetimer.dto.time_based.request.TimeBasedTableCreateRequest;
 import com.debatetimer.dto.time_based.response.TimeBasedTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -27,14 +27,14 @@ public class TimeBasedService {
         TimeBasedTable table = tableCreateRequest.toTable(member);
         TimeBasedTable savedTable = tableRepository.save(table);
 
-        TimeBasedTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new TimeBasedTableResponse(savedTable, savedTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public TimeBasedTableResponse findTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
-        TimeBasedTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new TimeBasedTableResponse(table, timeBoxes);
     }
 
@@ -48,27 +48,27 @@ public class TimeBasedService {
         TimeBasedTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
-        TimeBasedTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        TimeBasedTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new TimeBasedTableResponse(existingTable, savedTimeBoxes);
     }
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
-        TimeBasedTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private TimeBasedTimeBoxes saveTimeBoxes(
+    private TimeBoxes saveTimeBoxes(
             TimeBasedTableCreateRequest tableCreateRequest,
             TimeBasedTable table
     ) {
-        TimeBasedTimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
+        TimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<TimeBasedTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new TimeBasedTimeBoxes(savedTimeBoxes);
+        return new TimeBoxes(savedTimeBoxes);
     }
 
     private TimeBasedTable getOwnerTable(long tableId, long memberId) {
