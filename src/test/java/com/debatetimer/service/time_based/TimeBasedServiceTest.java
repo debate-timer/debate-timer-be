@@ -38,14 +38,14 @@ class TimeBasedServiceTest extends BaseServiceTest {
             List<TimeBasedTimeBoxCreateRequest> requestTimeBoxes = List.of(
                     new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                             1),
-                    new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                    new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                             60,
                             1));
             TimeBasedTableCreateRequest chanTableRequest = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                                     1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
                                     1)));
 
@@ -103,7 +103,7 @@ class TimeBasedServiceTest extends BaseServiceTest {
                     new TimeBasedTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                                     1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
                                     1)));
 
@@ -130,7 +130,7 @@ class TimeBasedServiceTest extends BaseServiceTest {
                     new TimeBasedTableInfoCreateRequest("새로운 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                                     1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
                                     1)));
 

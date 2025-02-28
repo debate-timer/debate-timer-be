@@ -30,7 +30,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
                     new TimeBasedTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                                     1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
                                     1)));
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -87,7 +87,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
                     new TimeBasedTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
                                     1),
-                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, null, 180,
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
                                     1)));
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
