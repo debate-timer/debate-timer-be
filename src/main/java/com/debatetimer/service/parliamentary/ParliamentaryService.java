@@ -62,7 +62,7 @@ public class ParliamentaryService {
     }
 
     @Transactional
-    public void deleteTable(Long tableId, Member member) {
+    public void deleteTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());

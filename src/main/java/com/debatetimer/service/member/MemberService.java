@@ -23,7 +23,7 @@ public class MemberService {
     private final TimeBasedTableRepository timeBasedTableRepository;
 
     @Transactional(readOnly = true)
-    public TableResponses getTables(Long memberId) {
+    public TableResponses getTables(long memberId) {
         Member member = memberRepository.getById(memberId);
         List<ParliamentaryTable> parliamentaryTables = parliamentaryTableRepository.findAllByMember(member);
         List<TimeBasedTable> timeBasedTables = timeBasedTableRepository.findAllByMember(member);

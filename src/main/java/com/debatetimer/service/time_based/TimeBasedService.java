@@ -55,7 +55,7 @@ public class TimeBasedService {
     }
 
     @Transactional
-    public void deleteTable(Long tableId, Member member) {
+    public void deleteTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
         TimeBasedTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
