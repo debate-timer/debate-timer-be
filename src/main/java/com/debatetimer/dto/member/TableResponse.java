@@ -1,25 +1,15 @@
 package com.debatetimer.dto.member;
 
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.domain.timebased.TimeBasedTable;
+import com.debatetimer.domain.DebateTable;
 
 public record TableResponse(long id, String name, TableType type, int duration) {
 
-    public TableResponse(ParliamentaryTable parliamentaryTable) {
+    public TableResponse(DebateTable debateTable, long id) {
         this(
-                parliamentaryTable.getId(),
-                parliamentaryTable.getName(),
-                TableType.PARLIAMENTARY,
-                parliamentaryTable.getDuration()
-        );
-    }
-
-    public TableResponse(TimeBasedTable timeBasedTable) {
-        this(
-                timeBasedTable.getId(),
-                timeBasedTable.getName(),
-                TableType.TIME_BASED,
-                timeBasedTable.getDuration()
+                id,
+                debateTable.getName(),
+                debateTable.getType(),
+                debateTable.getDuration()
         );
     }
 }

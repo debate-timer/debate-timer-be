@@ -1,6 +1,7 @@
 package com.debatetimer.domain;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.FetchType;
@@ -75,4 +76,6 @@ public abstract class DebateTable {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
         }
     }
+
+    abstract public TableType getType();
 }
