@@ -9,8 +9,10 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,5 +33,6 @@ public class AuthService {
         if (!member.isSameMember(email)) {
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
+        log.info("회원 로그아웃 성공 - 회원 이메일 : {}", email);
     }
 }
