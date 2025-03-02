@@ -1,4 +1,4 @@
-package com.debatetimer.dto.time_based.request;
+package com.debatetimer.dto.timebased.request;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;

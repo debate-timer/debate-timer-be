@@ -1,15 +1,15 @@
-package com.debatetimer.service.time_based;
+package com.debatetimer.service.timebased;
 
 import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
-import com.debatetimer.dto.time_based.request.TimeBasedTableCreateRequest;
-import com.debatetimer.dto.time_based.response.TimeBasedTableResponse;
+import com.debatetimer.dto.timebased.request.TimeBasedTableCreateRequest;
+import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.repository.time_based.TimeBasedTableRepository;
-import com.debatetimer.repository.time_based.TimeBasedTimeBoxRepository;
+import com.debatetimer.repository.timebased.TimeBasedTableRepository;
+import com.debatetimer.repository.timebased.TimeBasedTimeBoxRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

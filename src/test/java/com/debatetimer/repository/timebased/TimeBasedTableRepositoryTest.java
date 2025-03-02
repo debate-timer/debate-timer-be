@@ -1,4 +1,4 @@
-package com.debatetimer.repository.time_based;
+package com.debatetimer.repository.timebased;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

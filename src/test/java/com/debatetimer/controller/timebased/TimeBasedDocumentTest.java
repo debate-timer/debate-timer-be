@@ -1,4 +1,4 @@
-package com.debatetimer.controller.time_based;
+package com.debatetimer.controller.timebased;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,12 +21,12 @@ import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.dto.member.TableType;
-import com.debatetimer.dto.time_based.request.TimeBasedTableCreateRequest;
-import com.debatetimer.dto.time_based.request.TimeBasedTableInfoCreateRequest;
-import com.debatetimer.dto.time_based.request.TimeBasedTimeBoxCreateRequest;
-import com.debatetimer.dto.time_based.response.TimeBasedTableInfoResponse;
-import com.debatetimer.dto.time_based.response.TimeBasedTableResponse;
-import com.debatetimer.dto.time_based.response.TimeBasedTimeBoxResponse;
+import com.debatetimer.dto.timebased.request.TimeBasedTableCreateRequest;
+import com.debatetimer.dto.timebased.request.TimeBasedTableInfoCreateRequest;
+import com.debatetimer.dto.timebased.request.TimeBasedTimeBoxCreateRequest;
+import com.debatetimer.dto.timebased.response.TimeBasedTableInfoResponse;
+import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
+import com.debatetimer.dto.timebased.response.TimeBasedTimeBoxResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;

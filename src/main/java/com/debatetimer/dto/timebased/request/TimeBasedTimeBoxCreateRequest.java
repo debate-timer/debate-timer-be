@@ -1,4 +1,4 @@
-package com.debatetimer.dto.time_based.request;
+package com.debatetimer.dto.timebased.request;
 
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.timebased.TimeBasedBoxType;

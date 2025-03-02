@@ -1,4 +1,4 @@
-package com.debatetimer.controller.time_based;
+package com.debatetimer.controller.timebased;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,10 +8,10 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTable;
-import com.debatetimer.dto.time_based.request.TimeBasedTableCreateRequest;
-import com.debatetimer.dto.time_based.request.TimeBasedTableInfoCreateRequest;
-import com.debatetimer.dto.time_based.request.TimeBasedTimeBoxCreateRequest;
-import com.debatetimer.dto.time_based.response.TimeBasedTableResponse;
+import com.debatetimer.dto.timebased.request.TimeBasedTableCreateRequest;
+import com.debatetimer.dto.timebased.request.TimeBasedTableInfoCreateRequest;
+import com.debatetimer.dto.timebased.request.TimeBasedTimeBoxCreateRequest;
+import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
 import java.util.List;

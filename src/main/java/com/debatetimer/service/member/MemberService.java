@@ -8,7 +8,7 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
-import com.debatetimer.repository.time_based.TimeBasedTableRepository;
+import com.debatetimer.repository.timebased.TimeBasedTableRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

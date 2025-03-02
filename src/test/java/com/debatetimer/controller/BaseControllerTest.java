@@ -10,7 +10,7 @@ import com.debatetimer.fixture.TimeBasedTableGenerator;
 import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
 import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
-import com.debatetimer.repository.time_based.TimeBasedTableRepository;
+import com.debatetimer.repository.timebased.TimeBasedTableRepository;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;

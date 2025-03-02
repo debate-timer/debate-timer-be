@@ -2,7 +2,7 @@ package com.debatetimer.fixture;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;
-import com.debatetimer.repository.time_based.TimeBasedTableRepository;
+import com.debatetimer.repository.timebased.TimeBasedTableRepository;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -4,7 +4,7 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
-import com.debatetimer.repository.time_based.TimeBasedTimeBoxRepository;
+import com.debatetimer.repository.timebased.TimeBasedTimeBoxRepository;
 import org.springframework.stereotype.Component;
 
 @Component

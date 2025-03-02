@@ -1,10 +1,10 @@
-package com.debatetimer.controller.time_based;
+package com.debatetimer.controller.timebased;
 
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.dto.time_based.request.TimeBasedTableCreateRequest;
-import com.debatetimer.dto.time_based.response.TimeBasedTableResponse;
-import com.debatetimer.service.time_based.TimeBasedService;
+import com.debatetimer.dto.timebased.request.TimeBasedTableCreateRequest;
+import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
+import com.debatetimer.service.timebased.TimeBasedService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
