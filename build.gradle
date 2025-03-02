@@ -23,7 +23,7 @@ configurations {
         extendsFrom annotationProcessor
     }
 
-    all {
+    configureEach {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 }
@@ -62,6 +62,7 @@ dependencies {
 
     // Logging
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
 }
 
 bootJar {
