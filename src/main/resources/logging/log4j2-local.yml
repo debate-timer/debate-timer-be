@@ -15,7 +15,7 @@ Configuration:
       AppenderRef:
         ref: Console_Appender
     Logger:
-      name: debate-timer
+      name: debate-timer-local
       additivity: false
       level: debug
       AppenderRef:
