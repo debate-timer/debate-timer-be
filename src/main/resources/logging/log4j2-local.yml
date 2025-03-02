@@ -7,7 +7,7 @@ Configuration:
       name: Console_Appender
       target: SYSTEM_OUT
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n"
+        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] %-5level %logger{35} - %msg%n"
 
   Loggers:
     Root:

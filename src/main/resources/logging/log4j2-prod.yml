@@ -13,7 +13,7 @@ Configuration:
       fileName: ${log-dir}/logfile.log
       filePattern: "${log-dir}logfile-%d{yyyy-MM-dd}.%i.txt"
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n"
+        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] %-5level %logger{35} - %msg%n"
       immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
 
       Policies:
