@@ -98,6 +98,11 @@ class DebateTableTest {
         }
 
         @Override
+        public long getId() {
+            return 0;
+        }
+
+        @Override
         public TableType getType() {
             return null;
         }

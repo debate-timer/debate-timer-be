@@ -32,6 +32,11 @@ public class TimeBasedTable extends DebateTable {
     }
 
     @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
     public TableType getType() {
         return TableType.TIME_BASED;
     }
