@@ -1,16 +1,18 @@
-package com.debatetimer.domain.parliamentary;
+package com.debatetimer.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
+import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class ParliamentaryTimeBoxesTest {
+class TimeBoxesTest {
 
     @Nested
     class SortedBySequence {
@@ -25,7 +27,7 @@ class ParliamentaryTimeBoxesTest {
                     ParliamentaryBoxType.OPENING, 300, 1);
             List<ParliamentaryTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            ParliamentaryTimeBoxes actual = new ParliamentaryTimeBoxes(timeBoxes);
+            TimeBoxes actual = new TimeBoxes(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }

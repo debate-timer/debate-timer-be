@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TableInfoCreateRequest;
-import com.debatetimer.dto.parliamentary.request.TimeBoxCreateRequest;
+import com.debatetimer.dto.parliamentary.request.ParliamentaryTableInfoCreateRequest;
+import com.debatetimer.dto.parliamentary.request.ParliamentaryTimeBoxCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
@@ -27,10 +27,10 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         void 의회식_테이블을_생성한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블", "주제", true, true),
+                    new ParliamentaryTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
+                            new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -56,9 +56,9 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         @Test
         void 의회식_테이블을_조회한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
-            timeBoxGenerator.generate(bitoTable, 1);
-            timeBoxGenerator.generate(bitoTable, 2);
+            ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
@@ -82,12 +82,12 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         @Test
         void 의회식_토론_테이블을_업데이트한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
+            ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
             ParliamentaryTableCreateRequest renewTableRequest = new ParliamentaryTableCreateRequest(
-                    new TableInfoCreateRequest("비토 테이블", "주제", true, true),
+                    new ParliamentaryTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
-                            new TimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                            new TimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
+                            new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -115,9 +115,9 @@ class ParliamentaryControllerTest extends BaseControllerTest {
         @Test
         void 의회식_토론_테이블을_삭제한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable bitoTable = tableGenerator.generate(bito);
-            timeBoxGenerator.generate(bitoTable, 1);
-            timeBoxGenerator.generate(bitoTable, 2);
+            ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()

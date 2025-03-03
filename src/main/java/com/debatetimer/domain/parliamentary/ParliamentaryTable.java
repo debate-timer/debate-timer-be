@@ -2,6 +2,7 @@ package com.debatetimer.domain.parliamentary;
 
 import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.dto.member.TableType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,16 @@ public class ParliamentaryTable extends DebateTable {
             boolean finishBell
     ) {
         super(member, name, agenda, duration, warningBell, finishBell);
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public TableType getType() {
+        return TableType.PARLIAMENTARY;
     }
 
     public void update(ParliamentaryTable renewTable) {

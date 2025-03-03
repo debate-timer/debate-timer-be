@@ -1,10 +1,10 @@
-package com.debatetimer.repository.parliamentary;
+package com.debatetimer.repository.timebased;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.BaseRepositoryTest;
@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
+class TimeBasedTableRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
-    private ParliamentaryTableRepository tableRepository;
+    private TimeBasedTableRepository tableRepository;
 
     @Nested
     class FindAllByMember {
@@ -25,11 +25,11 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
         void 특정_회원의_테이블만_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member bito = memberGenerator.generate("default2@gmail.com");
-            ParliamentaryTable chanTable1 = parliamentaryTableGenerator.generate(chan);
-            ParliamentaryTable chanTable2 = parliamentaryTableGenerator.generate(chan);
-            ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
+            TimeBasedTable chanTable1 = timeBasedTableGenerator.generate(chan);
+            TimeBasedTable chanTable2 = timeBasedTableGenerator.generate(chan);
+            TimeBasedTable bitoTable = timeBasedTableGenerator.generate(bito);
 
-            List<ParliamentaryTable> foundKeoChanTables = tableRepository.findAllByMember(chan);
+            List<TimeBasedTable> foundKeoChanTables = tableRepository.findAllByMember(chan);
 
             assertThat(foundKeoChanTables).containsExactly(chanTable1, chanTable2);
         }
@@ -41,9 +41,9 @@ class ParliamentaryTableRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_아이디의_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
+            TimeBasedTable chanTable = timeBasedTableGenerator.generate(chan);
 
-            ParliamentaryTable foundChanTable = tableRepository.getById(chanTable.getId());
+            TimeBasedTable foundChanTable = tableRepository.getById(chanTable.getId());
 
             assertThat(foundChanTable).usingRecursiveComparison().isEqualTo(chanTable);
         }

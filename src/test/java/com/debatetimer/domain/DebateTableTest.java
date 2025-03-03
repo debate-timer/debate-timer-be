@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
@@ -94,6 +95,16 @@ class DebateTableTest {
                                      boolean warningBell,
                                      boolean finishBell) {
             super(member, name, agenda, duration, warningBell, finishBell);
+        }
+
+        @Override
+        public long getId() {
+            return 0;
+        }
+
+        @Override
+        public TableType getType() {
+            return null;
         }
 
         public void updateTable(DebateTableTestObject renewTable) {

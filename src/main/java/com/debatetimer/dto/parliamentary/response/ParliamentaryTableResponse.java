@@ -1,26 +1,29 @@
 package com.debatetimer.dto.parliamentary.response;
 
+import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
-import com.debatetimer.domain.parliamentary.ParliamentaryTimeBoxes;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import java.util.List;
 
-public record ParliamentaryTableResponse(long id, TableInfoResponse info, List<TimeBoxResponse> table) {
+public record ParliamentaryTableResponse(long id, ParliamentaryTableInfoResponse info,
+                                         List<ParliamentaryTimeBoxResponse> table) {
 
     public ParliamentaryTableResponse(
             ParliamentaryTable parliamentaryTable,
-            ParliamentaryTimeBoxes parliamentaryTimeBoxes
+            TimeBoxes parliamentaryTimeBoxes
     ) {
         this(
                 parliamentaryTable.getId(),
-                new TableInfoResponse(parliamentaryTable),
+                new ParliamentaryTableInfoResponse(parliamentaryTable),
                 toTimeBoxResponses(parliamentaryTimeBoxes)
         );
     }
 
-    private static List<TimeBoxResponse> toTimeBoxResponses(ParliamentaryTimeBoxes parliamentaryTimeBoxes) {
-        return parliamentaryTimeBoxes.getTimeBoxes()
+    private static List<ParliamentaryTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
+        List<ParliamentaryTimeBox> parliamentaryTimeBoxes = (List<ParliamentaryTimeBox>) timeBoxes.getTimeBoxes();
+        return parliamentaryTimeBoxes
                 .stream()
-                .map(TimeBoxResponse::new)
+                .map(ParliamentaryTimeBoxResponse::new)
                 .toList();
     }
 }
