@@ -77,5 +77,7 @@ public abstract class DebateTable {
         }
     }
 
+    abstract public long getId();
+
     abstract public TableType getType();
 }

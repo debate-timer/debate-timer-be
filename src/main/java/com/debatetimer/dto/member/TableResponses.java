@@ -15,9 +15,9 @@ public record TableResponses(List<TableResponse> tables) {
     private static List<TableResponse> toTableResponses(List<ParliamentaryTable> parliamentaryTables,
                                                         List<TimeBasedTable> timeBasedTables) {
         Stream<TableResponse> parliamentaryTableResponseStream = parliamentaryTables.stream()
-                .map(parliamentaryTable -> new TableResponse(parliamentaryTable, parliamentaryTable.getId()));
+                .map(TableResponse::new);
         Stream<TableResponse> timeBasedTableResponseStream = timeBasedTables.stream()
-                .map(timeBasedTable -> new TableResponse(timeBasedTable, timeBasedTable.getId()));
+                .map(TableResponse::new);
         return Stream.concat(parliamentaryTableResponseStream, timeBasedTableResponseStream)
                 .toList();
     }

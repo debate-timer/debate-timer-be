@@ -4,9 +4,9 @@ import com.debatetimer.domain.DebateTable;
 
 public record TableResponse(long id, String name, TableType type, int duration) {
 
-    public TableResponse(DebateTable debateTable, long id) {
+    public TableResponse(DebateTable debateTable) {
         this(
-                id,
+                debateTable.getId(),
                 debateTable.getName(),
                 debateTable.getType(),
                 debateTable.getDuration()
