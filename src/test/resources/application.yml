@@ -2,6 +2,19 @@ spring:
   profiles:
     active: test
 
+cors:
+  origin: http://test.debate-timer.com
+
+oauth:
+  client_id: oauth_client_id
+  client_secret: oauth_client_secret
+  grant_type: oauth_grant_type
+
+jwt:
+  secret_key: testtesttesttesttesttesttesttest
+  access_token_expiration: 1h
+  refresh_token_expiration: 1d
+
 ---
 
 spring:
@@ -21,16 +34,5 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
-
-cors:
-  origin: http://test.debate-timer.com
-
-oauth:
-  client_id: oauth_client_id
-  client_secret: oauth_client_secret
-  grant_type: oauth_grant_type
-
-jwt:
-  secret_key: testtesttesttesttesttesttesttest
-  access_token_expiration: 1h
-  refresh_token_expiration: 1d
+  flyway:
+    enabled: false

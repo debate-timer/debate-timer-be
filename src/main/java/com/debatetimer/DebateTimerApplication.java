@@ -9,5 +9,4 @@ public class DebateTimerApplication {
     public static void main(String[] args) {
         SpringApplication.run(DebateTimerApplication.class, args);
     }
-
 }

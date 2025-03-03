@@ -9,5 +9,4 @@ class DebateTimerApplicationTest {
     @Test
     void contextLoads() {
     }
-
 }
