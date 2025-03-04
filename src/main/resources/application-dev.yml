@@ -29,5 +29,5 @@ jwt:
   access_token_expiration: ${secret.jwt.access_token_expiration}
   refresh_token_expiration: ${secret.jwt.refresh_token_expiration}
 
-logging:
-  config: classpath:logging/log4j2-dev.yml
+#logging:
+#  config: classpath:logging/log4j2-dev.yml
