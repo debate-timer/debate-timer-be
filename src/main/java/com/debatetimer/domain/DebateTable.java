@@ -60,6 +60,10 @@ public abstract class DebateTable extends BaseTimeEntity {
         return Objects.equals(this.member.getId(), memberId);
     }
 
+    public final void updateUsedAt() {
+        this.usedAt = LocalDateTime.now();
+    }
+
     protected final void updateTable(DebateTable renewTable) {
         validate(renewTable.getName(), renewTable.getDuration());
 
@@ -68,7 +72,7 @@ public abstract class DebateTable extends BaseTimeEntity {
         this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
-        this.usedAt = LocalDateTime.now();
+        updateUsedAt();
     }
 
     private void validate(String name, int duration) {

@@ -66,6 +66,22 @@ class DebateTableTest {
     }
 
     @Nested
+    class UpdateUsedAt {
+
+        @Test
+        void 테이블의_사용_시각을_업데이트한다() throws InterruptedException {
+            Member member = new Member("default@gmail.com");
+            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", 10, true, true);
+            LocalDateTime beforeUsedAt = table.getUsedAt();
+            Thread.sleep(1);
+
+            table.updateUsedAt();
+
+            assertThat(table.getUsedAt()).isAfter(beforeUsedAt);
+        }
+    }
+
+    @Nested
     class Update {
 
         @Test
