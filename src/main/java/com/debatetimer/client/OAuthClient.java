@@ -1,18 +1,16 @@
 package com.debatetimer.client;
 
-import com.debatetimer.aop.logging.Logging;
+import com.debatetimer.aop.logging.LoggingClient;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Slf4j
-@Logging
 @Component
+@LoggingClient
 @EnableConfigurationProperties(OAuthProperties.class)
 public class OAuthClient {
 

@@ -14,7 +14,7 @@ public class ClientLoggingAspect extends LoggingAspect {
 
     private static final String CLIENT_REQUEST_TIME_KEY = "clientRequestTime";
 
-    @Pointcut("@within(com.debatetimer.aop.logging.Logging)")
+    @Pointcut("@within(com.debatetimer.aop.logging.LoggingClient)")
     public void loggingClients() {
     }
 
