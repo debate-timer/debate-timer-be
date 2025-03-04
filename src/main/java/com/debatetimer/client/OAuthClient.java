@@ -23,23 +23,19 @@ public class OAuthClient {
     }
 
     public OAuthToken requestToken(MemberCreateRequest request) {
-        OAuthToken oAuthToken = restClient.post()
+        return restClient.post()
                 .uri("https://oauth2.googleapis.com/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(oauthProperties.createTokenRequestBody(request))
                 .retrieve()
                 .body(OAuthToken.class);
-        log.info("구글 액세스 토근 발급 성공");
-        return oAuthToken;
     }
 
     public MemberInfo requestMemberInfo(OAuthToken response) {
-        MemberInfo memberInfo = restClient.get()
+        return restClient.get()
                 .uri("https://www.googleapis.com/oauth2/v3/userinfo")
                 .headers(headers -> headers.setBearerAuth(response.access_token()))
                 .retrieve()
                 .body(MemberInfo.class);
-        log.info("구글 회원정보 조회 성공");
-        return memberInfo;
     }
 }
