@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("flyway")
-public class DatabaseSchemaManagerTest {
+class DatabaseSchemaManagerTest {
 
     @Autowired
     private Flyway flyway;

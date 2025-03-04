@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DebateTable {
+public abstract class DebateTable extends BaseTimeEntity {
 
     private static final String NAME_REGEX = "^[a-zA-Z가-힣0-9 ]+$";
     public static final int NAME_MAX_LENGTH = 20;
@@ -38,6 +39,9 @@ public abstract class DebateTable {
     private boolean warningBell;
 
     private boolean finishBell;
+
+    @NotNull
+    private LocalDateTime usedAt;
 
     protected DebateTable(Member member, String name, String agenda, int duration, boolean warningBell,
                           boolean finishBell) {
@@ -77,7 +81,7 @@ public abstract class DebateTable {
         }
     }
 
-    abstract public long getId();
+    public abstract long getId();
 
-    abstract public TableType getType();
+    public abstract TableType getType();
 }
