@@ -12,11 +12,9 @@ import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ParliamentaryService {
@@ -30,7 +28,6 @@ public class ParliamentaryService {
         ParliamentaryTable savedTable = tableRepository.save(table);
 
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
-        log.info("새로운 의회식 토론 시간표 생성 성공");
         return new ParliamentaryTableResponse(savedTable, savedTimeBoxes);
     }
 
@@ -38,7 +35,6 @@ public class ParliamentaryService {
     public ParliamentaryTableResponse findTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        log.info("의회식 토론 시간표 조회 성공");
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
@@ -62,7 +58,6 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         ParliamentaryTimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
-        log.info("의회식 토론 시간표 업데이트 성공");
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
 
@@ -72,7 +67,6 @@ public class ParliamentaryService {
         ParliamentaryTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
-        log.info("의회식 토론 시간표 삭제 성공 - 테이블 아이디 : {}", tableId);
     }
 
     private ParliamentaryTimeBoxes saveTimeBoxes(
