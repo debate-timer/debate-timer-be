@@ -53,6 +53,7 @@ public abstract class DebateTable extends BaseTimeEntity {
         this.duration = duration;
         this.warningBell = warningBell;
         this.finishBell = finishBell;
+        this.usedAt = LocalDateTime.now();
     }
 
     public final boolean isOwner(long memberId) {
@@ -67,6 +68,7 @@ public abstract class DebateTable extends BaseTimeEntity {
         this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
+        this.usedAt = LocalDateTime.now();
     }
 
     private void validate(String name, int duration) {

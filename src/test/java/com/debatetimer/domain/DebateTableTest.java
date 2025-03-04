@@ -9,6 +9,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -83,6 +84,20 @@ class DebateTableTest {
                     () -> assertThat(table.isWarningBell()).isEqualTo(false),
                     () -> assertThat(table.isFinishBell()).isEqualTo(false)
             );
+        }
+
+        @Test
+        void 테이블_업데이트_할_때_사용_시간을_변경한다() throws InterruptedException {
+            Member member = new Member("default@gmail.com");
+            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", 10, true, true);
+            DebateTableTestObject renewTable = new DebateTableTestObject(member, "newName", "newAgenda", 100, false,
+                    false);
+            LocalDateTime beforeUsedAt = table.getUsedAt();
+            Thread.sleep(1);
+
+            table.updateTable(renewTable);
+
+            assertThat(table.getUsedAt()).isAfter(beforeUsedAt);
         }
     }
 
