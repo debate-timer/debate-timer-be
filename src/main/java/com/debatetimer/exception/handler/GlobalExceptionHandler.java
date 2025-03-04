@@ -4,7 +4,7 @@ import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.exception.errorcode.ErrorCode;
+import com.debatetimer.exception.errorcode.ResponseErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -77,17 +77,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DTServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(DTServerErrorException exception) {
-        log.warn("message: {}", exception.getMessage());
+        log.error("message: {}", exception.getMessage());
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-        log.error("exception: {}", exception);
+        log.error("exception: {}", exception.getMessage());
         return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<ErrorResponse> toResponse(ErrorCode errorCode) {
+    private ResponseEntity<ErrorResponse> toResponse(ResponseErrorCode errorCode) {
         return toResponse(errorCode.getStatus(), errorCode.getMessage());
     }
 

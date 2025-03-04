@@ -1,9 +1,9 @@
 package com.debatetimer.view.exporter;
 
 import com.debatetimer.domain.Stance;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTableInfoResponse;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
-import com.debatetimer.dto.parliamentary.response.TableInfoResponse;
-import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTimeBoxResponse;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.io.ByteArrayInputStream;
@@ -105,8 +105,8 @@ public class ParliamentaryTableExcelExporter {
     public InputStreamResource export(
             ParliamentaryTableResponse parliamentaryTableResponse
     ) {
-        TableInfoResponse tableInfo = parliamentaryTableResponse.info();
-        List<TimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
+        ParliamentaryTableInfoResponse tableInfo = parliamentaryTableResponse.info();
+        List<ParliamentaryTimeBoxResponse> timeBoxes = parliamentaryTableResponse.table();
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(tableInfo.name());
@@ -163,13 +163,13 @@ public class ParliamentaryTableExcelExporter {
         }
     }
 
-    private void createTimeBoxRows(List<TimeBoxResponse> timeBoxes, Sheet sheet) {
+    private void createTimeBoxRows(List<ParliamentaryTimeBoxResponse> timeBoxes, Sheet sheet) {
         for (int i = 0; i < timeBoxes.size(); i++) {
             createTimeBoxRow(sheet, i + TIME_BOX_FIRST_ROW_NUMBER, timeBoxes.get(i));
         }
     }
 
-    private void createTimeBoxRow(Sheet sheet, int rowNumber, TimeBoxResponse timeBox) {
+    private void createTimeBoxRow(Sheet sheet, int rowNumber, ParliamentaryTimeBoxResponse timeBox) {
         Row row = sheet.createRow(rowNumber);
         String timeBoxMessage = messageResolver.resolveBoxMessage(timeBox);
         Stance stance = timeBox.stance();

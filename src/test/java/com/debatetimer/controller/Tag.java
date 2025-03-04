@@ -4,7 +4,7 @@ public enum Tag {
 
     MEMBER_API("Member API"),
     PARLIAMENTARY_API("Parliamentary Table API"),
-    ;
+    TIME_BASED_API("Time Based Table API");
 
     private final String displayName;
 
