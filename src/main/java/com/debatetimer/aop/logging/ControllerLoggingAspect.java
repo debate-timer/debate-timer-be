@@ -12,7 +12,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,7 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 @Aspect
 @Component
-public class ControllerLoggingAspect {
+public class ControllerLoggingAspect extends LoggingAspect {
 
     private static final String REQUEST_ID_KEY = "requestId";
     private static final String START_TIME_KEY = "startTime";
@@ -31,16 +30,31 @@ public class ControllerLoggingAspect {
 
     @Around("allController()")
     public Object loggingControllerMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        setRequestId();
-        setStartTime();
-        HttpServletRequest request = getHttpServletRequest();
-        String requestParameters = getRequestParameters(proceedingJoinPoint);
-        logControllerRequest(request, requestParameters);
+        setMdc(REQUEST_ID_KEY, UUID.randomUUID().toString());
+        setMdc(START_TIME_KEY, System.currentTimeMillis());
+        logControllerRequest(proceedingJoinPoint);
 
         Object responseBody = proceedingJoinPoint.proceed();
-        logControllerResponse(request, responseBody);
-        clearMdc();
+
+        logControllerResponse(responseBody);
+        removeMdc(START_TIME_KEY);
         return responseBody;
+    }
+
+    private void logControllerRequest(ProceedingJoinPoint proceedingJoinPoint) {
+        HttpServletRequest request = getHttpServletRequest();
+        String requestParameters = getRequestParameters(proceedingJoinPoint);
+        String uri = request.getRequestURI();
+        String httpMethod = request.getMethod();
+        log.info("Request Logging: {} {} parameters - {}", httpMethod, uri, requestParameters);
+    }
+
+    private void logControllerResponse(Object responseBody) {
+        HttpServletRequest request = getHttpServletRequest();
+        String uri = request.getRequestURI();
+        String httpMethod = request.getMethod();
+        long latency = getLatency(START_TIME_KEY);
+        log.info("Response Logging: {} {} Body: {} latency - {}ms", httpMethod, uri, responseBody, latency);
     }
 
     private HttpServletRequest getHttpServletRequest() {
@@ -57,37 +71,5 @@ public class ControllerLoggingAspect {
             params.put(parameterNames[i], args[i]);
         }
         return params.toString();
-    }
-
-    private void logControllerRequest(HttpServletRequest request, String requestParams) {
-        String uri = request.getRequestURI();
-        String httpMethod = request.getMethod();
-        log.info("Request Logging: {} {} parameters - {}", httpMethod, uri, requestParams);
-    }
-
-    private void logControllerResponse(HttpServletRequest request, Object responseBody) {
-        String uri = request.getRequestURI();
-        String httpMethod = request.getMethod();
-        long latency = getApiLatency();
-        log.info("Response Logging: {} {} Body: {} latency - {}ms", httpMethod, uri, responseBody, latency);
-    }
-
-    private long getApiLatency() {
-        long startTime = Long.parseLong(MDC.get(START_TIME_KEY));
-        return System.currentTimeMillis() - startTime;
-    }
-
-    private void setRequestId() {
-        String traceId = UUID.randomUUID().toString();
-        MDC.put(REQUEST_ID_KEY, traceId);
-    }
-
-    private void setStartTime() {
-        long startTime = System.currentTimeMillis();
-        MDC.put(START_TIME_KEY, String.valueOf(startTime));
-    }
-
-    private void clearMdc() {
-        MDC.clear();
     }
 }
