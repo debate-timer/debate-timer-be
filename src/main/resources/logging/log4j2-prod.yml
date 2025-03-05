@@ -1,0 +1,44 @@
+Configuration:
+  name: Dev-Logger
+  status: debug
+
+  Properties:
+    Property:
+      name: log-dir
+      value: "logs"
+
+  Appenders:
+    RollingFile:
+      name: RollingFile_Appender
+      fileName: ${log-dir}/logfile.log
+      filePattern: "${log-dir}logfile-%d{yyyy-MM-dd}.%i.txt"
+      PatternLayout:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] [%-5level] %logger{35} - %msg%n"
+      immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
+
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: "10 MB"
+        TimeBasedTriggeringPolicy:
+          Interval: 1
+          modulate: true #다음 롤오버 시간을 정각 바운더리에 맞추는 설정
+      DefaultRollOverStrategy:
+        max: 30
+        Delete:
+          basePath: "${log-dir}"
+          maxDepth: "1"
+          IfLastModified:
+            age: "P30D" #30일간 데이터는 저장됨
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        ref: RollingFile_Appender
+    Logger:
+      name: debate-timer-prod
+      additivity: false
+      level: debug
+      includeLocation: false
+      AppenderRef:
+        ref: RollingFile_Appender
