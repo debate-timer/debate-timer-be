@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DebateTable {
+public abstract class DebateTable extends BaseTimeEntity {
 
     private static final String NAME_REGEX = "^[a-zA-Z가-힣0-9 ]+$";
     public static final int NAME_MAX_LENGTH = 20;
@@ -39,6 +40,9 @@ public abstract class DebateTable {
 
     private boolean finishBell;
 
+    @NotNull
+    private LocalDateTime usedAt;
+
     protected DebateTable(Member member, String name, String agenda, int duration, boolean warningBell,
                           boolean finishBell) {
         validate(name, duration);
@@ -49,10 +53,15 @@ public abstract class DebateTable {
         this.duration = duration;
         this.warningBell = warningBell;
         this.finishBell = finishBell;
+        this.usedAt = LocalDateTime.now();
     }
 
     public final boolean isOwner(long memberId) {
         return Objects.equals(this.member.getId(), memberId);
+    }
+
+    public final void updateUsedAt() {
+        this.usedAt = LocalDateTime.now();
     }
 
     protected final void updateTable(DebateTable renewTable) {
@@ -63,6 +72,7 @@ public abstract class DebateTable {
         this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
+        updateUsedAt();
     }
 
     private void validate(String name, int duration) {
@@ -77,7 +87,7 @@ public abstract class DebateTable {
         }
     }
 
-    abstract public long getId();
+    public abstract long getId();
 
-    abstract public TableType getType();
+    public abstract TableType getType();
 }
