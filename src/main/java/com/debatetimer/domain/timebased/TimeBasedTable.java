@@ -24,11 +24,10 @@ public class TimeBasedTable extends DebateTable {
             Member member,
             String name,
             String agenda,
-            int duration,
             boolean warningBell,
             boolean finishBell
     ) {
-        super(member, name, agenda, duration, warningBell, finishBell);
+        super(member, name, agenda, warningBell, finishBell);
     }
 
     @Override

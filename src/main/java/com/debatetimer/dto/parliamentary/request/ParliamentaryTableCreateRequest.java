@@ -11,13 +11,7 @@ public record ParliamentaryTableCreateRequest(ParliamentaryTableInfoCreateReques
                                               List<ParliamentaryTimeBoxCreateRequest> table) {
 
     public ParliamentaryTable toTable(Member member) {
-        return info.toTable(member, sumOfTime(), info.warningBell(), info().finishBell());
-    }
-
-    private int sumOfTime() {
-        return table.stream()
-                .mapToInt(ParliamentaryTimeBoxCreateRequest::time)
-                .sum();
+        return info.toTable(member, info.warningBell(), info().finishBell());
     }
 
     public TimeBoxes toTimeBoxes(ParliamentaryTable parliamentaryTable) {
