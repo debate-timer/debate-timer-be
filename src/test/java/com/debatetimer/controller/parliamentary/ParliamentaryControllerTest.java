@@ -113,7 +113,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     class DoDebate {
 
         @Test
-        void 토론을_진행한다() {
+        void 의회식_토론을_진행한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
             parliamentaryTimeBoxGenerator.generate(bitoTable, 1);

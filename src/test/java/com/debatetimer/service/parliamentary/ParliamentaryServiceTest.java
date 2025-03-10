@@ -128,7 +128,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     class UpdateUsedAt {
 
         @Test
-        void 의회식_토론_테이블을_수정한다() throws InterruptedException {
+        void 의회식_토론_테이블의_사용_시각을_최신화한다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable table = parliamentaryTableGenerator.generate(member);
             LocalDateTime beforeUsedAt = table.getUsedAt();

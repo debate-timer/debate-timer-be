@@ -380,7 +380,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 시간총량제_테이블_조회_성공() {
+        void 시간총량제_토론_진행_성공() {
             long tableId = 5L;
             TimeBasedTableResponse response = new TimeBasedTableResponse(
                     5L,
@@ -407,7 +407,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
 
         @ParameterizedTest
         @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND", "NOT_TABLE_OWNER"})
-        void 시간총량제_테이블_조회_실패(ClientErrorCode errorCode) {
+        void 시간총량제_토론_진행_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
             doThrow(new DTClientErrorException(errorCode)).when(timeBasedService).updateUsedAt(eq(tableId), any());
 

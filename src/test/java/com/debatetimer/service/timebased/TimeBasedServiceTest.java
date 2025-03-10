@@ -137,7 +137,7 @@ class TimeBasedServiceTest extends BaseServiceTest {
     class UpdateUsedAt {
 
         @Test
-        void 시간총량제_토론_테이블을_수정한다() throws InterruptedException {
+        void 시간총량제_토론_테이블의_사용_시각을_최신화한다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
             TimeBasedTable table = timeBasedTableGenerator.generate(member);
             LocalDateTime beforeUsedAt = table.getUsedAt();
