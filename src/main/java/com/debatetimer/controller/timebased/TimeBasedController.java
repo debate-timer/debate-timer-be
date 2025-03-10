@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -49,6 +50,15 @@ public class TimeBasedController {
             @AuthMember Member member
     ) {
         return timeBasedService.updateTable(tableCreateRequest, tableId, member);
+    }
+
+    @PatchMapping("/api/table/time-based/{tableId}/debate")
+    @ResponseStatus(HttpStatus.OK)
+    public TimeBasedTableResponse doDebate(
+            @PathVariable Long tableId,
+            @AuthMember Member member
+    ) {
+        return timeBasedService.updateUsedAt(tableId, member);
     }
 
     @DeleteMapping("/api/table/time-based/{tableId}")

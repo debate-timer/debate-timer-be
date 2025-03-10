@@ -380,7 +380,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
             );
             doReturn(response).when(parliamentaryService).updateUsedAt(eq(tableId), any());
 
-            var document = document("parliamentary/patch-debate", 200)
+            var document = document("parliamentary/patch_debate", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();

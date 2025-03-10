@@ -16,6 +16,7 @@ import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -117,6 +118,45 @@ class TimeBasedServiceTest extends BaseServiceTest {
                     () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
                     () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
+            );
+        }
+
+        @Test
+        void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            Member coli = memberGenerator.generate("default2@gmail.com");
+            TimeBasedTable chanTable = timeBasedTableGenerator.generate(chan);
+            long chanTableId = chanTable.getId();
+            TimeBasedTableCreateRequest renewTableRequest = new TimeBasedTableCreateRequest(
+                    new TimeBasedTableInfoCreateRequest("새로운 테이블", "주제", true, true),
+                    List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
+                                    1),
+                            new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
+                                    60,
+                                    1)));
+
+            assertThatThrownBy(() -> timeBasedService.updateTable(renewTableRequest, chanTableId, coli))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+        }
+    }
+
+    @Nested
+    class UpdateUsedAt {
+
+        @Test
+        void 시간총량제_토론_테이블을_수정한다() throws InterruptedException {
+            Member member = memberGenerator.generate("default@gmail.com");
+            TimeBasedTable table = timeBasedTableGenerator.generate(member);
+            LocalDateTime beforeUsedAt = table.getUsedAt();
+            Thread.sleep(1);
+
+            timeBasedService.updateUsedAt(table.getId(), member);
+
+            Optional<TimeBasedTable> updatedTable = timeBasedTableRepository.findById(table.getId());
+            assertAll(
+                    () -> assertThat(updatedTable.get().getId()).isEqualTo(table.getId()),
+                    () -> assertThat(updatedTable.get().getUsedAt()).isAfter(beforeUsedAt)
             );
         }
 

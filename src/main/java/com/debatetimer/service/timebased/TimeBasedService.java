@@ -55,6 +55,15 @@ public class TimeBasedService {
     }
 
     @Transactional
+    public TimeBasedTableResponse updateUsedAt(long tableId, Member member) {
+        TimeBasedTable table = getOwnerTable(tableId, member.getId());
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        table.updateUsedAt();
+
+        return new TimeBasedTableResponse(table, timeBoxes);
+    }
+
+    @Transactional
     public void deleteTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
         TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);

@@ -110,6 +110,33 @@ class TimeBasedControllerTest extends BaseControllerTest {
     }
 
     @Nested
+    class DoDebate {
+
+        @Test
+        void 시간총량제_토론을_시작한다() {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            TimeBasedTable bitoTable = timeBasedTableGenerator.generate(bito);
+            timeBasedTimeBoxGenerator.generate(bitoTable, 1);
+            timeBasedTimeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+
+            TimeBasedTableResponse response = given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("tableId", bitoTable.getId())
+                    .headers(headers)
+                    .when().patch("/api/table/time-based/{tableId}/debate")
+                    .then().statusCode(200)
+                    .extract().as(TimeBasedTableResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
+                    () -> assertThat(response.info().name()).isEqualTo(bitoTable.getName()),
+                    () -> assertThat(response.table()).hasSize(2)
+            );
+        }
+    }
+
+    @Nested
     class DeleteTable {
 
         @Test
