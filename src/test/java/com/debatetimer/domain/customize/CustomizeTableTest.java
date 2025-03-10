@@ -15,7 +15,7 @@ class CustomizeTableTest {
         void 사용자_지정_테이블_타입을_반환한다() {
             CustomizeTable customizeTable = new CustomizeTable();
 
-            assertThat(customizeTable.getType()).isEqualTo(TableType.PARLIAMENTARY);
+            assertThat(customizeTable.getType()).isEqualTo(TableType.CUSTOMIZE);
         }
     }
 }
