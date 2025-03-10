@@ -16,7 +16,7 @@ public record TimeBasedTableInfoCreateRequest(
         boolean finishBell
 ) {
 
-    public TimeBasedTable toTable(Member member, int duration) {
-        return new TimeBasedTable(member, name, agenda, duration, warningBell, finishBell);
+    public TimeBasedTable toTable(Member member) {
+        return new TimeBasedTable(member, name, agenda, warningBell, finishBell);
     }
 }

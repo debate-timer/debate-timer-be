@@ -85,13 +85,13 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 fieldWithPath("tables[].id").type(NUMBER).description("토론 테이블 ID (토론 타입 별로 ID를 가짐)"),
                 fieldWithPath("tables[].name").type(STRING).description("토론 테이블 이름"),
                 fieldWithPath("tables[].type").type(STRING).description("토론 타입"),
-                fieldWithPath("tables[].duration").type(NUMBER).description("소요 시간 (초)"));
+                fieldWithPath("tables[].agenda").type(STRING).description("토론 주제"));
 
         @Test
         void 테이블_조회_성공() {
             TableResponses response = new TableResponses(
-                    List.of(new TableResponse(1L, "토론 테이블 1", TableType.PARLIAMENTARY, 1800),
-                            new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, 2000))
+                    List.of(new TableResponse(1L, "토론 테이블 1", TableType.PARLIAMENTARY, "주제1"),
+                            new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, "주제2"))
             );
             doReturn(response).when(memberService).getTables(EXIST_MEMBER_ID);
 

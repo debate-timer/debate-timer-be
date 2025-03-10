@@ -24,7 +24,7 @@ class DebateTableTest {
         @ParameterizedTest
         void 테이블_이름은_영문과_한글_숫자_띄어쓰기만_가능하다(String name) {
             Member member = new Member("default@gmail.com");
-            assertThatCode(() -> new DebateTableTestObject(member, name, "agenda", 10, true, true))
+            assertThatCode(() -> new DebateTableTestObject(member, name, "agenda", true, true))
                     .doesNotThrowAnyException();
         }
 
@@ -32,7 +32,7 @@ class DebateTableTest {
         @ParameterizedTest
         void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
             Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, "f".repeat(length), "agenda", 10, true, true))
+            assertThatThrownBy(() -> new DebateTableTestObject(member, "f".repeat(length), "agenda", true, true))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
@@ -41,7 +41,7 @@ class DebateTableTest {
         @ParameterizedTest
         void 테이블_이름은_적어도_한_자_있어야_한다(String name) {
             Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", 10, true, true))
+            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", true, true))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
@@ -50,18 +50,9 @@ class DebateTableTest {
         @ParameterizedTest
         void 허용된_글자_이외의_문자는_불가능하다(String name) {
             Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", 10, true, true))
+            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", true, true))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_FORM.getMessage());
-        }
-
-        @ValueSource(ints = {0, -1, -60})
-        @ParameterizedTest
-        void 테이블_시간은_양수만_가능하다(int duration) {
-            Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, "nickname", "agenda", duration, true, true))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TABLE_TIME.getMessage());
         }
     }
 
@@ -71,7 +62,7 @@ class DebateTableTest {
         @Test
         void 테이블의_사용_시각을_업데이트한다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
-            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", 10, true, true);
+            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", true, true);
             LocalDateTime beforeUsedAt = table.getUsedAt();
             Thread.sleep(1);
 
@@ -87,8 +78,8 @@ class DebateTableTest {
         @Test
         void 테이블_정보를_업데이트_할_수_있다() {
             Member member = new Member("default@gmail.com");
-            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", 10, true, true);
-            DebateTableTestObject renewTable = new DebateTableTestObject(member, "newName", "newAgenda", 100, false,
+            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", true, true);
+            DebateTableTestObject renewTable = new DebateTableTestObject(member, "newName", "newAgenda", false,
                     false);
 
             table.updateTable(renewTable);
@@ -96,7 +87,6 @@ class DebateTableTest {
             assertAll(
                     () -> assertThat(table.getName()).isEqualTo("newName"),
                     () -> assertThat(table.getAgenda()).isEqualTo("newAgenda"),
-                    () -> assertThat(table.getDuration()).isEqualTo(100),
                     () -> assertThat(table.isWarningBell()).isEqualTo(false),
                     () -> assertThat(table.isFinishBell()).isEqualTo(false)
             );
@@ -105,8 +95,8 @@ class DebateTableTest {
         @Test
         void 테이블_업데이트_할_때_사용_시간을_변경한다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
-            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", 10, true, true);
-            DebateTableTestObject renewTable = new DebateTableTestObject(member, "newName", "newAgenda", 100, false,
+            DebateTableTestObject table = new DebateTableTestObject(member, "tableName", "agenda", true, true);
+            DebateTableTestObject renewTable = new DebateTableTestObject(member, "newName", "newAgenda", false,
                     false);
             LocalDateTime beforeUsedAt = table.getUsedAt();
             Thread.sleep(1);
@@ -122,10 +112,9 @@ class DebateTableTest {
         public DebateTableTestObject(Member member,
                                      String name,
                                      String agenda,
-                                     int duration,
                                      boolean warningBell,
                                      boolean finishBell) {
-            super(member, name, agenda, duration, warningBell, finishBell);
+            super(member, name, agenda, warningBell, finishBell);
         }
 
         @Override

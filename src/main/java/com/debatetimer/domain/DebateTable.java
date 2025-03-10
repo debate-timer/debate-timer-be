@@ -34,8 +34,6 @@ public abstract class DebateTable extends BaseTimeEntity {
     @NotNull
     private String agenda;
 
-    private int duration;
-
     private boolean warningBell;
 
     private boolean finishBell;
@@ -43,14 +41,12 @@ public abstract class DebateTable extends BaseTimeEntity {
     @NotNull
     private LocalDateTime usedAt;
 
-    protected DebateTable(Member member, String name, String agenda, int duration, boolean warningBell,
-                          boolean finishBell) {
-        validate(name, duration);
+    protected DebateTable(Member member, String name, String agenda, boolean warningBell, boolean finishBell) {
+        validate(name);
 
         this.member = member;
         this.name = name;
         this.agenda = agenda;
-        this.duration = duration;
         this.warningBell = warningBell;
         this.finishBell = finishBell;
         this.usedAt = LocalDateTime.now();
@@ -65,25 +61,21 @@ public abstract class DebateTable extends BaseTimeEntity {
     }
 
     protected final void updateTable(DebateTable renewTable) {
-        validate(renewTable.getName(), renewTable.getDuration());
+        validate(renewTable.getName());
 
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
-        this.duration = renewTable.getDuration();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
         updateUsedAt();
     }
 
-    private void validate(String name, int duration) {
+    private void validate(String name) {
         if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
         }
         if (!name.matches(NAME_REGEX)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_FORM);
-        }
-        if (duration <= 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_TIME);
         }
     }
 

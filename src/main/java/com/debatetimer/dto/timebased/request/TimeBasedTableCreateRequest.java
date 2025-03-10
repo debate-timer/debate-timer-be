@@ -11,13 +11,7 @@ public record TimeBasedTableCreateRequest(TimeBasedTableInfoCreateRequest info,
                                           List<TimeBasedTimeBoxCreateRequest> table) {
 
     public TimeBasedTable toTable(Member member) {
-        return info.toTable(member, sumOfTime());
-    }
-
-    private int sumOfTime() {
-        return table.stream()
-                .mapToInt(TimeBasedTimeBoxCreateRequest::time)
-                .sum();
+        return info.toTable(member);
     }
 
     public TimeBoxes toTimeBoxes(TimeBasedTable timeBasedTable) {
