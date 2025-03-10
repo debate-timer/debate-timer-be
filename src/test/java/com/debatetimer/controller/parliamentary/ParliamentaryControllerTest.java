@@ -110,7 +110,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class DoDebate {
+    class Debate {
 
         @Test
         void 의회식_토론을_진행한다() {

@@ -110,7 +110,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class DoDebate {
+    class Debate {
 
         @Test
         void 시간총량제_토론을_시작한다() {

@@ -339,7 +339,7 @@ public class ParliamentaryDocumentTest extends BaseDocumentTest {
     }
 
     @Nested
-    class DoDebate {
+    class Debate {
 
         private final RestDocumentationRequest requestDocument = request()
                 .summary("의회식 토론 진행")

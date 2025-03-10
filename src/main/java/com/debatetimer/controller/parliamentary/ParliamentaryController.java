@@ -59,7 +59,7 @@ public class ParliamentaryController {
 
     @PatchMapping("/api/table/parliamentary/{tableId}/debate")
     @ResponseStatus(HttpStatus.OK)
-    public ParliamentaryTableResponse doDebate(
+    public ParliamentaryTableResponse debate(
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {

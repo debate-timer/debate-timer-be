@@ -349,7 +349,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
     }
 
     @Nested
-    class DoDebate {
+    class Debate {
 
         private final RestDocumentationRequest requestDocument = request()
                 .summary("시간총량제 토론 시작")

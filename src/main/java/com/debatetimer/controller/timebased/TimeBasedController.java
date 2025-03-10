@@ -54,7 +54,7 @@ public class TimeBasedController {
 
     @PatchMapping("/api/table/time-based/{tableId}/debate")
     @ResponseStatus(HttpStatus.OK)
-    public TimeBasedTableResponse doDebate(
+    public TimeBasedTableResponse debate(
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
