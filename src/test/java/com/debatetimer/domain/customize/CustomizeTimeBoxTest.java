@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class CustomizeTimeBoxTest {
 
     @Nested
-    class ValidateTimeBased {
+    class ValidateCustomize {
 
         @Test
         void 자유토론_타입은_총_시간이_팀_발언_시간의_2배여야_한다() {
