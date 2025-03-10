@@ -34,14 +34,6 @@ class TimeBasedServiceTest extends BaseServiceTest {
         @Test
         void 시간총량제_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            TimeBasedTableInfoCreateRequest requestTableInfo = new TimeBasedTableInfoCreateRequest("커찬의 테이블",
-                    "주제", true, true);
-            List<TimeBasedTimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
-                            1),
-                    new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
-                            60,
-                            1));
             TimeBasedTableCreateRequest chanTableRequest = new TimeBasedTableCreateRequest(
                     new TimeBasedTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new TimeBasedTimeBoxCreateRequest(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null,
@@ -207,7 +199,7 @@ class TimeBasedServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
             TimeBasedTable chanTable = timeBasedTableGenerator.generate(chan);
-            Long chanTableId = chanTable.getId();
+            long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> timeBasedService.deleteTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)

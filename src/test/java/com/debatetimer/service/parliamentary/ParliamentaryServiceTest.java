@@ -34,12 +34,6 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTableInfoCreateRequest requestTableInfo = new ParliamentaryTableInfoCreateRequest("커찬의 테이블",
-                    "주제", true, true);
-            List<ParliamentaryTimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                    new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
                     new ParliamentaryTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
@@ -190,7 +184,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
             ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
-            Long chanTableId = chanTable.getId();
+            long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
