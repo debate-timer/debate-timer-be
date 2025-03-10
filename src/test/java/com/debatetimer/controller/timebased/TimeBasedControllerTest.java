@@ -97,7 +97,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
                     .pathParam("tableId", bitoTable.getId())
                     .headers(headers)
                     .body(renewTableRequest)
-                    .when().patch("/api/table/time-based/{tableId}")
+                    .when().put("/api/table/time-based/{tableId}")
                     .then().statusCode(200)
                     .extract().as(TimeBasedTableResponse.class);
 

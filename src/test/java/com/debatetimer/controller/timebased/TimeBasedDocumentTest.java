@@ -303,7 +303,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
                     .body(request)
-                    .when().patch("/api/table/time-based/{tableId}")
+                    .when().put("/api/table/time-based/{tableId}")
                     .then().statusCode(200);
         }
 
@@ -343,7 +343,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
                     .body(request)
-                    .when().patch("/api/table/time-based/{tableId}")
+                    .when().put("/api/table/time-based/{tableId}")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }
