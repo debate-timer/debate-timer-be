@@ -4,6 +4,7 @@ import com.debatetimer.domain.DebateTimeBox;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomizeTimeBox extends DebateTimeBox {
 
     @Id
@@ -30,7 +37,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
-    private BoxType boxType;
+    private CustomizeBoxType boxType;
 
     private Integer timePerTeam;
     private Integer timePerSpeaking;
@@ -40,7 +47,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             int sequence,
             Stance stance,
             String speechType,
-            BoxType boxType,
+            CustomizeBoxType boxType,
             int time,
             Integer speaker
     ) {
@@ -57,7 +64,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             int sequence,
             Stance stance,
             String speechType,
-            BoxType boxType,
+            CustomizeBoxType boxType,
             int time,
             int timePerTeam,
             Integer timePerSpeaking,
@@ -95,13 +102,13 @@ public class CustomizeTimeBox extends DebateTimeBox {
         }
     }
 
-    private void validateTimeBasedType(BoxType boxType) {
+    private void validateTimeBasedType(CustomizeBoxType boxType) {
         if (boxType.isNotTimeBased()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
         }
     }
 
-    private void validateNotTimeBasedType(BoxType boxType) {
+    private void validateNotTimeBasedType(CustomizeBoxType boxType) {
         if (boxType.isTimeBased()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
         }

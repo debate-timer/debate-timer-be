@@ -1,6 +1,6 @@
 package com.debatetimer.domain.customize;
 
-public enum BoxType {
+public enum CustomizeBoxType {
 
     NORMAL,
     TIME_BASED;
