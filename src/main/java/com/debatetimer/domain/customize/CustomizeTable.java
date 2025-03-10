@@ -31,13 +31,12 @@ public class CustomizeTable extends DebateTable {
             Member member,
             String name,
             String agenda,
-            int duration,
             boolean warningBell,
             boolean finishBell,
             String prosTeamName,
             String consTeamName
     ) {
-        super(member, name, agenda, duration, warningBell, finishBell);
+        super(member, name, agenda, warningBell, finishBell);
         this.prosTeamName = prosTeamName;
         this.consTeamName = consTeamName;
     }
