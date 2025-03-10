@@ -24,7 +24,7 @@ public abstract class DebateTimeBox {
     private int time;
     private Integer speaker;
 
-    public DebateTimeBox(int sequence, Stance stance, int time, Integer speaker) {
+    protected DebateTimeBox(int sequence, Stance stance, int time, Integer speaker) {
         validateSequence(sequence);
         validateTime(time);
         validateSpeakerNumber(speaker);
