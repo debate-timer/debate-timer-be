@@ -62,6 +62,14 @@ public class ParliamentaryService {
     }
 
     @Transactional
+    public ParliamentaryTableResponse updateUsedAt(long tableId, Member member) {
+        ParliamentaryTable table = getOwnerTable(tableId, member.getId());
+        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        table.updateUsedAt();
+        return new ParliamentaryTableResponse(table, timeBoxes);
+    }
+
+    @Transactional
     public void deleteTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
         TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);

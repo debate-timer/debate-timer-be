@@ -16,6 +16,7 @@ import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -124,6 +125,39 @@ class ParliamentaryServiceTest extends BaseServiceTest {
                             new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)));
 
             assertThatThrownBy(() -> parliamentaryService.updateTable(renewTableRequest, chanTableId, coli))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+        }
+    }
+
+    @Nested
+    class UpdateUsedAt {
+
+        @Test
+        void 의회식_토론_테이블을_수정한다() throws InterruptedException {
+            Member member = memberGenerator.generate("default@gmail.com");
+            ParliamentaryTable table = parliamentaryTableGenerator.generate(member);
+            LocalDateTime beforeUsedAt = table.getUsedAt();
+            Thread.sleep(1);
+
+            parliamentaryService.updateUsedAt(table.getId(), member);
+
+            Optional<ParliamentaryTable> updatedTable = parliamentaryTableRepository.findById(table.getId());
+
+            assertAll(
+                    () -> assertThat(updatedTable.get().getId()).isEqualTo(table.getId()),
+                    () -> assertThat(updatedTable.get().getUsedAt()).isAfter(beforeUsedAt)
+            );
+        }
+
+        @Test
+        void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            Member coli = memberGenerator.generate("default2@gmail.com");
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
+            long chanTableId = chanTable.getId();
+
+            assertThatThrownBy(() -> parliamentaryService.updateUsedAt(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }

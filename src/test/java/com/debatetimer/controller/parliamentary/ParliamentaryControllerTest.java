@@ -110,6 +110,33 @@ class ParliamentaryControllerTest extends BaseControllerTest {
     }
 
     @Nested
+    class DoDebate {
+
+        @Test
+        void 토론을_진행한다() {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
+            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+
+            ParliamentaryTableResponse response = given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("tableId", bitoTable.getId())
+                    .headers(headers)
+                    .when().patch("/api/table/parliamentary/{tableId}/debate")
+                    .then().statusCode(200)
+                    .extract().as(ParliamentaryTableResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
+                    () -> assertThat(response.info().name()).isEqualTo(bitoTable.getName()),
+                    () -> assertThat(response.table()).hasSize(2)
+            );
+        }
+    }
+
+    @Nested
     class DeleteTable {
 
         @Test
