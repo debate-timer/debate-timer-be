@@ -27,21 +27,21 @@ public class ParliamentaryService {
         ParliamentaryTable table = tableCreateRequest.toTable(member);
         ParliamentaryTable savedTable = tableRepository.save(table);
 
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        TimeBoxes<ParliamentaryTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new ParliamentaryTableResponse(savedTable, savedTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
     @Transactional(readOnly = true)
     public ParliamentaryTableResponse findTableById(long tableId, long id) {
         ParliamentaryTable table = getOwnerTable(tableId, id);
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
@@ -55,16 +55,16 @@ public class ParliamentaryService {
         ParliamentaryTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        TimeBoxes<ParliamentaryTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new ParliamentaryTableResponse(existingTable, savedTimeBoxes);
     }
 
     @Transactional
     public ParliamentaryTableResponse updateUsedAt(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         table.updateUsedAt();
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
@@ -72,18 +72,18 @@ public class ParliamentaryService {
     @Transactional
     public void deleteTable(long tableId, Member member) {
         ParliamentaryTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private TimeBoxes saveTimeBoxes(
+    private TimeBoxes<ParliamentaryTimeBox> saveTimeBoxes(
             ParliamentaryTableCreateRequest tableCreateRequest,
             ParliamentaryTable table
     ) {
-        TimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
+        TimeBoxes<ParliamentaryTimeBox> timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<ParliamentaryTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new TimeBoxes(savedTimeBoxes);
+        return new TimeBoxes<>(savedTimeBoxes);
     }
 
     private ParliamentaryTable getOwnerTable(long tableId, long memberId) {

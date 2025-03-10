@@ -22,9 +22,9 @@ public interface ParliamentaryTimeBoxRepository extends Repository<Parliamentary
 
     List<ParliamentaryTimeBox> findAllByParliamentaryTable(ParliamentaryTable table);
 
-    default TimeBoxes findTableTimeBoxes(ParliamentaryTable table) {
+    default TimeBoxes<ParliamentaryTimeBox> findTableTimeBoxes(ParliamentaryTable table) {
         List<ParliamentaryTimeBox> timeBoxes = findAllByParliamentaryTable(table);
-        return new TimeBoxes(timeBoxes);
+        return new TimeBoxes<>(timeBoxes);
     }
 
     @Query("DELETE FROM ParliamentaryTimeBox ptb WHERE ptb IN :timeBoxes")

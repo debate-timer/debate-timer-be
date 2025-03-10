@@ -3,6 +3,7 @@ package com.debatetimer.dto.parliamentary.request;
 import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,7 +15,7 @@ public record ParliamentaryTableCreateRequest(ParliamentaryTableInfoCreateReques
         return info.toTable(member, info.warningBell(), info().finishBell());
     }
 
-    public TimeBoxes toTimeBoxes(ParliamentaryTable parliamentaryTable) {
+    public TimeBoxes<ParliamentaryTimeBox> toTimeBoxes(ParliamentaryTable parliamentaryTable) {
         return IntStream.range(0, table.size())
                 .mapToObj(i -> table.get(i).toTimeBox(parliamentaryTable, i + 1))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), TimeBoxes::new));
