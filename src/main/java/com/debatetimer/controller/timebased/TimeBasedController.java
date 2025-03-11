@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +42,7 @@ public class TimeBasedController {
         return timeBasedService.findTable(tableId, member);
     }
 
-    @PatchMapping("/api/table/time-based/{tableId}")
+    @PutMapping("/api/table/time-based/{tableId}")
     @ResponseStatus(HttpStatus.OK)
     public TimeBasedTableResponse updateTable(
             @Valid @RequestBody TimeBasedTableCreateRequest tableCreateRequest,
@@ -49,6 +50,15 @@ public class TimeBasedController {
             @AuthMember Member member
     ) {
         return timeBasedService.updateTable(tableCreateRequest, tableId, member);
+    }
+
+    @PatchMapping("/api/table/time-based/{tableId}/debate")
+    @ResponseStatus(HttpStatus.OK)
+    public TimeBasedTableResponse debate(
+            @PathVariable Long tableId,
+            @AuthMember Member member
+    ) {
+        return timeBasedService.updateUsedAt(tableId, member);
     }
 
     @DeleteMapping("/api/table/time-based/{tableId}")

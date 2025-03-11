@@ -303,7 +303,7 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
                     .body(request)
-                    .when().patch("/api/table/time-based/{tableId}")
+                    .when().put("/api/table/time-based/{tableId}")
                     .then().statusCode(200);
         }
 
@@ -343,7 +343,84 @@ public class TimeBasedDocumentTest extends BaseDocumentTest {
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", tableId)
                     .body(request)
-                    .when().patch("/api/table/time-based/{tableId}")
+                    .when().put("/api/table/time-based/{tableId}")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
+    class Debate {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .summary("시간총량제 토론 시작")
+                .tag(Tag.TIME_BASED_API)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .pathParameter(
+                        parameterWithName("tableId").description("테이블 ID")
+                );
+
+        private final RestDocumentationResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("id").type(NUMBER).description("테이블 ID"),
+                        fieldWithPath("info").type(OBJECT).description("토론 테이블 정보"),
+                        fieldWithPath("info.name").type(STRING).description("테이블 이름"),
+                        fieldWithPath("info.type").type(STRING).description("토론 형식"),
+                        fieldWithPath("info.agenda").type(STRING).description("토론 주제"),
+                        fieldWithPath("info.warningBell").type(BOOLEAN).description("30초 종소리 유무"),
+                        fieldWithPath("info.finishBell").type(BOOLEAN).description("발언 종료 종소리 유무"),
+                        fieldWithPath("table").type(ARRAY).description("토론 테이블 구성"),
+                        fieldWithPath("table[].stance").type(STRING).description("입장"),
+                        fieldWithPath("table[].type").type(STRING).description("발언 유형"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
+                        fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
+                        fieldWithPath("table[].speakerNumber").type(NUMBER).description("발언자 번호").optional()
+                );
+
+        @Test
+        void 시간총량제_토론_진행_성공() {
+            long tableId = 5L;
+            TimeBasedTableResponse response = new TimeBasedTableResponse(
+                    5L,
+                    new TimeBasedTableInfoResponse("비토 테이블 1", TableType.PARLIAMENTARY, "토론 주제", true, true),
+                    List.of(
+                            new TimeBasedTimeBoxResponse(Stance.PROS, TimeBasedBoxType.OPENING, 120, null, null, 1),
+                            new TimeBasedTimeBoxResponse(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180, 60, 1)
+                    )
+            );
+            doReturn(response).when(timeBasedService).updateUsedAt(eq(tableId), any());
+
+            var document = document("time_based/patch_debate", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("tableId", tableId)
+                    .when().patch("/api/table/time-based/{tableId}/debate")
+                    .then().statusCode(200);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND", "NOT_TABLE_OWNER"})
+        void 시간총량제_토론_진행_실패(ClientErrorCode errorCode) {
+            long tableId = 5L;
+            doThrow(new DTClientErrorException(errorCode)).when(timeBasedService).updateUsedAt(eq(tableId), any());
+
+            var document = document("time_based/get", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("tableId", tableId)
+                    .when().patch("/api/table/time-based/{tableId}/debate")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }

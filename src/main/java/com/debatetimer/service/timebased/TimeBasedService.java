@@ -27,14 +27,14 @@ public class TimeBasedService {
         TimeBasedTable table = tableCreateRequest.toTable(member);
         TimeBasedTable savedTable = tableRepository.save(table);
 
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        TimeBoxes<TimeBasedTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new TimeBasedTableResponse(savedTable, savedTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public TimeBasedTableResponse findTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<TimeBasedTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new TimeBasedTableResponse(table, timeBoxes);
     }
 
@@ -48,27 +48,36 @@ public class TimeBasedService {
         TimeBasedTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        TimeBoxes<TimeBasedTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        TimeBoxes<TimeBasedTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new TimeBasedTableResponse(existingTable, savedTimeBoxes);
+    }
+
+    @Transactional
+    public TimeBasedTableResponse updateUsedAt(long tableId, Member member) {
+        TimeBasedTable table = getOwnerTable(tableId, member.getId());
+        TimeBoxes<TimeBasedTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        table.updateUsedAt();
+
+        return new TimeBasedTableResponse(table, timeBoxes);
     }
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
         TimeBasedTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        TimeBoxes<TimeBasedTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private TimeBoxes saveTimeBoxes(
+    private TimeBoxes<TimeBasedTimeBox> saveTimeBoxes(
             TimeBasedTableCreateRequest tableCreateRequest,
             TimeBasedTable table
     ) {
-        TimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
+        TimeBoxes<TimeBasedTimeBox> timeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<TimeBasedTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new TimeBoxes(savedTimeBoxes);
+        return new TimeBoxes<>(savedTimeBoxes);
     }
 
     private TimeBasedTable getOwnerTable(long tableId, long memberId) {

@@ -22,9 +22,9 @@ public interface TimeBasedTimeBoxRepository extends Repository<TimeBasedTimeBox,
 
     List<TimeBasedTimeBox> findAllByTimeBasedTable(TimeBasedTable table);
 
-    default TimeBoxes findTableTimeBoxes(TimeBasedTable table) {
+    default TimeBoxes<TimeBasedTimeBox> findTableTimeBoxes(TimeBasedTable table) {
         List<TimeBasedTimeBox> timeBoxes = findAllByTimeBasedTable(table);
-        return new TimeBoxes(timeBoxes);
+        return new TimeBoxes<>(timeBoxes);
     }
 
     @Query("DELETE FROM TimeBasedTimeBox ptb WHERE ptb IN :timeBoxes")

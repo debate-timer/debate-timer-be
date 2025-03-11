@@ -16,6 +16,7 @@ import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -33,12 +34,6 @@ class ParliamentaryServiceTest extends BaseServiceTest {
         @Test
         void 의회식_토론_테이블을_생성한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTableInfoCreateRequest requestTableInfo = new ParliamentaryTableInfoCreateRequest("커찬의 테이블",
-                    "주제", true, true);
-            List<ParliamentaryTimeBoxCreateRequest> requestTimeBoxes = List.of(
-                    new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                    new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
-            );
             ParliamentaryTableCreateRequest chanTableRequest = new ParliamentaryTableCreateRequest(
                     new ParliamentaryTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
                     List.of(new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
@@ -130,6 +125,38 @@ class ParliamentaryServiceTest extends BaseServiceTest {
     }
 
     @Nested
+    class UpdateUsedAt {
+
+        @Test
+        void 의회식_토론_테이블의_사용_시각을_최신화한다() {
+            Member member = memberGenerator.generate("default@gmail.com");
+            ParliamentaryTable table = parliamentaryTableGenerator.generate(member);
+            LocalDateTime beforeUsedAt = table.getUsedAt();
+
+            parliamentaryService.updateUsedAt(table.getId(), member);
+
+            Optional<ParliamentaryTable> updatedTable = parliamentaryTableRepository.findById(table.getId());
+
+            assertAll(
+                    () -> assertThat(updatedTable.get().getId()).isEqualTo(table.getId()),
+                    () -> assertThat(updatedTable.get().getUsedAt()).isAfter(beforeUsedAt)
+            );
+        }
+
+        @Test
+        void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            Member coli = memberGenerator.generate("default2@gmail.com");
+            ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
+            long chanTableId = chanTable.getId();
+
+            assertThatThrownBy(() -> parliamentaryService.updateUsedAt(chanTableId, coli))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+        }
+    }
+
+    @Nested
     class DeleteTable {
 
         @Test
@@ -156,7 +183,7 @@ class ParliamentaryServiceTest extends BaseServiceTest {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
             ParliamentaryTable chanTable = parliamentaryTableGenerator.generate(chan);
-            Long chanTableId = chanTable.getId();
+            long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> parliamentaryService.deleteTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
