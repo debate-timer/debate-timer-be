@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
     @JoinColumn(name = "table_id")
     private CustomizeTable customizeTable;
 
-    @NotNull
+    @NotBlank
     private String speechType;
 
     @NotNull
