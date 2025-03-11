@@ -31,11 +31,8 @@ public abstract class DebateTable extends BaseTimeEntity {
     @NotNull
     private String name;
 
-    @NotNull
     private String agenda;
-
     private boolean warningBell;
-
     private boolean finishBell;
 
     @NotNull
