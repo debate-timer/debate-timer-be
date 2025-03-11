@@ -16,7 +16,7 @@ public record ParliamentaryTableInfoCreateRequest(
         boolean finishBell
 ) {
 
-    public ParliamentaryTable toTable(Member member, boolean warningBell, boolean finishBell) {
+    public ParliamentaryTable toTable(Member member) {
         return new ParliamentaryTable(member, name, agenda, warningBell, finishBell);
     }
 }

@@ -11,7 +11,7 @@ public record ParliamentaryTableCreateRequest(ParliamentaryTableInfoCreateReques
                                               List<ParliamentaryTimeBoxCreateRequest> table) {
 
     public ParliamentaryTable toTable(Member member) {
-        return info.toTable(member, info.warningBell(), info().finishBell());
+        return info.toTable(member);
     }
 
     public TimeBoxes toTimeBoxes(ParliamentaryTable parliamentaryTable) {
