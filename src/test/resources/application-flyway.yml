@@ -11,6 +11,7 @@ spring:
     enabled: on
     baseline-on-migrate: false
     output-query-results: true
+    locations: classpath:/db/migration/h2
 
 logging:
   level:

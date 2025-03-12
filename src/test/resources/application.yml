@@ -36,3 +36,4 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
+    locations: classpath:/db/migration/h2
