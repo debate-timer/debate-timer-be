@@ -14,16 +14,6 @@ public record CustomizeTimeBoxResponse(
         String speaker
 ) {
 
-    //{
-    //			"stance": "PROS",
-    //			"speechType": "찬성측 청중 질의",
-    //			"boxType" : "NORMAL",
-    //			"time": 175,
-    //			"timePerTeam" : null,
-    //			"timePerSpeaking" : null,
-    //			"speaker": "콜리"
-    //		},
-
     public CustomizeTimeBoxResponse(CustomizeTimeBox customizeTimeBox) {
         this(
                 customizeTimeBox.getStance(),
@@ -32,7 +22,7 @@ public record CustomizeTimeBoxResponse(
                 customizeTimeBox.getTime(),
                 customizeTimeBox.getTimePerTeam(),
                 customizeTimeBox.getTimePerSpeaking(),
-                customizeTimeBox.getSpeaker()
+                String.valueOf(customizeTimeBox.getSpeaker()) //TODO 이거 구조 어떻게 할건지 논의필요
         );
     }
 }
