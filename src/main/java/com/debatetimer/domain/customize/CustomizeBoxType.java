@@ -1,6 +1,6 @@
 package com.debatetimer.domain.customize;
 
-public enum CustomizeBoxType {
+public enum CustomizeBoxType { //TODO 자유토론 박스 둘로 나누기
 
     NORMAL,
     TIME_BASED;
