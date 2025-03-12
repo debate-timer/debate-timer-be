@@ -19,7 +19,6 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 1
-    locations: classpath:/db/migration/mysql
 
 cors:
   origin: ${secret.cors.origin}
