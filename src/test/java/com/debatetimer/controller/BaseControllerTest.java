@@ -2,6 +2,7 @@ package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.OAuthClient;
+import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
@@ -9,6 +10,8 @@ import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
 import com.debatetimer.fixture.TimeBasedTableGenerator;
 import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
 import com.debatetimer.fixture.TokenGenerator;
+import com.debatetimer.repository.customize.CustomizeTableRepository;
+import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.timebased.TimeBasedTableRepository;
 import io.restassured.RestAssured;
@@ -34,6 +37,9 @@ public abstract class BaseControllerTest {
     protected TimeBasedTableRepository timeBasedTableRepository;
 
     @Autowired
+    protected CustomizeTableRepository customizeTableRepository;
+
+    @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
@@ -47,6 +53,12 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected TimeBasedTimeBoxGenerator timeBasedTimeBoxGenerator;
+
+    @Autowired
+    protected CustomizeTableGenerator customizeTableGenerator;
+
+    @Autowired
+    protected CustomizeTimeBoxRepository customizeTimeBoxRepository;
 
     @Autowired
     protected HeaderGenerator headerGenerator;
