@@ -47,7 +47,7 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, time, String.valueOf(speaker));
         validateStance(stance, type);
         validateNotTimeBasedType(type);
 
@@ -65,11 +65,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int timePerSpeaking,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, time, String.valueOf(speaker));
         validateTime(timePerTeam, timePerSpeaking);
         validateTimeBasedTime(time, timePerTeam);
         validateStance(stance, type);
         validateTimeBasedType(type);
+        validateSpeakerNumber(speaker);
 
         this.timeBasedTable = timeBasedTable;
         this.type = type;
@@ -112,6 +113,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
     private void validateNotTimeBasedType(TimeBasedBoxType boxType) {
         if (boxType.isTimeBased()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+    }
+
+    private void validateSpeakerNumber(Integer speaker) {
+        if (speaker != null && speaker <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
         }
     }
 }

@@ -19,7 +19,7 @@ public record TimeBasedTimeBoxResponse(
                 timeBasedTimeBox.getTime(),
                 timeBasedTimeBox.getTimePerTeam(),
                 timeBasedTimeBox.getTimePerSpeaking(),
-                timeBasedTimeBox.getSpeaker()
+                Integer.parseInt(timeBasedTimeBox.getSpeaker())
         );
     }
 }

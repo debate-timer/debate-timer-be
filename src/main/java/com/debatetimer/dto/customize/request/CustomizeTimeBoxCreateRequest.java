@@ -25,9 +25,8 @@ public record CustomizeTimeBoxCreateRequest(
     public CustomizeTimeBox toTimeBox(CustomizeTable customizeTable, int sequence) {
         if (boxType.isTimeBased()) {
             return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, time, timePerTeam,
-                    timePerSpeaking, Integer.parseInt(speaker));
+                    timePerSpeaking, speaker);
         }
-        return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, time,
-                Integer.parseInt(speaker));
+        return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, time, speaker);
     }
 }

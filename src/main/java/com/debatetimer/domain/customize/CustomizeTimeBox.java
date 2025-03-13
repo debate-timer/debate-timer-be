@@ -50,7 +50,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             String speechType,
             CustomizeBoxType boxType,
             int time,
-            Integer speaker
+            String speaker
     ) {
         super(sequence, stance, time, speaker);
         validateNotTimeBasedType(boxType);
@@ -69,7 +69,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             int time,
             int timePerTeam,
             Integer timePerSpeaking,
-            Integer speaker
+            String speaker
     ) {
         super(sequence, stance, time, speaker);
         validateTime(timePerTeam, timePerSpeaking);

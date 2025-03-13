@@ -44,8 +44,9 @@ public class ParliamentaryTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, time, String.valueOf(speaker));
         validate(stance, type);
+        validateSpeakerNumber(speaker);
 
         this.parliamentaryTable = parliamentaryTable;
         this.type = type;
@@ -54,6 +55,12 @@ public class ParliamentaryTimeBox extends DebateTimeBox {
     private void validate(Stance stance, ParliamentaryBoxType boxType) {
         if (!boxType.isAvailable(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
+        }
+    }
+
+    private void validateSpeakerNumber(Integer speaker) {
+        if (speaker != null && speaker <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
         }
     }
 }

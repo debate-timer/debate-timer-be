@@ -8,6 +8,8 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TimeBasedTimeBoxTest {
 
@@ -100,6 +102,21 @@ class TimeBasedTimeBoxTest {
                             timePerTeam, timePerSpeaking, 1))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
+        }
+    }
+
+    @Nested
+    class ValidateSpeakerNumber {
+
+        @ValueSource(ints = {0, -1})
+        @ParameterizedTest
+        void 시간총량제_타임박스의_발표자_번호는_양수만_가능하다(int speaker) {
+            TimeBasedTable table = new TimeBasedTable();
+
+            assertThatThrownBy(() -> new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED,
+                    240, 120, 60, speaker))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER.getMessage());
         }
     }
 }
