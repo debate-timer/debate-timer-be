@@ -9,7 +9,7 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
 
     public CustomizeTableResponse(
             CustomizeTable customizeTable,
-            TimeBoxes timeBasedTimeBoxes
+            TimeBoxes<CustomizeTimeBox> timeBasedTimeBoxes
     ) {
         this(
                 customizeTable.getId(),
