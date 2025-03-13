@@ -1,11 +1,15 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
+import com.debatetimer.fixture.CustomizeTableGenerator;
+import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.ParliamentaryTableGenerator;
 import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
 import com.debatetimer.fixture.TimeBasedTableGenerator;
 import com.debatetimer.fixture.TimeBasedTimeBoxGenerator;
+import com.debatetimer.repository.customize.CustomizeTableRepository;
+import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
@@ -35,6 +39,12 @@ public abstract class BaseServiceTest {
     protected TimeBasedTimeBoxRepository timeBasedTimeBoxRepository;
 
     @Autowired
+    protected CustomizeTableRepository customizeTableRepository;
+
+    @Autowired
+    protected CustomizeTimeBoxRepository customizeTimeBoxRepository;
+
+    @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
@@ -48,4 +58,10 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected TimeBasedTimeBoxGenerator timeBasedTimeBoxGenerator;
+
+    @Autowired
+    protected CustomizeTableGenerator customizeTableGenerator;
+
+    @Autowired
+    protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
 }
