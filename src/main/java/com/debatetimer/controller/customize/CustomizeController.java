@@ -2,9 +2,9 @@ package com.debatetimer.controller.customize;
 
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.dto.timebased.request.TimeBasedTableCreateRequest;
-import com.debatetimer.dto.timebased.response.TimeBasedTableResponse;
-import com.debatetimer.service.timebased.TimeBasedService;
+import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
+import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.service.customize.CustomizeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,43 +22,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CustomizeController {
 
-    private final TimeBasedService timeBasedService;
+    private final CustomizeService customizeService;
 
     @PostMapping("/api/table/customize")
     @ResponseStatus(HttpStatus.CREATED)
-    public TimeBasedTableResponse save(
-            @Valid @RequestBody TimeBasedTableCreateRequest tableCreateRequest,
+    public CustomizeTableResponse save(
+            @Valid @RequestBody CustomizeTableCreateRequest tableCreateRequest,
             @AuthMember Member member
     ) {
-        return timeBasedService.save(tableCreateRequest, member);
+        return customizeService.save(tableCreateRequest, member);
     }
 
     @GetMapping("/api/table/customize/{tableId}")
     @ResponseStatus(HttpStatus.OK)
-    public TimeBasedTableResponse getTable(
+    public CustomizeTableResponse getTable(
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
-        return timeBasedService.findTable(tableId, member);
+        return customizeService.findTable(tableId, member);
     }
 
     @PutMapping("/api/table/customize/{tableId}")
     @ResponseStatus(HttpStatus.OK)
-    public TimeBasedTableResponse updateTable(
-            @Valid @RequestBody TimeBasedTableCreateRequest tableCreateRequest,
+    public CustomizeTableResponse updateTable(
+            @Valid @RequestBody CustomizeTableCreateRequest tableCreateRequest,
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
-        return timeBasedService.updateTable(tableCreateRequest, tableId, member);
+        return customizeService.updateTable(tableCreateRequest, tableId, member);
     }
 
     @PatchMapping("/api/table/customize/{tableId}/debate")
     @ResponseStatus(HttpStatus.OK)
-    public TimeBasedTableResponse debate(
+    public CustomizeTableResponse debate(
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
-        return timeBasedService.updateUsedAt(tableId, member);
+        return customizeService.updateUsedAt(tableId, member);
     }
 
     @DeleteMapping("/api/table/customize/{tableId}")
@@ -67,6 +67,6 @@ public class CustomizeController {
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
-        timeBasedService.deleteTable(tableId, member);
+        customizeService.deleteTable(tableId, member);
     }
 }
