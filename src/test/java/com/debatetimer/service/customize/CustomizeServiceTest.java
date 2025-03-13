@@ -92,7 +92,7 @@ class CustomizeServiceTest extends BaseServiceTest {
     class UpdateTable {
 
         @Test
-        void 시간총량제_토론_테이블을_수정한다() {
+        void 사용자_지정_토론_테이블을_수정한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTable chanTable = customizeTableGenerator.generate(chan);
             CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
@@ -146,7 +146,7 @@ class CustomizeServiceTest extends BaseServiceTest {
     class UpdateUsedAt {
 
         @Test
-        void 시간총량제_토론_테이블의_사용_시각을_최신화한다() {
+        void 사용자_지정_토론_테이블의_사용_시각을_최신화한다() {
             Member member = memberGenerator.generate("default@gmail.com");
             CustomizeTable table = customizeTableGenerator.generate(member);
             LocalDateTime beforeUsedAt = table.getUsedAt();
@@ -187,7 +187,7 @@ class CustomizeServiceTest extends BaseServiceTest {
     class DeleteTable {
 
         @Test
-        void 시간총량제_토론_테이블을_삭제한다() {
+        void 사용자_지정_토론_테이블을_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTable chanTable = customizeTableGenerator.generate(chan);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
