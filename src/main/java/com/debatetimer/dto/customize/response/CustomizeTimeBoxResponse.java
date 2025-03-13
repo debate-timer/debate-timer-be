@@ -22,7 +22,7 @@ public record CustomizeTimeBoxResponse(
                 customizeTimeBox.getTime(),
                 customizeTimeBox.getTimePerTeam(),
                 customizeTimeBox.getTimePerSpeaking(),
-                String.valueOf(customizeTimeBox.getSpeaker()) //TODO 이거 구조 어떻게 할건지 논의필요
+                String.valueOf(customizeTimeBox.getSpeaker())
         );
     }
 }

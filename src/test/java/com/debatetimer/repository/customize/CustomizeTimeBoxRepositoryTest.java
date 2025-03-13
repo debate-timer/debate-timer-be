@@ -11,15 +11,11 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CustomizeTimeBoxRepository customizeTimeBoxRepository;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Nested
     class FindAllByCustomizeTable {
@@ -40,28 +36,4 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             assertThat(foundBoxes).containsExactly(chanBox1, chanBox2);
         }
     }
-
-    //TODO : 에러 원인 파악하기
-//    @Nested
-//    class SaveAll {
-//
-//        @Test
-//        void 타임박스를_모두_저장한다() {
-//            Member chan = memberGenerator.generate("default@gmail.com");
-//            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
-//            CustomizeTimeBox chanBox1 = new CustomizeTimeBox(chanTable, 1, Stance.PROS, "순서1", CustomizeBoxType.NORMAL,
-//                    60, "커찬");
-//            CustomizeTimeBox chanBox2 = new CustomizeTimeBox(chanTable, 2, Stance.PROS, "순서2", CustomizeBoxType.NORMAL,
-//                    60, "커찬");
-//
-//            customizeTimeBoxRepository.saveAll(List.of(chanBox1, chanBox2));
-//
-//            List<CustomizeTimeBox> timeBoxes = jdbcTemplate.queryForList(
-//                    "select * from customize_time_box where table_id = ?",
-//                    new Object[]{chanTable.getId()},
-//                    CustomizeTimeBox.class
-//            );
-//            assertThat(timeBoxes).hasSize(2);
-//        }
-//    }
 }
