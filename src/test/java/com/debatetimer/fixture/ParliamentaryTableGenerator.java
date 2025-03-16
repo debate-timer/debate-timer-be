@@ -19,7 +19,6 @@ public class ParliamentaryTableGenerator {
                 member,
                 "토론 테이블",
                 "주제",
-                1800,
                 false,
                 false
         );

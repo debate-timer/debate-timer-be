@@ -12,6 +12,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
+import com.debatetimer.service.timebased.TimeBasedService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -19,7 +20,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.specification.RequestSpecification;
-import jakarta.servlet.http.Cookie;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,11 +45,9 @@ public abstract class BaseDocumentTest {
     protected static String EXIST_MEMBER_ACCESS_TOKEN = "dflskgnkds";
     protected static String EXIST_MEMBER_REFRESH_TOKEN = "dfsfsdgrs";
     protected static JwtTokenResponse EXIST_MEMBER_TOKEN_RESPONSE = new JwtTokenResponse(EXIST_MEMBER_ACCESS_TOKEN,
-            EXIST_MEMBER_REFRESH_TOKEN);
+            EXIST_MEMBER_REFRESH_TOKEN, Duration.ofHours(1));
     protected static Headers EXIST_MEMBER_HEADER = new Headers(
             new Header(HttpHeaders.AUTHORIZATION, EXIST_MEMBER_ACCESS_TOKEN));
-    protected static Cookie EXIST_MEMBER_COOKIE = new Cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN);
-    protected static Cookie DELETE_MEMBER_COOKIE = new Cookie("refreshToken", "");
 
     protected static RestDocumentationResponse ERROR_RESPONSE = new RestDocumentationResponse()
             .responseBodyField(
@@ -60,6 +59,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected ParliamentaryService parliamentaryService;
+
+    @MockitoBean
+    protected TimeBasedService timeBasedService;
 
     @MockitoBean
     protected AuthService authService;

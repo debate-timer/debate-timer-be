@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:flyway;MODE=MySQL
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+    defer-datasource-initialization: false
+  flyway:
+    enabled: on
+    baseline-on-migrate: false
+    output-query-results: true
+
+logging:
+  level:
+    org.flywaydb: DEBUG
+    org.springframework.jdbc.core: DEBUG

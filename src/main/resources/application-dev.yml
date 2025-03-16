@@ -13,8 +13,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
+      ddl-auto: validate
+    defer-datasource-initialization: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
 
 cors:
   origin: ${secret.cors.origin}
@@ -22,10 +26,12 @@ cors:
 oauth:
   client_id: ${secret.oauth.client_id}
   client_secret: ${secret.oauth.client_secret}
-  redirect_uri: ${secret.oauth.redirect_uri}
   grant_type: ${secret.oauth.grant_type}
 
 jwt:
   secret_key: ${secret.jwt.secret_key}
-  access_token_expiration_millis: ${secret.jwt.access_token_expiration_millis}
-  refresh_token_expiration_millis: ${secret.jwt.refresh_token_expiration_millis}
+  access_token_expiration: ${secret.jwt.access_token_expiration}
+  refresh_token_expiration: ${secret.jwt.refresh_token_expiration}
+
+#logging:
+#  config: classpath:logging/log4j2-dev.yml

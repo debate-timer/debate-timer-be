@@ -1,5 +1,6 @@
 package com.debatetimer.client;
 
+import com.debatetimer.aop.logging.LoggingClient;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
+@LoggingClient
 @EnableConfigurationProperties(OAuthProperties.class)
 public class OAuthClient {
 

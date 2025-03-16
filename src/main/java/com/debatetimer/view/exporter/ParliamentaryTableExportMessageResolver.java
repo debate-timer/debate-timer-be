@@ -1,7 +1,7 @@
 package com.debatetimer.view.exporter;
 
-import com.debatetimer.domain.BoxType;
-import com.debatetimer.dto.parliamentary.response.TimeBoxResponse;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
+import com.debatetimer.dto.parliamentary.response.ParliamentaryTimeBoxResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,10 +15,10 @@ public class ParliamentaryTableExportMessageResolver {
     private static final String MESSAGE_DELIMITER = "/";
     private static final String SPACE = " ";
 
-    public String resolveBoxMessage(TimeBoxResponse timeBox) {
+    public String resolveBoxMessage(ParliamentaryTimeBoxResponse timeBox) {
         String defaultMessage = resolveDefaultMessage(timeBox);
-        BoxType type = timeBox.type();
-        if (type == BoxType.TIME_OUT) {
+        ParliamentaryBoxType type = timeBox.type();
+        if (type == ParliamentaryBoxType.TIME_OUT) {
             return defaultMessage;
         }
         return defaultMessage
@@ -26,22 +26,25 @@ public class ParliamentaryTableExportMessageResolver {
                 + resolveSpeakerMessage(timeBox.speakerNumber());
     }
 
-    private String resolveDefaultMessage(TimeBoxResponse timeBox) {
-        BoxType boxType = timeBox.type();
-        return BoxTypeView.mapView(boxType)
+    private String resolveDefaultMessage(ParliamentaryTimeBoxResponse timeBox) {
+        ParliamentaryBoxType boxType = timeBox.type();
+        return ParliamentaryBoxTypeView.mapView(boxType)
                 + resolveTimeMessage(timeBox.time());
     }
 
     private String resolveTimeMessage(int totalSecond) {
+        StringBuilder messageBuilder = new StringBuilder();
         int minutes = totalSecond / 60;
         int second = totalSecond % 60;
-        String message = minutes + MINUTES_MESSAGE;
 
+        if (minutes != 0) {
+            messageBuilder.append(minutes + MINUTES_MESSAGE + SPACE);
+        }
         if (second != 0) {
-            message += SPACE + second + SECOND_MESSAGE;
+            messageBuilder.append(second + SECOND_MESSAGE);
         }
         return TIME_MESSAGE_PREFIX
-                + message
+                + messageBuilder
                 + TIME_MESSAGE_SUFFIX;
     }
 

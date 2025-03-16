@@ -1,15 +1,20 @@
 package com.debatetimer.controller.parliamentary;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.controller.tool.export.ExcelExport;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.parliamentary.request.ParliamentaryTableCreateRequest;
 import com.debatetimer.dto.parliamentary.response.ParliamentaryTableResponse;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
+import com.debatetimer.view.exporter.ParliamentaryTableExcelExporter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParliamentaryController {
 
     private final ParliamentaryService parliamentaryService;
+    private final ParliamentaryTableExcelExporter parliamentaryTableExcelExporter;
 
     @PostMapping("/api/table/parliamentary")
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,6 +57,15 @@ public class ParliamentaryController {
         return parliamentaryService.updateTable(tableCreateRequest, tableId, member);
     }
 
+    @PatchMapping("/api/table/parliamentary/{tableId}/debate")
+    @ResponseStatus(HttpStatus.OK)
+    public ParliamentaryTableResponse debate(
+            @PathVariable Long tableId,
+            @AuthMember Member member
+    ) {
+        return parliamentaryService.updateUsedAt(tableId, member);
+    }
+
     @DeleteMapping("/api/table/parliamentary/{tableId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTable(
@@ -58,5 +73,16 @@ public class ParliamentaryController {
             @AuthMember Member member
     ) {
         parliamentaryService.deleteTable(tableId, member);
+    }
+
+    @GetMapping("/api/table/parliamentary/export/{tableId}")
+    @ExcelExport
+    public ResponseEntity<InputStreamResource> export(
+            @AuthMember Member member,
+            @PathVariable Long tableId
+    ) {
+        ParliamentaryTableResponse foundTable = parliamentaryService.findTableById(tableId, member.getId());
+        InputStreamResource excelStream = parliamentaryTableExcelExporter.export(foundTable);
+        return ResponseEntity.ok(excelStream);
     }
 }
