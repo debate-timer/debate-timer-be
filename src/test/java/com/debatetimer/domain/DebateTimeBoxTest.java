@@ -33,7 +33,7 @@ class DebateTimeBoxTest {
         }
 
         @Test
-        void 발표자_번호는_빈_값이_허용된다() {
+        void 발언자는_빈_값이_허용된다() {
             String speaker = null;
 
             assertThatCode(() -> new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker))
