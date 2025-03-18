@@ -10,6 +10,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
+import com.debatetimer.service.customize.CustomizeService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.parliamentary.ParliamentaryService;
 import com.debatetimer.service.timebased.TimeBasedService;
@@ -62,6 +63,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected TimeBasedService timeBasedService;
+
+    @MockitoBean
+    protected CustomizeService customizeService;
 
     @MockitoBean
     protected AuthService authService;

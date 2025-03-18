@@ -8,6 +8,8 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ParliamentaryTimeBoxTest {
 
@@ -28,6 +30,21 @@ class ParliamentaryTimeBoxTest {
                     () -> new ParliamentaryTimeBox(table, 1, Stance.NEUTRAL, ParliamentaryBoxType.OPENING, 10, 1))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_STANCE.getMessage());
+        }
+    }
+
+    @Nested
+    class ValidateSpeakerNumber {
+
+        @ValueSource(ints = {0, -1})
+        @ParameterizedTest
+        void 의회식_타임박스의_발표자_번호는_양수만_가능하다(int speaker) {
+            ParliamentaryTable table = new ParliamentaryTable();
+
+            assertThatThrownBy(
+                    () -> new ParliamentaryTimeBox(table, 1, Stance.PROS, ParliamentaryBoxType.OPENING, 10, speaker))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER.getMessage());
         }
     }
 }

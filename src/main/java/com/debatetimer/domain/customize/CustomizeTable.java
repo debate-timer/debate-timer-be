@@ -41,6 +41,12 @@ public class CustomizeTable extends DebateTable {
         this.consTeamName = consTeamName;
     }
 
+    public void update(CustomizeTable renewTable) {
+        this.prosTeamName = renewTable.getProsTeamName();
+        this.consTeamName = renewTable.getConsTeamName();
+        updateTable(renewTable);
+    }
+
     @Override
     public long getId() {
         return id;
