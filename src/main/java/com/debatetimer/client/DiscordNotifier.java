@@ -37,11 +37,14 @@ public class DiscordNotifier {
     }
 
     public void sendErrorMessage(Throwable throwable) {
-        log.info("에러 메시지 발송");
         TextChannel channel = jda.getTextChannelById(properties.getChannelId());
         String errorMessage = throwable.getMessage();
         String stackTrace = getStackTraceAsString(throwable);
-        String errorNotification = NOTIFICATION_PREFIX + errorMessage + System.lineSeparator() + stackTrace;
+
+        String errorNotification = NOTIFICATION_PREFIX
+                + errorMessage
+                + System.lineSeparator()
+                + stackTrace;
         channel.sendMessage(errorNotification).queue();
     }
 
