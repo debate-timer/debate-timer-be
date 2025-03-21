@@ -21,7 +21,7 @@ public class DiscordProperties {
 
     private void validate(String element) {
         if (element == null || element.isBlank()) {
-            throw new DTInitializationException(InitializationErrorCode.OAUTH_PROPERTIES_EMPTY);
+            throw new DTInitializationException(InitializationErrorCode.DISCORD_PROPERTIES_EMPTY);
         }
     }
 }
