@@ -68,6 +68,9 @@ dependencies {
     // Logging
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+
+    //Discord
+    implementation 'net.dv8tion:JDA:5.0.0-beta.24'
 }
 
 bootJar {
