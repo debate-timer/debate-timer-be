@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum InitializationErrorCode {
 
     OAUTH_PROPERTIES_EMPTY("OAuth 구성 요소들이 입력되지 않았습니다"),
+    DISCORD_PROPERTIES_EMPTY("디스코드 봇 구성 요소들이 입력되지 않았습니다"),
+    JDA_INITIALIZATION_FAIL("디스코드 client 구성에 실패하였습니다"),
 
     CORS_ORIGIN_EMPTY("CORS Origin 은 적어도 한 개 있어야 합니다"),
     CORS_ORIGIN_STRING_BLANK("CORS Origin 에 빈 값이 들어올 수 없습니다"),
