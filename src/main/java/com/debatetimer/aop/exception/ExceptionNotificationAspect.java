@@ -6,9 +6,11 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Aspect
+@Profile({"dev", "prod"})
 @Component
 @RequiredArgsConstructor
 public class ExceptionNotificationAspect {
@@ -22,6 +24,5 @@ public class ExceptionNotificationAspect {
     @AfterThrowing(pointcut = "restControllers()", throwing = "exception")
     public void sendDiscordNotification(JoinPoint joinPoint, Exception exception) {
         discordNotifier.sendErrorMessage(exception);
-
     }
 }
