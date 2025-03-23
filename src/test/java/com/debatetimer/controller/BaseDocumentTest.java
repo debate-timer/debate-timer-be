@@ -4,6 +4,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
+import com.debatetimer.client.ChannelNotifier;
 import com.debatetimer.controller.tool.cookie.CookieManager;
 import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.domain.member.Member;
@@ -75,6 +76,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected CookieManager cookieManager;
+
+    @MockitoBean
+    protected ChannelNotifier discordNotifier;
 
     @LocalServerPort
     private int port;

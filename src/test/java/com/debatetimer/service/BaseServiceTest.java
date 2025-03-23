@@ -1,6 +1,7 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
+import com.debatetimer.client.DiscordNotifier;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;
@@ -18,6 +19,7 @@ import com.debatetimer.repository.timebased.TimeBasedTimeBoxRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ExtendWith(DataBaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -64,4 +66,7 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+
+    @MockitoBean
+    protected DiscordNotifier discordNotifier;
 }
