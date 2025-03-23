@@ -36,3 +36,7 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
+
+discord:
+  channel-id: testChannelId
+  token: testToken
