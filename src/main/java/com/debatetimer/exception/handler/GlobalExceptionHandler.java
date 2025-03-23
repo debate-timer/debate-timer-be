@@ -1,5 +1,6 @@
 package com.debatetimer.exception.handler;
 
+import com.debatetimer.client.ChannelNotifier;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
@@ -7,6 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ResponseErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ChannelNotifier channelNotifier;
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindingException(BindException exception) {
@@ -78,12 +83,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DTServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(DTServerErrorException exception) {
         log.error("message: {}", exception.getMessage());
+        channelNotifier.sendErrorMessage(exception);
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         log.error("exception: {}", exception.getMessage());
+        channelNotifier.sendErrorMessage(exception);
         return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
     }
 

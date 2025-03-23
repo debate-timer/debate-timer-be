@@ -9,14 +9,13 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Profile({"dev", "prod"})
 @Component
 @EnableConfigurationProperties(DiscordProperties.class)
-public class DiscordNotifier {
+public class DiscordNotifier implements ChannelNotifier {
+
     private static final String NOTIFICATION_PREFIX = ":rotating_light:  [**Error 발생!**]\n```\n";
     private static final int STACK_TRACE_LENGTH = 10;
 
