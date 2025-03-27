@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomizeTable extends DebateTable {
 
+    private static final String TEAM_NAME_REGEX = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\s]+$";
     public static final int TEAM_NAME_MAX_LENGTH = 8;
 
     @Id
@@ -56,6 +57,9 @@ public class CustomizeTable extends DebateTable {
     private void validateTeamName(String teamName) {
         if (teamName.isBlank() || teamName.length() > TEAM_NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TEAM_NAME_LENGTH);
+        }
+        if (!teamName.matches(TEAM_NAME_REGEX)) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TEAM_NAME_FORM);
         }
     }
 
