@@ -49,7 +49,7 @@ class CustomizeTableTest {
                     .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_LENGTH.getMessage());
         }
 
-        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ"})
+        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ", "漢字", "にほんご", "vielfäl"})
         @ParameterizedTest
         void 찬성_팀_이름은_이모지를_제외한_글자만_가능하다(String prosName) {
             Member member = new Member("default@gmail.com");
@@ -66,7 +66,7 @@ class CustomizeTableTest {
                     .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_FORM.getMessage());
         }
 
-        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ"})
+        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ", "漢字", "にほんご", "vielfäl"})
         @ParameterizedTest
         void 반대_팀_이름은_이모지를_제외한_글자만_가능하다(String consName) {
             Member member = new Member("default@gmail.com");

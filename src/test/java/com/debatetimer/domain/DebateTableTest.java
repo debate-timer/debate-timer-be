@@ -20,7 +20,7 @@ class DebateTableTest {
     @Nested
     class Validate {
 
-        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ"})
+        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ", "漢字", "にほんご", "vielfältig"})
         @ParameterizedTest
         void 테이블_이름은_이모지를_제외한_글자만_가능하다(String name) {
             Member member = new Member("default@gmail.com");
