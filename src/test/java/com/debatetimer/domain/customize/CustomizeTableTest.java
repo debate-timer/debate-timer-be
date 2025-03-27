@@ -57,7 +57,7 @@ class CustomizeTableTest {
                     .doesNotThrowAnyException();
         }
 
-        @ValueSource(strings = {"a😀가다9", "🐥"})
+        @ValueSource(strings = {"a😀가다9", "🐥", "🥦"})
         @ParameterizedTest
         void 찬성_팀_이름에_이모지를_넣을_수_없다(String prosName) {
             Member member = new Member("default@gmail.com");
@@ -74,7 +74,7 @@ class CustomizeTableTest {
                     .doesNotThrowAnyException();
         }
 
-        @ValueSource(strings = {"a😀가다9", "🐥"})
+        @ValueSource(strings = {"a😀가다9", "🐥", "🥦"})
         @ParameterizedTest
         void 반대_팀_이름에_이모지를_넣을_수_없다(String consName) {
             Member member = new Member("default@gmail.com");

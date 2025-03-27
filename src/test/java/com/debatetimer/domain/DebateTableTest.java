@@ -28,7 +28,7 @@ class DebateTableTest {
                     .doesNotThrowAnyException();
         }
 
-        @ValueSource(strings = {"a😀bc가다9", "🐥"})
+        @ValueSource(strings = {"a😀bc가다9", "🐥", "🥦"})
         @ParameterizedTest
         void 테이블_이름에_이모지를_넣을_수_없다(String name) {
             Member member = new Member("default@gmail.com");
