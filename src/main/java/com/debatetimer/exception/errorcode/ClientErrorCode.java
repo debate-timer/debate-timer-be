@@ -1,6 +1,7 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.customize.CustomizeTable;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -9,7 +10,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(ParliamentaryTable.NAME_MAX_LENGTH)
+            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(DebateTable.NAME_MAX_LENGTH)
     ),
     INVALID_TABLE_NAME_FORM(
             HttpStatus.BAD_REQUEST,
@@ -24,6 +25,8 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_TIME_BOX_FORMAT(HttpStatus.BAD_REQUEST, "타임박스 유형과 일치하지 않는 형식입니다"),
     INVALID_TIME_BASED_TIME(HttpStatus.BAD_REQUEST, "팀 발언 시간은 개인 발언 시간보다 길어야합니다"),
     INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE(HttpStatus.BAD_REQUEST, "총 시간은 팀 발언 시간의 2배여야 합니다"),
+    INVALID_TEAM_NAME_LENGTH(HttpStatus.BAD_REQUEST,
+            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTable.TEAM_NAME_MAX_LENGTH)),
 
     FIELD_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     URL_PARAMETER_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),

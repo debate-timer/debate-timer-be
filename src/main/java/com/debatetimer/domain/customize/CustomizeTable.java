@@ -3,6 +3,8 @@ package com.debatetimer.domain.customize;
 import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +18,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomizeTable extends DebateTable {
+
+    public static final int TEAM_NAME_MAX_LENGTH = 8;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +41,8 @@ public class CustomizeTable extends DebateTable {
             String consTeamName
     ) {
         super(member, name, agenda, warningBell, finishBell);
+        validateTeamName(prosTeamName);
+        validateTeamName(consTeamName);
         this.prosTeamName = prosTeamName;
         this.consTeamName = consTeamName;
     }
@@ -45,6 +51,12 @@ public class CustomizeTable extends DebateTable {
         this.prosTeamName = renewTable.getProsTeamName();
         this.consTeamName = renewTable.getConsTeamName();
         updateTable(renewTable);
+    }
+
+    private void validateTeamName(String teamName) {
+        if (teamName.isBlank() || teamName.length() > TEAM_NAME_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TEAM_NAME_LENGTH);
+        }
     }
 
     @Override
