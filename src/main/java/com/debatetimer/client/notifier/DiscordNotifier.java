@@ -8,12 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@EnableConfigurationProperties(DiscordProperties.class)
 public class DiscordNotifier implements ErrorNotifier {
 
     private static final String NOTIFICATION_PREFIX = ":rotating_light:  [**Error 발생!**]\n```\n";
