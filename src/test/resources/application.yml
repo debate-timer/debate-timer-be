@@ -15,6 +15,10 @@ jwt:
   access_token_expiration: 1h
   refresh_token_expiration: 1d
 
+discord:
+  token: testToken
+  channel-id: testChannelId
+
 ---
 
 spring:
@@ -36,7 +40,3 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
-
-discord:
-  channel-id: testChannelId
-  token: testToken

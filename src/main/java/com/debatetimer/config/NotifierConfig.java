@@ -6,12 +6,14 @@ import com.debatetimer.client.notifier.DiscordNotifier;
 import com.debatetimer.client.notifier.DiscordProperties;
 import com.debatetimer.client.notifier.ErrorNotifier;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(DiscordProperties.class)
 public class NotifierConfig {
 
     private final DiscordProperties discordProperties;
