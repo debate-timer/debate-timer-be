@@ -1,6 +1,6 @@
 package com.debatetimer.client;
 
-public interface ChannelNotifier {
+public interface ErrorNotifier {
 
     void sendErrorMessage(Throwable throwable);
 }

@@ -2,7 +2,7 @@ package com.debatetimer;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.debatetimer.client.ChannelNotifier;
+import com.debatetimer.client.ErrorNotifier;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ class DatabaseSchemaManagerTest {
     private Flyway flyway;
 
     @MockitoBean
-    private ChannelNotifier channelNotifier;
+    private ErrorNotifier errorNotifier;
 
     @Test
     void contextLoads() {

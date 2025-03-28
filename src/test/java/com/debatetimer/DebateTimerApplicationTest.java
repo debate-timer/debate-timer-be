@@ -1,6 +1,6 @@
 package com.debatetimer;
 
-import com.debatetimer.client.ChannelNotifier;
+import com.debatetimer.client.ErrorNotifier;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -9,7 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class DebateTimerApplicationTest {
 
     @MockitoBean
-    private ChannelNotifier channelNotifier;
+    private ErrorNotifier errorNotifier;
 
     @Test
     void contextLoads() {

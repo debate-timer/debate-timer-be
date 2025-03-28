@@ -1,6 +1,6 @@
 package com.debatetimer.exception.handler;
 
-import com.debatetimer.client.ChannelNotifier;
+import com.debatetimer.client.ErrorNotifier;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
@@ -26,7 +26,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private final ChannelNotifier channelNotifier;
+    private final ErrorNotifier errorNotifier;
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindingException(BindException exception) {
@@ -83,14 +83,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DTServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(DTServerErrorException exception) {
         log.error("message: {}", exception.getMessage());
-        channelNotifier.sendErrorMessage(exception);
+        errorNotifier.sendErrorMessage(exception);
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         log.error("exception: {}", exception.getMessage());
-        channelNotifier.sendErrorMessage(exception);
+        errorNotifier.sendErrorMessage(exception);
         return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
     }
 

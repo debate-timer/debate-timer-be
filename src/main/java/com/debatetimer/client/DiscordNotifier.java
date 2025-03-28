@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableConfigurationProperties(DiscordProperties.class)
-public class DiscordNotifier implements ChannelNotifier {
+public class DiscordNotifier implements ErrorNotifier {
 
     private static final String NOTIFICATION_PREFIX = ":rotating_light:  [**Error 발생!**]\n```\n";
     private static final int STACK_TRACE_LENGTH = 10;
