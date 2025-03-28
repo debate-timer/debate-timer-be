@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 public class DiscordNotifier implements ErrorNotifier {
 
     private static final String NOTIFICATION_PREFIX = ":rotating_light:  [**Error 발생!**]\n```\n";
+    private static final String DISCORD_LINE_SEPARATOR = "/n";
     private static final int STACK_TRACE_LENGTH = 10;
 
     private final DiscordProperties properties;
@@ -38,7 +39,7 @@ public class DiscordNotifier implements ErrorNotifier {
 
         String errorNotification = NOTIFICATION_PREFIX
                 + errorMessage
-                + System.lineSeparator()
+                + DISCORD_LINE_SEPARATOR
                 + stackTrace;
         channel.sendMessage(errorNotification).queue();
     }
