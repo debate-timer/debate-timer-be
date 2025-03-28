@@ -1,4 +1,4 @@
-package com.debatetimer.client;
+package com.debatetimer.client.oauth;
 
 import com.debatetimer.aop.logging.LoggingClient;
 import com.debatetimer.dto.member.MemberCreateRequest;

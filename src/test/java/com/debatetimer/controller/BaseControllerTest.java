@@ -1,7 +1,7 @@
 package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
-import com.debatetimer.client.OAuthClient;
+import com.debatetimer.client.oauth.OAuthClient;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
