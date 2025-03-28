@@ -7,5 +7,6 @@ public class ConsoleNotifier implements ErrorNotifier {
     @Override
     public void sendErrorMessage(Throwable throwable) {
         System.out.println(ERROR_SEND_MESSAGE);
+        System.out.println(throwable.getMessage());
     }
 }
