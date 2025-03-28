@@ -1,7 +1,6 @@
 package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
-import com.debatetimer.client.notifier.ErrorNotifier;
 import com.debatetimer.client.oauth.OAuthClient;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
@@ -69,9 +68,6 @@ public abstract class BaseControllerTest {
 
     @MockitoBean
     protected OAuthClient oAuthClient;
-
-    @MockitoBean
-    protected ErrorNotifier errorNotifier;
 
     @LocalServerPort
     private int port;
