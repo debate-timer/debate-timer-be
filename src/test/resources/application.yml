@@ -15,10 +15,6 @@ jwt:
   access_token_expiration: 1h
   refresh_token_expiration: 1d
 
-discord:
-  token: testToken
-  channel-id: testChannelId
-
 ---
 
 spring:

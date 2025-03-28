@@ -11,22 +11,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Configuration
-@RequiredArgsConstructor
-@EnableConfigurationProperties(DiscordProperties.class)
 public class NotifierConfig {
 
-    private final DiscordProperties discordProperties;
-
     @Profile({"dev", "prod"})
-    @Bean
-    public ErrorNotifier discordNotifier() {
-        return new DiscordNotifier(discordProperties);
+    @Configuration
+    @RequiredArgsConstructor
+    @EnableConfigurationProperties(DiscordProperties.class)
+    public static class DiscordNotifierConfig {
+
+        private final DiscordProperties discordProperties;
+
+        @Bean
+        public ErrorNotifier discordNotifier() {
+            return new DiscordNotifier(discordProperties);
+        }
     }
 
     @Profile({"test", "local"})
-    @Bean
-    public ErrorNotifier consoleNotifier() {
-        return new ConsoleNotifier();
+    @Configuration
+    public static class ConsoleNotifierConfig {
+
+        @Bean
+        public ErrorNotifier consoleNotifier() {
+            return new ConsoleNotifier();
+        }
     }
 }
