@@ -1,7 +1,7 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
-import com.debatetimer.client.DiscordNotifier;
+import com.debatetimer.client.notifier.DiscordNotifier;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;

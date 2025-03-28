@@ -1,11 +1,13 @@
-package com.debatetimer.client;
+package com.debatetimer.client.notifier;
 
 import com.debatetimer.exception.custom.DTInitializationException;
 import com.debatetimer.exception.errorcode.InitializationErrorCode;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 
 @Getter
+@Profile({"dev", "prod"})
 @ConfigurationProperties(prefix = "discord")
 public class DiscordProperties {
 

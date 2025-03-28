@@ -1,6 +1,6 @@
 package com.debatetimer.exception.handler;
 
-import com.debatetimer.client.ErrorNotifier;
+import com.debatetimer.client.notifier.ErrorNotifier;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;

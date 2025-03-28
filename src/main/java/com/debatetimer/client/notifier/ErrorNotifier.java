@@ -1,4 +1,4 @@
-package com.debatetimer.client;
+package com.debatetimer.client.notifier;
 
 public interface ErrorNotifier {
 

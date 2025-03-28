@@ -1,4 +1,4 @@
-package com.debatetimer.client;
+package com.debatetimer.client.notifier;
 
 import com.debatetimer.exception.custom.DTInitializationException;
 import com.debatetimer.exception.errorcode.InitializationErrorCode;
@@ -9,9 +9,11 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Slf4j
+@Profile({"dev", "prod"})
 @Component
 @EnableConfigurationProperties(DiscordProperties.class)
 public class DiscordNotifier implements ErrorNotifier {

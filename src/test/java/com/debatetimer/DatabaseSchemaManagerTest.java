@@ -2,7 +2,7 @@ package com.debatetimer;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.debatetimer.client.ErrorNotifier;
+import com.debatetimer.client.notifier.ErrorNotifier;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
