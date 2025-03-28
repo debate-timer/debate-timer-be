@@ -33,5 +33,9 @@ jwt:
   access_token_expiration: ${secret.jwt.access_token_expiration}
   refresh_token_expiration: ${secret.jwt.refresh_token_expiration}
 
+discord:
+  token: ${secret.discord.token}
+  channelId: ${secret.discord.channelId}
+
 #logging:
 #  config: classpath:logging/log4j2-dev.yml
