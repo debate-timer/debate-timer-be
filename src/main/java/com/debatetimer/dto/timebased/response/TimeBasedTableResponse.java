@@ -9,7 +9,7 @@ public record TimeBasedTableResponse(long id, TimeBasedTableInfoResponse info, L
 
     public TimeBasedTableResponse(
             TimeBasedTable timeBasedTable,
-            TimeBoxes timeBasedTimeBoxes
+            TimeBoxes<TimeBasedTimeBox> timeBasedTimeBoxes
     ) {
         this(
                 timeBasedTable.getId(),
@@ -18,8 +18,8 @@ public record TimeBasedTableResponse(long id, TimeBasedTableInfoResponse info, L
         );
     }
 
-    private static List<TimeBasedTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
-        List<TimeBasedTimeBox> timeBasedTimeBoxes = (List<TimeBasedTimeBox>) timeBoxes.getTimeBoxes();
+    private static List<TimeBasedTimeBoxResponse> toTimeBoxResponses(TimeBoxes<TimeBasedTimeBox> timeBoxes) {
+        List<TimeBasedTimeBox> timeBasedTimeBoxes = timeBoxes.getTimeBoxes();
         return timeBasedTimeBoxes
                 .stream()
                 .map(TimeBasedTimeBoxResponse::new)

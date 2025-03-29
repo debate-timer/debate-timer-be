@@ -33,7 +33,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
                                     120, 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, 60, null, null)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -61,7 +61,7 @@ class CustomizeControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
             customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             CustomizeTableResponse response = given()
@@ -93,7 +93,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
                                     120, 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, 60, null, null)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -123,7 +123,7 @@ class CustomizeControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
             customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             CustomizeTableResponse response = given()
@@ -150,7 +150,7 @@ class CustomizeControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
             customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()

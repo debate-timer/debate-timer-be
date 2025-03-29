@@ -32,7 +32,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
                                     1),
                             new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
-                                    1)));
+                                    null)));
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             TimeBasedTableResponse response = given()
@@ -58,7 +58,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             TimeBasedTable bitoTable = timeBasedTableGenerator.generate(bito);
             timeBasedTimeBoxGenerator.generate(bitoTable, 1);
-            timeBasedTimeBoxGenerator.generate(bitoTable, 2);
+            timeBasedTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             TimeBasedTableResponse response = given()
@@ -89,7 +89,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
                                     1),
                             new TimeBasedTimeBoxCreateRequest(Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED, 360, 180,
                                     60,
-                                    1)));
+                                    null)));
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             TimeBasedTableResponse response = given()
@@ -117,7 +117,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             TimeBasedTable bitoTable = timeBasedTableGenerator.generate(bito);
             timeBasedTimeBoxGenerator.generate(bitoTable, 1);
-            timeBasedTimeBoxGenerator.generate(bitoTable, 2);
+            timeBasedTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             TimeBasedTableResponse response = given()
@@ -144,7 +144,7 @@ class TimeBasedControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             TimeBasedTable bitoTable = timeBasedTableGenerator.generate(bito);
             timeBasedTimeBoxGenerator.generate(bitoTable, 1);
-            timeBasedTimeBoxGenerator.generate(bitoTable, 2);
+            timeBasedTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()

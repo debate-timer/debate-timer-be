@@ -30,7 +30,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                     new ParliamentaryTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
                             new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
+                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, null)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -58,7 +58,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
             parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
-            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
+            parliamentaryTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
@@ -87,7 +87,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
                     new ParliamentaryTableInfoCreateRequest("비토 테이블", "주제", true, true),
                     List.of(
                             new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
-                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)
+                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, null)
                     )
             );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
@@ -117,7 +117,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
             parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
-            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
+            parliamentaryTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             ParliamentaryTableResponse response = given()
@@ -144,7 +144,7 @@ class ParliamentaryControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("default@gmail.com");
             ParliamentaryTable bitoTable = parliamentaryTableGenerator.generate(bito);
             parliamentaryTimeBoxGenerator.generate(bitoTable, 1);
-            parliamentaryTimeBoxGenerator.generate(bitoTable, 2);
+            parliamentaryTimeBoxGenerator.generateNotExistSpeaker(bitoTable, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()

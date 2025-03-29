@@ -10,7 +10,7 @@ public record ParliamentaryTableResponse(long id, ParliamentaryTableInfoResponse
 
     public ParliamentaryTableResponse(
             ParliamentaryTable parliamentaryTable,
-            TimeBoxes parliamentaryTimeBoxes
+            TimeBoxes<ParliamentaryTimeBox> parliamentaryTimeBoxes
     ) {
         this(
                 parliamentaryTable.getId(),
@@ -19,8 +19,8 @@ public record ParliamentaryTableResponse(long id, ParliamentaryTableInfoResponse
         );
     }
 
-    private static List<ParliamentaryTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
-        List<ParliamentaryTimeBox> parliamentaryTimeBoxes = (List<ParliamentaryTimeBox>) timeBoxes.getTimeBoxes();
+    private static List<ParliamentaryTimeBoxResponse> toTimeBoxResponses(TimeBoxes<ParliamentaryTimeBox> timeBoxes) {
+        List<ParliamentaryTimeBox> parliamentaryTimeBoxes = timeBoxes.getTimeBoxes();
         return parliamentaryTimeBoxes
                 .stream()
                 .map(ParliamentaryTimeBoxResponse::new)

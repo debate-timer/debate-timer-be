@@ -22,7 +22,7 @@ public record CustomizeTimeBoxResponse(
                 customizeTimeBox.getTime(),
                 customizeTimeBox.getTimePerTeam(),
                 customizeTimeBox.getTimePerSpeaking(),
-                String.valueOf(customizeTimeBox.getSpeaker())
+                customizeTimeBox.getSpeaker()
         );
     }
 }

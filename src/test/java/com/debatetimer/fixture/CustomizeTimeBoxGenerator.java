@@ -28,4 +28,17 @@ public class CustomizeTimeBoxGenerator {
         );
         return customizeTimeBoxRepository.save(timeBox);
     }
+
+    public CustomizeTimeBox generateNotExistSpeaker(CustomizeTable testTable, CustomizeBoxType boxType, int sequence) {
+        CustomizeTimeBox timeBox = new CustomizeTimeBox(
+                testTable,
+                sequence,
+                Stance.PROS,
+                "입론",
+                boxType,
+                180,
+                null
+        );
+        return customizeTimeBoxRepository.save(timeBox);
+    }
 }
