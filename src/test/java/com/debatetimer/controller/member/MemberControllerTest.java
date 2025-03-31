@@ -71,6 +71,13 @@ class MemberControllerTest extends BaseControllerTest {
                     .when().post("/api/member/reissue")
                     .then().statusCode(200);
         }
+
+        @Test
+        void 토큰이_없을_경우_400_에러를_반환한다() {
+            given()
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(400);
+        }
     }
 
     @Nested
@@ -87,6 +94,17 @@ class MemberControllerTest extends BaseControllerTest {
                     .headers(headers)
                     .when().post("/api/member/logout")
                     .then().statusCode(204);
+        }
+
+        @Test
+        void 토큰이_없을_경우_400_에러를_반환한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+
+            given()
+                    .headers(headers)
+                    .when().post("/api/member/logout")
+                    .then().statusCode(400);
         }
     }
 }
