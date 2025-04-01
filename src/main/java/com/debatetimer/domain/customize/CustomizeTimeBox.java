@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomizeTimeBox extends DebateTimeBox {
 
+    public static final int SPEECH_TYPE_MAX_LENGTH = 10;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,6 +56,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
     ) {
         super(sequence, stance, time, speaker);
         validateNotTimeBasedType(boxType);
+        validateSpeechType(speechType);
 
         this.customizeTable = customizeTable;
         this.speechType = speechType;
@@ -75,6 +78,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
         validateTime(timePerTeam, timePerSpeaking);
         validateTimeBasedTime(time, timePerTeam);
         validateTimeBasedType(boxType);
+        validateSpeechType(speechType);
 
         this.customizeTable = customizeTable;
         this.speechType = speechType;
@@ -112,6 +116,12 @@ public class CustomizeTimeBox extends DebateTimeBox {
     private void validateNotTimeBasedType(CustomizeBoxType boxType) {
         if (boxType.isTimeBased()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+    }
+
+    private void validateSpeechType(String speechType) {
+        if (speechType.isBlank() || speechType.length() > SPEECH_TYPE_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH);
         }
     }
 }
