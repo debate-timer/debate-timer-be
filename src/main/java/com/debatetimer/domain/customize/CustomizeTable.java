@@ -55,7 +55,7 @@ public class CustomizeTable extends DebateTable {
     }
 
     private void validateTeamName(String teamName) {
-        if (teamName.isBlank() || teamName.length() > TEAM_NAME_MAX_LENGTH) {
+        if (teamName == null || teamName.isBlank() || teamName.length() > TEAM_NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TEAM_NAME_LENGTH);
         }
         if (!teamName.matches(TEAM_NAME_REGEX)) {
