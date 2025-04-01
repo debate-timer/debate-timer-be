@@ -38,7 +38,7 @@ public abstract class DebateTimeBox {
     }
 
     private void validateSpeaker(String speaker) {
-        if (speaker != null && speaker.length() > SPEAKER_MAX_LENGTH) {
+        if (speaker != null && (speaker.isBlank() || speaker.length() > SPEAKER_MAX_LENGTH)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
         }
     }
