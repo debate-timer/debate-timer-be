@@ -8,20 +8,24 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CustomizeTimeBoxTest {
 
     @Nested
-    class ValidateCustomize {
+    class ValidateCustomizeTime {
 
         @Test
         void 자유토론_타입은_총_시간이_팀_발언_시간의_2배여야_한다() {
             CustomizeTable table = new CustomizeTable();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
-            assertThatThrownBy(
-                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, 150, 120, 60,
-                            "발언자")).isInstanceOf(DTClientErrorException.class)
+            int totalTime = 150;
+            int timePerTeam = 120;
+
+            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, totalTime,
+                    timePerTeam, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE.getMessage());
         }
 
@@ -30,8 +34,9 @@ class CustomizeTimeBoxTest {
             CustomizeTable table = new CustomizeTable();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
-            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, 240, 120, 60,
-                    "발언자")).doesNotThrowAnyException();
+            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론",
+                    customizeBoxType, 240, 120, 60, "발언자")
+            ).doesNotThrowAnyException();
         }
 
         @Test
@@ -74,6 +79,18 @@ class CustomizeTimeBoxTest {
             assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
                     timePerTeam * 2, timePerTeam, timePerSpeaking, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1})
+        void 발언유형은_일정_범위_이내여야_한다(int length) {
+            CustomizeTable table = new CustomizeTable();
+            String longSpeechType = "s".repeat(length);
+
+            assertThatThrownBy(
+                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, longSpeechType, CustomizeBoxType.TIME_BASED,
+                            240, 120, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH.getMessage());
         }
     }
 }
