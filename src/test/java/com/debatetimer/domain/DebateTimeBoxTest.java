@@ -45,7 +45,7 @@ class DebateTimeBoxTest {
     class ValidateSpeaker {
 
         @Test
-        void 발언자는_일정길이_이내로_허용된다() {
+        void 발언자_이름은_일정길이_이내로_허용된다() {
             String speaker = "k".repeat(DebateTimeBox.SPEAKER_MAX_LENGTH + 1);
 
             assertThatThrownBy(() -> new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker))
