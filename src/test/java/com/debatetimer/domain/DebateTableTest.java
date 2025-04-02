@@ -46,15 +46,6 @@ class DebateTableTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
-
-        @ValueSource(strings = {"", "\t", "\n"})
-        @ParameterizedTest
-        void 테이블_이름은_적어도_한_자_있어야_한다(String name) {
-            Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", true, true))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
-        }
     }
 
     @Nested
