@@ -37,11 +37,12 @@ class DebateTableTest {
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_FORM.getMessage());
         }
 
-        @ValueSource(ints = {0, DebateTable.NAME_MAX_LENGTH + 1})
-        @ParameterizedTest
-        void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
+        @Test
+        void 테이블_이름은_정해진_길이_이내여야_한다() {
             Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, "f".repeat(length), "agenda", true, true))
+            String longTableName = "f".repeat(DebateTable.NAME_MAX_LENGTH + 1);
+
+            assertThatThrownBy(() -> new DebateTableTestObject(member, longTableName, "agenda", true, true))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }

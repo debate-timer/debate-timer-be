@@ -8,6 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DebateTimeBoxTest {
@@ -42,20 +43,18 @@ class DebateTimeBoxTest {
     @Nested
     class ValidateSpeaker {
 
-        @ParameterizedTest
-        @ValueSource(ints = {0, DebateTimeBox.SPEAKER_MAX_LENGTH + 1})
-        void 발언자는_일정길이_이내로_허용된다(int length) {
-            String speaker = "k".repeat(length);
+        @Test
+        void 발언자는_일정길이_이내로_허용된다() {
+            String speaker = "k".repeat(DebateTimeBox.SPEAKER_MAX_LENGTH + 1);
 
             assertThatThrownBy(() -> new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH.getMessage());
         }
 
-        @Test
-        void 발언자는_빈_값이_허용된다() {
-            String speaker = null;
-
+        @NullAndEmptySource
+        @ParameterizedTest
+        void 발언자는_빈_값과_공백이_허용된다(String speaker) {
             assertThatCode(() -> new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker))
                     .doesNotThrowAnyException();
         }

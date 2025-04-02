@@ -68,7 +68,7 @@ public abstract class DebateTable extends BaseTimeEntity {
     }
 
     private void validate(String name) {
-        if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
+        if (name.length() > NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
         }
         if (!name.matches(NAME_REGEX)) {
