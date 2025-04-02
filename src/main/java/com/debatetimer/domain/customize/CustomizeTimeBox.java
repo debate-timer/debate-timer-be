@@ -120,7 +120,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
     }
 
     private void validateSpeechType(String speechType) {
-        if (speechType.isBlank() || speechType.length() > SPEECH_TYPE_MAX_LENGTH) {
+        if (speechType.length() > SPEECH_TYPE_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH);
         }
     }
