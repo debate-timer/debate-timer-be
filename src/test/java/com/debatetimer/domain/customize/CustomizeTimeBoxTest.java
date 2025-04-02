@@ -83,7 +83,7 @@ class CustomizeTimeBoxTest {
 
         @ParameterizedTest
         @ValueSource(ints = {0, CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1})
-        void 발언유형은_일정_범위_이내여야_한다(int length) {
+        void 발언_유형의_길이는_일정_범위_이내여야_한다(int length) {
             CustomizeTable table = new CustomizeTable();
             String longSpeechType = "s".repeat(length);
 
