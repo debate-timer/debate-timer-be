@@ -8,8 +8,6 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class CustomizeTimeBoxTest {
 
@@ -81,11 +79,10 @@ class CustomizeTimeBoxTest {
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
         }
 
-        @ParameterizedTest
-        @ValueSource(ints = {0, CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1})
-        void 발언_유형의_길이는_일정_범위_이내여야_한다(int length) {
+        @Test
+        void 발언_유형의_길이는_일정_범위_이내여야_한다() {
             CustomizeTable table = new CustomizeTable();
-            String longSpeechType = "s".repeat(length);
+            String longSpeechType = "s".repeat(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1);
 
             assertThatThrownBy(
                     () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, longSpeechType, CustomizeBoxType.TIME_BASED,

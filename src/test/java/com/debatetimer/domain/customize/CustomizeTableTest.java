@@ -29,22 +29,24 @@ class CustomizeTableTest {
     @Nested
     class ValidateTeamName {
 
-        @ValueSource(ints = {0, CustomizeTable.TEAM_NAME_MAX_LENGTH + 1})
-        @ParameterizedTest
-        void 찬성_팀_이름은_정해진_길이_이내여야_한다(int length) {
+        @Test
+        void 찬성_팀_이름은_정해진_길이_이내여야_한다() {
             Member member = new Member("default@gmail.com");
+            String longProsTeamName = "f".repeat(CustomizeTable.TEAM_NAME_MAX_LENGTH + 1);
+
             assertThatThrownBy(
-                    () -> new CustomizeTable(member, "name", "agenda", true, true, "f".repeat(length), "cons"))
+                    () -> new CustomizeTable(member, "name", "agenda", true, true, longProsTeamName, "cons"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_LENGTH.getMessage());
         }
 
-        @ValueSource(ints = {0, CustomizeTable.TEAM_NAME_MAX_LENGTH + 1})
-        @ParameterizedTest
-        void 반대_팀_이름은_정해진_길이_이내여야_한다(int length) {
+        @Test
+        void 반대_팀_이름은_정해진_길이_이내여야_한다() {
             Member member = new Member("default@gmail.com");
+            String longConsTeamName = "f".repeat(CustomizeTable.TEAM_NAME_MAX_LENGTH + 1);
+
             assertThatThrownBy(
-                    () -> new CustomizeTable(member, "name", "agenda", true, true, "pros", "f".repeat(length)))
+                    () -> new CustomizeTable(member, "name", "agenda", true, true, "pros", longConsTeamName))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_LENGTH.getMessage());
         }

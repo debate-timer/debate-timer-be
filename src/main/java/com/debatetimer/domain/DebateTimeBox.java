@@ -34,11 +34,18 @@ public abstract class DebateTimeBox {
         this.sequence = sequence;
         this.stance = stance;
         this.time = time;
-        this.speaker = speaker;
+        this.speaker = initializeSpeaker(speaker);
+    }
+
+    private String initializeSpeaker(String speaker) {
+        if (speaker == null || speaker.isBlank()) {
+            return null;
+        }
+        return speaker;
     }
 
     private void validateSpeaker(String speaker) {
-        if (speaker != null && (speaker.isBlank() || speaker.length() > SPEAKER_MAX_LENGTH)) {
+        if (speaker != null && speaker.length() > SPEAKER_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
         }
     }

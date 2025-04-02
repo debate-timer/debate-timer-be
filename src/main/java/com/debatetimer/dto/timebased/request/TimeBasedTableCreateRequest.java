@@ -4,12 +4,15 @@ import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public record TimeBasedTableCreateRequest(TimeBasedTableInfoCreateRequest info,
-                                          List<TimeBasedTimeBoxCreateRequest> table) {
+public record TimeBasedTableCreateRequest(
+        @Valid TimeBasedTableInfoCreateRequest info,
+        @Valid List<TimeBasedTimeBoxCreateRequest> table
+) {
 
     public TimeBasedTable toTable(Member member) {
         return info.toTable(member);

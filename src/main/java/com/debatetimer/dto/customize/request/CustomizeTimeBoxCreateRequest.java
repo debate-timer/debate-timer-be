@@ -5,15 +5,16 @@ import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CustomizeTimeBoxCreateRequest(
-        @NotBlank
+        @NotNull
         Stance stance,
 
         @NotBlank
         String speechType,
 
-        @NotBlank
+        @NotNull
         CustomizeBoxType boxType,
 
         int time,
