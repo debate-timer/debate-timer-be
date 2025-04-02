@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DebateTimeBox {
 
+    public static final int SPEAKER_MAX_LENGTH = 5;
+
     private int sequence;
 
     @NotNull
@@ -25,6 +27,7 @@ public abstract class DebateTimeBox {
     private String speaker;
 
     protected DebateTimeBox(int sequence, Stance stance, int time, String speaker) {
+        validateSpeaker(speaker);
         validateSequence(sequence);
         validateTime(time);
 
@@ -32,6 +35,12 @@ public abstract class DebateTimeBox {
         this.stance = stance;
         this.time = time;
         this.speaker = speaker;
+    }
+
+    private void validateSpeaker(String speaker) {
+        if (speaker != null && (speaker.isBlank() || speaker.length() > SPEAKER_MAX_LENGTH)) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
+        }
     }
 
     private void validateSequence(int sequence) {

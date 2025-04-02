@@ -1,7 +1,9 @@
 package com.debatetimer.exception.errorcode;
 
 import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.DebateTimeBox;
 import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTimeBox;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -25,6 +27,14 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_TIME_BOX_FORMAT(HttpStatus.BAD_REQUEST, "타임박스 유형과 일치하지 않는 형식입니다"),
     INVALID_TIME_BASED_TIME(HttpStatus.BAD_REQUEST, "팀 발언 시간은 개인 발언 시간보다 길어야합니다"),
     INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE(HttpStatus.BAD_REQUEST, "총 시간은 팀 발언 시간의 2배여야 합니다"),
+    INVALID_TIME_BOX_SPEECH_TYPE_LENGTH(
+            HttpStatus.BAD_REQUEST,
+            "발언 유형 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH)
+    ),
+    INVALID_TIME_BOX_SPEAKER_LENGTH(
+            HttpStatus.BAD_REQUEST,
+            "발언자 이름은 1자 이상 %d자 이하여야 합니다.".formatted(DebateTimeBox.SPEAKER_MAX_LENGTH)
+    ),
     INVALID_TEAM_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
             "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTable.TEAM_NAME_MAX_LENGTH)
@@ -49,8 +59,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     METHOD_NOT_SUPPORTED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."),
     MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 미디어 타입입니다."),
     ALREADY_DISCONNECTED(HttpStatus.BAD_REQUEST, "이미 클라이언트에서 요청이 종료되었습니다."),
-    NO_COOKIE_FOUND(HttpStatus.BAD_REQUEST, "필수 쿠키 값이 존재하지 않습니다.")
-    ;
+    NO_COOKIE_FOUND(HttpStatus.BAD_REQUEST, "필수 쿠키 값이 존재하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;
