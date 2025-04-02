@@ -4,13 +4,14 @@ import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public record CustomizeTableCreateRequest(
-        CustomizeTableInfoCreateRequest info,
-        List<CustomizeTimeBoxCreateRequest> table
+        @Valid CustomizeTableInfoCreateRequest info,
+        @Valid List<CustomizeTimeBoxCreateRequest> table
 ) {
 
     public CustomizeTable toTable(Member member) {
