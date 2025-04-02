@@ -1,17 +1,17 @@
 package com.debatetimer.dto.parliamentary.request;
 
-import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.Stance;
+import com.debatetimer.domain.parliamentary.ParliamentaryBoxType;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.domain.parliamentary.ParliamentaryTimeBox;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record ParliamentaryTimeBoxCreateRequest(
-        @NotBlank
+        @NotNull
         Stance stance,
 
-        @NotBlank
+        @NotNull
         ParliamentaryBoxType type,
 
         @Positive

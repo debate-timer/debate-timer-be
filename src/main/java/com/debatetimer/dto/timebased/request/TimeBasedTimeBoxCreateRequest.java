@@ -4,13 +4,13 @@ import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.timebased.TimeBasedBoxType;
 import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.domain.timebased.TimeBasedTimeBox;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record TimeBasedTimeBoxCreateRequest(
-        @NotBlank
+        @NotNull
         Stance stance,
 
-        @NotBlank
+        @NotNull
         TimeBasedBoxType type,
 
         int time,
