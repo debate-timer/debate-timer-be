@@ -1,5 +1,6 @@
 package com.debatetimer.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -8,7 +9,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DebateTimeBoxTest {
@@ -52,11 +53,19 @@ class DebateTimeBoxTest {
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH.getMessage());
         }
 
-        @NullAndEmptySource
+        @NullSource
         @ParameterizedTest
-        void 발언자는_빈_값과_공백이_허용된다(String speaker) {
+        void 발언자는_빈_값이_허용된다(String speaker) {
             assertThatCode(() -> new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker))
                     .doesNotThrowAnyException();
+        }
+
+        @ValueSource(strings = {"   ", " "})
+        @ParameterizedTest
+        void 발언자는_공백이_입력되면_null로_저장된다(String speaker) {
+            DebateTimeBoxTestObject timeBox = new DebateTimeBoxTestObject(1, Stance.CONS, 60, speaker);
+
+            assertThat(timeBox.getSpeaker()).isNull();
         }
     }
 
