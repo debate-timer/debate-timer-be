@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import com.debatetimer.controller.BaseControllerTest;
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.parliamentary.ParliamentaryTable;
+import com.debatetimer.domain.timebased.TimeBasedTable;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
@@ -24,7 +26,9 @@ class MemberControllerTest extends BaseControllerTest {
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
             parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 A", "주제", false, false));
-            parliamentaryTableRepository.save(new ParliamentaryTable(member, "토론 시간표 B", "주제", false, false));
+            timeBasedTableRepository.save(new TimeBasedTable(member, "토론 시간표 B", "주제", false, false));
+            customizeTableRepository.save(new CustomizeTable(member, "커스텀 테이블", "주제", false, false,
+                    "찬성", "반대"));
 
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
@@ -35,7 +39,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .then().statusCode(200)
                     .extract().as(TableResponses.class);
 
-            assertThat(response.tables()).hasSize(2);
+            assertThat(response.tables()).hasSize(3);
         }
     }
 
