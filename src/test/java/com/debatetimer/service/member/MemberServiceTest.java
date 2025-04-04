@@ -54,12 +54,11 @@ class MemberServiceTest extends BaseServiceTest {
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
             parliamentaryTableGenerator.generate(member);
-            timeBasedTableGenerator.generate(member);
             customizeTableGenerator.generate(member);
 
             TableResponses response = memberService.getTables(member.getId());
 
-            assertThat(response.tables()).hasSize(3);
+            assertThat(response.tables()).hasSize(2);
         }
 
         @Test
