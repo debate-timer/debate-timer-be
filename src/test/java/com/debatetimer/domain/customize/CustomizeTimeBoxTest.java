@@ -47,6 +47,16 @@ class CustomizeTimeBoxTest {
         }
 
         @Test
+        void 팀_발언_시간은_있으며_개인_발언_시간은_없을_수_있다() {
+            CustomizeTable table = new CustomizeTable();
+            Integer timePerTeam = 60;
+            Integer timePerSpeaking = null;
+
+            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
+                    timePerTeam, timePerSpeaking, "발언자")).doesNotThrowAnyException();
+        }
+
+        @Test
         void 개인_발언_시간은_팀_발언_시간보다_적거나_같아야_한다() {
             CustomizeTable table = new CustomizeTable();
             int timePerTeam = 60;

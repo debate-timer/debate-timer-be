@@ -101,6 +101,10 @@ public class CustomizeTimeBox extends DebateTimeBox {
 
     private void validateTimeBasedTimes(Integer timePerTeam, Integer timePerSpeaking) {
         validateTime(timePerTeam);
+        if (timePerSpeaking == null) {
+            return;
+        }
+
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
