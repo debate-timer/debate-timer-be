@@ -10,14 +10,7 @@ public record ParliamentaryTimeBoxResponse(Stance stance, ParliamentaryBoxType t
         this(parliamentaryTimeBox.getStance(),
                 parliamentaryTimeBox.getType(),
                 parliamentaryTimeBox.getTime(),
-                getSpeakerNumber(parliamentaryTimeBox)
+                parliamentaryTimeBox.getSpeakerNumber()
         );
-    }
-
-    private static Integer getSpeakerNumber(ParliamentaryTimeBox parliamentaryTimeBox) {
-        if (parliamentaryTimeBox.getSpeaker() == null || parliamentaryTimeBox.getSpeaker().equals("null")) {
-            return null;
-        }
-        return Integer.parseInt(parliamentaryTimeBox.getSpeaker());
     }
 }
