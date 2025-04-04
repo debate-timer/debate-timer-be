@@ -118,7 +118,7 @@ class TimeBasedTimeBoxTest {
             int timePerTeam = 300;
             int timePerSpeaking = 120;
             TimeBasedTable table = new TimeBasedTable();
-            TimeBasedTimeBox timeBasedTimeBox = new TimeBasedTimeBox(table, 1, Stance.CONS, TimeBasedBoxType.OPENING,
+            TimeBasedTimeBox timeBasedTimeBox = new TimeBasedTimeBox(table, 1, Stance.NEUTRAL, TimeBasedBoxType.TIME_BASED,
                     timePerTeam, timePerSpeaking, 1);
 
             assertThat(timeBasedTimeBox.getTime()).isEqualTo(timePerTeam * TimeBasedTimeBox.TIME_MULTIPLIER);

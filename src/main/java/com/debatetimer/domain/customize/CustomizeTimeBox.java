@@ -52,7 +52,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Stance stance,
             String speechType,
             CustomizeBoxType boxType,
-            int time,
+            Integer time,
             String speaker
     ) {
         super(sequence, stance, time, speaker);
@@ -70,12 +70,12 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Stance stance,
             String speechType,
             CustomizeBoxType boxType,
-            int timePerTeam,
+            Integer timePerTeam,
             Integer timePerSpeaking,
             String speaker
     ) {
-        super(sequence, stance, timePerTeam * TIME_MULTIPLIER, speaker);
-        validateTime(timePerTeam, timePerSpeaking);
+        super(sequence, stance, convertToTime(timePerTeam), speaker);
+        validateTimeBasedTimes(timePerTeam, timePerSpeaking);
         validateTimeBasedType(boxType);
         validateSpeechType(speechType);
 
@@ -86,13 +86,20 @@ public class CustomizeTimeBox extends DebateTimeBox {
         this.timePerSpeaking = timePerSpeaking;
     }
 
-    private void validateTime(int time) {
-        if (time <= 0) {
+    private static int convertToTime(Integer timePerTeam) {
+        if (timePerTeam == null) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+        return timePerTeam * TIME_MULTIPLIER;
+    }
+
+    private void validateTime(Integer time) {
+        if (time == null || time <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
         }
     }
 
-    private void validateTime(int timePerTeam, int timePerSpeaking) {
+    private void validateTimeBasedTimes(Integer timePerTeam, Integer timePerSpeaking) {
         validateTime(timePerTeam);
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
