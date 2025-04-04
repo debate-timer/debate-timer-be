@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class CustomizeTimeBox extends DebateTimeBox {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
+    public static final int TIME_MULTIPLIER = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +52,7 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Stance stance,
             String speechType,
             CustomizeBoxType boxType,
-            int time,
+            Integer time,
             String speaker
     ) {
         super(sequence, stance, time, speaker);
@@ -69,14 +70,12 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Stance stance,
             String speechType,
             CustomizeBoxType boxType,
-            int time,
-            int timePerTeam,
+            Integer timePerTeam,
             Integer timePerSpeaking,
             String speaker
     ) {
-        super(sequence, stance, time, speaker);
-        validateTime(timePerTeam, timePerSpeaking);
-        validateTimeBasedTime(time, timePerTeam);
+        super(sequence, stance, convertToTime(timePerTeam), speaker);
+        validateTimeBasedTimes(timePerTeam, timePerSpeaking);
         validateTimeBasedType(boxType);
         validateSpeechType(speechType);
 
@@ -87,23 +86,28 @@ public class CustomizeTimeBox extends DebateTimeBox {
         this.timePerSpeaking = timePerSpeaking;
     }
 
-    private void validateTime(int time) {
-        if (time <= 0) {
+    private static int convertToTime(Integer timePerTeam) {
+        if (timePerTeam == null) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+        return timePerTeam * TIME_MULTIPLIER;
+    }
+
+    private void validateTime(Integer time) {
+        if (time == null || time <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
         }
     }
 
-    private void validateTime(int timePerTeam, int timePerSpeaking) {
+    private void validateTimeBasedTimes(Integer timePerTeam, Integer timePerSpeaking) {
         validateTime(timePerTeam);
+        if (timePerSpeaking == null) {
+            return;
+        }
+
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
-        }
-    }
-
-    private void validateTimeBasedTime(int time, int timePerTeam) {
-        if (time != timePerTeam * 2) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE);
         }
     }
 
