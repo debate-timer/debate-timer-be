@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class CustomizeTimeBox extends DebateTimeBox {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
+    public static final int TIME_MULTIPLIER = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,14 +70,12 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Stance stance,
             String speechType,
             CustomizeBoxType boxType,
-            int time,
             int timePerTeam,
             Integer timePerSpeaking,
             String speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, timePerTeam * TIME_MULTIPLIER, speaker);
         validateTime(timePerTeam, timePerSpeaking);
-        validateTimeBasedTime(time, timePerTeam);
         validateTimeBasedType(boxType);
         validateSpeechType(speechType);
 
@@ -98,12 +97,6 @@ public class CustomizeTimeBox extends DebateTimeBox {
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
-        }
-    }
-
-    private void validateTimeBasedTime(int time, int timePerTeam) {
-        if (time != timePerTeam * 2) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE);
         }
     }
 

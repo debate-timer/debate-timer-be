@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TimeBasedTimeBox extends DebateTimeBox {
 
+    public static final int TIME_MULTIPLIER = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -60,14 +62,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int sequence,
             Stance stance,
             TimeBasedBoxType type,
-            int time,
             int timePerTeam,
             int timePerSpeaking,
             Integer speaker
     ) {
-        super(sequence, stance, time, String.valueOf(speaker));
+        super(sequence, stance, timePerTeam * TIME_MULTIPLIER, String.valueOf(speaker));
         validateTime(timePerTeam, timePerSpeaking);
-        validateTimeBasedTime(time, timePerTeam);
         validateStance(stance, type);
         validateTimeBasedType(type);
         validateSpeakerNumber(speaker);
@@ -89,12 +89,6 @@ public class TimeBasedTimeBox extends DebateTimeBox {
         validateTime(timePerSpeaking);
         if (timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
-        }
-    }
-
-    private void validateTimeBasedTime(int time, int timePerTeam) {
-        if (time != timePerTeam * 2) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE);
         }
     }
 

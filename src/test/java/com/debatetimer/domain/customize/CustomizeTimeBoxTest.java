@@ -1,5 +1,6 @@
 package com.debatetimer.domain.customize;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -15,25 +16,12 @@ class CustomizeTimeBoxTest {
     class ValidateCustomizeTime {
 
         @Test
-        void 자유토론_타입은_총_시간이_팀_발언_시간의_2배여야_한다() {
-            CustomizeTable table = new CustomizeTable();
-            CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
-
-            int totalTime = 150;
-            int timePerTeam = 120;
-
-            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, totalTime,
-                    timePerTeam, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE.getMessage());
-        }
-
-        @Test
         void 자유토론_타입은_개인_발언_시간과_팀_발언_시간을_입력해야_한다() {
             CustomizeTable table = new CustomizeTable();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
             assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론",
-                    customizeBoxType, 240, 120, 60, "발언자")
+                    customizeBoxType, 120, 60, "발언자")
             ).doesNotThrowAnyException();
         }
 
@@ -53,7 +41,7 @@ class CustomizeTimeBoxTest {
             CustomizeBoxType notTimeBasedBoxType = CustomizeBoxType.NORMAL;
 
             assertThatThrownBy(
-                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", notTimeBasedBoxType, 240, 120, 60,
+                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", notTimeBasedBoxType, 120, 60,
                             "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_FORMAT.getMessage());
         }
@@ -65,7 +53,7 @@ class CustomizeTimeBoxTest {
             int timePerSpeaking = 59;
 
             assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
-                    timePerTeam * 2, timePerTeam, timePerSpeaking, "발언자")).doesNotThrowAnyException();
+                    timePerTeam, timePerSpeaking, "발언자")).doesNotThrowAnyException();
         }
 
         @Test
@@ -75,7 +63,7 @@ class CustomizeTimeBoxTest {
             int timePerSpeaking = 61;
 
             assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
-                    timePerTeam * 2, timePerTeam, timePerSpeaking, "발언자")).isInstanceOf(DTClientErrorException.class)
+                    timePerTeam, timePerSpeaking, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
         }
 
@@ -86,8 +74,23 @@ class CustomizeTimeBoxTest {
 
             assertThatThrownBy(
                     () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, longSpeechType, CustomizeBoxType.TIME_BASED,
-                            240, 120, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
+                            120, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH.getMessage());
+        }
+    }
+
+    @Nested
+    class getTime {
+
+        @Test
+        void 자유_토론_타임_박스의_시간은_팀_당_발언_시간의_배수이어야_한다() {
+            int timePerTeam = 300;
+            int timePerSpeaking = 120;
+            CustomizeTable table = new CustomizeTable();
+            CustomizeTimeBox timeBasedTimeBox = new CustomizeTimeBox(table, 1, Stance.CONS, "자유 토론",
+                    CustomizeBoxType.TIME_BASED, timePerTeam, timePerSpeaking, "콜리");
+
+            assertThat(timeBasedTimeBox.getTime()).isEqualTo(timePerTeam * CustomizeTimeBox.TIME_MULTIPLIER);
         }
     }
 }
