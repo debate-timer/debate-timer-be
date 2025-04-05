@@ -19,10 +19,17 @@ public record CustomizeTimeBoxResponse(
                 customizeTimeBox.getStance(),
                 customizeTimeBox.getSpeechType(),
                 customizeTimeBox.getBoxType(),
-                customizeTimeBox.getTime(),
+                convertTime(customizeTimeBox),
                 customizeTimeBox.getTimePerTeam(),
                 customizeTimeBox.getTimePerSpeaking(),
                 customizeTimeBox.getSpeaker()
         );
+    }
+
+    private static Integer convertTime(CustomizeTimeBox customizeTimeBox) {
+        if (customizeTimeBox.getBoxType() == CustomizeBoxType.TIME_BASED) {
+            return null;
+        }
+        return customizeTimeBox.getTime();
     }
 }
