@@ -19,4 +19,4 @@ fi
 
 JAR_FILE=$(ls /home/ubuntu/app/*.jar | head -n 1)
 
-sudo nohup java -Dspring.profiles.active=prod -Duser.timezone=Asia/Seoul -Dserver.port=8080 -jar "$JAR_FILE" &
+sudo nohup java -Dspring.profiles.active=prod,monitor -Duser.timezone=Asia/Seoul -Dserver.port=8080 -jar "$JAR_FILE" &

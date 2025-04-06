@@ -1,0 +1,20 @@
+management:
+  server:
+    port: 9090
+
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /monitoring
+
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
