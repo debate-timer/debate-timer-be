@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DebateTimeBox {
 
+    public static final int SPEAKER_MAX_LENGTH = 5;
+
     private int sequence;
 
     @NotNull
@@ -22,17 +24,30 @@ public abstract class DebateTimeBox {
     private Stance stance;
 
     private int time;
-    private Integer speaker;
+    private String speaker;
 
-    protected DebateTimeBox(int sequence, Stance stance, int time, Integer speaker) {
+    protected DebateTimeBox(int sequence, Stance stance, int time, String speaker) {
+        validateSpeaker(speaker);
         validateSequence(sequence);
         validateTime(time);
-        validateSpeakerNumber(speaker);
 
         this.sequence = sequence;
         this.stance = stance;
         this.time = time;
-        this.speaker = speaker;
+        this.speaker = initializeSpeaker(speaker);
+    }
+
+    private String initializeSpeaker(String speaker) {
+        if (speaker == null || speaker.isBlank()) {
+            return null;
+        }
+        return speaker;
+    }
+
+    private void validateSpeaker(String speaker) {
+        if (speaker != null && speaker.length() > SPEAKER_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
+        }
     }
 
     private void validateSequence(int sequence) {
@@ -44,12 +59,6 @@ public abstract class DebateTimeBox {
     private void validateTime(int time) {
         if (time <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
-        }
-    }
-
-    private void validateSpeakerNumber(Integer speaker) {
-        if (speaker != null && speaker <= 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
         }
     }
 }

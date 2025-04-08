@@ -20,39 +20,31 @@ class DebateTableTest {
     @Nested
     class Validate {
 
-        @ValueSource(strings = {"a bc가다9", "가0나 다ab"})
+        @ValueSource(strings = {"a bc가다9", "가0나 다ab", "ㄱㄷㅇㄹ", "漢字", "にほんご", "vielfältig"})
         @ParameterizedTest
-        void 테이블_이름은_영문과_한글_숫자_띄어쓰기만_가능하다(String name) {
+        void 테이블_이름은_이모지를_제외한_글자만_가능하다(String name) {
             Member member = new Member("default@gmail.com");
             assertThatCode(() -> new DebateTableTestObject(member, name, "agenda", true, true))
                     .doesNotThrowAnyException();
         }
 
-        @ValueSource(ints = {0, DebateTable.NAME_MAX_LENGTH + 1})
+        @ValueSource(strings = {"a😀bc가다9", "🐥", "🥦"})
         @ParameterizedTest
-        void 테이블_이름은_정해진_길이_이내여야_한다(int length) {
-            Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, "f".repeat(length), "agenda", true, true))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
-        }
-
-        @ValueSource(strings = {"", "\t", "\n"})
-        @ParameterizedTest
-        void 테이블_이름은_적어도_한_자_있어야_한다(String name) {
-            Member member = new Member("default@gmail.com");
-            assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", true, true))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
-        }
-
-        @ValueSource(strings = {"abc@", "가나다*", "abc\tde"})
-        @ParameterizedTest
-        void 허용된_글자_이외의_문자는_불가능하다(String name) {
+        void 테이블_이름에_이모지를_넣을_수_없다(String name) {
             Member member = new Member("default@gmail.com");
             assertThatThrownBy(() -> new DebateTableTestObject(member, name, "agenda", true, true))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_FORM.getMessage());
+        }
+
+        @Test
+        void 테이블_이름은_정해진_길이_이내여야_한다() {
+            Member member = new Member("default@gmail.com");
+            String longTableName = "f".repeat(DebateTable.NAME_MAX_LENGTH + 1);
+
+            assertThatThrownBy(() -> new DebateTableTestObject(member, longTableName, "agenda", true, true))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TABLE_NAME_LENGTH.getMessage());
         }
     }
 

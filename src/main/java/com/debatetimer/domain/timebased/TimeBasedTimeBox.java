@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TimeBasedTimeBox extends DebateTimeBox {
 
+    public static final int TIME_MULTIPLIER = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,7 +49,7 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, time, String.valueOf(speaker));
         validateStance(stance, type);
         validateNotTimeBasedType(type);
 
@@ -60,16 +62,15 @@ public class TimeBasedTimeBox extends DebateTimeBox {
             int sequence,
             Stance stance,
             TimeBasedBoxType type,
-            int time,
             int timePerTeam,
             int timePerSpeaking,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, timePerTeam * TIME_MULTIPLIER, String.valueOf(speaker));
         validateTime(timePerTeam, timePerSpeaking);
-        validateTimeBasedTime(time, timePerTeam);
         validateStance(stance, type);
         validateTimeBasedType(type);
+        validateSpeakerNumber(speaker);
 
         this.timeBasedTable = timeBasedTable;
         this.type = type;
@@ -91,12 +92,6 @@ public class TimeBasedTimeBox extends DebateTimeBox {
         }
     }
 
-    private void validateTimeBasedTime(int time, int timePerTeam) {
-        if (time != timePerTeam * 2) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME_IS_NOT_DOUBLE);
-        }
-    }
-
     private void validateStance(Stance stance, TimeBasedBoxType boxType) {
         if (!boxType.isAvailable(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
@@ -112,6 +107,12 @@ public class TimeBasedTimeBox extends DebateTimeBox {
     private void validateNotTimeBasedType(TimeBasedBoxType boxType) {
         if (boxType.isTimeBased()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+    }
+
+    private void validateSpeakerNumber(Integer speaker) {
+        if (speaker != null && speaker <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
         }
     }
 }

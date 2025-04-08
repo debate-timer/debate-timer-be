@@ -27,7 +27,7 @@ public interface TimeBasedTimeBoxRepository extends Repository<TimeBasedTimeBox,
         return new TimeBoxes<>(timeBoxes);
     }
 
-    @Query("DELETE FROM TimeBasedTimeBox ptb WHERE ptb IN :timeBoxes")
+    @Query("DELETE FROM TimeBasedTimeBox tbtb WHERE tbtb IN :timeBoxes")
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     void deleteAll(List<TimeBasedTimeBox> timeBoxes);

@@ -44,16 +44,38 @@ public class ParliamentaryTimeBox extends DebateTimeBox {
             int time,
             Integer speaker
     ) {
-        super(sequence, stance, time, speaker);
+        super(sequence, stance, time, convertToSpeaker(speaker));
         validate(stance, type);
+        validateSpeakerNumber(speaker);
 
         this.parliamentaryTable = parliamentaryTable;
         this.type = type;
+    }
+
+    private static String convertToSpeaker(Integer speakerNumber) {
+        if (speakerNumber == null) {
+            return null;
+        }
+        return String.valueOf(speakerNumber);
     }
 
     private void validate(Stance stance, ParliamentaryBoxType boxType) {
         if (!boxType.isAvailable(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
         }
+    }
+
+    private void validateSpeakerNumber(Integer speaker) {
+        if (speaker != null && speaker <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER);
+        }
+    }
+
+    public Integer getSpeakerNumber() {
+        String speaker = getSpeaker();
+        if (speaker == null || speaker.isBlank() || speaker.equals("null")) {
+            return null;
+        }
+        return Integer.parseInt(speaker);
     }
 }

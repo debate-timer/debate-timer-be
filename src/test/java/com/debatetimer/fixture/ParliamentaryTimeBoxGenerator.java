@@ -21,4 +21,10 @@ public class ParliamentaryTimeBoxGenerator {
                 ParliamentaryBoxType.OPENING, 180, 1);
         return parliamentaryTimeBoxRepository.save(timeBox);
     }
+
+    public ParliamentaryTimeBox generateNotExistSpeaker(ParliamentaryTable testTable, int sequence) {
+        ParliamentaryTimeBox timeBox = new ParliamentaryTimeBox(testTable, sequence, Stance.PROS,
+                ParliamentaryBoxType.OPENING, 180, null);
+        return parliamentaryTimeBoxRepository.save(timeBox);
+    }
 }

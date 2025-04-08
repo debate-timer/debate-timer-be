@@ -21,4 +21,10 @@ public class TimeBasedTimeBoxGenerator {
                 TimeBasedBoxType.OPENING, 180, 1);
         return timeBasedTimeBoxRepository.save(timeBox);
     }
+
+    public TimeBasedTimeBox generateNotExistSpeaker(TimeBasedTable testTable, int sequence) {
+        TimeBasedTimeBox timeBox = new TimeBasedTimeBox(testTable, sequence, Stance.PROS,
+                TimeBasedBoxType.OPENING, 180, null);
+        return timeBasedTimeBoxRepository.save(timeBox);
+    }
 }

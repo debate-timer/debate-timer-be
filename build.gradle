@@ -51,6 +51,17 @@ dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'org.apache.poi:poi:5.2.3'
 
+    // Logging
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+
+    // Discord
+    implementation 'net.dv8tion:JDA:5.0.0-beta.24'
+
+    // Monitoring
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
     // DB schema manager
     implementation 'org.flywaydb:flyway-mysql'
 
@@ -64,10 +75,6 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
-
-    // Logging
-    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
 }
 
 bootJar {

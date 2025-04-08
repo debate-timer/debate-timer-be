@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DebateTable extends BaseTimeEntity {
 
-    private static final String NAME_REGEX = "^[a-zA-Z가-힣0-9 ]+$";
+    private static final String NAME_REGEX = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\s]+$";
     public static final int NAME_MAX_LENGTH = 20;
 
     @NotNull
@@ -68,7 +68,7 @@ public abstract class DebateTable extends BaseTimeEntity {
     }
 
     private void validate(String name) {
-        if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
+        if (name.length() > NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TABLE_NAME_LENGTH);
         }
         if (!name.matches(NAME_REGEX)) {

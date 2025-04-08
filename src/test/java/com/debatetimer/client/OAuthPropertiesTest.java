@@ -2,6 +2,7 @@ package com.debatetimer.client;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.debatetimer.client.oauth.OAuthProperties;
 import com.debatetimer.exception.custom.DTInitializationException;
 import com.debatetimer.exception.errorcode.InitializationErrorCode;
 import org.junit.jupiter.api.Nested;

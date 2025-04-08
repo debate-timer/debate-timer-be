@@ -19,7 +19,14 @@ public record TimeBasedTimeBoxResponse(
                 timeBasedTimeBox.getTime(),
                 timeBasedTimeBox.getTimePerTeam(),
                 timeBasedTimeBox.getTimePerSpeaking(),
-                timeBasedTimeBox.getSpeaker()
+                getSpeakerNumber(timeBasedTimeBox)
         );
+    }
+
+    private static Integer getSpeakerNumber(TimeBasedTimeBox timeBasedTimeBox) {
+        if (timeBasedTimeBox.getSpeaker() == null || timeBasedTimeBox.getSpeaker().equals("null")) {
+            return null;
+        }
+        return Integer.parseInt(timeBasedTimeBox.getSpeaker());
     }
 }

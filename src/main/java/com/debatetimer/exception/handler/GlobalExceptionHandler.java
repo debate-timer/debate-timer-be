@@ -1,5 +1,6 @@
 package com.debatetimer.exception.handler;
 
+import com.debatetimer.client.notifier.ErrorNotifier;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
@@ -7,6 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ResponseErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -21,7 +24,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ErrorNotifier errorNotifier;
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindingException(BindException exception) {
@@ -69,6 +75,11 @@ public class GlobalExceptionHandler {
         return toResponse(ClientErrorCode.NO_RESOURCE_FOUND);
     }
 
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestCookieException(MissingRequestCookieException exception) {
+        return toResponse(ClientErrorCode.NO_COOKIE_FOUND);
+    }
+
     @ExceptionHandler(DTClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleClientException(DTClientErrorException exception) {
         log.warn("message: {}", exception.getMessage());
@@ -78,12 +89,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DTServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(DTServerErrorException exception) {
         log.error("message: {}", exception.getMessage());
+        errorNotifier.sendErrorMessage(exception);
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         log.error("exception: {}", exception.getMessage());
+        errorNotifier.sendErrorMessage(exception);
         return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
     }
 
