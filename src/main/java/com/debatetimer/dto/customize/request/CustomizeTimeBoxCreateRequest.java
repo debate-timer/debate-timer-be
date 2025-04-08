@@ -6,6 +6,7 @@ import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
 
 public record CustomizeTimeBoxCreateRequest(
         @NotNull
@@ -17,15 +18,22 @@ public record CustomizeTimeBoxCreateRequest(
         @NotNull
         CustomizeBoxType boxType,
 
-        int time,
+        @Nullable
+        Integer time,
+
+        @Nullable
         Integer timePerTeam,
+
+        @Nullable
         Integer timePerSpeaking,
+
+        @Nullable
         String speaker
 ) {
 
     public CustomizeTimeBox toTimeBox(CustomizeTable customizeTable, int sequence) {
         if (boxType.isTimeBased()) {
-            return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, time, timePerTeam,
+            return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, timePerTeam,
                     timePerSpeaking, speaker);
         }
         return new CustomizeTimeBox(customizeTable, sequence, stance, speechType, boxType, time, speaker);
