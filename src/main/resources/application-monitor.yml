@@ -1,12 +1,16 @@
 management:
   server:
-    port: 9090
+    port: 8083
 
   endpoints:
     web:
       exposure:
         include: '*'
       base-path: /monitoring
+
+  endpoint:
+    health:
+      show-components: always
 
   info:
     java:
