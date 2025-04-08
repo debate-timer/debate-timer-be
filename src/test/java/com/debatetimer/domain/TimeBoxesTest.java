@@ -27,7 +27,7 @@ class TimeBoxesTest {
                     ParliamentaryBoxType.OPENING, 300, 1);
             List<ParliamentaryTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            TimeBoxes actual = new TimeBoxes(timeBoxes);
+            TimeBoxes<ParliamentaryTimeBox> actual = new TimeBoxes<>(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }

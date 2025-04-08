@@ -1,0 +1,24 @@
+management:
+  server:
+    port: 8083
+
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /monitoring
+
+  endpoint:
+    health:
+      show-components: always
+
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
