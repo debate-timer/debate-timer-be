@@ -31,26 +31,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindingException(BindException exception) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.FIELD_ERROR);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.URL_PARAMETER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException exception) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH);
     }
 
     @ExceptionHandler(ClientAbortException.class)
     public ResponseEntity<ErrorResponse> handleClientAbortException(ClientAbortException exception) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.ALREADY_DISCONNECTED);
     }
 
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException exception
     ) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.METHOD_NOT_SUPPORTED);
     }
 
@@ -66,38 +66,47 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(
             HttpMediaTypeNotSupportedException exception
     ) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(ClientErrorCode.MEDIA_TYPE_NOT_SUPPORTED);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception) {
+        logClientError(exception);
         return toResponse(ClientErrorCode.NO_RESOURCE_FOUND);
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
     public ResponseEntity<ErrorResponse> handleMissingRequestCookieException(MissingRequestCookieException exception) {
+        logClientError(exception);
         return toResponse(ClientErrorCode.NO_COOKIE_FOUND);
     }
 
     @ExceptionHandler(DTClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleClientException(DTClientErrorException exception) {
-        log.warn("message: {}", exception.getMessage());
+        logClientError(exception);
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(DTServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(DTServerErrorException exception) {
-        log.error("message: {}", exception.getMessage());
-        errorNotifier.sendErrorMessage(exception);
+        logServerError(exception);
         return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-        log.error("exception: {}", exception.getMessage());
-        errorNotifier.sendErrorMessage(exception);
+        logServerError(exception);
         return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    private void logClientError(Exception exception) {
+        log.warn("exception message: {}", exception.getMessage());
+    }
+
+    private void logServerError(Exception exception) {
+        log.error("exception message: {}", exception.getMessage());
+        errorNotifier.sendErrorMessage(exception);
     }
 
     private ResponseEntity<ErrorResponse> toResponse(ResponseErrorCode errorCode) {
