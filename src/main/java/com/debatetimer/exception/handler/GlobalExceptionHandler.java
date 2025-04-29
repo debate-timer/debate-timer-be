@@ -8,6 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ResponseErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import jakarta.validation.ConstraintViolationException;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
@@ -19,6 +20,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -52,6 +54,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleClientAbortException(ClientAbortException exception) {
         logClientError(exception);
         return toResponse(ClientErrorCode.ALREADY_DISCONNECTED);
+    }
+
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public ResponseEntity<ErrorResponse> handleAsyncError(AsyncRequestNotUsableException exception) {
+        if (isClientDisconnect(exception.getCause())) {
+            logClientError(exception);
+            return toResponse(ClientErrorCode.ALREADY_DISCONNECTED);
+        }
+        logServerError(exception);
+        return toResponse(ServerErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    private boolean isClientDisconnect(Throwable cause) {
+        return cause instanceof IOException
+                && cause.getMessage() != null
+                && cause.getMessage().contains("Broken pipe");
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
