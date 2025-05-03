@@ -47,7 +47,6 @@ public enum ClientErrorCode implements ResponseErrorCode {
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
-    EMPTY_COOKIE(HttpStatus.UNAUTHORIZED, "쿠키에 값이 없습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
 
