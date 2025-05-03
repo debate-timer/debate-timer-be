@@ -16,6 +16,7 @@ public class ExcelExportInterceptor implements HandlerInterceptor {
     private static final String SPREAD_SHEET_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final String EXCEL_FILE_NAME = "my_debate_template.xlsx";
 
+    @Override
     public boolean preHandle(
             HttpServletRequest request,
             HttpServletResponse response,
