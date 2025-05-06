@@ -19,8 +19,8 @@ public class OAuthClient {
     private final RestClient restClient;
     private final OAuthProperties oauthProperties;
 
-    public OAuthClient(OAuthProperties oauthProperties) {
-        this.restClient = RestClient.create();
+    public OAuthClient(RestClient.Builder restClientBuilder, OAuthProperties oauthProperties) {
+        this.restClient = restClientBuilder.build();
         this.oauthProperties = oauthProperties;
     }
 
