@@ -12,6 +12,8 @@ import com.debatetimer.exception.errorcode.ServerErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
@@ -40,19 +42,16 @@ class OAuthClientTest {
         this.oAuthClient = new OAuthClient(restClientBuilder, oAuthProperties);
     }
 
-
     @Nested
     class RequestTokenExceptionHandling {
 
-        @Test
-        void 잘못된_인증코드로로_토큰_발급요청_시_클라이언트_에러를_반환한다() {
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "{\"error\":\"invalid_grant\",\"error_description\":\"Bad Request\"}",
+                "{\"error\":\"invalid_grant\",\"error_description\":\"Malformed auth code.\"}",
+        })
+        void 잘못된_인증코드로_토큰_발급요청_시_클라이언트_에러를_반환한다(String invalidCodeResponse) {
             MemberCreateRequest memberCreateRequest = new MemberCreateRequest("invalid_code", "redirect_uri");
-            String invalidCodeResponse = """
-                    {
-                      "ErrorCode": "invalid_request",
-                      "Error": "Invalid Authorization Code"
-                    }
-                    """;
             setMockserver(MockRestResponseCreators.withBadRequest().body(invalidCodeResponse));
 
             assertThatThrownBy(() -> oAuthClient.requestToken(memberCreateRequest))
@@ -63,12 +62,7 @@ class OAuthClientTest {
         @Test
         void 잘못된_리다이렉트_uri로_토큰_발급요청_시_클라이언트_에러를_반환한다() {
             MemberCreateRequest memberCreateRequest = new MemberCreateRequest("code", "invalid_uri");
-            String invalidRedirectUrlResponse = """
-                    {
-                      "ErrorCode": "invalid_request",
-                      "Error": "Invalid redirect_uri : invalid_uri"
-                    }
-                    """;
+            String invalidRedirectUrlResponse = "{\"error\":\"redirect_uri_mismatch\",\"error_description\":\"Bad Request\"}";
             setMockserver(MockRestResponseCreators.withBadRequest().body(invalidRedirectUrlResponse));
 
             assertThatThrownBy(() -> oAuthClient.requestToken(memberCreateRequest))
@@ -77,16 +71,10 @@ class OAuthClientTest {
         }
 
         @Test
-        void 그외_에러는_서버에러를_반환한다() {
+        void 클라이언트_인증_에러는_서버에러를_반환한다() {
             MemberCreateRequest memberCreateRequest = new MemberCreateRequest("code", "redirect_url");
-            String otherErrorResponse = """
-                    {
-                      "ErrorCode": "invalid_request",
-                      "Error": "Unsupported grant type : client_credentials_invalid"
-                    }
-                    
-                    """;
-            setMockserver(MockRestResponseCreators.withBadRequest().body(otherErrorResponse));
+            String otherErrorResponse = "{\"error\":\"invalid_client\",\"error_description\":\"The OAuth client was not found.\"}";
+            setMockserver(MockRestResponseCreators.withUnauthorizedRequest().body(otherErrorResponse));
 
             assertThatThrownBy(() -> oAuthClient.requestToken(memberCreateRequest))
                     .isInstanceOf(DTServerErrorException.class)

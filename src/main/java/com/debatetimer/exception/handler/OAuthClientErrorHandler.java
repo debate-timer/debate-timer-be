@@ -15,8 +15,8 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 @Component
 public class OAuthClientErrorHandler implements ErrorHandler {
 
-    private final String INVALID_REDIRECT_URI_PREFIX = "Invalid redirect_uri";
-    private final String INVALID_AUTHORIZATION_CODE_MESSAGE = "Invalid Authorization Code";
+    private final String INVALID_REDIRECT_URI_MESSAGE = "redirect_uri_mismatch";
+    private final String INVALID_AUTHORIZATION_CODE_MESSAGE = "invalid_grant";
 
     @Override
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
@@ -30,9 +30,7 @@ public class OAuthClientErrorHandler implements ErrorHandler {
     private boolean isClientError(ClientHttpResponse response) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         OAuthErrorResponse errorResponse = objectMapper.readValue(response.getBody(), OAuthErrorResponse.class);
-
-        String error = errorResponse.error();
-        return error.startsWith(INVALID_REDIRECT_URI_PREFIX)
-                || error.equals(INVALID_AUTHORIZATION_CODE_MESSAGE);
+        return errorResponse.isError(INVALID_REDIRECT_URI_MESSAGE)
+                || errorResponse.isError(INVALID_AUTHORIZATION_CODE_MESSAGE);
     }
 }
