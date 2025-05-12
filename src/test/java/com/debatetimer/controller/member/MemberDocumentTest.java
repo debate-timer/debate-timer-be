@@ -69,7 +69,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .then().statusCode(201);
         }
 
-        @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"}) // PR #160 병합 시 추가
+        @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"}) // PR #160 병합 시 변경
         @ParameterizedTest
         void 회원_생성_및_로그인_실패(ClientErrorCode errorCode) {
             MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg", "http://localhost:3000");
@@ -82,7 +82,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .when().get("/api/member")
+                    .body(request)
+                    .when().post("/api/member")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }
