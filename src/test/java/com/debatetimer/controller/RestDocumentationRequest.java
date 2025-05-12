@@ -35,6 +35,11 @@ public class RestDocumentationRequest {
         return this;
     }
 
+    public RestDocumentationRequest description(String description) {
+        resourceBuilder.description(description);
+        return this;
+    }
+
     public RestDocumentationRequest pathParameter(ParameterDescriptor... descriptors) {
         snippets.add(pathParameters(descriptors));
         return this;
