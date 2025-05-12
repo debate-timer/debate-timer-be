@@ -3,6 +3,7 @@ package com.debatetimer.exception.handler;
 import com.debatetimer.client.notifier.ErrorNotifier;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTOAuthClientException;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ResponseErrorCode;
@@ -98,6 +99,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingRequestCookieException(MissingRequestCookieException exception) {
         logClientError(exception);
         return toResponse(ClientErrorCode.NO_COOKIE_FOUND);
+    }
+
+    @ExceptionHandler(DTOAuthClientException.class)
+    public ResponseEntity<ErrorResponse> handleOAuthClientException(DTOAuthClientException exception) {
+        logClientError(exception);
+        return toResponse(exception.getHttpStatus(), exception.getMessage());
     }
 
     @ExceptionHandler(DTClientErrorException.class)
