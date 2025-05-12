@@ -46,8 +46,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                 .tag(Tag.CUSTOMIZE_API)
                 .summary("새로운 사용자 지정 토론 시간표 생성")
                 .description("""
-                        **타임 박스 종류에 따른 요청 값**
-                        
+                        ### 타임 박스 종류에 따른 요청 값
                         | 타임 박스 종류 | 필수 입력 | 선택 입력 | null 입력 |
                         | :---: | ---| --- | --- |
                         | 커스텀 타임 박스 | stance, speechType, boxType, time | speaker | timePerTeam, timePerSpeaking |
@@ -68,7 +67,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -89,7 +88,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -191,8 +190,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .summary("사용자_지정 토론 시간표 조회")
                 .description("""
-                        **타임 박스 종류에 따른 웅답 값**
-                        
+                        ### 타임 박스 종류에 따른 웅답 값
                         | 타임 박스 종류 | 필수 입력 | 선택 입력 | null 입력 |
                         | :---: | ---| --- | --- |
                         | 커스텀 타임 박스 | stance, speechType, boxType, time | speaker | timePerTeam, timePerSpeaking |
@@ -221,7 +219,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -287,8 +285,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                 .tag(Tag.CUSTOMIZE_API)
                 .summary("사용자 지정 토론 시간표 수정")
                 .description("""
-                        **타임 박스 종류에 따른 요청/웅답 값**
-                        
+                        ### 타임 박스 종류에 따른 요청/웅답 값
                         | 타임 박스 종류 | 필수 입력 | 선택 입력 | null 입력 |
                         | :---: | ---| --- | --- |
                         | 커스텀 타임 박스 | stance, speechType, boxType, time | speaker | timePerTeam, timePerSpeaking |
@@ -312,7 +309,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -333,7 +330,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -440,8 +437,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .summary("사용자 지정 토론 시작")
                 .description("""
-                        **타임 박스 종류에 따른 웅답 값**
-                        
+                        ### 타임 박스 종류에 따른 웅답 값
                         | 타임 박스 종류 | 필수 입력 | 선택 입력 | null 입력 |
                         | :---: | ---| --- | --- |
                         | 커스텀 타임 박스 | stance, speechType, boxType, time | speaker | timePerTeam, timePerSpeaking |
@@ -470,7 +466,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].stance").type(STRING).description("입장"),
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
-                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)"),
+                        fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
