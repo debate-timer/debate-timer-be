@@ -9,7 +9,4 @@ public record OAuthErrorResponse(
         String errorDescription
 ) {
 
-    public boolean isError(String error) {
-        return this.error.equals(error);
-    }
 }
