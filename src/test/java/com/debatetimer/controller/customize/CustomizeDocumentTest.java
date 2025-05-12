@@ -101,10 +101,14 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             CustomizeTableResponse response = new CustomizeTableResponse(
@@ -112,10 +116,14 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "토론 주제",
                             "찬성", "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).save(eq(request), any());
@@ -151,10 +159,14 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(customizeService).save(eq(request), any());
@@ -223,10 +235,14 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "토론 주제",
                             "찬성", "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).findTable(eq(tableId), any());
@@ -330,21 +346,29 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             CustomizeTableResponse response = new CustomizeTableResponse(
                     5L,
-                    new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "토론 주제",
+                    new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "주제",
                             "찬성", "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).updateTable(eq(request), eq(tableId), any());
@@ -382,10 +406,14 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(customizeService)
@@ -454,13 +482,17 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
             long tableId = 5L;
             CustomizeTableResponse response = new CustomizeTableResponse(
                     5L,
-                    new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "토론 주제",
+                    new CustomizeTableInfoResponse("나의 테이블", TableType.CUSTOMIZE, "주제",
                             "찬성", "반대", true, true),
                     List.of(
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론1", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxResponse(Stance.PROS, "입론2", CustomizeBoxType.TIME_BASED,
-                                    120, 60, null, "발언자2")
+                            new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "콜리"),
+                            new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
+                                    120, null, null, "비토"),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, 120, null),
+                            new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
+                                    null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).updateUsedAt(eq(tableId), any());
