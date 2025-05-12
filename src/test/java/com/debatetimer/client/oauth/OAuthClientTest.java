@@ -5,9 +5,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 import com.debatetimer.dto.member.MemberCreateRequest;
-import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTOAuthClientException;
 import com.debatetimer.exception.custom.DTServerErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.OAuthErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -55,19 +55,19 @@ class OAuthClientTest {
             setMockserver(MockRestResponseCreators.withBadRequest().body(invalidCodeResponse));
 
             assertThatThrownBy(() -> oAuthClient.requestToken(memberCreateRequest))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_OAUTH_REQUEST.getMessage());
+                    .isInstanceOf(DTOAuthClientException.class)
+                    .hasMessage(OAuthErrorCode.INVALID_AUTHORIZATION_CODE.getMessage());
         }
 
         @Test
-        void 잘못된_리다이렉트_uri로_토큰_발급요청_시_클라이언트_에러를_반환한다() {
+        void 잘못된_리다이렉트_uri로_토큰_발급요청_시_oauth_클라이언트_에러를_반환한다() {
             MemberCreateRequest memberCreateRequest = new MemberCreateRequest("code", "invalid_uri");
             String invalidRedirectUrlResponse = "{\"error\":\"redirect_uri_mismatch\",\"error_description\":\"Bad Request\"}";
             setMockserver(MockRestResponseCreators.withBadRequest().body(invalidRedirectUrlResponse));
 
             assertThatThrownBy(() -> oAuthClient.requestToken(memberCreateRequest))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.INVALID_OAUTH_REQUEST.getMessage());
+                    .isInstanceOf(DTOAuthClientException.class)
+                    .hasMessage(OAuthErrorCode.INVALID_REDIRECT_URI.getMessage());
         }
 
         @Test
