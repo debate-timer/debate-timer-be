@@ -50,8 +50,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 회원_생성_성공() {
-            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg", "http://redirectUrl");
+        void 회원_생성_및_로그인_성공() {
+            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg", "http://localhost:3000");
             MemberInfo memberInfo = new MemberInfo(EXIST_MEMBER_EMAIL);
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(memberInfo).when(authService).getMemberInfo(request);
@@ -67,6 +67,23 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .body(request)
                     .when().post("/api/member")
                     .then().statusCode(201);
+        }
+
+        @EnumSource(value = ClientErrorCode.class, names = {"MEMBER_NOT_FOUND"}) // PR #160 병합 시 추가
+        @ParameterizedTest
+        void 회원_생성_및_로그인_실패(ClientErrorCode errorCode) {
+            MemberCreateRequest request = new MemberCreateRequest("dfsfgdsg", "http://localhost:3000");
+            doThrow(new DTClientErrorException(errorCode)).when(authService).getMemberInfo(request);
+
+            var document = document("member/create", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .when().get("/api/member")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
