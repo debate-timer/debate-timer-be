@@ -11,11 +11,11 @@ public record TableResponses(List<TableResponse> tables) {
             .comparing(DebateTable::getUsedAt)
             .reversed();
 
-    public TableResponses(
-            List<CustomizeTable> customizeTables
-    ) {
-        this(toTableResponses(customizeTables));
-    }
+//    public TableResponses(
+//            List<CustomizeTable> customizeTables
+//    ) {
+//        this(toTableResponses(customizeTables));
+//    }
 
     private static List<TableResponse> toTableResponses(List<CustomizeTable> customizeTables) {
         return customizeTables.stream()
