@@ -50,6 +50,8 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
 
+    INVALID_OAUTH_REQUEST(HttpStatus.BAD_REQUEST, "구글 OAuth 요청 파라미터 값이 잘못되었습니다."),
+
     FIELD_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     URL_PARAMETER_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     METHOD_ARGUMENT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "입력한 값의 타입이 잘못되었습니다."),
