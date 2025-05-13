@@ -22,6 +22,7 @@ Configuration:
         TimeBasedTriggeringPolicy:
           Interval: 1
           modulate: true #다음 롤오버 시간을 정각 바운더리에 맞추는 설정
+
       DefaultRollOverStrategy:
         max: 10
         Delete:

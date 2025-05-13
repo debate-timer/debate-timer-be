@@ -10,3 +10,4 @@ springdoc:
     filter: true
     persist-authorization: true
     display-request-duration: true
+    default-model-expand-depth: 10

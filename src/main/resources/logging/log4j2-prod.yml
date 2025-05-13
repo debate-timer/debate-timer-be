@@ -1,5 +1,5 @@
 Configuration:
-  name: Dev-Logger
+  name: Prod-Logger
   status: debug
 
   Properties:

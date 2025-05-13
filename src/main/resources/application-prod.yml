@@ -36,5 +36,5 @@ discord:
   token: ${secret.discord.token}
   channelId: ${secret.discord.channelId}
 
-#logging:
-#  config: classpath:logging/log4j2-prod.yml
+logging:
+  config: classpath:logging/log4j2-prod.yml
