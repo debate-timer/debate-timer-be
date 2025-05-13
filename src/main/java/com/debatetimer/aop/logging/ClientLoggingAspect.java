@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientLoggingAspect extends LoggingAspect {
 
-    private static final String CLIENT_REQUEST_TIME_KEY = "clientRequestTime";
 
     @Pointcut("@within(com.debatetimer.aop.logging.LoggingClient)")
     public void loggingClients() {
@@ -22,7 +21,6 @@ public class ClientLoggingAspect extends LoggingAspect {
 
     @Around("loggingClients()")
     public Object loggingControllerMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        setMdc(CLIENT_REQUEST_TIME_KEY, System.currentTimeMillis());
         try {
             logClientRequest(proceedingJoinPoint);
             Object responseBody = proceedingJoinPoint.proceed();
@@ -32,8 +30,6 @@ public class ClientLoggingAspect extends LoggingAspect {
             logClientErrorRequest(proceedingJoinPoint);
             logClientErrorResponse(exception.getErrorResponse());
             throw exception;
-        } finally {
-            removeMdc(CLIENT_REQUEST_TIME_KEY);
         }
     }
 
@@ -46,9 +42,7 @@ public class ClientLoggingAspect extends LoggingAspect {
     private void logClientResponse(ProceedingJoinPoint joinPoint) {
         String clientName = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        long latency = getLatency(CLIENT_REQUEST_TIME_KEY);
-        log.info("Client Response Logging - Client Name: {} | MethodName: {} | Latency: {}ms",
-                clientName, methodName, latency);
+        log.info("Client Response Logging - Client Name: {} | MethodName: {}", clientName, methodName);
     }
 
     private void logClientErrorRequest(ProceedingJoinPoint proceedingJoinPoint) {

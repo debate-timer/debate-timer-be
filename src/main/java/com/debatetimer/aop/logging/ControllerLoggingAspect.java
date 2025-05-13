@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class ControllerLoggingAspect extends LoggingAspect {
 
     private static final String REQUEST_ID_KEY = "requestId";
-    private static final String START_TIME_KEY = "startTime";
 
     @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
     public void allController() {
@@ -25,13 +24,12 @@ public class ControllerLoggingAspect extends LoggingAspect {
     @Around("allController()")
     public Object loggingControllerMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         setMdc(REQUEST_ID_KEY, UUID.randomUUID().toString());
-        setMdc(START_TIME_KEY, System.currentTimeMillis());
         logControllerRequest(proceedingJoinPoint);
 
         Object responseBody = proceedingJoinPoint.proceed();
 
         logControllerResponse(responseBody);
-        removeMdc(START_TIME_KEY);
+        removeMdc(REQUEST_ID_KEY);
         return responseBody;
     }
 
@@ -47,7 +45,6 @@ public class ControllerLoggingAspect extends LoggingAspect {
         HttpServletRequest request = getHttpServletRequest();
         String uri = request.getRequestURI();
         String httpMethod = request.getMethod();
-        long latency = getLatency(START_TIME_KEY);
-        log.info("Response Logging: {} {} Body: {} latency - {}ms", httpMethod, uri, responseBody, latency);
+        log.info("Response Logging: {} {} Body: {}", httpMethod, uri, responseBody);
     }
 }

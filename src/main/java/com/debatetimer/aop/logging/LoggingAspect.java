@@ -21,11 +21,6 @@ public abstract class LoggingAspect {
         MDC.remove(key);
     }
 
-    protected final long getLatency(String startTimeKey) {
-        long startTime = Long.parseLong(MDC.get(startTimeKey));
-        return System.currentTimeMillis() - startTime;
-    }
-
     protected HttpServletRequest getHttpServletRequest() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         return requestAttributes.getRequest();
