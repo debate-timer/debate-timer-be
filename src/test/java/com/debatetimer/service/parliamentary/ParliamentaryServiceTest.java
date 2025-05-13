@@ -122,6 +122,20 @@ class ParliamentaryServiceTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
+
+        @Test
+        void 테이블_정보_수정을_동시에_요청할_때_동시에_처리하지_않는다() throws InterruptedException {
+            Member member = memberGenerator.generate("default@gmail.com");
+            ParliamentaryTable table = parliamentaryTableGenerator.generate(member);
+            ParliamentaryTableCreateRequest request = new ParliamentaryTableCreateRequest(
+                    new ParliamentaryTableInfoCreateRequest("커찬의 테이블", "주제", true, true),
+                    List.of(new ParliamentaryTimeBoxCreateRequest(Stance.PROS, ParliamentaryBoxType.OPENING, 3, 1),
+                            new ParliamentaryTimeBoxCreateRequest(Stance.CONS, ParliamentaryBoxType.OPENING, 3, 1)));
+
+            runAtSameTime(2, () -> parliamentaryService.updateTable(request, member.getId(), member));
+
+            assertThat(parliamentaryTimeBoxRepository.findAllByParliamentaryTable(table)).hasSize(2);
+        }
     }
 
     @Nested

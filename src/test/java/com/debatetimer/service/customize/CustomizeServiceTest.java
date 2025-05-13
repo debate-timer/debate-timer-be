@@ -140,6 +140,26 @@ class CustomizeServiceTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
         }
+
+        @Test
+        void 테이블_정보_수정을_동시에_요청할_때_동시에_처리하지_않는다() throws InterruptedException {
+            Member member = memberGenerator.generate("default@gmail.com");
+            CustomizeTable table = customizeTableGenerator.generate(member);
+            CustomizeTableCreateRequest request = new CustomizeTableCreateRequest(
+                    new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
+                            "반대", true, true),
+                    List.of(
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
+                                    120, 60, null, "발언자1"),
+                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
+                                    120, 60, null, "발언자2")
+                    )
+            );
+
+            runAtSameTime(2, () -> customizeService.updateTable(request, table.getId(), member));
+
+            assertThat(customizeTimeBoxRepository.findAllByCustomizeTable(table)).hasSize(2);
+        }
     }
 
     @Nested

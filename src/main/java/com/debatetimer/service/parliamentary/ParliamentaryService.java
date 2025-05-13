@@ -13,6 +13,7 @@ import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -45,7 +46,7 @@ public class ParliamentaryService {
         return new ParliamentaryTableResponse(table, timeBoxes);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public ParliamentaryTableResponse updateTable(
             ParliamentaryTableCreateRequest tableCreateRequest,
             long tableId,

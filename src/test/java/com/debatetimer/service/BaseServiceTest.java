@@ -11,6 +11,8 @@ import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.member.MemberRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import com.debatetimer.repository.parliamentary.ParliamentaryTimeBoxRepository;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,4 +50,15 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+
+    protected void runAtSameTime(int count, Runnable task) throws InterruptedException {
+        List<Thread> threads = IntStream.range(0, count)
+                .mapToObj(i -> new Thread(task))
+                .toList();
+
+        threads.forEach(Thread::start);
+        for (Thread thread : threads) {
+            thread.join();
+        }
+    }
 }
