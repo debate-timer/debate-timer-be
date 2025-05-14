@@ -2,10 +2,9 @@ package com.debatetimer.dto.member;
 
 import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public record TableResponses(List<TableResponse> tables) {
 
@@ -13,21 +12,10 @@ public record TableResponses(List<TableResponse> tables) {
             .comparing(DebateTable::getUsedAt)
             .reversed();
 
-    public TableResponses(
-            List<ParliamentaryTable> parliamentaryTables,
-            List<CustomizeTable> customizeTables
-    ) {
-        this(toTableResponses(parliamentaryTables, customizeTables));
-    }
-
-    private static List<TableResponse> toTableResponses(
-            List<ParliamentaryTable> parliamentaryTables,
-            List<CustomizeTable> customizeTables
-    ) {
-        return Stream.of(parliamentaryTables, customizeTables)
-                .flatMap(List::stream)
+    public static TableResponses from(List<CustomizeTable> customizeTables) {
+        return customizeTables.stream()
                 .sorted(DEBATE_TABLE_COMPARATOR)
                 .map(TableResponse::new)
-                .toList();
+                .collect(Collectors.collectingAndThen(Collectors.toList(), TableResponses::new));
     }
 }

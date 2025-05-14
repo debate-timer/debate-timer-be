@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.domain.parliamentary.ParliamentaryTable;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
@@ -53,7 +52,7 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
-            parliamentaryTableGenerator.generate(member);
+            customizeTableGenerator.generate(member);
             customizeTableGenerator.generate(member);
 
             TableResponses response = memberService.getTables(member.getId());
@@ -64,16 +63,13 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 회원의_전체_토론_시간표는_정해진_순서대로_반환한다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
-            ParliamentaryTable table1 = parliamentaryTableGenerator.generate(member);
-            CustomizeTable table2 = customizeTableGenerator.generate(member);
+            CustomizeTable table = customizeTableGenerator.generate(member);
             Thread.sleep(1);
-            table1.updateUsedAt();
 
             TableResponses response = memberService.getTables(member.getId());
 
             assertAll(
-                    () -> assertThat(response.tables().get(0).id()).isEqualTo(table1.getId()),
-                    () -> assertThat(response.tables().get(1).id()).isEqualTo(table2.getId())
+                    () -> assertThat(response.tables().get(0).id()).isEqualTo(table.getId())
             );
         }
     }

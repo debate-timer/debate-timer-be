@@ -6,11 +6,8 @@ import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
-import com.debatetimer.fixture.ParliamentaryTableGenerator;
-import com.debatetimer.fixture.ParliamentaryTimeBoxGenerator;
 import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
-import com.debatetimer.repository.parliamentary.ParliamentaryTableRepository;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -28,19 +25,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 public abstract class BaseControllerTest {
 
     @Autowired
-    protected ParliamentaryTableRepository parliamentaryTableRepository;
-
-    @Autowired
     protected CustomizeTableRepository customizeTableRepository;
 
     @Autowired
     protected MemberGenerator memberGenerator;
-
-    @Autowired
-    protected ParliamentaryTableGenerator parliamentaryTableGenerator;
-
-    @Autowired
-    protected ParliamentaryTimeBoxGenerator parliamentaryTimeBoxGenerator;
 
     @Autowired
     protected CustomizeTableGenerator customizeTableGenerator;
