@@ -13,7 +13,6 @@ import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -34,18 +33,18 @@ public class CustomizeService {
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
-        CustomizeTable table = getOwnerTable(tableId, member.getId());
+        CustomizeTable table = getOwnerTable(tableId, member.getId(), false);
         TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new CustomizeTableResponse(table, timeBoxes);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public CustomizeTableResponse updateTable(
             CustomizeTableCreateRequest tableCreateRequest,
             long tableId,
             Member member
     ) {
-        CustomizeTable existingTable = getOwnerTable(tableId, member.getId());
+        CustomizeTable existingTable = getOwnerTable(tableId, member.getId(), true);
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.update(renewedTable);
 
@@ -57,7 +56,7 @@ public class CustomizeService {
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
-        CustomizeTable table = getOwnerTable(tableId, member.getId());
+        CustomizeTable table = getOwnerTable(tableId, member.getId(), false);
         TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         table.updateUsedAt();
 
@@ -66,7 +65,7 @@ public class CustomizeService {
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
-        CustomizeTable table = getOwnerTable(tableId, member.getId());
+        CustomizeTable table = getOwnerTable(tableId, member.getId(), false);
         TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
@@ -81,8 +80,8 @@ public class CustomizeService {
         return new TimeBoxes<>(savedTimeBoxes);
     }
 
-    private CustomizeTable getOwnerTable(long tableId, long memberId) {
-        CustomizeTable foundTable = tableRepository.getById(tableId);
+    private CustomizeTable getOwnerTable(long tableId, long memberId, boolean needWriteLock) {
+        CustomizeTable foundTable = tableRepository.getById(tableId, needWriteLock);
         validateOwn(foundTable, memberId);
         return foundTable;
     }
