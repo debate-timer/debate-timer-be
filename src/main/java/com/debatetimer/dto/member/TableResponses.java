@@ -18,5 +18,4 @@ public record TableResponses(List<TableResponse> tables) {
                 .map(TableResponse::new)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), TableResponses::new));
     }
-
 }
