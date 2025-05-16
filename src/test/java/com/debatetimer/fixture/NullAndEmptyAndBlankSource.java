@@ -12,4 +12,5 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 @ArgumentsSource(BlankArgumentsProvider.class)
 @NullAndEmptySource
 public @interface NullAndEmptyAndBlankSource {
+
 }
