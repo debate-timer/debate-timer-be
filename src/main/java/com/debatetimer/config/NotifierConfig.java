@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Profile;
 
 public class NotifierConfig {
 
+    private NotifierConfig() {
+    }
+
     @Profile({"dev", "prod"})
     @Configuration
     @RequiredArgsConstructor
