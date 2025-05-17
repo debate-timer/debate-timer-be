@@ -28,7 +28,7 @@ class TimeBoxesTest {
                     CustomizeBoxType.NORMAL, 300, "콜리2");
             List<CustomizeTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            TimeBoxes<CustomizeTimeBox> actual = new TimeBoxes<>(timeBoxes);
+            TimeBoxes actual = new TimeBoxes(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }

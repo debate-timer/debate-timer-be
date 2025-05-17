@@ -9,7 +9,7 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
 
     public CustomizeTableResponse(
             CustomizeTable customizeTable,
-            TimeBoxes<CustomizeTimeBox> timeBasedTimeBoxes
+            TimeBoxes timeBasedTimeBoxes
     ) {
         this(
                 customizeTable.getId(),
@@ -18,7 +18,7 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
         );
     }
 
-    private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(TimeBoxes<CustomizeTimeBox> timeBoxes) {
+    private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
         List<CustomizeTimeBox> customizeTimeBoxes = timeBoxes.getTimeBoxes();
         return customizeTimeBoxes
                 .stream()
