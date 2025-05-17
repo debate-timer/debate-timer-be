@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientLoggingAspect extends LoggingAspect {
 
-
     @Pointcut("@within(com.debatetimer.aop.logging.LoggingClient)")
     public void loggingClients() {
     }

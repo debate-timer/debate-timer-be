@@ -27,7 +27,7 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
             Member bito = memberGenerator.generate("default2@gmail.com");
             CustomizeTable chanTable1 = customizeTableGenerator.generate(chan);
             CustomizeTable chanTable2 = customizeTableGenerator.generate(chan);
-            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            customizeTableGenerator.generate(bito);
 
             List<CustomizeTable> foundKeoChanTables = tableRepository.findAllByMember(chan);
 

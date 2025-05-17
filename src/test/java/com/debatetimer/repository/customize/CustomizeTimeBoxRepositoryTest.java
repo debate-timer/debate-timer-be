@@ -28,8 +28,8 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
             CustomizeTimeBox chanBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
             CustomizeTimeBox chanBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
-            CustomizeTimeBox bitoBox1 = customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
-            CustomizeTimeBox bitoBox2 = customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
 
             List<CustomizeTimeBox> foundBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
 
