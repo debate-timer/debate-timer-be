@@ -47,7 +47,7 @@ public class CustomizeService {
     ) {
         CustomizeTable existingTable = getOwnerTable(tableId, member.getId());
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
-        existingTable.update(renewedTable);
+        existingTable.updateTable(renewedTable);
 
         TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
