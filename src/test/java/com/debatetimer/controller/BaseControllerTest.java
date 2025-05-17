@@ -58,6 +58,10 @@ public abstract class BaseControllerTest {
 
     private RequestSpecification spec;
 
+    private final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
+            .objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
+            .build();
+
     @BeforeEach
     void setEnvironment() {
         RestAssured.port = port;
@@ -72,18 +76,12 @@ public abstract class BaseControllerTest {
     }
 
     protected ArbitraryBuilder<CustomizeTableCreateRequest> getCustomizeTableCreateRequestBuilder() {
-        FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-                .objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
-                .build();
         return fixtureMonkey.giveMeBuilder(CustomizeTableCreateRequest.class)
                 .set("info", getCustomizeTableInfoCreateRequestBuilder().sample())
                 .set("table", getCustomizeTimeBoxCreateRequestBuilder().sampleList(2));
     }
 
     private ArbitraryBuilder<CustomizeTableInfoCreateRequest> getCustomizeTableInfoCreateRequestBuilder() {
-        FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-                .objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
-                .build();
         return fixtureMonkey.giveMeBuilder(CustomizeTableInfoCreateRequest.class)
                 .set("name", "자유 테이블")
                 .set("agenda", "주제")
@@ -94,9 +92,6 @@ public abstract class BaseControllerTest {
     }
 
     private ArbitraryBuilder<CustomizeTimeBoxCreateRequest> getCustomizeTimeBoxCreateRequestBuilder() {
-        FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-                .objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
-                .build();
         return fixtureMonkey.giveMeBuilder(CustomizeTimeBoxCreateRequest.class)
                 .set("stance", Stance.PROS)
                 .set("speechType", "입론1")
