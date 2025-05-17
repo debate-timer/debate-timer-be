@@ -21,7 +21,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,7 @@ public abstract class BaseControllerTest {
                 .build();
         return fixtureMonkey.giveMeBuilder(CustomizeTableCreateRequest.class)
                 .set("info", getCustomizeTableInfoCreateRequestBuilder().sample())
-                .set("table", List.of(getCustomizeTimeBoxCreateRequestBuilder().sample()));
+                .set("table", getCustomizeTimeBoxCreateRequestBuilder().sampleList(2));
     }
 
     private ArbitraryBuilder<CustomizeTableInfoCreateRequest> getCustomizeTableInfoCreateRequestBuilder() {
