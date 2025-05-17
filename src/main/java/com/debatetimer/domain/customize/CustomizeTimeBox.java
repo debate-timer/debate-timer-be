@@ -1,6 +1,5 @@
 package com.debatetimer.domain.customize;
 
-import com.debatetimer.domain.DebateTimeBox;
 import com.debatetimer.domain.Stance;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -22,10 +21,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTimeBox extends DebateTimeBox {
+public class CustomizeTimeBox {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
     public static final int TIME_MULTIPLIER = 2;
+    public static final int SPEAKER_MAX_LENGTH = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +35,15 @@ public class CustomizeTimeBox extends DebateTimeBox {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id")
     private CustomizeTable customizeTable;
+
+    private int sequence;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Stance stance;
+
+    private int time;
+    private String speaker;
 
     @NotBlank
     private String speechType;
@@ -55,11 +64,17 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Integer time,
             String speaker
     ) {
-        super(sequence, stance, time, speaker);
         validateNotTimeBasedType(boxType);
         validateSpeechType(speechType);
+        validateSpeaker(speaker);
+        validateSequence(sequence);
+        validateTime(time);
 
         this.customizeTable = customizeTable;
+        this.sequence = sequence;
+        this.stance = stance;
+        this.time = time;
+        this.speaker = initializeSpeaker(speaker);
         this.speechType = speechType;
         this.boxType = boxType;
     }
@@ -74,11 +89,17 @@ public class CustomizeTimeBox extends DebateTimeBox {
             Integer timePerSpeaking,
             String speaker
     ) {
-        super(sequence, stance, convertToTime(timePerTeam), speaker);
         validateTimeBasedTimes(timePerTeam, timePerSpeaking);
         validateTimeBasedType(boxType);
         validateSpeechType(speechType);
+        validateSpeaker(speaker);
+        validateSequence(sequence);
+        validateTime(convertToTime(timePerTeam));
 
+        this.sequence = sequence;
+        this.stance = stance;
+        this.time = convertToTime(timePerTeam);
+        this.speaker = initializeSpeaker(speaker);
         this.customizeTable = customizeTable;
         this.speechType = speechType;
         this.boxType = boxType;
@@ -91,6 +112,32 @@ public class CustomizeTimeBox extends DebateTimeBox {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
         }
         return timePerTeam * TIME_MULTIPLIER;
+    }
+
+
+    private String initializeSpeaker(String speaker) {
+        if (speaker == null || speaker.isBlank()) {
+            return null;
+        }
+        return speaker;
+    }
+
+    private void validateSpeaker(String speaker) {
+        if (speaker != null && speaker.length() > SPEAKER_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
+        }
+    }
+
+    private void validateSequence(int sequence) {
+        if (sequence <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
+        }
+    }
+
+    private void validateTime(int time) {
+        if (time <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
+        }
     }
 
     private void validateTime(Integer time) {

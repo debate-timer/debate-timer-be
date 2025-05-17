@@ -9,8 +9,83 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CustomizeTimeBoxTest {
+
+    @Nested
+    class ValidateSequence {
+
+        @ValueSource(ints = {0, -1})
+        @ParameterizedTest
+        void 순서는_양수만_가능하다(int sequence) {
+            CustomizeTable table = new CustomizeTable();
+            CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
+
+            assertThatThrownBy(() -> new CustomizeTimeBox(table, sequence, Stance.NEUTRAL, "자유토론",
+                    customizeBoxType, 120, 60, "발언자"))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE.getMessage());
+        }
+    }
+
+    @Nested
+    class ValidateTime {
+
+        @ValueSource(ints = {0, -1})
+        @ParameterizedTest
+        void 시간은_양수만_가능하다(int time) {
+            CustomizeTable table = new CustomizeTable();
+            CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
+
+            assertThatThrownBy(
+                    () -> new CustomizeTimeBox(table, 1, Stance.CONS, "자유토론",
+                            customizeBoxType, time, 60, "발언자"))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
+        }
+    }
+
+    @Nested
+    class ValidateSpeaker {
+
+        @Test
+        void 발언자_이름은_일정길이_이내로_허용된다() {
+            CustomizeTable table = new CustomizeTable();
+            CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
+            String speaker = "k".repeat(CustomizeTimeBox.SPEAKER_MAX_LENGTH + 1);
+
+            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+                    customizeBoxType, 120, speaker))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 발언자는_빈_값이_허용된다(String speaker) {
+            CustomizeTable table = new CustomizeTable();
+            CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
+
+            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+                    customizeBoxType, 120, speaker))
+                    .doesNotThrowAnyException();
+        }
+
+        @ValueSource(strings = {"   ", " "})
+        @ParameterizedTest
+        void 발언자는_공백이_입력되면_null로_저장된다(String speaker) {
+            CustomizeTable table = new CustomizeTable();
+            CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
+
+            CustomizeTimeBox timeBox = new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+                    customizeBoxType, 120, speaker);
+
+            assertThat(timeBox.getSpeaker()).isNull();
+        }
+    }
 
     @Nested
     class ValidateCustomizeTime {
