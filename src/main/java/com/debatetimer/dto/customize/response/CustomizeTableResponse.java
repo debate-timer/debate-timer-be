@@ -9,12 +9,12 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
 
     public CustomizeTableResponse(
             CustomizeTable customizeTable,
-            TimeBoxes timeBasedTimeBoxes
+            TimeBoxes timeBoxes
     ) {
         this(
                 customizeTable.getId(),
                 new CustomizeTableInfoResponse(customizeTable),
-                toTimeBoxResponses(timeBasedTimeBoxes)
+                toTimeBoxResponses(timeBoxes)
         );
     }
 
