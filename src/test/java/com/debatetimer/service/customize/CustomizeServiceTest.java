@@ -84,7 +84,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> customizeService.findTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
     }
 
@@ -138,7 +138,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> customizeService.updateTable(renewTableRequest, chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -199,7 +199,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> customizeService.updateTable(renewTableRequest, chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
     }
 
@@ -234,7 +234,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> customizeService.deleteTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.NOT_TABLE_OWNER.getMessage());
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
     }
 }
