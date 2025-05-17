@@ -82,7 +82,6 @@ public class CustomizeTable {
     }
 
     public void updateTable(CustomizeTable renewTable) {
-        validateTableName(renewTable.getName());
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
         this.prosTeamName = renewTable.getProsTeamName();
