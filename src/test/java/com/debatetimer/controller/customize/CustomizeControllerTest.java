@@ -9,14 +9,18 @@ import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
-import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
-import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.exception.ErrorResponse;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.fixture.NullAndEmptyAndBlankSource;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
-import java.util.List;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.springframework.http.HttpStatus;
 
 class CustomizeControllerTest extends BaseControllerTest {
 
@@ -25,31 +29,122 @@ class CustomizeControllerTest extends BaseControllerTest {
 
         @Test
         void 사용자_지정_테이블을_생성한다() {
-            Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableCreateRequest request = new CustomizeTableCreateRequest(
-                    new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
-                            "반대", true, true),
-                    List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, null)
-                    )
-            );
-            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[1].speaker", null)
+                    .sample();
 
-            CustomizeTableResponse response = given()
-                    .contentType(ContentType.JSON)
-                    .headers(headers)
-                    .body(request)
-                    .when().post("/api/table/customize")
-                    .then().statusCode(201)
+            CustomizeTableResponse response = sendCustomizeTableSaveRequest(request, HttpStatus.CREATED)
                     .extract().as(CustomizeTableResponse.class);
 
             assertAll(
                     () -> assertThat(response.info().name()).isEqualTo(request.info().name()),
                     () -> assertThat(response.table()).hasSize(request.table().size())
             );
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_생성할때_테이블_이름은_개행문자_외_다른_글자가_포함되야한다(String tableName) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.name", tableName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_생성할때_테이블_주제는_null이_올_수_없다(String agenda) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.agenda", agenda)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_생성할때_찬성팀_이름은_개행문자_외_다른_글자가_포함되야한다(String prosTeamName) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.prosTeamName", prosTeamName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_생성할때_반대팀_이름은_개행문자_외_다른_글자가_포함되야한다(String consTeamName) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.consTeamName", consTeamName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_생성할때_타임박스_입장은_null이_올_수_없다(Stance stance) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].stance", stance)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_생성할때_타임박스_발언_유형은_개행문자_외_다른_글자가_포함되야한다(String speechType) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].speechType", speechType)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_생성할때_타임박스_타입은_null이_올_수_없다(CustomizeBoxType boxType) {
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].boxType", boxType)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        private ValidatableResponse sendCustomizeTableSaveRequest(
+                CustomizeTableCreateRequest request,
+                HttpStatus statusCode
+        ) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            return given()
+                    .contentType(ContentType.JSON)
+                    .headers(headers)
+                    .body(request)
+                    .when().post("/api/table/customize")
+                    .then().statusCode(statusCode.value());
         }
     }
 
@@ -86,32 +181,155 @@ class CustomizeControllerTest extends BaseControllerTest {
         void 사용자_지정_토론_테이블을_업데이트한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
             CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
-            CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
-                    new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
-                            "반대", true, true),
-                    List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, null)
-                    )
-            );
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest renewTableRequest = getCustomizeTableCreateRequestBuilder()
+                    .set("table[1].speaker", null)
+                    .sample();
 
-            CustomizeTableResponse response = given()
-                    .contentType(ContentType.JSON)
-                    .pathParam("tableId", bitoTable.getId())
-                    .headers(headers)
-                    .body(renewTableRequest)
-                    .when().put("/api/table/customize/{tableId}")
-                    .then().statusCode(200)
-                    .extract().as(CustomizeTableResponse.class);
+            CustomizeTableResponse response = sendCustomizeTableUpdateRequest(
+                    renewTableRequest, HttpStatus.OK, bitoTable, headers
+            ).extract().as(CustomizeTableResponse.class);
 
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(bitoTable.getId()),
                     () -> assertThat(response.info().name()).isEqualTo(renewTableRequest.info().name()),
                     () -> assertThat(response.table()).hasSize(renewTableRequest.table().size())
             );
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_업데이트할때_테이블_이름은_개행문자_외_다른_글자가_포함되야한다(String tableName) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.name", tableName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_업데이트할때_테이블_주제는_null이_올_수_없다(String agenda) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.agenda", agenda)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_업데이트할때_찬성팀_이름은_개행문자_외_다른_글자가_포함되야한다(String prosTeamName) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.prosTeamName", prosTeamName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_업데이트할때_반대팀_이름은_개행문자_외_다른_글자가_포함되야한다(String consTeamName) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("info.consTeamName", consTeamName)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_업데이트할때_타임박스_입장은_null이_올_수_없다(Stance stance) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].stance", stance)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 사용자_지정_테이블을_업데이트할때_타임박스_발언_유형은_개행문자_외_다른_글자가_포함되야한다(String speechType) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].speechType", speechType)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        @NullSource
+        @ParameterizedTest
+        void 사용자_지정_테이블을_업데이트할때_타임박스_타입은_null이_올_수_없다(CustomizeBoxType boxType) {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTable bitoTable = customizeTableGenerator.generate(bito);
+            Headers headers = headerGenerator.generateAccessTokenHeader(bito);
+            CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
+                    .set("table[0].boxType", boxType)
+                    .sample();
+
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
+                    request, HttpStatus.BAD_REQUEST, bitoTable, headers
+            ).extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
+        }
+
+        private ValidatableResponse sendCustomizeTableUpdateRequest(
+                CustomizeTableCreateRequest request,
+                HttpStatus statusCode,
+                CustomizeTable table,
+                Headers headers
+        ) {
+            return given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("tableId", table.getId())
+                    .headers(headers)
+                    .body(request)
+                    .when().put("/api/table/customize/{tableId}")
+                    .then().statusCode(statusCode.value());
         }
     }
 

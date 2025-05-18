@@ -5,12 +5,14 @@ import com.debatetimer.client.notifier.ConsoleNotifier;
 import com.debatetimer.client.notifier.DiscordNotifier;
 import com.debatetimer.client.notifier.DiscordProperties;
 import com.debatetimer.client.notifier.ErrorNotifier;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class NotifierConfig {
 
     @Profile({"dev", "prod"})

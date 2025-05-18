@@ -79,8 +79,8 @@ class DebateTableTest {
             assertAll(
                     () -> assertThat(table.getName()).isEqualTo("newName"),
                     () -> assertThat(table.getAgenda()).isEqualTo("newAgenda"),
-                    () -> assertThat(table.isWarningBell()).isEqualTo(false),
-                    () -> assertThat(table.isFinishBell()).isEqualTo(false)
+                    () -> assertThat(table.isWarningBell()).isFalse(),
+                    () -> assertThat(table.isFinishBell()).isFalse()
             );
         }
 
