@@ -33,7 +33,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[1].speaker", null)
                     .sample();
 
-            CustomizeTableResponse response = sendCustomizeTableCreateRequest(request, HttpStatus.CREATED)
+            CustomizeTableResponse response = sendCustomizeTableSaveRequest(request, HttpStatus.CREATED)
                     .extract().as(CustomizeTableResponse.class);
 
             assertAll(
@@ -49,7 +49,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.name", tableName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -62,7 +62,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.agenda", agenda)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -75,7 +75,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.prosTeamName", prosTeamName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -88,7 +88,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.consTeamName", consTeamName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -101,7 +101,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].stance", stance)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -114,7 +114,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].speechType", speechType)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
@@ -127,13 +127,13 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].boxType", boxType)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(request, HttpStatus.BAD_REQUEST)
+            ErrorResponse errorResponse = sendCustomizeTableSaveRequest(request, HttpStatus.BAD_REQUEST)
                     .extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
         }
 
-        private ValidatableResponse sendCustomizeTableCreateRequest(
+        private ValidatableResponse sendCustomizeTableSaveRequest(
                 CustomizeTableCreateRequest request,
                 HttpStatus statusCode
         ) {
@@ -186,7 +186,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[1].speaker", null)
                     .sample();
 
-            CustomizeTableResponse response = sendCustomizeTableCreateRequest(
+            CustomizeTableResponse response = sendCustomizeTableUpdateRequest(
                     renewTableRequest, HttpStatus.OK, bitoTable, headers
             ).extract().as(CustomizeTableResponse.class);
 
@@ -207,7 +207,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.name", tableName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -224,7 +224,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.agenda", agenda)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -241,7 +241,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.prosTeamName", prosTeamName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -259,7 +259,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("info.consTeamName", consTeamName)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -276,7 +276,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].stance", stance)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -293,7 +293,7 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].speechType", speechType)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
@@ -310,14 +310,14 @@ class CustomizeControllerTest extends BaseControllerTest {
                     .set("table[0].boxType", boxType)
                     .sample();
 
-            ErrorResponse errorResponse = sendCustomizeTableCreateRequest(
+            ErrorResponse errorResponse = sendCustomizeTableUpdateRequest(
                     request, HttpStatus.BAD_REQUEST, bitoTable, headers
             ).extract().as(ErrorResponse.class);
 
             assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.FIELD_ERROR.getMessage());
         }
 
-        private ValidatableResponse sendCustomizeTableCreateRequest(
+        private ValidatableResponse sendCustomizeTableUpdateRequest(
                 CustomizeTableCreateRequest request,
                 HttpStatus statusCode,
                 CustomizeTable table,
