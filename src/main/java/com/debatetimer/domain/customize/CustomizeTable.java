@@ -91,7 +91,7 @@ public class CustomizeTable {
         this.usedAt = LocalDateTime.now();
     }
 
-    public final void updateUsedAt() {
+    public void updateUsedAt() {
         this.usedAt = LocalDateTime.now();
     }
 
