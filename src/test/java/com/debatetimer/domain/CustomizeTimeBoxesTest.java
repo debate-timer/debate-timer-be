@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class TimeBoxesTest {
+class CustomizeTimeBoxesTest {
 
     @Nested
     class SortedBySequence {
@@ -28,7 +28,7 @@ class TimeBoxesTest {
                     CustomizeBoxType.NORMAL, 300, "콜리2");
             List<CustomizeTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            TimeBoxes actual = new TimeBoxes(timeBoxes);
+            CustomizeTimeBoxes actual = new CustomizeTimeBoxes(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }

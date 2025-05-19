@@ -1,6 +1,6 @@
 package com.debatetimer.dto.customize.response;
 
-import com.debatetimer.domain.TimeBoxes;
+import com.debatetimer.domain.CustomizeTimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import java.util.List;
@@ -9,16 +9,16 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
 
     public CustomizeTableResponse(
             CustomizeTable customizeTable,
-            TimeBoxes timeBoxes
+            CustomizeTimeBoxes customizeTimeBoxes
     ) {
         this(
                 customizeTable.getId(),
                 new CustomizeTableInfoResponse(customizeTable),
-                toTimeBoxResponses(timeBoxes)
+                toTimeBoxResponses(customizeTimeBoxes)
         );
     }
 
-    private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(TimeBoxes timeBoxes) {
+    private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(CustomizeTimeBoxes timeBoxes) {
         List<CustomizeTimeBox> customizeTimeBoxes = timeBoxes.getTimeBoxes();
         return customizeTimeBoxes
                 .stream()

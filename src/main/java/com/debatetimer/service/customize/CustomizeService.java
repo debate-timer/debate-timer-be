@@ -1,6 +1,6 @@
 package com.debatetimer.service.customize;
 
-import com.debatetimer.domain.TimeBoxes;
+import com.debatetimer.domain.CustomizeTimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
@@ -28,15 +28,15 @@ public class CustomizeService {
         CustomizeTable table = tableCreateRequest.toTable(member);
         CustomizeTable savedTable = tableRepository.save(table);
 
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
-        return new CustomizeTableResponse(savedTable, savedTimeBoxes);
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        return new CustomizeTableResponse(savedTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
         CustomizeTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        return new CustomizeTableResponse(table, timeBoxes);
+        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        return new CustomizeTableResponse(table, customizeTimeBoxes);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -49,36 +49,36 @@ public class CustomizeService {
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        TimeBoxes savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
-        return new CustomizeTableResponse(existingTable, savedTimeBoxes);
+        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        return new CustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
         CustomizeTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         table.updateUsedAt();
 
-        return new CustomizeTableResponse(table, timeBoxes);
+        return new CustomizeTableResponse(table, customizeTimeBoxes);
     }
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
         CustomizeTable table = getOwnerTable(tableId, member.getId());
-        TimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
+        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private TimeBoxes saveTimeBoxes(
+    private CustomizeTimeBoxes saveTimeBoxes(
             CustomizeTableCreateRequest tableCreateRequest,
             CustomizeTable table
     ) {
-        TimeBoxes timeBoxes = tableCreateRequest.toTimeBoxes(table);
-        List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new TimeBoxes(savedTimeBoxes);
+        CustomizeTimeBoxes customizeTimeBoxes = tableCreateRequest.toTimeBoxes(table);
+        List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(customizeTimeBoxes.getTimeBoxes());
+        return new CustomizeTimeBoxes(savedTimeBoxes);
     }
 
     private CustomizeTable getOwnerTable(long tableId, long memberId) {
