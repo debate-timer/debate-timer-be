@@ -1,10 +1,8 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.customize;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,8 +1,8 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.CustomizeTimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,8 +1,8 @@
 package com.debatetimer.service.customize;
 
-import com.debatetimer.domain.CustomizeTimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
