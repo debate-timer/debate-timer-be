@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 public class DiscordNotifier implements ErrorNotifier {
 
     private static final String NOTIFICATION_PREFIX = ":rotating_light:  [**Error 발생!**]\n";
-    private static final String STACK_TRACE_AFFIX =  "\n```\n";
+    private static final String STACK_TRACE_AFFIX = "\n```\n";
     private static final String DISCORD_LINE_SEPARATOR = "\n";
     private static final int STACK_TRACE_LENGTH = 10;
 
@@ -29,6 +29,7 @@ public class DiscordNotifier implements ErrorNotifier {
         try {
             return JDABuilder.createDefault(token).build().awaitReady();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new DTInitializationException(InitializationErrorCode.JDA_INITIALIZATION_FAIL);
         }
     }
