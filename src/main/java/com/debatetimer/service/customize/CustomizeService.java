@@ -1,8 +1,8 @@
 package com.debatetimer.service.customize;
 
-import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
@@ -27,15 +27,15 @@ public class CustomizeService {
         CustomizeTable table = tableCreateRequest.toTable(member);
         CustomizeTable savedTable = tableRepository.save(table);
 
-        TimeBoxes<CustomizeTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
-        return new CustomizeTableResponse(savedTable, savedTimeBoxes);
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
+        return new CustomizeTableResponse(savedTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
         CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new CustomizeTableResponse(table, timeBoxes);
     }
 
@@ -48,19 +48,19 @@ public class CustomizeService {
         CustomizeTable existingTable = tableRepository.findByIdAndMemberWithLock(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
-        existingTable.update(renewedTable);
+        existingTable.updateTable(renewedTable);
 
-        TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
-        TimeBoxes<CustomizeTimeBox> savedTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
-        return new CustomizeTableResponse(existingTable, savedTimeBoxes);
+        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
+        timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
+        return new CustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
         CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         table.updateUsedAt();
 
         return new CustomizeTableResponse(table, timeBoxes);
@@ -70,17 +70,17 @@ public class CustomizeService {
     public void deleteTable(long tableId, Member member) {
         CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        TimeBoxes<CustomizeTimeBox> timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
+        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
         tableRepository.delete(table);
     }
 
-    private TimeBoxes<CustomizeTimeBox> saveTimeBoxes(
+    private CustomizeTimeBoxes saveTimeBoxes(
             CustomizeTableCreateRequest tableCreateRequest,
             CustomizeTable table
     ) {
-        TimeBoxes<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxes(table);
-        List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(timeBoxes.getTimeBoxes());
-        return new TimeBoxes<>(savedTimeBoxes);
+        CustomizeTimeBoxes customizeTimeBoxes = tableCreateRequest.toTimeBoxes(table);
+        List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(customizeTimeBoxes.getTimeBoxes());
+        return new CustomizeTimeBoxes(savedTimeBoxes);
     }
 }

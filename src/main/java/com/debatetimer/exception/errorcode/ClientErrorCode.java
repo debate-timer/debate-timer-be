@@ -1,7 +1,5 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.DebateTable;
-import com.debatetimer.domain.DebateTimeBox;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import lombok.Getter;
@@ -12,7 +10,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(DebateTable.NAME_MAX_LENGTH)
+            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(CustomizeTable.TABLE_NAME_MAX_LENGTH)
     ),
     INVALID_TABLE_NAME_FORM(
             HttpStatus.BAD_REQUEST,
@@ -32,7 +30,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ),
     INVALID_TIME_BOX_SPEAKER_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "발언자 이름은 1자 이상 %d자 이하여야 합니다.".formatted(DebateTimeBox.SPEAKER_MAX_LENGTH)
+            "발언자 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBox.SPEAKER_MAX_LENGTH)
     ),
     INVALID_TEAM_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,

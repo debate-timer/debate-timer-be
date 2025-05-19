@@ -1,10 +1,8 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.customize;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.member.Member;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class TimeBoxesTest {
+class CustomizeTimeBoxesTest {
 
     @Nested
     class SortedBySequence {
@@ -28,7 +26,7 @@ class TimeBoxesTest {
                     CustomizeBoxType.NORMAL, 300, "콜리2");
             List<CustomizeTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            TimeBoxes<CustomizeTimeBox> actual = new TimeBoxes<>(timeBoxes);
+            CustomizeTimeBoxes actual = new CustomizeTimeBoxes(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }
