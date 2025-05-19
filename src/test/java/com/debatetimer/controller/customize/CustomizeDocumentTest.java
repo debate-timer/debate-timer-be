@@ -259,7 +259,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND", "NOT_TABLE_OWNER"})
+        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND"})
         void 사용자_지정_테이블_조회_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
             doThrow(new DTClientErrorException(errorCode)).when(customizeService).findTable(eq(tableId), any());
@@ -387,6 +387,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         @EnumSource(
                 value = ClientErrorCode.class,
                 names = {
+                        "TABLE_NOT_FOUND",
                         "INVALID_TABLE_NAME_LENGTH",
                         "INVALID_TABLE_NAME_FORM",
                         "INVALID_TABLE_TIME",
@@ -507,7 +508,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND", "NOT_TABLE_OWNER"})
+        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND"})
         void 사용자_지정_토론_진행_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
             doThrow(new DTClientErrorException(errorCode)).when(customizeService).updateUsedAt(eq(tableId), any());
@@ -555,7 +556,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                     .then().statusCode(204);
         }
 
-        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND", "NOT_TABLE_OWNER"})
+        @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND"})
         @ParameterizedTest
         void 사용자_지정_테이블_삭제_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
