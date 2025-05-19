@@ -14,7 +14,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -75,10 +74,6 @@ public class CustomizeTable {
         this.warningBell = warningBell;
         this.finishBell = finishBell;
         this.usedAt = LocalDateTime.now();
-    }
-
-    public boolean isOwner(long memberId) {
-        return Objects.equals(this.member.getId(), memberId);
     }
 
     public void updateTable(CustomizeTable renewTable) {
