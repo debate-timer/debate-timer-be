@@ -57,7 +57,9 @@ public enum ClientErrorCode implements ResponseErrorCode {
     METHOD_NOT_SUPPORTED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."),
     MEDIA_TYPE_NOT_SUPPORTED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 미디어 타입입니다."),
     ALREADY_DISCONNECTED(HttpStatus.BAD_REQUEST, "이미 클라이언트에서 요청이 종료되었습니다."),
-    NO_COOKIE_FOUND(HttpStatus.BAD_REQUEST, "필수 쿠키 값이 존재하지 않습니다.");
+    NO_COOKIE_FOUND(HttpStatus.BAD_REQUEST, "필수 쿠키 값이 존재하지 않습니다."),
+    FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;
