@@ -1,9 +1,8 @@
 package com.debatetimer.domain;
 
 import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.TableName;
-import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.member.Member;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -24,10 +23,11 @@ public class DebateTable {
                 member,
                 name.getValue(),
                 agenda,
+                prosTeamName.getValue(),
+                consTeamName.getValue(),
                 warningBell,
                 finishBell,
-                prosTeamName.getValue(),
-                consTeamName.getValue()
+                LocalDateTime.now()
         );
     }
 }

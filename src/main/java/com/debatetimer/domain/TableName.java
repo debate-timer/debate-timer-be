@@ -1,4 +1,4 @@
-package com.debatetimer.domain.customize;
+package com.debatetimer.domain;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
