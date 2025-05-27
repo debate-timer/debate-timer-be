@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -142,8 +143,8 @@ class CustomizeTableTest {
         void 테이블_정보를_업데이트_할_수_있다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", true, true, "pros", "cons");
-            CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda", false, false, "newPros",
-                    "newCons");
+            DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
+                    new TeamName("newPros"), new TeamName("newCons"), false, false);
 
             table.updateTable(renewTable);
 
@@ -161,8 +162,8 @@ class CustomizeTableTest {
         void 테이블_업데이트_할_때_사용_시간을_변경한다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", true, true, "pros", "cons");
-            CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda", false, false, "newPros",
-                    "newCons");
+            DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
+                    new TeamName("newPros"), new TeamName("newcons"), false, false);
             LocalDateTime beforeUsedAt = table.getUsedAt();
             Thread.sleep(1);
 

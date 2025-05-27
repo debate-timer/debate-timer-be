@@ -1,5 +1,6 @@
 package com.debatetimer.dto.customize.request;
 
+import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
@@ -13,7 +14,7 @@ public record CustomizeTableCreateRequest(
         @Valid List<CustomizeTimeBoxCreateRequest> table
 ) {
 
-    public CustomizeTable toTable(Member member) {
+    public DebateTable toTable(Member member) {
         return info.toTable(member);
     }
 

@@ -1,5 +1,6 @@
 package com.debatetimer.domain.customize;
 
+import com.debatetimer.domain.DebateTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -76,11 +77,11 @@ public class CustomizeTable {
         this.usedAt = LocalDateTime.now();
     }
 
-    public void updateTable(CustomizeTable renewTable) {
-        this.name = renewTable.getName();
+    public void updateTable(DebateTable renewTable) {
+        this.name = renewTable.getName().getValue();
         this.agenda = renewTable.getAgenda();
-        this.prosTeamName = renewTable.getProsTeamName();
-        this.consTeamName = renewTable.getConsTeamName();
+        this.prosTeamName = renewTable.getProsTeamName().getValue();
+        this.consTeamName = renewTable.getConsTeamName().getValue();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
         this.usedAt = LocalDateTime.now();
