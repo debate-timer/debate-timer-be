@@ -18,7 +18,7 @@ public class TeamName {
     }
 
     private void validate(String teamName) {
-        if (teamName.length() > NAME_MAX_LENGTH) {
+        if (teamName.isBlank() || teamName.length() > NAME_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TEAM_NAME_LENGTH);
         }
         if (!teamName.matches(NAME_REGEX)) {

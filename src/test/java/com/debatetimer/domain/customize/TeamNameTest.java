@@ -8,6 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class TeamNameTest {
@@ -21,6 +22,15 @@ class TeamNameTest {
 
             assertThatThrownBy(
                     () -> new TeamName(longTeamName))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_LENGTH.getMessage());
+        }
+
+        @ParameterizedTest
+        @EmptySource
+        @ValueSource(strings = {"  "})
+        void 팀_이름은_빈_값을_허용하지_않는다(String invalidTeamName) {
+            assertThatThrownBy(() -> new TeamName(invalidTeamName))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TEAM_NAME_LENGTH.getMessage());
         }
