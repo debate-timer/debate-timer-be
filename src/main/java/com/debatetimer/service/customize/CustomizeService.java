@@ -45,13 +45,12 @@ public class CustomizeService {
             long tableId,
             Member member
     ) {
-        CustomizeTable existingTable = tableRepository.findByIdAndMemberWithLock(tableId, member)
+        CustomizeTable existingTable = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
-        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAllByTable(existingTable);
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new CustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
@@ -70,8 +69,7 @@ public class CustomizeService {
     public void deleteTable(long tableId, Member member) {
         CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAllByTable(table);
         tableRepository.delete(table);
     }
 
