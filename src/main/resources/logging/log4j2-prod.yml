@@ -18,7 +18,7 @@ Configuration:
         eventEol: true
         properties: true
         stacktraceAsString: true
-        objectMessageAsJsonObject: false
+        objectMessageAsJsonObject: true
       immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
 
       Policies:
