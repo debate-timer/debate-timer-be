@@ -2,14 +2,6 @@ spring:
   profiles:
     default: local
 
-server:
-  error:
-    include-message: never
-    include-exception: false
-    include-stacktrace: never
-    whitelabel:
-      enabled: false
-
 springdoc:
   swagger-ui:
     path: /docs/swagger
