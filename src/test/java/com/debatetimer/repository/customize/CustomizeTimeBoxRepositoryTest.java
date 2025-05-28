@@ -36,4 +36,21 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             assertThat(foundBoxes).containsExactly(chanBox1, chanBox2);
         }
     }
+
+    @Nested
+    class DeleteAllByTable {
+
+        @Test
+        void 특정_테이블의_타임박스를_모두_삭제한다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+
+            customizeTimeBoxRepository.deleteAllByTable(chanTable);
+
+            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
+            assertThat(timeBoxes).isEmpty();
+        }
+    }
 }

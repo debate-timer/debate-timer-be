@@ -31,4 +31,8 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBox,
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     void deleteAll(List<CustomizeTimeBox> timeBoxes);
+
+    @Query("DELETE FROM CustomizeTimeBox ctb WHERE ctb.customizeTable = :table")
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void deleteAllByTable(CustomizeTable table);
 }
