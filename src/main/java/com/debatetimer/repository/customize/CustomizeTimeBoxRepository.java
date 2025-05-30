@@ -1,8 +1,8 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.TimeBoxes;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,9 +22,9 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBox,
 
     List<CustomizeTimeBox> findAllByCustomizeTable(CustomizeTable table);
 
-    default TimeBoxes<CustomizeTimeBox> findTableTimeBoxes(CustomizeTable table) {
+    default CustomizeTimeBoxes findTableTimeBoxes(CustomizeTable table) {
         List<CustomizeTimeBox> timeBoxes = findAllByCustomizeTable(table);
-        return new TimeBoxes<>(timeBoxes);
+        return new CustomizeTimeBoxes(timeBoxes);
     }
 
     @Query("DELETE FROM CustomizeTimeBox ctb WHERE ctb IN :timeBoxes")

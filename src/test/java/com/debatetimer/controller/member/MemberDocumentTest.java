@@ -108,8 +108,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @Test
         void 테이블_조회_성공() {
             TableResponses response = new TableResponses(
-                    List.of(new TableResponse(1L, "토론 테이블 1", TableType.PARLIAMENTARY, "주제1"),
-                            new TableResponse(2L, "토론 테이블 2", TableType.PARLIAMENTARY, "주제2"))
+                    List.of(new TableResponse(1L, "토론 테이블 1", TableType.CUSTOMIZE, "주제1"),
+                            new TableResponse(2L, "토론 테이블 2", TableType.CUSTOMIZE, "주제2"))
             );
             doReturn(response).when(memberService).getTables(EXIST_MEMBER_ID);
 
