@@ -3,11 +3,9 @@ package com.debatetimer.domain.customize;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class CustomizeTable {
 
     private final Member member;
@@ -17,6 +15,24 @@ public class CustomizeTable {
     private final TeamName consTeamName;
     private final boolean warningBell;
     private final boolean finishBell;
+
+    public CustomizeTable(
+            Member member,
+            String name,
+            String agenda,
+            String prosTeamName,
+            String consTeamName,
+            boolean warningBell,
+            boolean finishBell
+    ) {
+        this.member = member;
+        this.name = new TableName(name);
+        this.agenda = agenda;
+        this.prosTeamName = new TeamName(prosTeamName);
+        this.consTeamName = new TeamName(consTeamName);
+        this.warningBell = warningBell;
+        this.finishBell = finishBell;
+    }
 
     public CustomizeTableEntity toEntity() {
         return new CustomizeTableEntity(

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.TableName;
-import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import java.time.LocalDateTime;
@@ -49,8 +47,8 @@ class CustomizeTableEntityTest {
             Member member = new Member("default@gmail.com");
             CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
-            CustomizeTable renewTable = new CustomizeTable(member, new TableName("newName"), "newAgenda",
-                    new TeamName("newPros"), new TeamName("newCons"), false, false);
+            CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
+                    "newPros", "newCons", false, false);
 
             table.updateTable(renewTable);
 
@@ -69,8 +67,8 @@ class CustomizeTableEntityTest {
             Member member = new Member("default@gmail.com");
             CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
-            CustomizeTable renewTable = new CustomizeTable(member, new TableName("newName"), "newAgenda",
-                    new TeamName("newPros"), new TeamName("newcons"), false, false);
+            CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
+                    "newPros", "newCons", false, false);
             LocalDateTime beforeUsedAt = table.getUsedAt();
 
             table.updateTable(renewTable);
