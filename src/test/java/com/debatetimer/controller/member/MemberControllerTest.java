@@ -10,6 +10,7 @@ import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
 import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.fixture.NullAndEmptyAndBlankSource;
@@ -30,7 +31,7 @@ class MemberControllerTest extends BaseControllerTest {
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "커스텀 테이블", "주제", "찬성", "반대", false, false);
-            customizeTableRepository.save(table.toEntity());
+            customizeTableRepository.save(new CustomizeTableEntity(table));
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             TableResponses response = given()

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -34,34 +35,32 @@ public class CustomizeTableEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @NotBlank
     private String name;
+
     private String agenda;
+
+    @NotBlank
     private String prosTeamName;
+
+    @NotBlank
     private String consTeamName;
+
     private boolean warningBell;
     private boolean finishBell;
 
     @NotNull
     private LocalDateTime usedAt;
 
-    public CustomizeTableEntity(
-            Member member,
-            String name,
-            String agenda,
-            String prosTeamName,
-            String consTeamName,
-            boolean warningBell,
-            boolean finishBell,
-            LocalDateTime usedAt
-    ) {
-        this.member = member;
-        this.name = name;
-        this.agenda = agenda;
-        this.prosTeamName = prosTeamName;
-        this.consTeamName = consTeamName;
-        this.warningBell = warningBell;
-        this.finishBell = finishBell;
-        this.usedAt = usedAt;
+    public CustomizeTableEntity(CustomizeTable customizeTable) {
+        this.member = customizeTable.getMember();
+        this.name = customizeTable.getName();
+        this.agenda = customizeTable.getAgenda();
+        this.prosTeamName = customizeTable.getProsTeamName();
+        this.consTeamName = customizeTable.getConsTeamName();
+        this.warningBell = customizeTable.isWarningBell();
+        this.finishBell = customizeTable.isFinishBell();
+        this.usedAt = LocalDateTime.now();
     }
 
     public void updateTable(CustomizeTable renewTable) {

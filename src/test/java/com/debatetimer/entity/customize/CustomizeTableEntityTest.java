@@ -27,15 +27,17 @@ class CustomizeTableEntityTest {
     class UpdateUsedAt {
 
         @Test
-        void 테이블의_사용_시각을_업데이트한다() {
+        void 테이블의_사용_시각을_업데이트한다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
-            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
-                    "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
-            LocalDateTime beforeUsedAt = table.getUsedAt();
+            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
+                    true, true);
+            CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
+            LocalDateTime beforeUsedAt = customizeTableEntity.getUsedAt();
+            Thread.sleep(1L);
 
-            table.updateUsedAt();
+            customizeTableEntity.updateUsedAt();
 
-            assertThat(table.getUsedAt()).isAfter(beforeUsedAt);
+            assertThat(customizeTableEntity.getUsedAt()).isAfter(beforeUsedAt);
         }
     }
 
@@ -43,37 +45,41 @@ class CustomizeTableEntityTest {
     class Update {
 
         @Test
-        void 테이블_정보를_업데이트_할_수_있다() {
+        void 테이블_정보를_업데이트_할_수_있다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
-            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
-                    "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
+            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
+                    true, true);
+            CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
                     "newPros", "newCons", false, false);
+            Thread.sleep(1L);
 
-            table.updateTable(renewTable);
+            customizeTableEntity.updateTable(renewTable);
 
             assertAll(
-                    () -> assertThat(table.getName()).isEqualTo("newName"),
-                    () -> assertThat(table.getAgenda()).isEqualTo("newAgenda"),
-                    () -> assertThat(table.getProsTeamName()).isEqualTo("newPros"),
-                    () -> assertThat(table.getConsTeamName()).isEqualTo("newCons"),
-                    () -> assertThat(table.isWarningBell()).isFalse(),
-                    () -> assertThat(table.isFinishBell()).isFalse()
+                    () -> assertThat(customizeTableEntity.getName()).isEqualTo("newName"),
+                    () -> assertThat(customizeTableEntity.getAgenda()).isEqualTo("newAgenda"),
+                    () -> assertThat(customizeTableEntity.getProsTeamName()).isEqualTo("newPros"),
+                    () -> assertThat(customizeTableEntity.getConsTeamName()).isEqualTo("newCons"),
+                    () -> assertThat(customizeTableEntity.isWarningBell()).isFalse(),
+                    () -> assertThat(customizeTableEntity.isFinishBell()).isFalse()
             );
         }
 
         @Test
-        void 테이블_업데이트_할_때_사용_시간을_변경한다() {
+        void 테이블_업데이트_할_때_사용_시간을_변경한다() throws InterruptedException {
             Member member = new Member("default@gmail.com");
-            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
-                    "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
+            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
+                    true, true);
+            CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
                     "newPros", "newCons", false, false);
-            LocalDateTime beforeUsedAt = table.getUsedAt();
+            LocalDateTime beforeUsedAt = customizeTableEntity.getUsedAt();
+            Thread.sleep(1L);
 
-            table.updateTable(renewTable);
+            customizeTableEntity.updateTable(renewTable);
 
-            assertThat(table.getUsedAt()).isAfter(beforeUsedAt);
+            assertThat(customizeTableEntity.getUsedAt()).isAfter(beforeUsedAt);
         }
     }
 }

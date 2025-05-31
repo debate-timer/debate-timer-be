@@ -26,7 +26,7 @@ public class CustomizeService {
     @Transactional
     public CustomizeTableResponse save(CustomizeTableCreateRequest tableCreateRequest, Member member) {
         CustomizeTable table = tableCreateRequest.toTable(member);
-        CustomizeTableEntity savedTable = tableRepository.save(table.toEntity());
+        CustomizeTableEntity savedTable = tableRepository.save(new CustomizeTableEntity(table));
 
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
         return new CustomizeTableResponse(savedTable, savedCustomizeTimeBoxes);
