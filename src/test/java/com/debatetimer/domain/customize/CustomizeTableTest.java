@@ -3,7 +3,7 @@ package com.debatetimer.domain.customize;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.CustomizeTable;
 import com.debatetimer.domain.TableName;
 import com.debatetimer.domain.TeamName;
 import com.debatetimer.domain.member.Member;
@@ -49,7 +49,7 @@ class CustomizeTableTest {
             Member member = new Member("default@gmail.com");
             CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
-            DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
+            CustomizeTable renewTable = new CustomizeTable(member, new TableName("newName"), "newAgenda",
                     new TeamName("newPros"), new TeamName("newCons"), false, false);
 
             table.updateTable(renewTable);
@@ -69,7 +69,7 @@ class CustomizeTableTest {
             Member member = new Member("default@gmail.com");
             CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
-            DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
+            CustomizeTable renewTable = new CustomizeTable(member, new TableName("newName"), "newAgenda",
                     new TeamName("newPros"), new TeamName("newcons"), false, false);
             LocalDateTime beforeUsedAt = table.getUsedAt();
 

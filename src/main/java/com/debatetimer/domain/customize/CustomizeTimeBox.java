@@ -34,7 +34,7 @@ public class CustomizeTimeBox {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id")
-    private CustomizeTableEntity customizeTableEntity;
+    private CustomizeTableEntity customizeTable;
 
     private int sequence;
 
@@ -70,7 +70,7 @@ public class CustomizeTimeBox {
         validateSequence(sequence);
         validateTime(time);
 
-        this.customizeTableEntity = customizeTableEntity;
+        this.customizeTable = customizeTableEntity;
         this.sequence = sequence;
         this.stance = stance;
         this.time = time;
@@ -100,7 +100,7 @@ public class CustomizeTimeBox {
         this.stance = stance;
         this.time = convertToTime(timePerTeam);
         this.speaker = initializeSpeaker(speaker);
-        this.customizeTableEntity = customizeTableEntity;
+        this.customizeTable = customizeTableEntity;
         this.speechType = speechType;
         this.boxType = boxType;
         this.timePerTeam = timePerTeam;

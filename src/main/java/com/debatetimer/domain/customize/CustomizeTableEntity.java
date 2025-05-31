@@ -1,6 +1,6 @@
 package com.debatetimer.domain.customize;
 
-import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import jakarta.persistence.Entity;
@@ -64,7 +64,7 @@ public class CustomizeTableEntity {
         this.usedAt = usedAt;
     }
 
-    public void updateTable(DebateTable renewTable) {
+    public void updateTable(CustomizeTable renewTable) {
         this.name = renewTable.getName().getValue();
         this.agenda = renewTable.getAgenda();
         this.prosTeamName = renewTable.getProsTeamName().getValue();

@@ -1,6 +1,6 @@
 package com.debatetimer.dto.customize.request;
 
-import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.CustomizeTable;
 import com.debatetimer.domain.TableName;
 import com.debatetimer.domain.TeamName;
 import com.debatetimer.domain.member.Member;
@@ -24,8 +24,8 @@ public record CustomizeTableInfoCreateRequest(
         boolean finishBell
 ) {
 
-    public DebateTable toTable(Member member) {
-        return new DebateTable(member, new TableName(name), agenda, new TeamName(prosTeamName),
+    public CustomizeTable toTable(Member member) {
+        return new CustomizeTable(member, new TableName(name), agenda, new TeamName(prosTeamName),
                 new TeamName(consTeamName), warningBell, finishBell);
     }
 }

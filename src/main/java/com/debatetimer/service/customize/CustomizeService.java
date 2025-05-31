@@ -1,6 +1,6 @@
 package com.debatetimer.service.customize;
 
-import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
@@ -25,7 +25,7 @@ public class CustomizeService {
 
     @Transactional
     public CustomizeTableResponse save(CustomizeTableCreateRequest tableCreateRequest, Member member) {
-        DebateTable table = tableCreateRequest.toTable(member);
+        CustomizeTable table = tableCreateRequest.toTable(member);
         CustomizeTableEntity savedTable = tableRepository.save(table.toEntity());
 
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
@@ -48,7 +48,7 @@ public class CustomizeService {
     ) {
         CustomizeTableEntity existingTable = tableRepository.findByIdAndMemberWithLock(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        DebateTable renewedTable = tableCreateRequest.toTable(member);
+        CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
         CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);

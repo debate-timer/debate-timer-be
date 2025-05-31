@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class DebateTable {
+public class CustomizeTable {
 
     private final Member member;
     private final TableName name;

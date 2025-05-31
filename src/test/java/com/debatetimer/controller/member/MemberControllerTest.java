@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.domain.DebateTable;
+import com.debatetimer.domain.CustomizeTable;
 import com.debatetimer.domain.TableName;
 import com.debatetimer.domain.TeamName;
 import com.debatetimer.domain.member.Member;
@@ -31,7 +31,7 @@ class MemberControllerTest extends BaseControllerTest {
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
-            DebateTable table = new DebateTable(member, new TableName("커스텀 테이블"), "주제",
+            CustomizeTable table = new CustomizeTable(member, new TableName("커스텀 테이블"), "주제",
                     new TeamName("찬성"), new TeamName("반대"), false, false);
             customizeTableRepository.save(table.toEntity());
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
