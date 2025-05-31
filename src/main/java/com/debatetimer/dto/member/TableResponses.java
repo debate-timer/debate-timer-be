@@ -1,6 +1,6 @@
 package com.debatetimer.dto.member;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;

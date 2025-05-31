@@ -2,8 +2,8 @@ package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.oauth.OAuthClient;
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;

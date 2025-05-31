@@ -1,6 +1,7 @@
-package com.debatetimer.domain.customize;
+package com.debatetimer.entity.customize;
 
-import com.debatetimer.domain.Stance;
+import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;

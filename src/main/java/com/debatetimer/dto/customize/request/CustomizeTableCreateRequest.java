@@ -1,9 +1,9 @@
 package com.debatetimer.dto.customize.request;
 
-import com.debatetimer.domain.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTableEntity;
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;

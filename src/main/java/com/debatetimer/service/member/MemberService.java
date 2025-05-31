@@ -1,10 +1,10 @@
 package com.debatetimer.service.member;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.member.MemberRepository;
 import java.util.List;

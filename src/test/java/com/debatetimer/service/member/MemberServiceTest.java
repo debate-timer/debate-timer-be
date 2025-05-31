@@ -3,11 +3,11 @@ package com.debatetimer.service.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;

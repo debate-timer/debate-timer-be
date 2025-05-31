@@ -1,8 +1,8 @@
 package com.debatetimer.dto.customize.request;
 
-import com.debatetimer.domain.CustomizeTable;
-import com.debatetimer.domain.TableName;
-import com.debatetimer.domain.TeamName;
+import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.member.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

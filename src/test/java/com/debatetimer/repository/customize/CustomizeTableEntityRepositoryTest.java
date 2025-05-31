@@ -2,8 +2,8 @@ package com.debatetimer.repository.customize;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.repository.BaseRepositoryTest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;

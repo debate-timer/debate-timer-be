@@ -1,7 +1,7 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;

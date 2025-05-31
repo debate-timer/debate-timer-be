@@ -1,7 +1,7 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.customize;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

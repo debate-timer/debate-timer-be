@@ -1,9 +1,9 @@
 package com.debatetimer.fixture;
 
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTableEntity;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import org.springframework.stereotype.Component;
 

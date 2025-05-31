@@ -1,7 +1,7 @@
 package com.debatetimer.fixture;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;

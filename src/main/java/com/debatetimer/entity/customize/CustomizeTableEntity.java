@@ -1,6 +1,6 @@
-package com.debatetimer.domain.customize;
+package com.debatetimer.entity.customize;
 
-import com.debatetimer.domain.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import jakarta.persistence.Entity;

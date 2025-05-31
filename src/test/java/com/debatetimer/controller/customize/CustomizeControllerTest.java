@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTableEntity;
+import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.fixture.NullAndEmptyAndBlankSource;

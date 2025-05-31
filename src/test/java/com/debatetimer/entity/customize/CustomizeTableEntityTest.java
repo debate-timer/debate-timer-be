@@ -1,18 +1,18 @@
-package com.debatetimer.domain.customize;
+package com.debatetimer.entity.customize;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.domain.CustomizeTable;
-import com.debatetimer.domain.TableName;
-import com.debatetimer.domain.TeamName;
+import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class CustomizeTableTest {
+class CustomizeTableEntityTest {
 
     @Nested
     class GetType {

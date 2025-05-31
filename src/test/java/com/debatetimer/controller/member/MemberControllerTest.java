@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.domain.CustomizeTable;
-import com.debatetimer.domain.TableName;
-import com.debatetimer.domain.TeamName;
+import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;

@@ -1,7 +1,7 @@
 package com.debatetimer.dto.customize.response;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.dto.member.TableType;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 
 public record CustomizeTableInfoResponse(
         String name,

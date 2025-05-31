@@ -1,8 +1,8 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.TableName;
-import com.debatetimer.domain.TeamName;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

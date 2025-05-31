@@ -1,8 +1,8 @@
 package com.debatetimer.dto.customize.response;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import java.util.List;
 
 public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, List<CustomizeTimeBoxResponse> table) {

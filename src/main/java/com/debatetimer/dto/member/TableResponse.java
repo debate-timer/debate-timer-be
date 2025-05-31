@@ -1,6 +1,6 @@
 package com.debatetimer.dto.member;
 
-import com.debatetimer.domain.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 
 public record TableResponse(long id, String name, TableType type, String agenda) {
 
