@@ -10,7 +10,7 @@ public class CustomizeTable {
 
     private final Member member;
     private final TableName name;
-    private final String agenda;
+    private final Agenda agenda;
     private final TeamName prosTeamName;
     private final TeamName consTeamName;
     private final boolean warningBell;
@@ -27,7 +27,7 @@ public class CustomizeTable {
     ) {
         this.member = member;
         this.name = new TableName(name);
-        this.agenda = agenda;
+        this.agenda = new Agenda(agenda);
         this.prosTeamName = new TeamName(prosTeamName);
         this.consTeamName = new TeamName(consTeamName);
         this.warningBell = warningBell;
@@ -38,7 +38,7 @@ public class CustomizeTable {
         return new CustomizeTableEntity(
                 member,
                 name.getValue(),
-                agenda,
+                agenda.getValue(),
                 prosTeamName.getValue(),
                 consTeamName.getValue(),
                 warningBell,
@@ -57,5 +57,9 @@ public class CustomizeTable {
 
     public String getName() {
         return name.getValue();
+    }
+
+    public String getAgenda() {
+        return agenda.getValue();
     }
 }
