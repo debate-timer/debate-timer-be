@@ -2,11 +2,10 @@ package com.debatetimer.repository.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
-import jakarta.persistence.LockModeType;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 public interface CustomizeTableRepository extends Repository<CustomizeTable, Long> {
@@ -19,9 +18,10 @@ public interface CustomizeTableRepository extends Repository<CustomizeTable, Lon
 
     Optional<CustomizeTable> findByIdAndMember(long tableId, Member member);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT c FROM CustomizeTable c WHERE c.id = :id AND c.member = :member")
-    Optional<CustomizeTable> findByIdAndMemberWithLock(long id, Member member);
+    default CustomizeTable getByIdAndMember(long tableId, Member member) {
+        return findByIdAndMember(tableId, member)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+    }
 
     void delete(CustomizeTable table);
 }

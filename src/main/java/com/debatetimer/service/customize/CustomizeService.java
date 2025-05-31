@@ -6,8 +6,6 @@ import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import java.util.List;
@@ -33,8 +31,7 @@ public class CustomizeService {
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
-        CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTable table = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         return new CustomizeTableResponse(table, timeBoxes);
     }
@@ -45,21 +42,18 @@ public class CustomizeService {
             long tableId,
             Member member
     ) {
-        CustomizeTable existingTable = tableRepository.findByIdAndMemberWithLock(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTable existingTable = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
-        CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTable);
-        timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
+        timeBoxRepository.deleteAllByTable(existingTable);
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable);
         return new CustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
-        CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTable table = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
         table.updateUsedAt();
 
@@ -68,10 +62,8 @@ public class CustomizeService {
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
-        CustomizeTable table = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
-        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(table);
-        timeBoxRepository.deleteAll(timeBoxes.getTimeBoxes());
+        CustomizeTable table = tableRepository.getByIdAndMember(tableId, member);
+        timeBoxRepository.deleteAllByTable(table);
         tableRepository.delete(table);
     }
 

@@ -1,6 +1,7 @@
 package com.debatetimer.repository.customize;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.CustomizeTable;
@@ -34,6 +35,47 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             List<CustomizeTimeBox> foundBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
 
             assertThat(foundBoxes).containsExactly(chanBox1, chanBox2);
+        }
+    }
+
+    @Nested
+    class DeleteAllByTable {
+
+        @Test
+        void 특정_테이블의_타임박스를_모두_삭제한다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+
+            customizeTimeBoxRepository.deleteAllByTable(chanTable);
+
+            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
+            assertThat(timeBoxes).isEmpty();
+        }
+
+        @Test
+        void 특정_테이블의_타임_박스를_삭제해도_다른_테이블의_타임_박스는_삭제되지_않는다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTable filledTable = customizeTableGenerator.generate(chan);
+            customizeTimeBoxGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTable deletedTable = customizeTableGenerator.generate(chan);
+            customizeTimeBoxGenerator.generate(deletedTable, CustomizeBoxType.NORMAL, 1);
+
+            customizeTimeBoxRepository.deleteAllByTable(deletedTable);
+
+            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(filledTable);
+            assertThat(timeBoxes).hasSize(2);
+        }
+
+        @Test
+        void 테이블의_타임_박스가_없을_경우_타임_박스_삭제_시_예외가_발생하지_않는다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTable emptyTable = customizeTableGenerator.generate(chan);
+
+            assertThatCode(() -> customizeTimeBoxRepository.deleteAllByTable(emptyTable))
+                    .doesNotThrowAnyException();
         }
     }
 }
