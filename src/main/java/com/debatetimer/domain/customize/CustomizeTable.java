@@ -46,4 +46,16 @@ public class CustomizeTable {
                 LocalDateTime.now()
         );
     }
+
+    public String getProsTeamName() {
+        return prosTeamName.getValue();
+    }
+
+    public String getConsTeamName() {
+        return consTeamName.getValue();
+    }
+
+    public String getName() {
+        return name.getValue();
+    }
 }

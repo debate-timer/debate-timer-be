@@ -65,10 +65,10 @@ public class CustomizeTableEntity {
     }
 
     public void updateTable(CustomizeTable renewTable) {
-        this.name = renewTable.getName().getValue();
+        this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();
-        this.prosTeamName = renewTable.getProsTeamName().getValue();
-        this.consTeamName = renewTable.getConsTeamName().getValue();
+        this.prosTeamName = renewTable.getProsTeamName();
+        this.consTeamName = renewTable.getConsTeamName();
         this.warningBell = renewTable.isWarningBell();
         this.finishBell = renewTable.isFinishBell();
         this.usedAt = LocalDateTime.now();
