@@ -1,6 +1,7 @@
 package com.debatetimer.exception.errorcode;
 
 import com.debatetimer.domain.TableName;
+import com.debatetimer.domain.TeamName;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ),
     INVALID_TEAM_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(TableName.NAME_MAX_LENGTH)
+            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(TeamName.NAME_MAX_LENGTH)
     ),
     INVALID_TEAM_NAME_FORM(
             HttpStatus.BAD_REQUEST,
