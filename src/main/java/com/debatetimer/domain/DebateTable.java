@@ -1,6 +1,6 @@
 package com.debatetimer.domain;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -18,8 +18,8 @@ public class DebateTable {
     private final boolean warningBell;
     private final boolean finishBell;
 
-    public CustomizeTable toEntity() {
-        return new CustomizeTable(
+    public CustomizeTableEntity toEntity() {
+        return new CustomizeTableEntity(
                 member,
                 name.getValue(),
                 agenda,

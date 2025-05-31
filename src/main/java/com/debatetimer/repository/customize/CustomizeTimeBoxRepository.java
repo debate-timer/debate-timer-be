@@ -1,6 +1,6 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import java.util.List;
@@ -20,9 +20,9 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBox,
                 .toList();
     }
 
-    List<CustomizeTimeBox> findAllByCustomizeTable(CustomizeTable table);
+    List<CustomizeTimeBox> findAllByCustomizeTable(CustomizeTableEntity table);
 
-    default CustomizeTimeBoxes findTableTimeBoxes(CustomizeTable table) {
+    default CustomizeTimeBoxes findTableTimeBoxes(CustomizeTableEntity table) {
         List<CustomizeTimeBox> timeBoxes = findAllByCustomizeTable(table);
         return new CustomizeTimeBoxes(timeBoxes);
     }

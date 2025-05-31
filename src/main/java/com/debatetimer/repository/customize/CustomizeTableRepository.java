@@ -1,6 +1,6 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import jakarta.persistence.LockModeType;
 import java.util.List;
@@ -9,19 +9,19 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-public interface CustomizeTableRepository extends Repository<CustomizeTable, Long> {
+public interface CustomizeTableRepository extends Repository<CustomizeTableEntity, Long> {
 
-    CustomizeTable save(CustomizeTable customizeTable);
+    CustomizeTableEntity save(CustomizeTableEntity customizeTableEntity);
 
-    Optional<CustomizeTable> findById(long id);
+    Optional<CustomizeTableEntity> findById(long id);
 
-    List<CustomizeTable> findAllByMember(Member member);
+    List<CustomizeTableEntity> findAllByMember(Member member);
 
-    Optional<CustomizeTable> findByIdAndMember(long tableId, Member member);
+    Optional<CustomizeTableEntity> findByIdAndMember(long tableId, Member member);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT c FROM CustomizeTable c WHERE c.id = :id AND c.member = :member")
-    Optional<CustomizeTable> findByIdAndMemberWithLock(long id, Member member);
+    @Query("SELECT c FROM CustomizeTableEntity c WHERE c.id = :id AND c.member = :member")
+    Optional<CustomizeTableEntity> findByIdAndMemberWithLock(long id, Member member);
 
-    void delete(CustomizeTable table);
+    void delete(CustomizeTableEntity table);
 }

@@ -1,6 +1,6 @@
 package com.debatetimer.service.member;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
@@ -22,7 +22,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public TableResponses getTables(long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<CustomizeTable> memberTables = customizeTableRepository.findAllByMember(member);
+        List<CustomizeTableEntity> memberTables = customizeTableRepository.findAllByMember(member);
         return TableResponses.from(memberTables);
     }
 

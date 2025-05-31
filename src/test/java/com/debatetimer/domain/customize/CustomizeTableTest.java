@@ -19,9 +19,9 @@ class CustomizeTableTest {
 
         @Test
         void 사용자_지정_테이블_타입을_반환한다() {
-            CustomizeTable customizeTable = new CustomizeTable();
+            CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity();
 
-            assertThat(customizeTable.getType()).isEqualTo(TableType.CUSTOMIZE);
+            assertThat(customizeTableEntity.getType()).isEqualTo(TableType.CUSTOMIZE);
         }
     }
 
@@ -31,7 +31,7 @@ class CustomizeTableTest {
         @Test
         void 테이블의_사용_시각을_업데이트한다() {
             Member member = new Member("default@gmail.com");
-            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda",
+            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
             LocalDateTime beforeUsedAt = table.getUsedAt();
 
@@ -47,7 +47,7 @@ class CustomizeTableTest {
         @Test
         void 테이블_정보를_업데이트_할_수_있다() {
             Member member = new Member("default@gmail.com");
-            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda",
+            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
             DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
                     new TeamName("newPros"), new TeamName("newCons"), false, false);
@@ -67,7 +67,7 @@ class CustomizeTableTest {
         @Test
         void 테이블_업데이트_할_때_사용_시간을_변경한다() {
             Member member = new Member("default@gmail.com");
-            CustomizeTable table = new CustomizeTable(member, "tableName", "agenda",
+            CustomizeTableEntity table = new CustomizeTableEntity(member, "tableName", "agenda",
                     "찬성", "반대", true, true, LocalDateTime.now().minusMinutes(1L));
             DebateTable renewTable = new DebateTable(member, new TableName("newName"), "newAgenda",
                     new TeamName("newPros"), new TeamName("newcons"), false, false);

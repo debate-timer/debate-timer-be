@@ -1,6 +1,6 @@
 package com.debatetimer.dto.customize.response;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.dto.member.TableType;
 
 public record CustomizeTableInfoResponse(
@@ -13,15 +13,15 @@ public record CustomizeTableInfoResponse(
         boolean finishBell
 ) {
 
-    public CustomizeTableInfoResponse(CustomizeTable customizeTable) {
+    public CustomizeTableInfoResponse(CustomizeTableEntity customizeTableEntity) {
         this(
-                customizeTable.getName(),
+                customizeTableEntity.getName(),
                 TableType.CUSTOMIZE,
-                customizeTable.getAgenda(),
-                customizeTable.getProsTeamName(),
-                customizeTable.getConsTeamName(),
-                customizeTable.isWarningBell(),
-                customizeTable.isFinishBell()
+                customizeTableEntity.getAgenda(),
+                customizeTableEntity.getProsTeamName(),
+                customizeTableEntity.getConsTeamName(),
+                customizeTableEntity.isWarningBell(),
+                customizeTableEntity.isFinishBell()
         );
     }
 }

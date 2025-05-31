@@ -1,6 +1,6 @@
 package com.debatetimer.fixture;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import java.time.LocalDateTime;
@@ -15,8 +15,8 @@ public class CustomizeTableGenerator {
         this.customizeTableRepository = customizeTableRepository;
     }
 
-    public CustomizeTable generate(Member member) {
-        CustomizeTable table = new CustomizeTable(
+    public CustomizeTableEntity generate(Member member) {
+        CustomizeTableEntity table = new CustomizeTableEntity(
                 member,
                 "토론 테이블",
                 "주제",

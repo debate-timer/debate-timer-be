@@ -1,10 +1,10 @@
 package com.debatetimer.dto.member;
 
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 
 public record TableResponse(long id, String name, TableType type, String agenda) {
 
-    public TableResponse(CustomizeTable debateTable) {
+    public TableResponse(CustomizeTableEntity debateTable) {
         this(
                 debateTable.getId(),
                 debateTable.getName(),

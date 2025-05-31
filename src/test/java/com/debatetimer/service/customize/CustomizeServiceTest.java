@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
@@ -46,7 +46,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             );
 
             CustomizeTableResponse savedTableResponse = customizeService.save(customizeTableCreateRequest, chan);
-            Optional<CustomizeTable> foundTable = customizeTableRepository.findById(savedTableResponse.id());
+            Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(savedTableResponse.id());
             List<CustomizeTimeBox> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     foundTable.get());
 
@@ -63,7 +63,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         @Test
         void 사용자_지정_토론_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
 
@@ -79,7 +79,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_조회_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> customizeService.findTable(chanTableId, coli))
@@ -94,7 +94,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         @Test
         void 사용자_지정_토론_테이블을_수정한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
@@ -108,7 +108,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             customizeService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
-            Optional<CustomizeTable> updatedTable = customizeTableRepository.findById(chanTable.getId());
+            Optional<CustomizeTableEntity> updatedTable = customizeTableRepository.findById(chanTable.getId());
             List<CustomizeTimeBox> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     updatedTable.get());
 
@@ -123,7 +123,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
             CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
@@ -144,7 +144,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         @Test
         void 테이블_정보_수정을_동시에_요청할_때_동시에_처리하지_않는다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
-            CustomizeTable table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
             CustomizeTableCreateRequest request = new CustomizeTableCreateRequest(
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
                             "반대", true, true),
@@ -168,12 +168,12 @@ class CustomizeServiceTest extends BaseServiceTest {
         @Test
         void 사용자_지정_토론_테이블의_사용_시각을_최신화한다() {
             Member member = memberGenerator.generate("default@gmail.com");
-            CustomizeTable table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
             LocalDateTime beforeUsedAt = table.getUsedAt();
 
             customizeService.updateUsedAt(table.getId(), member);
 
-            Optional<CustomizeTable> updatedTable = customizeTableRepository.findById(table.getId());
+            Optional<CustomizeTableEntity> updatedTable = customizeTableRepository.findById(table.getId());
             assertAll(
                     () -> assertThat(updatedTable.get().getId()).isEqualTo(table.getId()),
                     () -> assertThat(updatedTable.get().getUsedAt()).isAfter(beforeUsedAt)
@@ -184,7 +184,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_수정_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
             CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
                     new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
@@ -209,13 +209,13 @@ class CustomizeServiceTest extends BaseServiceTest {
         @Test
         void 사용자_지정_토론_테이블을_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
 
             customizeService.deleteTable(chanTable.getId(), chan);
 
-            Optional<CustomizeTable> foundTable = customizeTableRepository.findById(chanTable.getId());
+            Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(chanTable.getId());
             List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     chanTable);
 
@@ -229,7 +229,7 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 회원_소유가_아닌_테이블_삭제_시_예외를_발생시킨다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member coli = memberGenerator.generate("default2@gmail.com");
-            CustomizeTable chanTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
 
             assertThatThrownBy(() -> customizeService.deleteTable(chanTableId, coli))

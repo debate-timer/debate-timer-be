@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -19,9 +20,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "customize_table")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTable {
+public class CustomizeTableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +44,7 @@ public class CustomizeTable {
     @NotNull
     private LocalDateTime usedAt;
 
-    public CustomizeTable(
+    public CustomizeTableEntity(
             Member member,
             String name,
             String agenda,

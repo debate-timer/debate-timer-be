@@ -2,7 +2,7 @@ package com.debatetimer.fixture;
 
 import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableEntity;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class CustomizeTimeBoxGenerator {
         this.customizeTimeBoxRepository = customizeTimeBoxRepository;
     }
 
-    public CustomizeTimeBox generate(CustomizeTable testTable, CustomizeBoxType boxType, int sequence) {
+    public CustomizeTimeBox generate(CustomizeTableEntity testTable, CustomizeBoxType boxType, int sequence) {
         CustomizeTimeBox timeBox = new CustomizeTimeBox(
                 testTable,
                 sequence,
@@ -29,7 +29,8 @@ public class CustomizeTimeBoxGenerator {
         return customizeTimeBoxRepository.save(timeBox);
     }
 
-    public CustomizeTimeBox generateNotExistSpeaker(CustomizeTable testTable, CustomizeBoxType boxType, int sequence) {
+    public CustomizeTimeBox generateNotExistSpeaker(CustomizeTableEntity testTable, CustomizeBoxType boxType,
+                                                    int sequence) {
         CustomizeTimeBox timeBox = new CustomizeTimeBox(
                 testTable,
                 sequence,

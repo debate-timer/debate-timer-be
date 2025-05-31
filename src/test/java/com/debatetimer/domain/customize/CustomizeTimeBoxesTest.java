@@ -19,7 +19,7 @@ class CustomizeTimeBoxesTest {
         @Test
         void 타임박스의_순서에_따라_정렬된다() {
             Member member = new Member("default@gmail.com");
-            CustomizeTable testTable = new CustomizeTable(member, "토론 테이블", "주제",
+            CustomizeTableEntity testTable = new CustomizeTableEntity(member, "토론 테이블", "주제",
                     "찬성", "반대", true, true, LocalDateTime.now());
             CustomizeTimeBox firstBox = new CustomizeTimeBox(testTable, 1, Stance.PROS, "입론",
                     CustomizeBoxType.NORMAL, 300, "콜리");
