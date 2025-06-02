@@ -63,6 +63,18 @@ public class CustomizeTableEntity {
         this.usedAt = LocalDateTime.now();
     }
 
+    public CustomizeTable toDomain() {
+        return new CustomizeTable(
+                member,
+                name,
+                agenda,
+                prosTeamName,
+                consTeamName,
+                warningBell,
+                finishBell
+        );
+    }
+
     public void updateTable(CustomizeTable renewTable) {
         this.name = renewTable.getName();
         this.agenda = renewTable.getAgenda();

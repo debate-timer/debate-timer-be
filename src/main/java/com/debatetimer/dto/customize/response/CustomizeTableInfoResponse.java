@@ -1,7 +1,7 @@
 package com.debatetimer.dto.customize.response;
 
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.dto.member.TableType;
-import com.debatetimer.entity.customize.CustomizeTableEntity;
 
 public record CustomizeTableInfoResponse(
         String name,
@@ -13,15 +13,15 @@ public record CustomizeTableInfoResponse(
         boolean finishBell
 ) {
 
-    public CustomizeTableInfoResponse(CustomizeTableEntity customizeTableEntity) {
+    public CustomizeTableInfoResponse(CustomizeTable customizeTable) {
         this(
-                customizeTableEntity.getName(),
+                customizeTable.getName(),
                 TableType.CUSTOMIZE,
-                customizeTableEntity.getAgenda(),
-                customizeTableEntity.getProsTeamName(),
-                customizeTableEntity.getConsTeamName(),
-                customizeTableEntity.isWarningBell(),
-                customizeTableEntity.isFinishBell()
+                customizeTable.getAgenda(),
+                customizeTable.getProsTeamName(),
+                customizeTable.getConsTeamName(),
+                customizeTable.isWarningBell(),
+                customizeTable.isFinishBell()
         );
     }
 }
