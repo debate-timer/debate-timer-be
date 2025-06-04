@@ -7,7 +7,7 @@ import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.member.MemberRepository;
-import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +22,10 @@ public class MemberService {
     @Transactional(readOnly = true)
     public TableResponses getTables(long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<CustomizeTableEntity> memberTables = customizeTableRepository.findAllByMember(member);
-        return TableResponses.from(memberTables);
+        return customizeTableRepository.findAllByMember(member)
+                .stream()
+                .map(CustomizeTableEntity::toDomain)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), TableResponses::from));
     }
 
     @Transactional

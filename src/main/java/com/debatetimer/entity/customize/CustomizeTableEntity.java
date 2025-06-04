@@ -51,6 +51,7 @@ public class CustomizeTableEntity {
     private LocalDateTime usedAt;
 
     public CustomizeTableEntity(CustomizeTable customizeTable) {
+        this.id = customizeTable.getId();
         this.member = customizeTable.getMember();
         this.name = customizeTable.getName();
         this.agenda = customizeTable.getAgenda();
@@ -63,13 +64,15 @@ public class CustomizeTableEntity {
 
     public CustomizeTable toDomain() {
         return new CustomizeTable(
+                id,
                 member,
                 name,
                 agenda,
                 prosTeamName,
                 consTeamName,
                 warningBell,
-                finishBell
+                finishBell,
+                usedAt
         );
     }
 

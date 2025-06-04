@@ -1,6 +1,7 @@
 package com.debatetimer.dto.customize.request;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
@@ -31,11 +32,12 @@ public record CustomizeTimeBoxCreateRequest(
         String speaker
 ) {
 
-    public CustomizeTimeBox toTimeBox(CustomizeTableEntity customizeTableEntity, int sequence) {
+    public CustomizeTimeBox toTimeBox(CustomizeTable customizeTable, int sequence) {
         if (boxType.isTimeBased()) {
-            return new CustomizeTimeBox(customizeTableEntity, sequence, stance, speechType, boxType, timePerTeam,
-                    timePerSpeaking, speaker);
+            return new CustomizeTimeBox(new CustomizeTableEntity(customizeTable), sequence, stance, speechType,
+                    boxType, timePerTeam, timePerSpeaking, speaker);
         }
-        return new CustomizeTimeBox(customizeTableEntity, sequence, stance, speechType, boxType, time, speaker);
+        return new CustomizeTimeBox(new CustomizeTableEntity(customizeTable), sequence, stance, speechType, boxType,
+                time, speaker);
     }
 }

@@ -4,6 +4,7 @@ import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,7 +24,8 @@ public class CustomizeTableGenerator {
                 "찬성",
                 "반대",
                 false,
-                false
+                false,
+                LocalDateTime.now()
         );
         CustomizeTableEntity table = new CustomizeTableEntity(customizeTable);
         return customizeTableRepository.save(table);

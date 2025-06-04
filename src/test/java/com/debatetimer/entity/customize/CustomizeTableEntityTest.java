@@ -27,13 +27,12 @@ class CustomizeTableEntityTest {
     class UpdateUsedAt {
 
         @Test
-        void 테이블의_사용_시각을_업데이트한다() throws InterruptedException {
+        void 테이블의_사용_시각을_업데이트한다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
-                    true, true);
+                    true, true, LocalDateTime.now().minusNanos(1L));
             CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             LocalDateTime beforeUsedAt = customizeTableEntity.getUsedAt();
-            Thread.sleep(1L);
 
             customizeTableEntity.updateUsedAt();
 
@@ -45,14 +44,13 @@ class CustomizeTableEntityTest {
     class Update {
 
         @Test
-        void 테이블_정보를_업데이트_할_수_있다() throws InterruptedException {
+        void 테이블_정보를_업데이트_할_수_있다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
-                    true, true);
+                    true, true, LocalDateTime.now().minusNanos(1L));
             CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
-                    "newPros", "newCons", false, false);
-            Thread.sleep(1L);
+                    "newPros", "newCons", false, false, LocalDateTime.now());
 
             customizeTableEntity.updateTable(renewTable);
 
@@ -67,15 +65,14 @@ class CustomizeTableEntityTest {
         }
 
         @Test
-        void 테이블_업데이트_할_때_사용_시간을_변경한다() throws InterruptedException {
+        void 테이블_업데이트_할_때_사용_시간을_변경한다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
-                    true, true);
+                    true, true, LocalDateTime.now().minusNanos(1L));
             CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
-                    "newPros", "newCons", false, false);
+                    "newPros", "newCons", false, false, LocalDateTime.now());
             LocalDateTime beforeUsedAt = customizeTableEntity.getUsedAt();
-            Thread.sleep(1L);
 
             customizeTableEntity.updateTable(renewTable);
 

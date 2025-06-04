@@ -17,6 +17,7 @@ import com.debatetimer.fixture.NullAndEmptyAndBlankSource;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
 import io.restassured.response.ValidatableResponse;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,7 +31,8 @@ class MemberControllerTest extends BaseControllerTest {
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
-            CustomizeTable table = new CustomizeTable(member, "커스텀 테이블", "주제", "찬성", "반대", false, false);
+            CustomizeTable table = new CustomizeTable(member, "커스텀 테이블", "주제", "찬성", "반대", false, false,
+                    LocalDateTime.now());
             customizeTableRepository.save(new CustomizeTableEntity(table));
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 

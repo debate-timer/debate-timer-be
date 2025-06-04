@@ -28,8 +28,8 @@ public class CustomizeService {
         CustomizeTable table = tableCreateRequest.toTable(member);
         CustomizeTableEntity savedTable = tableRepository.save(new CustomizeTableEntity(table));
 
-        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable);
-        return new CustomizeTableResponse(savedTable.getId(), savedTable.toDomain(), savedCustomizeTimeBoxes);
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable.toDomain());
+        return new CustomizeTableResponse(savedTable.toDomain(), savedCustomizeTimeBoxes);
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +37,7 @@ public class CustomizeService {
         CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
-        return new CustomizeTableResponse(tableEntity.getId(), tableEntity.toDomain(), timeBoxes);
+        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional
@@ -53,12 +53,8 @@ public class CustomizeService {
 
         CustomizeTimeBoxes customizeTimeBoxes = timeBoxRepository.findTableTimeBoxes(existingTableEntity);
         timeBoxRepository.deleteAll(customizeTimeBoxes.getTimeBoxes());
-        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTableEntity);
-        return new CustomizeTableResponse(
-                existingTableEntity.getId(),
-                existingTableEntity.toDomain(),
-                savedCustomizeTimeBoxes
-        );
+        CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTableEntity.toDomain());
+        return new CustomizeTableResponse(existingTableEntity.toDomain(), savedCustomizeTimeBoxes);
     }
 
     @Transactional
@@ -68,7 +64,7 @@ public class CustomizeService {
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         tableEntity.updateUsedAt();
 
-        return new CustomizeTableResponse(tableEntity.getId(), tableEntity.toDomain(), timeBoxes);
+        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional
@@ -82,7 +78,7 @@ public class CustomizeService {
 
     private CustomizeTimeBoxes saveTimeBoxes(
             CustomizeTableCreateRequest tableCreateRequest,
-            CustomizeTableEntity table
+            CustomizeTable table
     ) {
         CustomizeTimeBoxes customizeTimeBoxes = tableCreateRequest.toTimeBoxes(table);
         List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(customizeTimeBoxes.getTimeBoxes());
