@@ -12,8 +12,13 @@ Configuration:
       name: RollingFile_Appender
       fileName: ${log-dir}/logfile.log
       filePattern: "${log-dir}/logfile-%d{yyyy-MM-dd}.%i.log.gz"
-      PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] [%-5level] %logger{35} - %msg%n"
+      JsonLayout:
+        complete: false
+        compact: true
+        eventEol: true
+        properties: true
+        stacktraceAsString: true
+        objectMessageAsJsonObject: true
       immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
 
       Policies:
