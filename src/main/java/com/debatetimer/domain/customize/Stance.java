@@ -1,4 +1,4 @@
-package com.debatetimer.domain;
+package com.debatetimer.domain.customize;
 
 public enum Stance {
 

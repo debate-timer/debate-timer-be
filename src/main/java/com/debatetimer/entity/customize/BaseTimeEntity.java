@@ -1,4 +1,4 @@
-package com.debatetimer.domain;
+package com.debatetimer.entity.customize;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

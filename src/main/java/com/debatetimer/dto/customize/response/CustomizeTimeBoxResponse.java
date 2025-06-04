@@ -1,8 +1,8 @@
 package com.debatetimer.dto.customize.response;
 
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 
 public record CustomizeTimeBoxResponse(
         Stance stance,

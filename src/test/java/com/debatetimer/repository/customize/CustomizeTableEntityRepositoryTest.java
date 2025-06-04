@@ -3,8 +3,8 @@ package com.debatetimer.repository.customize;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.BaseRepositoryTest;
@@ -25,11 +25,11 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
         void 특정_회원의_테이블만_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member bito = memberGenerator.generate("default2@gmail.com");
-            CustomizeTable chanTable1 = customizeTableGenerator.generate(chan);
-            CustomizeTable chanTable2 = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable1 = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity chanTable2 = customizeTableGenerator.generate(chan);
             customizeTableGenerator.generate(bito);
 
-            List<CustomizeTable> foundKeoChanTables = tableRepository.findAllByMember(chan);
+            List<CustomizeTableEntity> foundKeoChanTables = tableRepository.findAllByMember(chan);
 
             assertThat(foundKeoChanTables).containsExactly(chanTable1, chanTable2);
         }
@@ -41,9 +41,9 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_회원의_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTable table = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity table = customizeTableGenerator.generate(chan);
 
-            CustomizeTable foundTable = tableRepository.getByIdAndMember(table.getId(), chan);
+            CustomizeTableEntity foundTable = tableRepository.getByIdAndMember(table.getId(), chan);
 
             assertThat(foundTable).isEqualTo(table);
         }

@@ -1,5 +1,6 @@
 package com.debatetimer.domain.customize;
 
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;

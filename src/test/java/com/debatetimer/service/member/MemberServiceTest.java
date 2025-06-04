@@ -3,11 +3,11 @@ package com.debatetimer.service.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -63,7 +63,7 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 회원의_전체_토론_시간표는_정해진_순서대로_반환한다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
-            CustomizeTable table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
             Thread.sleep(1);
 
             TableResponses response = memberService.getTables(member.getId());
