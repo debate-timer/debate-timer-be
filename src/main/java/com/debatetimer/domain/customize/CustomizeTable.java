@@ -1,5 +1,6 @@
 package com.debatetimer.domain.customize;
 
+import com.debatetimer.domain.BaseTimeEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTable {
+public class CustomizeTable extends BaseTimeEntity {
 
     private static final String TABLE_NAME_REGEX = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\s]+$";
     private static final String TEAM_NAME_REGEX = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\s]+$";
