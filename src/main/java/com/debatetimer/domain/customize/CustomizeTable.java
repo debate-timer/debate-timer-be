@@ -1,5 +1,6 @@
 package com.debatetimer.domain.customize;
 
+import com.debatetimer.domain.BaseTimeEntity;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
 import java.time.LocalDateTime;
