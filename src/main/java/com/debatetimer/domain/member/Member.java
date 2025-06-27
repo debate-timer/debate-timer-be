@@ -1,6 +1,6 @@
 package com.debatetimer.domain.member;
 
-import com.debatetimer.domain.BaseTimeEntity;
+import com.debatetimer.entity.customize.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

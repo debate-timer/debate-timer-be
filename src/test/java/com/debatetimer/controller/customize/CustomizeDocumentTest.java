@@ -18,8 +18,8 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
-import com.debatetimer.domain.Stance;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
@@ -146,6 +146,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         "INVALID_TABLE_NAME_LENGTH",
                         "INVALID_TABLE_NAME_FORM",
                         "INVALID_TABLE_TIME",
+                        "INVALID_AGENDA_LENGTH",
                         "INVALID_TIME_BOX_SEQUENCE",
                         "INVALID_TIME_BOX_TIME",
                         "INVALID_TIME_BOX_STANCE",
@@ -391,6 +392,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         "INVALID_TABLE_NAME_LENGTH",
                         "INVALID_TABLE_NAME_FORM",
                         "INVALID_TABLE_TIME",
+                        "INVALID_AGENDA_LENGTH",
                         "INVALID_TIME_BOX_SEQUENCE",
                         "INVALID_TIME_BOX_TIME",
                         "INVALID_TIME_BOX_STANCE",

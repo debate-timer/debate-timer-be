@@ -1,7 +1,9 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.Agenda;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -10,7 +12,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(CustomizeTable.TABLE_NAME_MAX_LENGTH)
+            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(TableName.NAME_MAX_LENGTH)
     ),
     INVALID_TABLE_NAME_FORM(
             HttpStatus.BAD_REQUEST,
@@ -34,11 +36,15 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ),
     INVALID_TEAM_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTable.TEAM_NAME_MAX_LENGTH)
+            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(TeamName.NAME_MAX_LENGTH)
     ),
     INVALID_TEAM_NAME_FORM(
             HttpStatus.BAD_REQUEST,
             "팀 이름에 이모지를 넣을 수 없습니다"
+    ),
+    INVALID_AGENDA_LENGTH(
+            HttpStatus.BAD_REQUEST,
+            "토론 주제는 1자 이상 %d자 이하여야 합니다.".formatted(Agenda.AGENDA_MAX_LENGTH)
     ),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
