@@ -4,14 +4,20 @@ import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBoxes;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
+import com.debatetimer.dto.customize.response.BellResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
+import com.debatetimer.entity.customize.Bell;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +27,7 @@ public class CustomizeService {
 
     private final CustomizeTableRepository tableRepository;
     private final CustomizeTimeBoxRepository timeBoxRepository;
+    private final BellRepository bellRepository;
 
     @Transactional
     public CustomizeTableResponse save(CustomizeTableCreateRequest tableCreateRequest, Member member) {
@@ -28,7 +35,7 @@ public class CustomizeService {
         CustomizeTableEntity savedTable = tableRepository.save(new CustomizeTableEntity(table));
 
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable.toDomain());
-        return new CustomizeTableResponse(savedTable.toDomain(), savedCustomizeTimeBoxes);
+        return getCustomizeTableResponse(savedTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional(readOnly = true)
@@ -36,7 +43,7 @@ public class CustomizeService {
         CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
-        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
+        return getCustomizeTableResponse(tableEntity, timeBoxes);
     }
 
     @Transactional
@@ -51,7 +58,7 @@ public class CustomizeService {
 
         timeBoxRepository.deleteAllByTable(existingTable);
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable.toDomain());
-        return new CustomizeTableResponse(existingTable.toDomain(), savedCustomizeTimeBoxes);
+        return getCustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
 
     @Transactional
@@ -61,7 +68,7 @@ public class CustomizeService {
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         tableEntity.updateUsedAt();
 
-        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
+        return getCustomizeTableResponse(tableEntity, timeBoxes);
     }
 
     @Transactional
@@ -80,5 +87,52 @@ public class CustomizeService {
         List<com.debatetimer.entity.customize.CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(
                 customizeTimeBoxes.getTimeBoxes());
         return new CustomizeTimeBoxes(savedTimeBoxes);
+    }
+
+    @NotNull
+    private CustomizeTableResponse getCustomizeTableResponse(
+            CustomizeTableEntity savedTable,
+            CustomizeTimeBoxes savedCustomizeTimeBoxes
+    ) {
+        if (savedTable.isFinishBell()) {
+            savedCustomizeTimeBoxes.getTimeBoxes()
+                    .stream()
+                    .filter(timeBox -> timeBox.getBoxType().isNotTimeBased())
+                    .forEach(timeBox -> bellRepository.save(new Bell(
+                            timeBox,
+                            timeBox.getTime(),
+                            2
+                    )));
+        }
+        if (savedTable.isWarningBell()) {
+            savedCustomizeTimeBoxes.getTimeBoxes()
+                    .stream()
+                    .filter(timeBox -> timeBox.getBoxType().isNotTimeBased())
+                    .forEach(timeBox -> bellRepository.save(new Bell(
+                            timeBox,
+                            timeBox.getTime() - 30,
+                            1
+                    )));
+        }
+        List<CustomizeTimeBoxResponse> customizeTimeBoxResponses = savedCustomizeTimeBoxes.getTimeBoxes()
+                .stream()
+                .map(timeBox -> {
+                    List<BellResponse> bell = null;
+                    if (timeBox.getBoxType().isNotTimeBased() && (savedTable.isFinishBell() || savedTable.isWarningBell())) {
+                        bell = new ArrayList<>();
+                        if (savedTable.isWarningBell()) {
+                            bell.add(new BellResponse(timeBox.getTime() - 30, 1));
+                        }
+                        if (savedTable.isFinishBell()) {
+                            bell.add(new BellResponse(timeBox.getTime(), 2));
+                        }
+                    }
+                    return new CustomizeTimeBoxResponse(
+                            timeBox,
+                            bell
+                    );
+                })
+                .toList();
+        return new CustomizeTableResponse(savedTable.toDomain(), customizeTimeBoxResponses);
     }
 }
