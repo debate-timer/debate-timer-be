@@ -108,6 +108,7 @@ public class CustomizeService {
             savedCustomizeTimeBoxes.getTimeBoxes()
                     .stream()
                     .filter(timeBox -> timeBox.getBoxType().isNotTimeBased())
+                    .filter(timeBox -> timeBox.getTime() >= 30)
                     .forEach(timeBox -> bellRepository.save(new Bell(
                             timeBox,
                             timeBox.getTime() - 30,
