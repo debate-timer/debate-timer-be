@@ -7,8 +7,8 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
 
     public CustomizeTableResponse(
             CustomizeTable customizeTable,
-            List<CustomizeTimeBoxResponse> table
+            List<CustomizeTimeBoxResponse> timeBoxResponses
     ) {
-        this(customizeTable.getId(), new CustomizeTableInfoResponse(customizeTable), table);
+        this(customizeTable.getId(), new CustomizeTableInfoResponse(customizeTable), timeBoxResponses);
     }
 }
