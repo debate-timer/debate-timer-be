@@ -81,8 +81,12 @@ public class CustomizeService {
     public void deleteTable(long tableId, Member member) {
         CustomizeTableEntity table = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+
+        deleteBell(timeBoxRepository.findTableTimeBoxes(table));
+
         timeBoxRepository.deleteAllByTable(table);
         tableRepository.delete(table);
+
     }
 
     private CustomizeTimeBoxes saveTimeBoxes(
