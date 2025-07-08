@@ -35,6 +35,8 @@ public class CustomizeService {
         CustomizeTableEntity savedTable = tableRepository.save(new CustomizeTableEntity(table));
 
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, savedTable.toDomain());
+
+        saveBell(savedTable, savedCustomizeTimeBoxes);
         return getCustomizeTableResponse(savedTable, savedCustomizeTimeBoxes);
     }
 
@@ -43,6 +45,7 @@ public class CustomizeService {
         CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
+
         return getCustomizeTableResponse(tableEntity, timeBoxes);
     }
 
@@ -58,6 +61,9 @@ public class CustomizeService {
 
         timeBoxRepository.deleteAllByTable(existingTable);
         CustomizeTimeBoxes savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable.toDomain());
+
+        deleteBell(savedCustomizeTimeBoxes);
+        saveBell(existingTable, savedCustomizeTimeBoxes);
         return getCustomizeTableResponse(existingTable, savedCustomizeTimeBoxes);
     }
 
@@ -94,6 +100,29 @@ public class CustomizeService {
             CustomizeTableEntity savedTable,
             CustomizeTimeBoxes savedCustomizeTimeBoxes
     ) {
+        List<CustomizeTimeBoxResponse> customizeTimeBoxResponses = savedCustomizeTimeBoxes.getTimeBoxes()
+                .stream()
+                .map(timeBox -> {
+                    List<BellResponse> bell = null;
+                    if (timeBox.getBoxType().isNotTimeBased() && (savedTable.isFinishBell() || savedTable.isWarningBell())) {
+                        bell = new ArrayList<>();
+                        if (savedTable.isWarningBell()) {
+                            bell.add(new BellResponse(timeBox.getTime() - 30, 1));
+                        }
+                        if (savedTable.isFinishBell()) {
+                            bell.add(new BellResponse(timeBox.getTime(), 2));
+                        }
+                    }
+                    return new CustomizeTimeBoxResponse(
+                            timeBox,
+                            bell
+                    );
+                })
+                .toList();
+        return new CustomizeTableResponse(savedTable.toDomain(), customizeTimeBoxResponses);
+    }
+
+    private void saveBell(CustomizeTableEntity savedTable, CustomizeTimeBoxes savedCustomizeTimeBoxes) {
         if (savedTable.isFinishBell()) {
             savedCustomizeTimeBoxes.getTimeBoxes()
                     .stream()
@@ -115,25 +144,15 @@ public class CustomizeService {
                             1
                     )));
         }
-        List<CustomizeTimeBoxResponse> customizeTimeBoxResponses = savedCustomizeTimeBoxes.getTimeBoxes()
+    }
+
+    private void deleteBell(CustomizeTimeBoxes savedCustomizeTimeBoxes) {
+        savedCustomizeTimeBoxes.getTimeBoxes()
                 .stream()
-                .map(timeBox -> {
-                    List<BellResponse> bell = null;
-                    if (timeBox.getBoxType().isNotTimeBased() && (savedTable.isFinishBell() || savedTable.isWarningBell())) {
-                        bell = new ArrayList<>();
-                        if (savedTable.isWarningBell()) {
-                            bell.add(new BellResponse(timeBox.getTime() - 30, 1));
-                        }
-                        if (savedTable.isFinishBell()) {
-                            bell.add(new BellResponse(timeBox.getTime(), 2));
-                        }
-                    }
-                    return new CustomizeTimeBoxResponse(
-                            timeBox,
-                            bell
-                    );
-                })
-                .toList();
-        return new CustomizeTableResponse(savedTable.toDomain(), customizeTimeBoxResponses);
+                .filter(timeBox -> timeBox.getBoxType().isNotTimeBased())
+                .forEach(timeBox ->
+                        bellRepository.findByCustomizeTimeBox(timeBox)
+                                .forEach(bellRepository::delete)
+                );
     }
 }
