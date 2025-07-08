@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bell {
 
+    public static final int MAX_BELL_COUNT = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,7 +49,7 @@ public class Bell {
     }
 
     private void validateCount(int count) {
-        if (count <= 0) {
+        if (count <= 0 || count > MAX_BELL_COUNT) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_COUNT);
         }
     }
