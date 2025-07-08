@@ -9,6 +9,7 @@ import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
 import com.debatetimer.entity.customize.Bell;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTimeBox;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.customize.BellRepository;
@@ -94,7 +95,7 @@ public class CustomizeService {
             CustomizeTable table
     ) {
         CustomizeTimeBoxes customizeTimeBoxes = tableCreateRequest.toTimeBoxes(table);
-        List<com.debatetimer.entity.customize.CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(
+        List<CustomizeTimeBox> savedTimeBoxes = timeBoxRepository.saveAll(
                 customizeTimeBoxes.getTimeBoxes());
         return new CustomizeTimeBoxes(savedTimeBoxes);
     }

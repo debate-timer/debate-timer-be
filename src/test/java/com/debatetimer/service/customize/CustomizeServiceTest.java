@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
@@ -39,9 +40,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -52,7 +53,12 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(foundTable.get().getName()).isEqualTo(customizeTableCreateRequest.info().name()),
-                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size())
+                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size()),
+                    () -> {
+                        for (CustomizeTimeBox timeBox : foundTimeBoxes) {
+                            assertThat(bellRepository.findByCustomizeTimeBox(timeBox)).hasSize(2);
+                        }
+                    }
             );
         }
     }
@@ -100,9 +106,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -115,7 +121,12 @@ class CustomizeServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
-                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size()),
+                    () -> {
+                        for (CustomizeTimeBox timeBox : updatedTimeBoxes) {
+                            assertThat(bellRepository.findByCustomizeTimeBox(timeBox)).hasSize(2);
+                        }
+                    }
             );
         }
 
@@ -130,9 +141,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -150,9 +161,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -191,9 +202,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, 60, null, "발언자2")
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
                     )
             );
 

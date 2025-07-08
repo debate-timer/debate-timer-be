@@ -7,6 +7,7 @@ import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
 public record CustomizeTimeBoxCreateRequest(
@@ -21,6 +22,9 @@ public record CustomizeTimeBoxCreateRequest(
 
         @Nullable
         Integer time,
+
+        @Nullable
+        List<BellRequest> bell,
 
         @Nullable
         Integer timePerTeam,
