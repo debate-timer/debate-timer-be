@@ -2,6 +2,7 @@ package com.debatetimer.entity.customize;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +33,7 @@ public class BellEntity {
     @JoinColumn(name = "customize_time_box_id")
     private CustomizeTimeBox customizeTimeBox;
 
+    @Column(name = "bell_time")
     private int time;
     private int count;
 

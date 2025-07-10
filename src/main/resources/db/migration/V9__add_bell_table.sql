@@ -1,7 +1,7 @@
 create table bell
 (
     id           bigint auto_increment,
-    time    bigint       not null,
+    bell_time    bigint       not null,
     count       bigint not null,
     customize_time_box_id bigint not null,
     primary key (id)
