@@ -6,8 +6,8 @@ CREATE TABLE poll
     pros_team_name VARCHAR(255) NOT NULL,
     cons_team_name VARCHAR(255) NOT NULL,
     agenda      VARCHAR(255) NOT NULL,
-    created_at  TIMESTAMP    NOT NULL,
-    modified_at TIMESTAMP    NOT NULL
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE vote
