@@ -4,6 +4,7 @@ import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.oauth.OAuthClient;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
@@ -97,8 +98,15 @@ public abstract class BaseControllerTest {
                 .set("speechType", "입론1")
                 .set("boxType", CustomizeBoxType.NORMAL)
                 .set("time", 120)
+                .set("bell", getBellRequestBuilder().sampleList(2))
                 .set("timePerTeam", 60)
                 .set("timePerSpeaking", null)
                 .set("speaker", "발언자");
+    }
+
+    private ArbitraryBuilder<BellRequest> getBellRequestBuilder() {
+        return fixtureMonkey.giveMeBuilder(BellRequest.class)
+                .set("time", 30)
+                .set("count", 1);
     }
 }

@@ -1,15 +1,21 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.entity.customize.Bell;
+import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
 import java.util.List;
 import org.springframework.data.repository.Repository;
 
-public interface BellRepository extends Repository<Bell, Long> {
+public interface BellRepository extends Repository<BellEntity, Long> {
 
-    Bell save(Bell bell);
+    BellEntity save(BellEntity bell);
 
-    List<Bell> findByCustomizeTimeBox(CustomizeTimeBox customizeTimeBox);
+    List<BellEntity> findByCustomizeTimeBox(CustomizeTimeBox customizeTimeBox);
 
-    void delete(Bell bell);
+    void delete(BellEntity bell);
+
+    void deleteAllByCustomizeTimeBoxIn(List<CustomizeTimeBox> customizeTimeBoxes);
+
+    List<BellEntity> findAllByCustomizeTimeBoxIn(List<CustomizeTimeBox> timeBoxes);
+
+    List<BellEntity> findAll();
 }

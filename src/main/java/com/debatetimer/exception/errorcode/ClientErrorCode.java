@@ -3,7 +3,7 @@ package com.debatetimer.exception.errorcode;
 import com.debatetimer.domain.customize.Agenda;
 import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
-import com.debatetimer.entity.customize.Bell;
+import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -68,7 +68,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
 
     INVALID_BELL_TIME(HttpStatus.BAD_REQUEST, "벨 시간은 0 이상의 정수여야 합니다."),
-    INVALID_BELL_COUNT(HttpStatus.BAD_REQUEST, "벨 카운트는 1 이상 %d 이하의 정수여야 합니다.".formatted(Bell.MAX_BELL_COUNT)),
+    INVALID_BELL_COUNT(HttpStatus.BAD_REQUEST, "벨 카운트는 1 이상 %d 이하의 정수여야 합니다.".formatted(BellEntity.MAX_BELL_COUNT)),
     ;
 
     private final HttpStatus status;

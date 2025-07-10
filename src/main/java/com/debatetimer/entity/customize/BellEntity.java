@@ -9,15 +9,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(name = "bell")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Bell {
+public class BellEntity {
 
     public static final int MAX_BELL_COUNT = 3;
 
@@ -33,7 +35,7 @@ public class Bell {
     private int time;
     private int count;
 
-    public Bell(CustomizeTimeBox customizeTimeBox, int time, int count) {
+    public BellEntity(CustomizeTimeBox customizeTimeBox, int time, int count) {
         validateTime(time);
         validateCount(count);
 

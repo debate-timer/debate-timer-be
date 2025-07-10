@@ -12,6 +12,7 @@ import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -221,18 +222,24 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 사용자_지정_토론_테이블을_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTimeBox timeBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            CustomizeTimeBox timeBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL,
+                    2);
+            bellGenerator.generate(timeBox1, 30, 1);
+            bellGenerator.generate(timeBox1, 45, 1);
+            bellGenerator.generate(timeBox2, 60, 2);
 
             customizeService.deleteTable(chanTable.getId(), chan);
 
             Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(chanTable.getId());
             List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     chanTable);
+            List<BellEntity> bells = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxes);
 
             assertAll(
                     () -> assertThat(foundTable).isEmpty(),
-                    () -> assertThat(timeBoxes).isEmpty()
+                    () -> assertThat(timeBoxes).isEmpty(),
+                    () -> assertThat(bells).isEmpty()
             );
         }
 
