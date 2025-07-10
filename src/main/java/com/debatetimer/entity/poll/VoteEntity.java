@@ -1,13 +1,15 @@
 package com.debatetimer.entity.poll;
 
-import com.debatetimer.domain.poll.PollStatus;
-import com.debatetimer.entity.customize.BaseTimeEntity;
+import com.debatetimer.domain.poll.VoteTeam;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,25 +17,26 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "poll")
+@Table(name = "vote")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PollEntity extends BaseTimeEntity {
+public class VoteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long tableId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "poll_id")
+    private PollEntity poll;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private PollStatus status;
+    private VoteTeam team;
 
     @NotBlank
-    private String prosTeamName;
+    private String name;
 
     @NotBlank
-    private String consTeamName;
-
-    private String agenda;
+    private String participantCode;
 }
