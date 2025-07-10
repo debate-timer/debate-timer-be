@@ -2,6 +2,7 @@ package com.debatetimer.client.notifier;
 
 import com.debatetimer.exception.custom.DTInitializationException;
 import com.debatetimer.exception.errorcode.InitializationErrorCode;
+import io.micrometer.core.annotation.Timed;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class DiscordNotifier implements ErrorNotifier {
         }
     }
 
+    @Timed(value = "discord.send_error_message")
     public void sendErrorMessage(Throwable throwable) {
         TextChannel channel = jda.getTextChannelById(properties.getChannelId());
         String errorMessage = throwable.toString();
