@@ -5,6 +5,7 @@ import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
 import com.debatetimer.exception.handler.OAuthClientErrorHandler;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ public class OAuthClient {
         this.oauthProperties = oauthProperties;
     }
 
+    @Timed(value = "google.request_token")
     public OAuthToken requestToken(MemberCreateRequest request) {
         return restClient.post()
                 .uri("https://oauth2.googleapis.com/token")
@@ -34,6 +36,7 @@ public class OAuthClient {
                 .body(OAuthToken.class);
     }
 
+    @Timed(value = "google.request_member_info")
     public MemberInfo requestMemberInfo(OAuthToken response) {
         return restClient.get()
                 .uri("https://www.googleapis.com/oauth2/v3/userinfo")
