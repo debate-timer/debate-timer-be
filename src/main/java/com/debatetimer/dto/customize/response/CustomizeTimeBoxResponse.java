@@ -16,6 +16,19 @@ public record CustomizeTimeBoxResponse(
         String speaker
 ) {
 
+    public CustomizeTimeBoxResponse(CustomizeTimeBox customizeTimeBox) {
+        this(
+                customizeTimeBox.getStance(),
+                customizeTimeBox.getSpeechType(),
+                customizeTimeBox.getBoxType(),
+                convertTime(customizeTimeBox),
+                null,
+                customizeTimeBox.getTimePerTeam(),
+                customizeTimeBox.getTimePerSpeaking(),
+                customizeTimeBox.getSpeaker()
+        );
+    }
+
     public CustomizeTimeBoxResponse(CustomizeTimeBox customizeTimeBox, List<BellResponse> bell) {
         this(
                 customizeTimeBox.getStance(),

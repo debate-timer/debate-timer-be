@@ -54,12 +54,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(foundTable.get().getName()).isEqualTo(customizeTableCreateRequest.info().name()),
-                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size()),
-                    () -> {
-                        for (CustomizeTimeBox timeBox : foundTimeBoxes) {
-                            assertThat(bellRepository.findByCustomizeTimeBox(timeBox)).hasSize(2);
-                        }
-                    }
+                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size())
             );
         }
     }
@@ -122,12 +117,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
-                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size()),
-                    () -> {
-                        for (CustomizeTimeBox timeBox : updatedTimeBoxes) {
-                            assertThat(bellRepository.findByCustomizeTimeBox(timeBox)).hasSize(2);
-                        }
-                    }
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
             );
         }
 
@@ -222,12 +212,8 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 사용자_지정_토론_테이블을_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            CustomizeTimeBox timeBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
-            CustomizeTimeBox timeBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL,
-                    2);
-            bellGenerator.generate(timeBox1, 30, 1);
-            bellGenerator.generate(timeBox1, 45, 1);
-            bellGenerator.generate(timeBox2, 60, 2);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
 
             customizeService.deleteTable(chanTable.getId(), chan);
 
