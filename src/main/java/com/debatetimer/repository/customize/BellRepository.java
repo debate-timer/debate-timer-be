@@ -11,11 +11,7 @@ public interface BellRepository extends Repository<BellEntity, Long> {
 
     List<BellEntity> findByCustomizeTimeBox(CustomizeTimeBox customizeTimeBox);
 
-    void delete(BellEntity bell);
-
     void deleteAllByCustomizeTimeBoxIn(List<CustomizeTimeBox> customizeTimeBoxes);
 
     List<BellEntity> findAllByCustomizeTimeBoxIn(List<CustomizeTimeBox> timeBoxes);
-
-    List<BellEntity> findAll();
 }
