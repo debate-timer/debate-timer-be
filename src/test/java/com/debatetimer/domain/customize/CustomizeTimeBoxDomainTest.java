@@ -14,6 +14,23 @@ import org.junit.jupiter.params.provider.ValueSource;
 class CustomizeTimeBoxDomainTest {
 
     @Nested
+    class ValidateStance {
+
+        @Test
+        void 발언_입장은_비어있을_수_없다() {
+            assertThatThrownBy(() -> new InheritedCustomizeTimeBoxDomain(null, "비토", "발언자"))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIME_BOX_STANCE.getMessage());
+        }
+
+        @Test
+        void 발언_입장은_유효한_값이어야_한다() {
+            assertThatCode(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, "비토", "발언자"))
+                    .doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
     class ValidateSpeechType {
 
         @Test
@@ -61,8 +78,6 @@ class CustomizeTimeBoxDomainTest {
                     .doesNotThrowAnyException();
         }
     }
-
-
 
     static class InheritedCustomizeTimeBoxDomain extends CustomizeTimeBoxDomain {
 

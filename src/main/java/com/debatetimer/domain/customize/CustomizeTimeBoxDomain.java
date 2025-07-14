@@ -27,7 +27,7 @@ public abstract class CustomizeTimeBoxDomain {
     }
 
     private void validateStance(Stance stance) {
-        if (!isValidStance(stance)) {
+        if (stance == null || !isValidStance(stance)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_STANCE);
         }
     }
