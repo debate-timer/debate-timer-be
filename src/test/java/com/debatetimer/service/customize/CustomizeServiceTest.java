@@ -47,12 +47,11 @@ class CustomizeServiceTest extends BaseServiceTest {
             );
 
             CustomizeTableResponse savedTableResponse = customizeService.save(customizeTableCreateRequest, chan);
-            Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(savedTableResponse.id());
-            List<CustomizeTimeBox> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
-                    foundTable.get());
+            CustomizeTableEntity foundTable = customizeTableRepository.getByIdAndMember(savedTableResponse.id(), chan);
+            List<CustomizeTimeBox> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(foundTable);
 
             assertAll(
-                    () -> assertThat(foundTable.get().getName()).isEqualTo(customizeTableCreateRequest.info().name()),
+                    () -> assertThat(foundTable.getName()).isEqualTo(customizeTableCreateRequest.info().name()),
                     () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size())
             );
         }
@@ -109,13 +108,12 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             customizeService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
-            Optional<CustomizeTableEntity> updatedTable = customizeTableRepository.findById(chanTable.getId());
-            List<CustomizeTimeBox> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
-                    updatedTable.get());
+            CustomizeTableEntity updatedTable = customizeTableRepository.getByIdAndMember(chanTable.getId(), chan);
+            List<CustomizeTimeBox> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(updatedTable);
 
             assertAll(
-                    () -> assertThat(updatedTable.get().getId()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(updatedTable.get().getName()).isEqualTo(renewTableRequest.info().name()),
+                    () -> assertThat(updatedTable.getId()).isEqualTo(chanTable.getId()),
+                    () -> assertThat(updatedTable.getName()).isEqualTo(renewTableRequest.info().name()),
                     () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
             );
         }
@@ -174,10 +172,10 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             customizeService.updateUsedAt(table.getId(), member);
 
-            Optional<CustomizeTableEntity> updatedTable = customizeTableRepository.findById(table.getId());
+            CustomizeTableEntity updatedTable = customizeTableRepository.getByIdAndMember(table.getId(), member);
             assertAll(
-                    () -> assertThat(updatedTable.get().getId()).isEqualTo(table.getId()),
-                    () -> assertThat(updatedTable.get().getUsedAt()).isAfter(beforeUsedAt)
+                    () -> assertThat(updatedTable.getId()).isEqualTo(table.getId()),
+                    () -> assertThat(updatedTable.getUsedAt()).isAfter(beforeUsedAt)
             );
         }
 
@@ -187,18 +185,8 @@ class CustomizeServiceTest extends BaseServiceTest {
             Member coli = memberGenerator.generate("default2@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             long chanTableId = chanTable.getId();
-            CustomizeTableCreateRequest renewTableRequest = new CustomizeTableCreateRequest(
-                    new CustomizeTableInfoCreateRequest("자유 테이블", "주제", "찬성",
-                            "반대", true, true),
-                    List.of(
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
-                            new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
-                    )
-            );
 
-            assertThatThrownBy(() -> customizeService.updateTable(renewTableRequest, chanTableId, coli))
+            assertThatThrownBy(() -> customizeService.updateUsedAt(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
