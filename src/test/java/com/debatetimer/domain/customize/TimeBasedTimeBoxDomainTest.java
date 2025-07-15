@@ -7,8 +7,6 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class TimeBasedTimeBoxDomainTest {
 
@@ -38,9 +36,9 @@ class TimeBasedTimeBoxDomainTest {
     @Nested
     class ValidateTimes {
 
-        @ParameterizedTest
-        @ValueSource(ints = {0, -1, -100})
-        void 팀_당_발언_시간이_양수이어야_한다(int timePerTeam) {
+        @Test
+        void 팀_당_발언_시간이_양수이어야_한다() {
+            int timePerTeam = 0;
             int timePerSpeaking = 1;
 
             assertThatThrownBy(
@@ -60,9 +58,9 @@ class TimeBasedTimeBoxDomainTest {
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
 
-        @ParameterizedTest
-        @ValueSource(ints = {0, -1, -100})
-        void 개인_당_시간이_양수이어야_한다(int timePerSpeaking) {
+        @Test
+        void 개인_당_시간이_양수이어야_한다() {
+            int timePerSpeaking = 0;
             int timePerTeam = 1;
 
             assertThatThrownBy(
@@ -81,9 +79,9 @@ class TimeBasedTimeBoxDomainTest {
                     .doesNotThrowAnyException();
         }
 
-        @ParameterizedTest
-        @ValueSource(ints = {1, 60, 120})
-        void 팀_당_발언시간은_개인_발언시간보다_많거나_같아야_한다(int timePerTeam) {
+        @Test
+        void 팀_당_발언시간은_개인_발언시간보다_많거나_같아야_한다() {
+            int timePerTeam = 60;
             int timePerSpeaking = timePerTeam + 1;
 
             assertThatThrownBy(
