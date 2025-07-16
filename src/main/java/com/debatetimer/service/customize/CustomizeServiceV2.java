@@ -12,8 +12,6 @@ import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBox;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
@@ -67,8 +65,7 @@ public class CustomizeServiceV2 {
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
-        CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         tableEntity.updateUsedAt();
         List<CustomizeTimeBoxResponse> timeBoxResponses = timeBoxes.getTimeBoxes()
@@ -80,8 +77,7 @@ public class CustomizeServiceV2 {
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
-        CustomizeTableEntity table = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity table = tableRepository.getByIdAndMember(tableId, member);
 
         deleteBell(timeBoxRepository.findTableTimeBoxes(table));
         timeBoxRepository.deleteAllByTable(table);
