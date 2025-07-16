@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class CustomizeTimeBoxesTest {
+class CustomizeTimeBoxEntitiesTest {
 
     @Nested
     class SortedBySequence {
@@ -23,13 +23,13 @@ class CustomizeTimeBoxesTest {
             CustomizeTable table = new CustomizeTable(member, "토론 테이블", "주제", "찬성",
                     "반대", true, true, LocalDateTime.now());
             CustomizeTableEntity testTable = new CustomizeTableEntity(table);
-            CustomizeTimeBox firstBox = new CustomizeTimeBox(testTable, 1, Stance.PROS, "입론",
+            CustomizeTimeBoxEntity firstBox = new CustomizeTimeBoxEntity(testTable, 1, Stance.PROS, "입론",
                     CustomizeBoxType.NORMAL, 300, "콜리");
-            CustomizeTimeBox secondBox = new CustomizeTimeBox(testTable, 2, Stance.PROS, "입론",
+            CustomizeTimeBoxEntity secondBox = new CustomizeTimeBoxEntity(testTable, 2, Stance.PROS, "입론",
                     CustomizeBoxType.NORMAL, 300, "콜리2");
-            List<CustomizeTimeBox> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
+            List<CustomizeTimeBoxEntity> timeBoxes = new ArrayList<>(Arrays.asList(secondBox, firstBox));
 
-            CustomizeTimeBoxes actual = new CustomizeTimeBoxes(timeBoxes);
+            CustomizeTimeBoxEntities actual = new CustomizeTimeBoxEntities(timeBoxes);
 
             assertThat(actual.getTimeBoxes()).containsExactly(firstBox, secondBox);
         }

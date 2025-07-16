@@ -13,7 +13,7 @@ import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
@@ -48,7 +48,7 @@ class CustomizeServiceTest extends BaseServiceTest {
 
             CustomizeTableResponse savedTableResponse = customizeService.save(customizeTableCreateRequest, chan);
             CustomizeTableEntity foundTable = customizeTableRepository.getByIdAndMember(savedTableResponse.id(), chan);
-            List<CustomizeTimeBox> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(foundTable);
+            List<CustomizeTimeBoxEntity> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(foundTable);
 
             assertAll(
                     () -> assertThat(foundTable.getName()).isEqualTo(customizeTableCreateRequest.info().name()),
@@ -109,7 +109,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             customizeService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
             CustomizeTableEntity updatedTable = customizeTableRepository.getByIdAndMember(chanTable.getId(), chan);
-            List<CustomizeTimeBox> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(updatedTable);
+            List<CustomizeTimeBoxEntity> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(updatedTable);
 
             assertAll(
                     () -> assertThat(updatedTable.getId()).isEqualTo(chanTable.getId()),
@@ -205,7 +205,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             customizeService.deleteTable(chanTable.getId(), chan);
 
             Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(chanTable.getId());
-            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+            List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     chanTable);
 
             assertAll(

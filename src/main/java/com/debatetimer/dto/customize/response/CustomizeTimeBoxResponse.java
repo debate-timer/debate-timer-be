@@ -2,7 +2,7 @@ package com.debatetimer.dto.customize.response;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import java.util.List;
 
 public record CustomizeTimeBoxResponse(
@@ -16,7 +16,7 @@ public record CustomizeTimeBoxResponse(
         String speaker
 ) {
 
-    public CustomizeTimeBoxResponse(CustomizeTimeBox customizeTimeBox) {
+    public CustomizeTimeBoxResponse(CustomizeTimeBoxEntity customizeTimeBox) {
         this(
                 customizeTimeBox.getStance(),
                 customizeTimeBox.getSpeechType(),
@@ -29,7 +29,7 @@ public record CustomizeTimeBoxResponse(
         );
     }
 
-    public CustomizeTimeBoxResponse(CustomizeTimeBox customizeTimeBox, List<BellResponse> bell) {
+    public CustomizeTimeBoxResponse(CustomizeTimeBoxEntity customizeTimeBox, List<BellResponse> bell) {
         this(
                 customizeTimeBox.getStance(),
                 customizeTimeBox.getSpeechType(),
@@ -42,7 +42,7 @@ public record CustomizeTimeBoxResponse(
         );
     }
 
-    private static Integer convertTime(CustomizeTimeBox customizeTimeBox) {
+    private static Integer convertTime(CustomizeTimeBoxEntity customizeTimeBox) {
         if (customizeTimeBox.getBoxType() == CustomizeBoxType.TIME_BASED) {
             return null;
         }

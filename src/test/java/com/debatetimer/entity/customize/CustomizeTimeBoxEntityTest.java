@@ -14,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class CustomizeTimeBoxTest {
+class CustomizeTimeBoxEntityTest {
 
     @Nested
     class ValidateSequence {
@@ -25,7 +25,7 @@ class CustomizeTimeBoxTest {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
-            assertThatThrownBy(() -> new CustomizeTimeBox(table, sequence, Stance.NEUTRAL, "자유토론",
+            assertThatThrownBy(() -> new CustomizeTimeBoxEntity(table, sequence, Stance.NEUTRAL, "자유토론",
                     customizeBoxType, 120, 60, "발언자"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE.getMessage());
@@ -42,7 +42,7 @@ class CustomizeTimeBoxTest {
             CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
 
             assertThatThrownBy(
-                    () -> new CustomizeTimeBox(table, 1, Stance.CONS, "자유토론",
+                    () -> new CustomizeTimeBoxEntity(table, 1, Stance.CONS, "자유토론",
                             customizeBoxType, time, 60, "발언자"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
@@ -56,9 +56,9 @@ class CustomizeTimeBoxTest {
         void 발언자_이름은_일정길이_이내로_허용된다() {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
-            String speaker = "k".repeat(CustomizeTimeBox.SPEAKER_MAX_LENGTH + 1);
+            String speaker = "k".repeat(CustomizeTimeBoxEntity.SPEAKER_MAX_LENGTH + 1);
 
-            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+            assertThatThrownBy(() -> new CustomizeTimeBoxEntity(table, 1, Stance.CONS, "입론",
                     customizeBoxType, 120, speaker))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH.getMessage());
@@ -70,7 +70,7 @@ class CustomizeTimeBoxTest {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
 
-            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+            assertThatCode(() -> new CustomizeTimeBoxEntity(table, 1, Stance.CONS, "입론",
                     customizeBoxType, 120, speaker))
                     .doesNotThrowAnyException();
         }
@@ -81,7 +81,7 @@ class CustomizeTimeBoxTest {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.NORMAL;
 
-            CustomizeTimeBox timeBox = new CustomizeTimeBox(table, 1, Stance.CONS, "입론",
+            CustomizeTimeBoxEntity timeBox = new CustomizeTimeBoxEntity(table, 1, Stance.CONS, "입론",
                     customizeBoxType, 120, speaker);
 
             assertThat(timeBox.getSpeaker()).isNull();
@@ -96,7 +96,7 @@ class CustomizeTimeBoxTest {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
-            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론",
+            assertThatCode(() -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론",
                     customizeBoxType, 120, 60, "발언자")
             ).doesNotThrowAnyException();
         }
@@ -106,7 +106,7 @@ class CustomizeTimeBoxTest {
             CustomizeTableEntity table = new CustomizeTableEntity();
             CustomizeBoxType customizeBoxType = CustomizeBoxType.TIME_BASED;
 
-            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, 10,
+            assertThatThrownBy(() -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론", customizeBoxType, 10,
                     "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_FORMAT.getMessage());
         }
@@ -117,7 +117,7 @@ class CustomizeTimeBoxTest {
             CustomizeBoxType notTimeBasedBoxType = CustomizeBoxType.NORMAL;
 
             assertThatThrownBy(
-                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", notTimeBasedBoxType, 120, 60,
+                    () -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론", notTimeBasedBoxType, 120, 60,
                             "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_FORMAT.getMessage());
         }
@@ -128,7 +128,7 @@ class CustomizeTimeBoxTest {
             Integer timePerTeam = 60;
             Integer timePerSpeaking = null;
 
-            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
+            assertThatCode(() -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
                     timePerTeam, timePerSpeaking, "발언자")).doesNotThrowAnyException();
         }
 
@@ -138,7 +138,7 @@ class CustomizeTimeBoxTest {
             int timePerTeam = 60;
             int timePerSpeaking = 59;
 
-            assertThatCode(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
+            assertThatCode(() -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
                     timePerTeam, timePerSpeaking, "발언자")).doesNotThrowAnyException();
         }
 
@@ -148,7 +148,7 @@ class CustomizeTimeBoxTest {
             int timePerTeam = 60;
             int timePerSpeaking = 61;
 
-            assertThatThrownBy(() -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
+            assertThatThrownBy(() -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED,
                     timePerTeam, timePerSpeaking, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
         }
@@ -156,10 +156,10 @@ class CustomizeTimeBoxTest {
         @Test
         void 발언_유형의_길이는_일정_범위_이내여야_한다() {
             CustomizeTableEntity table = new CustomizeTableEntity();
-            String longSpeechType = "s".repeat(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1);
+            String longSpeechType = "s".repeat(CustomizeTimeBoxEntity.SPEECH_TYPE_MAX_LENGTH + 1);
 
             assertThatThrownBy(
-                    () -> new CustomizeTimeBox(table, 1, Stance.NEUTRAL, longSpeechType, CustomizeBoxType.TIME_BASED,
+                    () -> new CustomizeTimeBoxEntity(table, 1, Stance.NEUTRAL, longSpeechType, CustomizeBoxType.TIME_BASED,
                             120, 60, "발언자")).isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH.getMessage());
         }
@@ -173,10 +173,10 @@ class CustomizeTimeBoxTest {
             int timePerTeam = 300;
             int timePerSpeaking = 120;
             CustomizeTableEntity table = new CustomizeTableEntity();
-            CustomizeTimeBox timeBasedTimeBox = new CustomizeTimeBox(table, 1, Stance.CONS, "자유 토론",
+            CustomizeTimeBoxEntity timeBasedTimeBox = new CustomizeTimeBoxEntity(table, 1, Stance.CONS, "자유 토론",
                     CustomizeBoxType.TIME_BASED, timePerTeam, timePerSpeaking, "콜리");
 
-            assertThat(timeBasedTimeBox.getTime()).isEqualTo(timePerTeam * CustomizeTimeBox.TIME_MULTIPLIER);
+            assertThat(timeBasedTimeBox.getTime()).isEqualTo(timePerTeam * CustomizeTimeBoxEntity.TIME_MULTIPLIER);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.debatetimer.fixture;
 
 import com.debatetimer.entity.customize.BellEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.BellRepository;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ public class BellGenerator {
         this.bellRepository = bellRepository;
     }
 
-    public BellEntity generate(CustomizeTimeBox timeBox, int time, int count) {
+    public BellEntity generate(CustomizeTimeBoxEntity timeBox, int time, int count) {
         BellEntity bell = new BellEntity(timeBox, time, count);
         return bellRepository.save(bell);
     }

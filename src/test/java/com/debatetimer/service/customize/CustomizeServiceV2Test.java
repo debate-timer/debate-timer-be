@@ -14,7 +14,7 @@ import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
@@ -49,7 +49,8 @@ class CustomizeServiceV2Test extends BaseServiceTest {
 
             CustomizeTableResponse savedTableResponse = customizeService.save(customizeTableCreateRequest, chan);
             CustomizeTableEntity foundTable = customizeTableRepository.getByIdAndMember(savedTableResponse.id(), chan);
-            List<CustomizeTimeBox> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(foundTable);
+            List<CustomizeTimeBoxEntity> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+                    foundTable);
             List<BellEntity> foundBells = bellRepository.findAllByCustomizeTimeBoxIn(foundTimeBoxes);
 
             assertAll(
@@ -67,8 +68,8 @@ class CustomizeServiceV2Test extends BaseServiceTest {
         void 사용자_지정_토론_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            CustomizeTimeBox customizeTimeBox = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL,
-                    1);
+            CustomizeTimeBoxEntity customizeTimeBox = customizeTimeBoxGenerator.generate(
+                    chanTable, CustomizeBoxType.NORMAL, 1);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
             bellGenerator.generate(customizeTimeBox, 1, 1);
             bellGenerator.generate(customizeTimeBox, 1, 2);
@@ -117,7 +118,8 @@ class CustomizeServiceV2Test extends BaseServiceTest {
             customizeService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
             CustomizeTableEntity updatedTable = customizeTableRepository.getByIdAndMember(chanTable.getId(), chan);
-            List<CustomizeTimeBox> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(updatedTable);
+            List<CustomizeTimeBoxEntity> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+                    updatedTable);
             List<BellEntity> bells = bellRepository.findAllByCustomizeTimeBoxIn(updatedTimeBoxes);
 
             assertAll(
@@ -215,7 +217,7 @@ class CustomizeServiceV2Test extends BaseServiceTest {
             customizeService.deleteTable(chanTable.getId(), chan);
 
             Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(chanTable.getId());
-            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+            List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     chanTable);
             List<BellEntity> bells = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxes);
 

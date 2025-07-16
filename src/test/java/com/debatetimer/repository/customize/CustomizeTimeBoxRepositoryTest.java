@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.BaseRepositoryTest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -27,12 +27,12 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             Member bito = memberGenerator.generate("default2@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
             CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
-            CustomizeTimeBox chanBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
-            CustomizeTimeBox chanBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTimeBoxEntity chanBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            CustomizeTimeBoxEntity chanBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
             customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
             customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
 
-            List<CustomizeTimeBox> foundBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
+            List<CustomizeTimeBoxEntity> foundBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
 
             assertThat(foundBoxes).containsExactly(chanBox1, chanBox2);
         }
@@ -50,7 +50,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
 
             customizeTimeBoxRepository.deleteAllByTable(chanTable);
 
-            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
+            List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
             assertThat(timeBoxes).isEmpty();
         }
 
@@ -65,7 +65,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
 
             customizeTimeBoxRepository.deleteAllByTable(deletedTable);
 
-            List<CustomizeTimeBox> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(filledTable);
+            List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(filledTable);
             assertThat(timeBoxes).hasSize(2);
         }
 

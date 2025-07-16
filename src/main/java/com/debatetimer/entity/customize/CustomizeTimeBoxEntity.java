@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTimeBox {
+public class CustomizeTimeBoxEntity {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
     public static final int TIME_MULTIPLIER = 2;
@@ -56,7 +56,7 @@ public class CustomizeTimeBox {
     private Integer timePerTeam;
     private Integer timePerSpeaking;
 
-    public CustomizeTimeBox(
+    public CustomizeTimeBoxEntity(
             CustomizeTableEntity customizeTableEntity,
             int sequence,
             Stance stance,
@@ -80,7 +80,7 @@ public class CustomizeTimeBox {
         this.boxType = boxType;
     }
 
-    public CustomizeTimeBox(
+    public CustomizeTimeBoxEntity(
             CustomizeTableEntity customizeTableEntity,
             int sequence,
             Stance stance,

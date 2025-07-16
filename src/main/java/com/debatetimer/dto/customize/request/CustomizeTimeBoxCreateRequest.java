@@ -4,7 +4,7 @@ import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -36,12 +36,12 @@ public record CustomizeTimeBoxCreateRequest(
         String speaker
 ) {
 
-    public CustomizeTimeBox toTimeBox(CustomizeTable customizeTable, int sequence) {
+    public CustomizeTimeBoxEntity toTimeBox(CustomizeTable customizeTable, int sequence) {
         if (boxType.isTimeBased()) {
-            return new CustomizeTimeBox(new CustomizeTableEntity(customizeTable), sequence, stance, speechType,
+            return new CustomizeTimeBoxEntity(new CustomizeTableEntity(customizeTable), sequence, stance, speechType,
                     boxType, timePerTeam, timePerSpeaking, speaker);
         }
-        return new CustomizeTimeBox(new CustomizeTableEntity(customizeTable), sequence, stance, speechType, boxType,
+        return new CustomizeTimeBoxEntity(new CustomizeTableEntity(customizeTable), sequence, stance, speechType, boxType,
                 time, speaker);
     }
 }
