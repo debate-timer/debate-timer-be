@@ -4,11 +4,11 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.springframework.lang.Nullable;
 
-public final class NormalTimeBoxDomain extends CustomizeTimeBoxDomain {
+public final class NormalTimeBox extends CustomizeTimeBox {
 
     private final int time;
 
-    public NormalTimeBoxDomain(Stance stance, String speechType, @Nullable String speaker, Integer time) {
+    public NormalTimeBox(Stance stance, String speechType, @Nullable String speaker, Integer time) {
         super(stance, speechType, speaker);
 
         validateTime(time);

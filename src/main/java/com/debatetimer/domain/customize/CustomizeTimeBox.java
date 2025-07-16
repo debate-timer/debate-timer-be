@@ -4,7 +4,7 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.springframework.lang.Nullable;
 
-public abstract class CustomizeTimeBoxDomain {
+public abstract class CustomizeTimeBox {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
     public static final int SPEAKER_MAX_LENGTH = 5;
@@ -16,7 +16,7 @@ public abstract class CustomizeTimeBoxDomain {
     @Nullable
     private final String speaker;
 
-    protected CustomizeTimeBoxDomain(Stance stance, String speechType, @Nullable String speaker) {
+    protected CustomizeTimeBox(Stance stance, String speechType, @Nullable String speaker) {
         validateStance(stance);
         validateSpeechType(speechType);
         validateSpeaker(speaker);

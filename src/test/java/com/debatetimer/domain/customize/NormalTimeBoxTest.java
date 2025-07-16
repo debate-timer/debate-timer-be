@@ -8,7 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class NormalTimeBoxDomainTest {
+class NormalTimeBoxTest {
 
     @Nested
     class ValidateTime {
@@ -17,7 +17,7 @@ class NormalTimeBoxDomainTest {
         void 시간은_0보다_커야_한다() {
             Integer time = 0;
 
-            assertThatThrownBy(() -> new NormalTimeBoxDomain(Stance.PROS, "비토", null, time))
+            assertThatThrownBy(() -> new NormalTimeBox(Stance.PROS, "비토", null, time))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
@@ -26,7 +26,7 @@ class NormalTimeBoxDomainTest {
         void 시간은_비어있지_않아야_한다() {
             Integer time = null;
 
-            assertThatThrownBy(() -> new NormalTimeBoxDomain(Stance.PROS, "비토", null, time))
+            assertThatThrownBy(() -> new NormalTimeBox(Stance.PROS, "비토", null, time))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
@@ -35,7 +35,7 @@ class NormalTimeBoxDomainTest {
         void 시간은_양수여야_한다() {
             Integer time = 1;
 
-            assertThatCode(() -> new NormalTimeBoxDomain(Stance.PROS, "비토", null, time))
+            assertThatCode(() -> new NormalTimeBox(Stance.PROS, "비토", null, time))
                     .doesNotThrowAnyException();
         }
     }

@@ -11,21 +11,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class CustomizeTimeBoxDomainTest {
+class CustomizeTimeBoxTest {
 
     @Nested
     class ValidateStance {
 
         @Test
         void 발언_입장은_비어있을_수_없다() {
-            assertThatThrownBy(() -> new InheritedCustomizeTimeBoxDomain(null, "비토", "발언자"))
+            assertThatThrownBy(() -> new InheritedCustomizeTimeBox(null, "비토", "발언자"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_STANCE.getMessage());
         }
 
         @Test
         void 발언_입장은_유효한_값이어야_한다() {
-            assertThatCode(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, "비토", "발언자"))
+            assertThatCode(() -> new InheritedCustomizeTimeBox(Stance.PROS, "비토", "발언자"))
                     .doesNotThrowAnyException();
         }
     }
@@ -35,9 +35,9 @@ class CustomizeTimeBoxDomainTest {
 
         @Test
         void 발언_종류는_특정_글자를_초과할_수_없다() {
-            String speechType = "a".repeat(CustomizeTimeBoxDomain.SPEECH_TYPE_MAX_LENGTH + 1);
+            String speechType = "a".repeat(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH + 1);
 
-            assertThatThrownBy(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, speechType, "비토"))
+            assertThatThrownBy(() -> new InheritedCustomizeTimeBox(Stance.PROS, speechType, "비토"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH.getMessage());
         }
@@ -46,16 +46,16 @@ class CustomizeTimeBoxDomainTest {
         @NullAndEmptySource
         @ValueSource(strings = {" ", "\n\t"})
         void 발언_종류는_비어있을_수_없다(String emptySpeechType) {
-            assertThatThrownBy(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, emptySpeechType, "비토"))
+            assertThatThrownBy(() -> new InheritedCustomizeTimeBox(Stance.PROS, emptySpeechType, "비토"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH.getMessage());
         }
 
         @Test
         void 발언_종류는_특정_글자_이내이어야_한다() {
-            String speechType = "a".repeat(CustomizeTimeBoxDomain.SPEECH_TYPE_MAX_LENGTH);
+            String speechType = "a".repeat(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH);
 
-            assertThatCode(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, speechType, "비토"))
+            assertThatCode(() -> new InheritedCustomizeTimeBox(Stance.PROS, speechType, "비토"))
                     .doesNotThrowAnyException();
         }
     }
@@ -65,23 +65,23 @@ class CustomizeTimeBoxDomainTest {
 
         @Test
         void 발언자_이름은_특정_글자를_초과할_수_없다() {
-            String speaker = "a".repeat(CustomizeTimeBoxDomain.SPEAKER_MAX_LENGTH + 1);
+            String speaker = "a".repeat(CustomizeTimeBox.SPEAKER_MAX_LENGTH + 1);
 
-            assertThatThrownBy(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, "비토", speaker))
+            assertThatThrownBy(() -> new InheritedCustomizeTimeBox(Stance.PROS, "비토", speaker))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH.getMessage());
         }
 
         @Test
         void 발언자_이름은_비어있을_수_있다() {
-            assertThatCode(() -> new InheritedCustomizeTimeBoxDomain(Stance.PROS, "비토", null))
+            assertThatCode(() -> new InheritedCustomizeTimeBox(Stance.PROS, "비토", null))
                     .doesNotThrowAnyException();
         }
     }
 
-    static class InheritedCustomizeTimeBoxDomain extends CustomizeTimeBoxDomain {
+    static class InheritedCustomizeTimeBox extends CustomizeTimeBox {
 
-        protected InheritedCustomizeTimeBoxDomain(Stance stance, String speechType, String speaker) {
+        protected InheritedCustomizeTimeBox(Stance stance, String speechType, String speaker) {
             super(stance, speechType, speaker);
         }
 

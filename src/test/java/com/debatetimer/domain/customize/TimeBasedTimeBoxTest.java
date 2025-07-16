@@ -8,7 +8,7 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class TimeBasedTimeBoxDomainTest {
+class TimeBasedTimeBoxTest {
 
     @Nested
     class ValidateStance {
@@ -18,7 +18,7 @@ class TimeBasedTimeBoxDomainTest {
             Stance stance = Stance.PROS;
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBoxDomain(stance, "자유발언", "비토", 120, 60))
+                    () -> new TimeBasedTimeBox(stance, "자유발언", "비토", 120, 60))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_STANCE.getMessage());
         }
@@ -28,7 +28,7 @@ class TimeBasedTimeBoxDomainTest {
             Stance stance = Stance.NEUTRAL;
 
             assertThatCode(
-                    () -> new TimeBasedTimeBoxDomain(stance, "자유발언", "비토", 120, 60))
+                    () -> new TimeBasedTimeBox(stance, "자유발언", "비토", 120, 60))
                     .doesNotThrowAnyException();
         }
     }
@@ -42,7 +42,7 @@ class TimeBasedTimeBoxDomainTest {
             int timePerSpeaking = 1;
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBoxDomain(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
+                    () -> new TimeBasedTimeBox(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
@@ -53,7 +53,7 @@ class TimeBasedTimeBoxDomainTest {
             int timePerSpeaking = 1;
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBoxDomain(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
+                    () -> new TimeBasedTimeBox(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
@@ -64,7 +64,7 @@ class TimeBasedTimeBoxDomainTest {
             int timePerTeam = 1;
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBoxDomain(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
+                    () -> new TimeBasedTimeBox(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BOX_TIME.getMessage());
         }
@@ -75,7 +75,7 @@ class TimeBasedTimeBoxDomainTest {
             int timePerTeam = 1;
 
             assertThatCode(
-                    () -> new TimeBasedTimeBoxDomain(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
+                    () -> new TimeBasedTimeBox(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
                     .doesNotThrowAnyException();
         }
 
@@ -85,7 +85,7 @@ class TimeBasedTimeBoxDomainTest {
             int timePerSpeaking = timePerTeam + 1;
 
             assertThatThrownBy(
-                    () -> new TimeBasedTimeBoxDomain(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
+                    () -> new TimeBasedTimeBox(Stance.NEUTRAL, "자유발언", "비토", timePerTeam, timePerSpeaking))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIME_BASED_TIME.getMessage());
         }

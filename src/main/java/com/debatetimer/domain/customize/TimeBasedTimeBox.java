@@ -4,18 +4,18 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.springframework.lang.Nullable;
 
-public class TimeBasedTimeBoxDomain extends CustomizeTimeBoxDomain {
+public class TimeBasedTimeBox extends CustomizeTimeBox {
 
     private final int timePerTeam;
 
     @Nullable
     private final Integer timePerSpeaking;
 
-    public TimeBasedTimeBoxDomain(Stance stance,
-                                  String speechType,
-                                  @Nullable String speaker,
-                                  Integer timePerTeam,
-                                  @Nullable Integer timePerSpeaking) {
+    public TimeBasedTimeBox(Stance stance,
+                            String speechType,
+                            @Nullable String speaker,
+                            Integer timePerTeam,
+                            @Nullable Integer timePerSpeaking) {
         super(stance, speechType, speaker);
 
         validateTimes(timePerTeam, timePerSpeaking);
