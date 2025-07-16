@@ -33,8 +33,7 @@ public class CustomizeService {
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
-        CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
