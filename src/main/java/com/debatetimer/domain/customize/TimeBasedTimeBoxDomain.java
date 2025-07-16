@@ -24,19 +24,21 @@ public class TimeBasedTimeBoxDomain extends CustomizeTimeBoxDomain {
     }
 
     private void validateTimes(Integer timePerTeam, Integer timePerSpeaking) {
-        validateTime(timePerTeam);
-        if (timePerSpeaking == null) {
-            return;
-        }
-
-        validateTime(timePerSpeaking);
-        if (timePerTeam < timePerSpeaking) {
+        validateTimePerTeam(timePerTeam);
+        validateTimePerSpeaking(timePerSpeaking);
+        if (timePerSpeaking != null && timePerTeam < timePerSpeaking) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
         }
     }
 
-    private void validateTime(Integer time) {
+    private void validateTimePerTeam(Integer time) {
         if (time == null || time <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
+        }
+    }
+
+    private void validateTimePerSpeaking(Integer timePerSpeaking) {
+        if (timePerSpeaking != null && timePerSpeaking <= 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
         }
     }
