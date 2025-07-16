@@ -2,6 +2,7 @@ package com.debatetimer.domain.customize;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
 public abstract class CustomizeTimeBox {
@@ -69,4 +70,6 @@ public abstract class CustomizeTimeBox {
 
     @Nullable
     public abstract Integer getTimePerSpeaking();
+
+    public abstract List<Bell> getBells();
 }

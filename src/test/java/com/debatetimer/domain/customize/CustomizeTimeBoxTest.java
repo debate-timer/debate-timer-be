@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -108,6 +110,11 @@ class CustomizeTimeBoxTest {
         @Override
         public Integer getTimePerSpeaking() {
             return 0;
+        }
+
+        @Override
+        public List<Bell> getBells() {
+            return Collections.emptyList();
         }
     }
 }

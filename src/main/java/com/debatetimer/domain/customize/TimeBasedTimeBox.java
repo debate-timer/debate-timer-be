@@ -2,6 +2,8 @@ package com.debatetimer.domain.customize;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
 public class TimeBasedTimeBox extends CustomizeTimeBox {
@@ -68,5 +70,10 @@ public class TimeBasedTimeBox extends CustomizeTimeBox {
     @Nullable
     public Integer getTimePerSpeaking() {
         return timePerSpeaking;
+    }
+
+    @Override
+    public List<Bell> getBells() {
+        return Collections.emptyList();
     }
 }
