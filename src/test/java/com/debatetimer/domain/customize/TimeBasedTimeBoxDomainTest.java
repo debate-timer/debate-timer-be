@@ -59,7 +59,7 @@ class TimeBasedTimeBoxDomainTest {
         }
 
         @Test
-        void 개인_당_시간이_양수이어야_한다() {
+        void 회_당_시간이_양수이어야_한다() {
             int timePerSpeaking = 0;
             int timePerTeam = 1;
 
@@ -70,7 +70,7 @@ class TimeBasedTimeBoxDomainTest {
         }
 
         @Test
-        void 개인_당_발언_시간은_비어있을_수_있다() {
+        void 회_당_발언_시간은_비어있을_수_있다() {
             Integer timePerSpeaking = null;
             int timePerTeam = 1;
 
@@ -80,7 +80,7 @@ class TimeBasedTimeBoxDomainTest {
         }
 
         @Test
-        void 팀_당_발언시간은_개인_발언시간보다_많거나_같아야_한다() {
+        void 팀_당_발언시간은_회_당_발언시간보다_많거나_같아야_한다() {
             int timePerTeam = 60;
             int timePerSpeaking = timePerTeam + 1;
 
