@@ -6,8 +6,6 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import java.util.List;
@@ -33,8 +31,7 @@ public class CustomizeService {
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
-        CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
@@ -56,8 +53,7 @@ public class CustomizeService {
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
-        CustomizeTableEntity tableEntity = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         tableEntity.updateUsedAt();
 
@@ -66,8 +62,7 @@ public class CustomizeService {
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
-        CustomizeTableEntity table = tableRepository.findByIdAndMember(tableId, member)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+        CustomizeTableEntity table = tableRepository.getByIdAndMember(tableId, member);
         timeBoxRepository.deleteAllByTable(table);
         tableRepository.delete(table);
     }

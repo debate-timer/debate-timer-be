@@ -1,9 +1,11 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
+import com.debatetimer.fixture.BellGenerator;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.member.MemberRepository;
@@ -27,6 +29,9 @@ public abstract class BaseServiceTest {
     protected CustomizeTimeBoxRepository customizeTimeBoxRepository;
 
     @Autowired
+    protected BellRepository bellRepository;
+
+    @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
@@ -34,6 +39,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+
+    @Autowired
+    protected BellGenerator bellGenerator;
 
     protected void runAtSameTime(int count, Runnable task) throws InterruptedException {
         List<Thread> threads = IntStream.range(0, count)

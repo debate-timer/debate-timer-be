@@ -20,9 +20,11 @@ import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
+import com.debatetimer.dto.customize.response.BellResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableInfoResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
@@ -68,6 +70,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -89,6 +94,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -101,13 +109,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellRequest(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             CustomizeTableResponse response = new CustomizeTableResponse(
@@ -116,13 +124,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "찬성", "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellResponse(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellResponse(90, 1), new BellResponse(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).save(eq(request), any());
@@ -160,13 +168,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellRequest(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(customizeService).save(eq(request), any());
@@ -221,6 +229,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -235,13 +246,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "찬성", "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellResponse(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellResponse(90, 1), new BellResponse(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).findTable(eq(tableId), any());
@@ -311,6 +322,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -332,6 +346,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -345,13 +362,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellRequest(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             CustomizeTableResponse response = new CustomizeTableResponse(
@@ -360,13 +377,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "찬성", "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellResponse(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellResponse(90, 1), new BellResponse(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).updateTable(eq(request), eq(tableId), any());
@@ -407,13 +424,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellRequest(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doThrow(new DTClientErrorException(errorCode)).when(customizeService)
@@ -470,6 +487,9 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                         fieldWithPath("table[].speechType").type(STRING).description("발언 유형"),
                         fieldWithPath("table[].boxType").type(STRING).description("타임 박스 유형"),
                         fieldWithPath("table[].time").type(NUMBER).description("발언 시간(초)").optional(),
+                        fieldWithPath("table[].bell").type(ARRAY).description("종소리 정보").optional(),
+                        fieldWithPath("table[].bell[].time").type(NUMBER).description("종소리 울릴 시간(초)").optional(),
+                        fieldWithPath("table[].bell[].count").type(NUMBER).description("종소리 횟수").optional(),
                         fieldWithPath("table[].timePerTeam").type(NUMBER).description("팀당 발언 시간 (초)").optional(),
                         fieldWithPath("table[].timePerSpeaking").type(NUMBER).description("1회 발언 시간 (초)").optional(),
                         fieldWithPath("table[].speaker").type(STRING).description("발언자 이름").optional()
@@ -485,13 +505,13 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             "찬성", "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "콜리"),
+                                    120, List.of(new BellResponse(90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, null, null, "비토"),
+                                    120, List.of(new BellResponse(90, 1), new BellResponse(120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, 120, null),
+                                    null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
-                                    null, 360, null, null)
+                                    null, null, 360, null, null)
                     )
             );
             doReturn(response).when(customizeService).updateUsedAt(eq(tableId), any());

@@ -15,6 +15,13 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
                 toTimeBoxResponses(customizeTimeBoxes));
     }
 
+    public CustomizeTableResponse(
+            CustomizeTable customizeTable,
+            List<CustomizeTimeBoxResponse> timeBoxResponses
+    ) {
+        this(customizeTable.getId(), new CustomizeTableInfoResponse(customizeTable), timeBoxResponses);
+    }
+
     private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(CustomizeTimeBoxes timeBoxes) {
         List<CustomizeTimeBox> customizeTimeBoxes = timeBoxes.getTimeBoxes();
         return customizeTimeBoxes
