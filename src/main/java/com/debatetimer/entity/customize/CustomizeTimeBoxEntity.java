@@ -1,7 +1,11 @@
 package com.debatetimer.entity.customize;
 
+import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.NormalTimeBox;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.customize.TimeBasedTimeBox;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Entity;
@@ -16,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +50,7 @@ public class CustomizeTimeBoxEntity {
     @Enumerated(EnumType.STRING)
     private Stance stance;
 
-    private int time;
+    private Integer time;
     private String speaker;
 
     @NotBlank
@@ -108,6 +113,18 @@ public class CustomizeTimeBoxEntity {
         this.boxType = boxType;
         this.timePerTeam = timePerTeam;
         this.timePerSpeaking = timePerSpeaking;
+    }
+
+    public CustomizeTimeBoxEntity(CustomizeTableEntity customizeTable, CustomizeTimeBox timeBox, int sequence) {
+        this.customizeTable = customizeTable;
+        this.sequence = sequence;
+        this.stance = timeBox.getStance();
+        this.time = timeBox.getTime();
+        this.speaker = timeBox.getSpeaker();
+        this.speechType = timeBox.getSpeechType();
+        this.boxType = timeBox.getBoxType();
+        this.timePerTeam = timeBox.getTimePerTeam();
+        this.timePerSpeaking = timeBox.getTimePerSpeaking();
     }
 
     private static int convertToTime(Integer timePerTeam) {
@@ -177,5 +194,12 @@ public class CustomizeTimeBoxEntity {
         if (speechType.length() > SPEECH_TYPE_MAX_LENGTH) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH);
         }
+    }
+
+    public CustomizeTimeBox toDomain(List<Bell> bells) {
+        if (boxType.isTimeBased()) {
+            return new TimeBasedTimeBox(stance, speechType, speaker, timePerTeam, timePerSpeaking);
+        }
+        return new NormalTimeBox(stance, speechType, speaker, time, bells);
     }
 }

@@ -1,5 +1,6 @@
 package com.debatetimer.entity.customize;
 
+import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Column;
@@ -46,6 +47,12 @@ public class BellEntity {
         this.count = count;
     }
 
+    public BellEntity(CustomizeTimeBoxEntity customizeTimeBox, Bell bell) {
+        this.customizeTimeBox = customizeTimeBox;
+        this.time = bell.getTime();
+        this.count = bell.getCount();
+    }
+
     private void validateTime(int time) {
         if (time < 0) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_TIME);
@@ -56,5 +63,13 @@ public class BellEntity {
         if (count <= 0 || count > MAX_BELL_COUNT) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_COUNT);
         }
+    }
+
+    public Bell toDomain() {
+        return new Bell(time, count);
+    }
+
+    public boolean isContained(CustomizeTimeBoxEntity timeBox) {
+        return this.customizeTimeBox.getId().equals(timeBox.getId());
     }
 }
