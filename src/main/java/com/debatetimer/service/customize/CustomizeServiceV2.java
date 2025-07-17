@@ -53,10 +53,10 @@ public class CustomizeServiceV2 {
             Member member
     ) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
+        tableEntity.updateTable(tableCreateRequest.toTable(member));
+
         bellRepository.deleteAllByTable(tableEntity.getId());
         timeBoxRepository.deleteAllByTable(tableEntity.getId());
-
-        tableEntity.updateTable(tableCreateRequest.toTable(member));
         List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
         saveTimeBoxes(tableEntity, timeBoxes);
         return CustomizeTableResponse.ofDomain(tableEntity.toDomain(), timeBoxes);
