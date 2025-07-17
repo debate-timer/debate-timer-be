@@ -1,7 +1,7 @@
 package com.debatetimer.service.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBoxes;
+import com.debatetimer.domain.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
@@ -11,7 +11,7 @@ import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBox;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
@@ -40,7 +40,7 @@ public class CustomizeServiceV2 {
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
-        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
+        CustomizeTimeBoxEntities timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         List<CustomizeTimeBoxResponse> timeBoxResponses = timeBoxes.getTimeBoxes()
                 .stream()
                 .map(this::getTimeBoxResponse)
@@ -66,7 +66,7 @@ public class CustomizeServiceV2 {
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
-        CustomizeTimeBoxes timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
+        CustomizeTimeBoxEntities timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
         tableEntity.updateUsedAt();
         List<CustomizeTimeBoxResponse> timeBoxResponses = timeBoxes.getTimeBoxes()
                 .stream()
@@ -100,11 +100,11 @@ public class CustomizeServiceV2 {
             CustomizeTable table,
             int sequence
     ) {
-        CustomizeTimeBox savedTimeBox = timeBoxRepository.save(request.toTimeBox(table, sequence));
+        CustomizeTimeBoxEntity savedTimeBox = timeBoxRepository.save(request.toTimeBox(table, sequence));
         return createTimeBoxResponse(request.bell(), savedTimeBox);
     }
 
-    private CustomizeTimeBoxResponse createTimeBoxResponse(List<BellRequest> bellRequests, CustomizeTimeBox timeBox) {
+    private CustomizeTimeBoxResponse createTimeBoxResponse(List<BellRequest> bellRequests, CustomizeTimeBoxEntity timeBox) {
         if (timeBox.getBoxType().isTimeBased()) {
             return new CustomizeTimeBoxResponse(timeBox, null);
         }
@@ -118,7 +118,7 @@ public class CustomizeServiceV2 {
         return new CustomizeTimeBoxResponse(timeBox, bellResponses);
     }
 
-    private CustomizeTimeBoxResponse getTimeBoxResponse(CustomizeTimeBox timeBox) {
+    private CustomizeTimeBoxResponse getTimeBoxResponse(CustomizeTimeBoxEntity timeBox) {
         if (timeBox.getBoxType().isTimeBased()) {
             return new CustomizeTimeBoxResponse(timeBox, null);
         }
@@ -130,7 +130,7 @@ public class CustomizeServiceV2 {
         return new CustomizeTimeBoxResponse(timeBox, bellResponses);
     }
 
-    private void deleteBell(CustomizeTimeBoxes savedCustomizeTimeBoxes) {
+    private void deleteBell(CustomizeTimeBoxEntities savedCustomizeTimeBoxes) {
         bellRepository.deleteAllByCustomizeTimeBoxIn(savedCustomizeTimeBoxes.getTimeBoxes());
     }
 }

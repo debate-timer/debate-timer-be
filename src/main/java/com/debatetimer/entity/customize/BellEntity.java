@@ -31,13 +31,13 @@ public class BellEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customize_time_box_id")
-    private CustomizeTimeBox customizeTimeBox;
+    private CustomizeTimeBoxEntity customizeTimeBox;
 
     @Column(name = "bell_time")
     private int time;
     private int count;
 
-    public BellEntity(CustomizeTimeBox customizeTimeBox, int time, int count) {
+    public BellEntity(CustomizeTimeBoxEntity customizeTimeBox, int time, int count) {
         validateTime(time);
         validateCount(count);
 

@@ -13,16 +13,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(name = "customize_time_box")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTimeBox {
+public class CustomizeTimeBoxEntity {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
     public static final int TIME_MULTIPLIER = 2;
@@ -56,7 +58,7 @@ public class CustomizeTimeBox {
     private Integer timePerTeam;
     private Integer timePerSpeaking;
 
-    public CustomizeTimeBox(
+    public CustomizeTimeBoxEntity(
             CustomizeTableEntity customizeTableEntity,
             int sequence,
             Stance stance,
@@ -80,7 +82,7 @@ public class CustomizeTimeBox {
         this.boxType = boxType;
     }
 
-    public CustomizeTimeBox(
+    public CustomizeTimeBoxEntity(
             CustomizeTableEntity customizeTableEntity,
             int sequence,
             Stance stance,

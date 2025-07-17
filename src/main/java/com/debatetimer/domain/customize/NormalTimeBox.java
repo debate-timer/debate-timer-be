@@ -2,17 +2,19 @@ package com.debatetimer.domain.customize;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
-public final class NormalTimeBoxDomain extends CustomizeTimeBoxDomain {
+public final class NormalTimeBox extends CustomizeTimeBox {
 
     private final int time;
+    private final List<Bell> bells;
 
-    public NormalTimeBoxDomain(Stance stance, String speechType, @Nullable String speaker, Integer time) {
+    public NormalTimeBox(Stance stance, String speechType, @Nullable String speaker, Integer time, List<Bell> bells) {
         super(stance, speechType, speaker);
-
         validateTime(time);
         this.time = time;
+        this.bells = bells;
     }
 
     private void validateTime(Integer time) {
@@ -46,5 +48,10 @@ public final class NormalTimeBoxDomain extends CustomizeTimeBoxDomain {
     @Override
     public Integer getTimePerSpeaking() {
         return null;
+    }
+
+    @Override
+    public List<Bell> getBells() {
+        return bells;
     }
 }

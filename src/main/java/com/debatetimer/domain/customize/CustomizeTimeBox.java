@@ -2,9 +2,10 @@ package com.debatetimer.domain.customize;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
-public abstract class CustomizeTimeBoxDomain {
+public abstract class CustomizeTimeBox {
 
     public static final int SPEECH_TYPE_MAX_LENGTH = 10;
     public static final int SPEAKER_MAX_LENGTH = 5;
@@ -16,7 +17,7 @@ public abstract class CustomizeTimeBoxDomain {
     @Nullable
     private final String speaker;
 
-    protected CustomizeTimeBoxDomain(Stance stance, String speechType, @Nullable String speaker) {
+    protected CustomizeTimeBox(Stance stance, String speechType, @Nullable String speaker) {
         validateStance(stance);
         validateSpeechType(speechType);
         validateSpeaker(speaker);
@@ -69,4 +70,6 @@ public abstract class CustomizeTimeBoxDomain {
 
     @Nullable
     public abstract Integer getTimePerSpeaking();
+
+    public abstract List<Bell> getBells();
 }
