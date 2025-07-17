@@ -2,7 +2,7 @@ package com.debatetimer.dto.customize.response;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
-import com.debatetimer.domain.customize.CustomizeTimeBoxEntities;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import java.util.List;
 

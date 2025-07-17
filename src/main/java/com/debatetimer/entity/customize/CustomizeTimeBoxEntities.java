@@ -1,7 +1,7 @@
-package com.debatetimer.domain.customize;
+package com.debatetimer.entity.customize;
 
-import com.debatetimer.entity.customize.BellEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
+import com.debatetimer.domain.customize.Bell;
+import com.debatetimer.domain.customize.CustomizeTimeBox;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
