@@ -80,7 +80,7 @@ class CustomizeServiceV2Test extends BaseServiceTest {
                     () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
                     () -> assertThat(foundResponse.table()).hasSize(2),
                     () -> assertThat(foundResponse.table().get(0).bell()).hasSize(2),
-                    () -> assertThat(foundResponse.table().get(1).bell()).hasSize(0)
+                    () -> assertThat(foundResponse.table().get(1).bell()).isNull()
             );
         }
 

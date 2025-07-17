@@ -47,7 +47,7 @@ public class CustomizeService {
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
-        timeBoxRepository.deleteAllByTable(existingTable);
+        timeBoxRepository.deleteAllByTable(existingTable.getId());
         CustomizeTimeBoxEntities savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable.toDomain());
         return new CustomizeTableResponse(existingTable.toDomain(), savedCustomizeTimeBoxes);
     }
@@ -64,7 +64,7 @@ public class CustomizeService {
     @Transactional
     public void deleteTable(long tableId, Member member) {
         CustomizeTableEntity table = tableRepository.getByIdAndMember(tableId, member);
-        timeBoxRepository.deleteAllByTable(table);
+        timeBoxRepository.deleteAllByTable(table.getId());
         tableRepository.delete(table);
     }
 

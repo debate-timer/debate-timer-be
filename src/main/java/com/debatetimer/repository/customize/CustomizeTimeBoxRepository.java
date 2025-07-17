@@ -27,7 +27,7 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBoxE
         return new CustomizeTimeBoxEntities(timeBoxes);
     }
 
-    @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable = :table")
+    @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable.id = :tableId")
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    void deleteAllByTable(CustomizeTableEntity table);
+    void deleteAllByTable(long tableId);
 }

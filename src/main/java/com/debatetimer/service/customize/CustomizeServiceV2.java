@@ -1,14 +1,11 @@
 package com.debatetimer.service.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
-import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
-import com.debatetimer.dto.customize.response.BellResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
-import com.debatetimer.dto.customize.response.CustomizeTimeBoxResponse;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
@@ -32,20 +29,21 @@ public class CustomizeServiceV2 {
     @Transactional
     public CustomizeTableResponse save(CustomizeTableCreateRequest tableCreateRequest, Member member) {
         CustomizeTable table = tableCreateRequest.toTable(member);
-        CustomizeTableEntity savedTable = tableRepository.save(new CustomizeTableEntity(table));
+        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
 
-        return saveTimeBoxesAndBells(tableCreateRequest, savedTable.toDomain());
+        CustomizeTableEntity savedTableEntity = tableRepository.save(new CustomizeTableEntity(table));
+        saveTimeBoxes(savedTableEntity, timeBoxes);
+        return CustomizeTableResponse.ofDomain(savedTableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
-        CustomizeTimeBoxEntities timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
-        List<CustomizeTimeBoxResponse> timeBoxResponses = timeBoxes.getTimeBoxes()
-                .stream()
-                .map(this::getTimeBoxResponse)
-                .toList();
-        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxResponses);
+        List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
+        List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
+        CustomizeTimeBoxEntities timeBoxEntities = new CustomizeTimeBoxEntities(timeBoxEntityList, bellEntityList);
+
+        return CustomizeTableResponse.ofDomain(tableEntity.toDomain(), timeBoxEntities.toDomain());
     }
 
     @Transactional
@@ -54,83 +52,47 @@ public class CustomizeServiceV2 {
             long tableId,
             Member member
     ) {
-        CustomizeTableEntity existingTable = tableRepository.getByIdAndMember(tableId, member);
-        CustomizeTable renewedTable = tableCreateRequest.toTable(member);
-        existingTable.updateTable(renewedTable);
+        CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
+        bellRepository.deleteAllByTable(tableEntity.getId());
+        timeBoxRepository.deleteAllByTable(tableEntity.getId());
 
-        deleteBell(timeBoxRepository.findTableTimeBoxes(existingTable));
-        timeBoxRepository.deleteAllByTable(existingTable);
-        return saveTimeBoxesAndBells(tableCreateRequest, existingTable.toDomain());
+        tableEntity.updateTable(tableCreateRequest.toTable(member));
+        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
+        saveTimeBoxes(tableEntity, timeBoxes);
+        return CustomizeTableResponse.ofDomain(tableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
-        CustomizeTimeBoxEntities timeBoxes = timeBoxRepository.findTableTimeBoxes(tableEntity);
+        List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
+        List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
+        CustomizeTimeBoxEntities timeBoxEntities = new CustomizeTimeBoxEntities(timeBoxEntityList, bellEntityList);
+
         tableEntity.updateUsedAt();
-        List<CustomizeTimeBoxResponse> timeBoxResponses = timeBoxes.getTimeBoxes()
-                .stream()
-                .map(this::getTimeBoxResponse)
-                .toList();
-        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxResponses);
+        CustomizeTable table = tableEntity.toDomain();
+        List<CustomizeTimeBox> timeBoxes = timeBoxEntities.toDomain();
+        return CustomizeTableResponse.ofDomain(table, timeBoxes);
     }
 
     @Transactional
     public void deleteTable(long tableId, Member member) {
         CustomizeTableEntity table = tableRepository.getByIdAndMember(tableId, member);
 
-        deleteBell(timeBoxRepository.findTableTimeBoxes(table));
-        timeBoxRepository.deleteAllByTable(table);
+        bellRepository.deleteAllByTable(table.getId());
+        timeBoxRepository.deleteAllByTable(table.getId());
         tableRepository.delete(table);
     }
 
-    private CustomizeTableResponse saveTimeBoxesAndBells(
-            CustomizeTableCreateRequest tableCreateRequest,
-            CustomizeTable table
-    ) {
-        List<CustomizeTimeBoxCreateRequest> timeBoxCreateRequests = tableCreateRequest.table();
-        List<CustomizeTimeBoxResponse> timeBoxResponses = IntStream.range(0, timeBoxCreateRequests.size())
-                .mapToObj(i -> createTimeBoxResponse(timeBoxCreateRequests.get(i), table, i + 1))
-                .toList();
-        return new CustomizeTableResponse(table, timeBoxResponses);
+    private void saveTimeBoxes(CustomizeTableEntity tableEntity, List<CustomizeTimeBox> timeBoxes) {
+        IntStream.range(0, timeBoxes.size())
+                .forEach(i -> saveTimeBox(tableEntity, timeBoxes.get(i), i + 1));
     }
 
-    private CustomizeTimeBoxResponse createTimeBoxResponse(
-            CustomizeTimeBoxCreateRequest request,
-            CustomizeTable table,
-            int sequence
-    ) {
-        CustomizeTimeBoxEntity savedTimeBox = timeBoxRepository.save(request.toTimeBox(table, sequence));
-        return createTimeBoxResponse(request.bell(), savedTimeBox);
-    }
-
-    private CustomizeTimeBoxResponse createTimeBoxResponse(List<BellRequest> bellRequests, CustomizeTimeBoxEntity timeBox) {
-        if (timeBox.getBoxType().isTimeBased()) {
-            return new CustomizeTimeBoxResponse(timeBox, null);
-        }
-
-        List<BellResponse> bellResponses = bellRequests
-                .stream()
-                .map(bellRequest -> new BellEntity(timeBox, bellRequest.time(), bellRequest.count()))
-                .map(bellRepository::save)
-                .map(bell -> new BellResponse(bell.getTime(), bell.getCount()))
-                .toList();
-        return new CustomizeTimeBoxResponse(timeBox, bellResponses);
-    }
-
-    private CustomizeTimeBoxResponse getTimeBoxResponse(CustomizeTimeBoxEntity timeBox) {
-        if (timeBox.getBoxType().isTimeBased()) {
-            return new CustomizeTimeBoxResponse(timeBox, null);
-        }
-
-        List<BellResponse> bellResponses = bellRepository.findByCustomizeTimeBox(timeBox)
-                .stream()
-                .map(bell -> new BellResponse(bell.getTime(), bell.getCount()))
-                .toList();
-        return new CustomizeTimeBoxResponse(timeBox, bellResponses);
-    }
-
-    private void deleteBell(CustomizeTimeBoxEntities savedCustomizeTimeBoxes) {
-        bellRepository.deleteAllByCustomizeTimeBoxIn(savedCustomizeTimeBoxes.getTimeBoxes());
+    private void saveTimeBox(CustomizeTableEntity tableEntity, CustomizeTimeBox timeBox, int sequence) {
+        CustomizeTimeBoxEntity timeBoxEntity = timeBoxRepository.save(
+                new CustomizeTimeBoxEntity(tableEntity, timeBox, sequence));
+        timeBox.getBells()
+                .forEach(bell -> bellRepository.save(new BellEntity(timeBoxEntity, bell)));
     }
 }
