@@ -33,7 +33,7 @@ public class CustomizeServiceV2 {
 
         CustomizeTableEntity savedTableEntity = tableRepository.save(new CustomizeTableEntity(table));
         saveTimeBoxes(savedTableEntity, timeBoxes);
-        return CustomizeTableResponse.ofDomain(savedTableEntity.toDomain(), timeBoxes);
+        return new CustomizeTableResponse(savedTableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +43,7 @@ public class CustomizeServiceV2 {
         List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
         CustomizeTimeBoxEntities timeBoxEntities = new CustomizeTimeBoxEntities(timeBoxEntityList, bellEntityList);
 
-        return CustomizeTableResponse.ofDomain(tableEntity.toDomain(), timeBoxEntities.toDomain());
+        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxEntities.toDomain());
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class CustomizeServiceV2 {
         timeBoxRepository.deleteAllByTable(tableEntity.getId());
         List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
         saveTimeBoxes(tableEntity, timeBoxes);
-        return CustomizeTableResponse.ofDomain(tableEntity.toDomain(), timeBoxes);
+        return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class CustomizeServiceV2 {
         tableEntity.updateUsedAt();
         CustomizeTable table = tableEntity.toDomain();
         List<CustomizeTimeBox> timeBoxes = timeBoxEntities.toDomain();
-        return CustomizeTableResponse.ofDomain(table, timeBoxes);
+        return new CustomizeTableResponse(table, timeBoxes);
     }
 
     @Transactional

@@ -16,13 +16,6 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
                 toTimeBoxResponses(customizeTimeBoxes));
     }
 
-    public CustomizeTableResponse(
-            CustomizeTable customizeTable,
-            List<CustomizeTimeBoxResponse> timeBoxResponses
-    ) {
-        this(customizeTable.getId(), new CustomizeTableInfoResponse(customizeTable), timeBoxResponses);
-    }
-
     private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(CustomizeTimeBoxEntities timeBoxes) {
         List<CustomizeTimeBoxEntity> customizeTimeBoxes = timeBoxes.getTimeBoxes();
         return customizeTimeBoxes
@@ -31,13 +24,11 @@ public record CustomizeTableResponse(long id, CustomizeTableInfoResponse info, L
                 .toList();
     }
 
-    public static CustomizeTableResponse ofDomain(CustomizeTable customizeTable,
-                                                  List<CustomizeTimeBox> customizeTimeBoxes) { // TODO 정팩매 -> 생성자로 전환
-        return new CustomizeTableResponse(
-                customizeTable.getId(),
+    public CustomizeTableResponse(CustomizeTable customizeTable,
+                                  List<CustomizeTimeBox> customizeTimeBoxes) {
+        this(customizeTable.getId(),
                 new CustomizeTableInfoResponse(customizeTable),
-                toTimeBoxResponses(customizeTimeBoxes)
-        );
+                toTimeBoxResponses(customizeTimeBoxes));
     }
 
     private static List<CustomizeTimeBoxResponse> toTimeBoxResponses(List<CustomizeTimeBox> customizeTimeBoxes) {
