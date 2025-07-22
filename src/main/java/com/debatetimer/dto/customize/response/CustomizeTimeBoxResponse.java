@@ -5,7 +5,6 @@ import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
-import java.util.Collections;
 import java.util.List;
 
 public record CustomizeTimeBoxResponse(
@@ -26,19 +25,6 @@ public record CustomizeTimeBoxResponse(
                 customizeTimeBox.getBoxType(),
                 convertTime(customizeTimeBox),
                 null,
-                customizeTimeBox.getTimePerTeam(),
-                customizeTimeBox.getTimePerSpeaking(),
-                customizeTimeBox.getSpeaker()
-        );
-    }
-
-    public CustomizeTimeBoxResponse(CustomizeTimeBoxEntity customizeTimeBox, List<BellResponse> bell) {
-        this(
-                customizeTimeBox.getStance(),
-                customizeTimeBox.getSpeechType(),
-                customizeTimeBox.getBoxType(),
-                convertTime(customizeTimeBox),
-                bell,
                 customizeTimeBox.getTimePerTeam(),
                 customizeTimeBox.getTimePerSpeaking(),
                 customizeTimeBox.getSpeaker()

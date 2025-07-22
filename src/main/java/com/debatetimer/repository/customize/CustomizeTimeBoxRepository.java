@@ -1,7 +1,7 @@
 package com.debatetimer.repository.customize;
 
-import com.debatetimer.domain.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,7 +27,7 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBoxE
         return new CustomizeTimeBoxEntities(timeBoxes);
     }
 
-    @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable = :table")
+    @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable.id = :tableId")
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    void deleteAllByTable(CustomizeTableEntity table);
+    void deleteAllByTable(long tableId);
 }

@@ -1,6 +1,7 @@
 package com.debatetimer.repository;
 
 import com.debatetimer.config.JpaAuditingConfig;
+import com.debatetimer.fixture.BellGenerator;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;
@@ -12,7 +13,8 @@ import org.springframework.context.annotation.Import;
         JpaAuditingConfig.class,
         MemberGenerator.class,
         CustomizeTableGenerator.class,
-        CustomizeTimeBoxGenerator.class
+        CustomizeTimeBoxGenerator.class,
+        BellGenerator.class
 })
 @DataJpaTest
 public abstract class BaseRepositoryTest {
@@ -25,4 +27,7 @@ public abstract class BaseRepositoryTest {
 
     @Autowired
     protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+
+    @Autowired
+    protected BellGenerator bellGenerator;
 }

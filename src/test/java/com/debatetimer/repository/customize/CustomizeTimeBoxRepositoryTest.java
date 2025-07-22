@@ -48,7 +48,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
 
-            customizeTimeBoxRepository.deleteAllByTable(chanTable);
+            customizeTimeBoxRepository.deleteAllByTable(chanTable.getId());
 
             List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
             assertThat(timeBoxes).isEmpty();
@@ -63,7 +63,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             CustomizeTableEntity deletedTable = customizeTableGenerator.generate(chan);
             customizeTimeBoxGenerator.generate(deletedTable, CustomizeBoxType.NORMAL, 1);
 
-            customizeTimeBoxRepository.deleteAllByTable(deletedTable);
+            customizeTimeBoxRepository.deleteAllByTable(deletedTable.getId());
 
             List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(filledTable);
             assertThat(timeBoxes).hasSize(2);
@@ -74,7 +74,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTableEntity emptyTable = customizeTableGenerator.generate(chan);
 
-            assertThatCode(() -> customizeTimeBoxRepository.deleteAllByTable(emptyTable))
+            assertThatCode(() -> customizeTimeBoxRepository.deleteAllByTable(emptyTable.getId()))
                     .doesNotThrowAnyException();
         }
     }

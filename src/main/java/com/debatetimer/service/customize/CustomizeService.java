@@ -1,11 +1,11 @@
 package com.debatetimer.service.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
@@ -47,7 +47,7 @@ public class CustomizeService {
         CustomizeTable renewedTable = tableCreateRequest.toTable(member);
         existingTable.updateTable(renewedTable);
 
-        timeBoxRepository.deleteAllByTable(existingTable);
+        timeBoxRepository.deleteAllByTable(existingTable.getId());
         CustomizeTimeBoxEntities savedCustomizeTimeBoxes = saveTimeBoxes(tableCreateRequest, existingTable.toDomain());
         return new CustomizeTableResponse(existingTable.toDomain(), savedCustomizeTimeBoxes);
     }
@@ -64,7 +64,7 @@ public class CustomizeService {
     @Transactional
     public void deleteTable(long tableId, Member member) {
         CustomizeTableEntity table = tableRepository.getByIdAndMember(tableId, member);
-        timeBoxRepository.deleteAllByTable(table);
+        timeBoxRepository.deleteAllByTable(table.getId());
         tableRepository.delete(table);
     }
 
