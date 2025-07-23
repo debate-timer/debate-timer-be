@@ -11,7 +11,7 @@ import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.member.MemberRepository;
-import com.debatetimer.repository.poll.PollJpaRepository;
+import com.debatetimer.repository.poll.PollRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ public abstract class BaseServiceTest {
     protected BellRepository bellRepository;
 
     @Autowired
-    protected PollJpaRepository pollJpaRepository;
+    protected PollRepository pollRepository;
 
     @Autowired
     protected MemberGenerator memberGenerator;

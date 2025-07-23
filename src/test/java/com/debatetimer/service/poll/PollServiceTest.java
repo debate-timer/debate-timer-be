@@ -31,7 +31,7 @@ class PollServiceTest extends BaseServiceTest {
 
             PollCreateResponse createdPoll = pollService.create(table.getId(), member);
 
-            Optional<PollEntity> foundPoll = pollJpaRepository.findById(createdPoll.id());
+            Optional<PollEntity> foundPoll = pollRepository.findById(createdPoll.id());
             assertThat(foundPoll).isPresent();
         }
     }

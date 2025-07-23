@@ -4,16 +4,16 @@ import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
-import com.debatetimer.repository.poll.PollJpaRepository;
+import com.debatetimer.repository.poll.PollRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PollGenerator {
 
-    private final PollJpaRepository pollJpaRepository;
+    private final PollRepository pollRepository;
 
-    public PollGenerator(final PollJpaRepository pollJpaRepository) {
-        this.pollJpaRepository = pollJpaRepository;
+    public PollGenerator(final PollRepository pollRepository) {
+        this.pollRepository = pollRepository;
     }
 
     public PollEntity generate(CustomizeTableEntity customizeTableEntity, PollStatus status) {
@@ -26,6 +26,6 @@ public class PollGenerator {
                 "반대",
                 "주제"
         );
-        return pollJpaRepository.save(new PollEntity(poll));
+        return pollRepository.save(new PollEntity(poll));
     }
 }

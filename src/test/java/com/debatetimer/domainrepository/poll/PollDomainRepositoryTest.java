@@ -30,7 +30,7 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
 
             pollDomainRepository.create(poll);
 
-            Optional<PollEntity> foundPollEntity = pollJpaRepository.findById(poll.getId());
+            Optional<PollEntity> foundPollEntity = pollRepository.findById(poll.getId());
             assertThat(foundPollEntity).isPresent();
         }
 

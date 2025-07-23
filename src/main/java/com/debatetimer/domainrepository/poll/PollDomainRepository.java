@@ -4,7 +4,7 @@ import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.repository.poll.PollJpaRepository;
+import com.debatetimer.repository.poll.PollRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PollDomainRepository {
 
-    private final PollJpaRepository pollJpaRepository;
+    private final PollRepository pollRepository;
 
     @Transactional
     public Poll create(Poll poll) {
         PollEntity pollEntity = new PollEntity(poll);
-        return pollJpaRepository.save(pollEntity)
+        return pollRepository.save(pollEntity)
                 .toDomain();
     }
 
@@ -36,7 +36,7 @@ public class PollDomainRepository {
     }
 
     private PollEntity findPoll(long pollId, long memberId) {
-        return pollJpaRepository.findByIdAndMemberId(pollId, memberId)
+        return pollRepository.findByIdAndMemberId(pollId, memberId)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.POLL_NOT_FOUND));
     }
 }

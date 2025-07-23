@@ -5,7 +5,7 @@ import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.MemberGenerator;
 import com.debatetimer.fixture.PollGenerator;
 import com.debatetimer.fixture.VoteGenerator;
-import com.debatetimer.repository.poll.PollJpaRepository;
+import com.debatetimer.repository.poll.PollRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,5 +27,5 @@ public abstract class BaseDomainRepositoryTest {
     protected VoteGenerator voteGenerator;
 
     @Autowired
-    protected PollJpaRepository pollJpaRepository;
+    protected PollRepository pollRepository;
 }

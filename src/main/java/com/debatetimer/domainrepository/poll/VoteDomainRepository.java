@@ -3,7 +3,7 @@ package com.debatetimer.domainrepository.poll;
 import com.debatetimer.domain.poll.VoteInfo;
 import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.entity.poll.VoteEntity;
-import com.debatetimer.repository.poll.VoteJpaRepository;
+import com.debatetimer.repository.poll.VoteRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class VoteDomainRepository {
 
-    private final VoteJpaRepository voteJpaRepository;
+    private final VoteRepository voteRepository;
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
-        List<VoteEntity> pollVotes = voteJpaRepository.findAllByPollId(pollId);
+        List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
         return resolveVoteInfo(pollId, pollVotes);
     }
 
