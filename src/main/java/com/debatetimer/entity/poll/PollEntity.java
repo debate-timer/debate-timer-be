@@ -1,5 +1,6 @@
 package com.debatetimer.entity.poll;
 
+import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.entity.customize.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -25,6 +26,8 @@ public class PollEntity extends BaseTimeEntity {
 
     private long tableId;
 
+    private long userId;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private PollStatus status;
@@ -36,4 +39,8 @@ public class PollEntity extends BaseTimeEntity {
     private String consTeamName;
 
     private String agenda;
+
+    public Poll toDomain() {
+        return new Poll(id, tableId, userId, status, prosTeamName, consTeamName, agenda);
+    }
 }
