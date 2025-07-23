@@ -3,6 +3,7 @@ package com.debatetimer.entity.poll;
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.entity.customize.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,9 +27,11 @@ public class PollEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "table_id")
     private long tableId;
 
-    private long userId;
+    @Column(name = "member_id")
+    private long memberId;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -45,14 +48,18 @@ public class PollEntity extends BaseTimeEntity {
     public PollEntity(Poll poll) {
         this.id = poll.getId();
         this.tableId = poll.getTableId();
-        this.userId = poll.getUserId();
+        this.memberId = poll.getMemberId();
         this.status = poll.getStatus();
         this.prosTeamName = poll.getProsTeamName().getValue();
         this.consTeamName = poll.getConsTeamName().getValue();
         this.agenda = poll.getAgenda().getValue();
     }
 
+    public void updateToDone() {
+        this.status = PollStatus.DONE;
+    }
+
     public Poll toDomain() {
-        return new Poll(id, tableId, userId, status, prosTeamName, consTeamName, agenda);
+        return new Poll(id, tableId, memberId, status, prosTeamName, consTeamName, agenda);
     }
 }

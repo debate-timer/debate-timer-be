@@ -1,2 +1,0 @@
-ALTER TABLE poll
-    ADD COLUMN user_id BIGINT NOT NULL

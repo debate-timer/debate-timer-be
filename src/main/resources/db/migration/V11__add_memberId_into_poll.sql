@@ -1,0 +1,2 @@
+ALTER TABLE poll
+    ADD COLUMN member_id BIGINT NOT NULL

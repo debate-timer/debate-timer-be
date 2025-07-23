@@ -1,5 +1,8 @@
 package com.debatetimer.domain.poll;
 
+import lombok.Getter;
+
+@Getter
 public class VoteInfo {
 
     private final long pollId;

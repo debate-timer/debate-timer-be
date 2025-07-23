@@ -11,14 +11,14 @@ public class Poll {
 
     private final Long id;
     private final long tableId;
-    private final long userId;
+    private final long memberId;
     private final PollStatus status;
     private final TeamName prosTeamName;
     private final TeamName consTeamName;
     private final Agenda agenda;
 
-    public Poll(Long id, long tableId, long userId, PollStatus status,
+    public Poll(Long id, long tableId, long memberId, PollStatus status,
                 String prosTeamName, String consTeamName, String agenda) {
-        this(id, tableId, userId, status, new TeamName(prosTeamName), new TeamName(consTeamName), new Agenda(agenda));
+        this(id, tableId, memberId, status, new TeamName(prosTeamName), new TeamName(consTeamName), new Agenda(agenda));
     }
 }
