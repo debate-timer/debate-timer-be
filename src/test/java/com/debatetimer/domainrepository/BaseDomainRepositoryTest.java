@@ -1,4 +1,4 @@
-package com.debatetimer.domainrepository.poll;
+package com.debatetimer.domainrepository;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.fixture.CustomizeTableGenerator;

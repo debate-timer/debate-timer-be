@@ -7,6 +7,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.domain.poll.VoteInfo;
 import com.debatetimer.domain.poll.VoteTeam;
+import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
 import org.junit.jupiter.api.Nested;
