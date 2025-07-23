@@ -23,12 +23,9 @@ public class VoteDomainRepository {
 
     private VoteInfo resolveVoteInfo(long pollId, List<VoteEntity> voteEntities) {
         Map<VoteTeam, Long> teamCount = voteEntities.stream()
-                .collect(Collectors.groupingBy(
-                        VoteEntity::getTeam,
-                        Collectors.counting()
-                ));
-        long prosCount = teamCount.get(VoteTeam.PROS);
-        long consCount = teamCount.get(VoteTeam.CONS);
+                .collect(Collectors.groupingBy(VoteEntity::getTeam, Collectors.counting()));
+        long prosCount = teamCount.getOrDefault(VoteTeam.PROS, 0L);
+        long consCount = teamCount.getOrDefault(VoteTeam.CONS, 0L);
         return new VoteInfo(pollId, prosCount, consCount);
     }
 }
