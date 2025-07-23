@@ -1,5 +1,6 @@
 package com.debatetimer.entity.poll;
 
+import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteTeam;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,4 +40,8 @@ public class VoteEntity {
 
     @NotBlank
     private String participantCode;
+
+    public Vote toDomain() {
+        return new Vote(id, poll.getId(), team, name, participantCode);
+    }
 }
