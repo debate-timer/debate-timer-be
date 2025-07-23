@@ -12,7 +12,9 @@ import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.fixture.PollGenerator;
 import com.debatetimer.fixture.TokenGenerator;
+import com.debatetimer.fixture.VoteGenerator;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import com.navercorp.fixturemonkey.FixtureMonkey;
@@ -44,6 +46,12 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+
+    @Autowired
+    protected PollGenerator pollGenerator;
+
+    @Autowired
+    protected VoteGenerator voteGenerator;
 
     @Autowired
     protected HeaderGenerator headerGenerator;
