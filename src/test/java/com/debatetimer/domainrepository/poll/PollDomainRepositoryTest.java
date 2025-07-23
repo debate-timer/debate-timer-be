@@ -1,0 +1,66 @@
+package com.debatetimer.domainrepository.poll;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.poll.Poll;
+import com.debatetimer.domain.poll.PollStatus;
+import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.entity.poll.PollEntity;
+import java.util.Optional;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
+
+    @Autowired
+    private PollDomainRepository pollDomainRepository;
+
+    @Nested
+    class CRUDTest {
+
+        @Test
+        void 선거를_생성한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            Poll poll = new Poll(null, table.getId(), member.getId(), PollStatus.PROGRESS, "찬성", "반대", "주제");
+
+            pollDomainRepository.create(poll);
+
+            Optional<PollEntity> foundPollEntity = pollJpaRepository.findById(poll.getId());
+            assertThat(foundPollEntity).isPresent();
+        }
+
+        @Test
+        void 회원이_개최한_선거를_가져온다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+
+            Poll foundPoll = pollDomainRepository.getByIdAndMemberId(pollEntity.getId(), member.getId());
+
+            assertAll(
+                    () -> assertThat(foundPoll.getId()).isEqualTo(pollEntity.getId()),
+                    () -> assertThat(foundPoll.getAgenda().getValue()).isEqualTo(pollEntity.getAgenda()),
+                    () -> assertThat(foundPoll.getStatus()).isEqualTo(pollEntity.getStatus()),
+                    () -> assertThat(foundPoll.getMemberId()).isEqualTo(pollEntity.getMemberId()),
+                    () -> assertThat(foundPoll.getProsTeamName().getValue()).isEqualTo(pollEntity.getProsTeamName()),
+                    () -> assertThat(foundPoll.getConsTeamName().getValue()).isEqualTo(pollEntity.getConsTeamName())
+            );
+        }
+
+        @Test
+        void 선거를_완료_상태로_변경한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+
+            Poll updatedPoll = pollDomainRepository.updateToDone(pollEntity.getId(), member.getId());
+
+            assertThat(updatedPoll.getStatus()).isEqualTo(PollStatus.DONE);
+        }
+    }
+}

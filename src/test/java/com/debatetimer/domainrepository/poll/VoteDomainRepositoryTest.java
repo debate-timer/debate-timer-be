@@ -13,9 +13,7 @@ import com.debatetimer.entity.poll.PollEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 
-@Import(VoteDomainRepository.class)
 class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
 
     @Autowired
