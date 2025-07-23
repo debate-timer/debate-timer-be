@@ -42,6 +42,16 @@ public class PollEntity extends BaseTimeEntity {
 
     private String agenda;
 
+    public PollEntity(Poll poll) {
+        this.id = poll.getId();
+        this.tableId = poll.getTableId();
+        this.userId = poll.getUserId();
+        this.status = poll.getStatus();
+        this.prosTeamName = poll.getProsTeamName().getValue();
+        this.consTeamName = poll.getConsTeamName().getValue();
+        this.agenda = poll.getAgenda().getValue();
+    }
+
     public Poll toDomain() {
         return new Poll(id, tableId, userId, status, prosTeamName, consTeamName, agenda);
     }

@@ -2,8 +2,10 @@ package com.debatetimer.domain.poll;
 
 import com.debatetimer.domain.customize.Agenda;
 import com.debatetimer.domain.customize.TeamName;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public class Poll {
 

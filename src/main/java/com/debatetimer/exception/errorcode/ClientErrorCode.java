@@ -54,6 +54,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
+    POLL_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
