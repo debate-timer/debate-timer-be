@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
         MemberGenerator.class,
         CustomizeTableGenerator.class,
         CustomizeTimeBoxGenerator.class,
-        BellGenerator.class
+        BellGenerator.class,
 })
 @DataJpaTest
 public abstract class BaseRepositoryTest {
