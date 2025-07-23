@@ -28,9 +28,9 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             Poll poll = new Poll(null, table.getId(), member.getId(), PollStatus.PROGRESS, "찬성", "반대", "주제");
 
-            pollDomainRepository.create(poll);
+            Poll createdPoll = pollDomainRepository.create(poll);
 
-            Optional<PollEntity> foundPollEntity = pollRepository.findById(poll.getId());
+            Optional<PollEntity> foundPollEntity = pollRepository.findById(createdPoll.getId());
             assertThat(foundPollEntity).isPresent();
         }
 
