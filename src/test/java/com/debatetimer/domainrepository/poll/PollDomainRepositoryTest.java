@@ -20,7 +20,7 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
     private PollDomainRepository pollDomainRepository;
 
     @Nested
-    class CRUDTest {
+    class Create {
 
         @Test
         void 선거를_생성한다() {
@@ -33,6 +33,10 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
             Optional<PollEntity> foundPollEntity = pollRepository.findById(createdPoll.getId());
             assertThat(foundPollEntity).isPresent();
         }
+    }
+
+    @Nested
+    class GetByIdAndMemberId {
 
         @Test
         void 회원이_개최한_선거를_가져온다() {
@@ -51,6 +55,10 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
                     () -> assertThat(foundPoll.getConsTeamName().getValue()).isEqualTo(pollEntity.getConsTeamName())
             );
         }
+    }
+
+    @Nested
+    class FinishPoll {
 
         @Test
         void 선거를_완료_상태로_변경한다() {
