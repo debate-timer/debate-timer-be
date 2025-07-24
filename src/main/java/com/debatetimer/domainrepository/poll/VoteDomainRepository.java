@@ -18,10 +18,10 @@ public class VoteDomainRepository {
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
         List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
-        return resolveVoteInfo(pollId, pollVotes);
+        return countVotes(pollId, pollVotes);
     }
 
-    private VoteInfo resolveVoteInfo(long pollId, List<VoteEntity> voteEntities) {
+    private VoteInfo countVotes(long pollId, List<VoteEntity> voteEntities) {
         Map<VoteTeam, Long> teamCount = voteEntities.stream()
                 .collect(Collectors.groupingBy(VoteEntity::getTeam, Collectors.counting()));
         long prosCount = teamCount.getOrDefault(VoteTeam.PROS, 0L);
