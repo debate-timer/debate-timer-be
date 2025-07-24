@@ -116,7 +116,7 @@ public class PollDocumentTest extends BaseDocumentTest {
     }
 
     @Nested
-    class UpdateToDone {
+    class FinishPoll {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.POLL_API)
@@ -150,7 +150,7 @@ public class PollDocumentTest extends BaseDocumentTest {
                     2L,
                     1L
             );
-            doReturn(response).when(pollService).updateToDone(anyLong(), any(Member.class));
+            doReturn(response).when(pollService).finishPoll(anyLong(), any(Member.class));
 
             var document = document("poll/patch", 200)
                     .request(requestDocument)

@@ -29,7 +29,7 @@ public class PollDomainRepository {
     }
 
     @Transactional
-    public Poll updateToDone(long pollId, long memberId) {
+    public Poll finishPoll(long pollId, long memberId) {
         PollEntity pollEntity = findPoll(pollId, memberId);
         pollEntity.updateToDone();
         return pollEntity.toDomain();

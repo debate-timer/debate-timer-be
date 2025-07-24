@@ -70,7 +70,7 @@ class PollControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class UpdateToDone {
+    class FinishPoll {
 
         @Test
         void 선거정보를_완료상태로_변경한다() {

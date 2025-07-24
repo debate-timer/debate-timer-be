@@ -39,8 +39,8 @@ public class PollService {
     }
 
     @Transactional
-    public PollInfoResponse updateToDone(long pollId, Member member) {
-        Poll poll = pollDomainRepository.updateToDone(pollId, member.getId());
+    public PollInfoResponse finishPoll(long pollId, Member member) {
+        Poll poll = pollDomainRepository.finishPoll(pollId, member.getId());
         VoteInfo voteInfo = voteDomainRepository.findVoteInfoByPollId(pollId);
         return new PollInfoResponse(poll, voteInfo);
     }

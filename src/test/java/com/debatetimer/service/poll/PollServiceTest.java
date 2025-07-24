@@ -63,7 +63,7 @@ class PollServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class UpdateToDone {
+    class FinishPoll {
 
         @Test
         void 선거를_완료상태로_변경한다() {
@@ -71,7 +71,7 @@ class PollServiceTest extends BaseServiceTest {
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             pollGenerator.generate(table, PollStatus.PROGRESS);
 
-            PollInfoResponse pollInfo = pollService.updateToDone(table.getId(), member);
+            PollInfoResponse pollInfo = pollService.finishPoll(table.getId(), member);
 
             assertThat(pollInfo.status()).isEqualTo(PollStatus.DONE);
         }

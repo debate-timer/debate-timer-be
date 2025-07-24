@@ -40,10 +40,10 @@ public class PollController {
 
     @PatchMapping("/api/polls/{pollId}")
     @ResponseStatus(HttpStatus.OK)
-    public PollInfoResponse updateToDone(
+    public PollInfoResponse finishPoll(
             @AuthMember Member member,
             @PathVariable(name = "pollId") long pollId
     ) {
-        return pollService.updateToDone(pollId, member);
+        return pollService.finishPoll(pollId, member);
     }
 }

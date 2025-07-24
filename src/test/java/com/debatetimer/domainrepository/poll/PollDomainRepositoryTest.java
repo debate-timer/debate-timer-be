@@ -58,7 +58,7 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
 
-            Poll updatedPoll = pollDomainRepository.updateToDone(pollEntity.getId(), member.getId());
+            Poll updatedPoll = pollDomainRepository.finishPoll(pollEntity.getId(), member.getId());
 
             assertThat(updatedPoll.getStatus()).isEqualTo(PollStatus.DONE);
         }
