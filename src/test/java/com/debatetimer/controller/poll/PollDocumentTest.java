@@ -39,12 +39,15 @@ public class PollDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationResponse responseDocument = response()
                 .responseBodyField(
-                        fieldWithPath("id").type(NUMBER).description("선거 ID")
+                        fieldWithPath("id").type(NUMBER).description("선거 ID"),
+                        fieldWithPath("status").type(STRING).description("선거 상태 - 진행중 : PROGRESS, 완료 : DONE"),
+                        fieldWithPath("prosTeamName").type(STRING).description("찬성측 팀 이름"),
+                        fieldWithPath("consTeamName").type(STRING).description("반대측 팀 이름")
                 );
 
         @Test
         void 선거_생성_성공() {
-            PollCreateResponse response = new PollCreateResponse(1l);
+            PollCreateResponse response = new PollCreateResponse(1l, PollStatus.PROGRESS, "찬성", "반대");
             doReturn(response).when(pollService).create(anyLong(), any(Member.class));
 
             var document = document("poll/post", 201)
