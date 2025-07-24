@@ -31,11 +31,11 @@ public class PollController {
 
     @GetMapping("/api/polls/{pollId}")
     @ResponseStatus(HttpStatus.OK)
-    public PollInfoResponse readPollInfo(
+    public PollInfoResponse getPollInfo(
             @AuthMember Member member,
             @PathVariable(name = "pollId") long pollId
     ) {
-        return pollService.readPollInfo(pollId, member);
+        return pollService.getPollInfo(pollId, member);
     }
 
     @PatchMapping("/api/polls/{pollId}")

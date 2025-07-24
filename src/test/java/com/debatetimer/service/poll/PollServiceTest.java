@@ -37,7 +37,7 @@ class PollServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class ReadPollInfo {
+    class GetPollInfo {
 
         @Test
         void 선거_정보를_읽어온다() {
@@ -48,7 +48,7 @@ class PollServiceTest extends BaseServiceTest {
             voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
             voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
-            PollInfoResponse pollInfo = pollService.readPollInfo(table.getId(), member);
+            PollInfoResponse pollInfo = pollService.getPollInfo(table.getId(), member);
 
             assertAll(
                     () -> assertThat(pollInfo.id()).isEqualTo(pollEntity.getId()),

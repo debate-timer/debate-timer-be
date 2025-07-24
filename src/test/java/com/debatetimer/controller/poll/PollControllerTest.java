@@ -37,7 +37,7 @@ class PollControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class ReadPollInfo {
+    class GetPollInfo {
 
         @Test
         void 선거정보를_읽을_수_있다() {

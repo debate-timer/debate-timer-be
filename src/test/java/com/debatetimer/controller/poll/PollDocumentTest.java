@@ -65,7 +65,7 @@ public class PollDocumentTest extends BaseDocumentTest {
     }
 
     @Nested
-    class ReadPollInfo {
+    class GetPollInfo {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.POLL_API)
@@ -99,7 +99,7 @@ public class PollDocumentTest extends BaseDocumentTest {
                     2L,
                     1L
             );
-            doReturn(response).when(pollService).readPollInfo(anyLong(), any(Member.class));
+            doReturn(response).when(pollService).getPollInfo(anyLong(), any(Member.class));
 
             var document = document("poll/get", 200)
                     .request(requestDocument)

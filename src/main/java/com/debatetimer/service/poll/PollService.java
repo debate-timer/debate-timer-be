@@ -31,7 +31,7 @@ public class PollService {
     }
 
     @Transactional(readOnly = true)
-    public PollInfoResponse readPollInfo(long pollId, Member member) {
+    public PollInfoResponse getPollInfo(long pollId, Member member) {
         Poll poll = pollDomainRepository.getByIdAndMemberId(pollId, member.getId());
         VoteInfo voteInfo = voteDomainRepository.findVoteInfoByPollId(pollId);
         return new PollInfoResponse(poll, voteInfo);
