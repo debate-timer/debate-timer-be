@@ -143,7 +143,7 @@ public class PollDocumentTest extends BaseDocumentTest {
         void 선거_완료() {
             PollInfoResponse response = new PollInfoResponse(
                     1L,
-                    PollStatus.PROGRESS,
+                    PollStatus.DONE,
                     "찬성",
                     "반대",
                     3L,
