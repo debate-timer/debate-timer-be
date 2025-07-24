@@ -17,6 +17,11 @@ public class Poll {
     private final TeamName consTeamName;
     private final Agenda agenda;
 
+    public Poll(long tableId, long memberId, String prosTeamName, String consTeamName, String agenda) {
+        this(null, tableId, memberId, PollStatus.PROGRESS,
+                new TeamName(prosTeamName), new TeamName(consTeamName), new Agenda(agenda));
+    }
+
     public Poll(Long id, long tableId, long memberId, PollStatus status,
                 String prosTeamName, String consTeamName, String agenda) {
         this(id, tableId, memberId, status, new TeamName(prosTeamName), new TeamName(consTeamName), new Agenda(agenda));

@@ -3,7 +3,6 @@ package com.debatetimer.service.poll;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.poll.Poll;
-import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.domain.poll.VoteInfo;
 import com.debatetimer.domainrepository.poll.CustomizeTableDomainRepository;
 import com.debatetimer.domainrepository.poll.PollDomainRepository;
@@ -25,8 +24,8 @@ public class PollService {
     @Transactional
     public PollCreateResponse create(long tableId, Member member) {
         CustomizeTable table = customizeTableDomainRepository.getByIdAndMember(tableId, member);
-        Poll poll = new Poll(null, table.getId(), member.getId(), PollStatus.PROGRESS,
-                table.getProsTeamName(), table.getConsTeamName(), table.getAgenda());
+        Poll poll = new Poll(table.getId(), member.getId(), table.getProsTeamName(),
+                table.getConsTeamName(), table.getAgenda());
         Poll savedPoll = pollDomainRepository.create(poll);
         return new PollCreateResponse(savedPoll);
     }
