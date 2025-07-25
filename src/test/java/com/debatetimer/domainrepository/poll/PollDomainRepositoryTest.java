@@ -26,7 +26,7 @@ class PollDomainRepositoryTest extends BaseDomainRepositoryTest {
         void 선거를_생성한다() {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            Poll poll = new Poll(null, table.getId(), member.getId(), PollStatus.PROGRESS, "찬성", "반대", "주제");
+            Poll poll = new Poll(table.getId(), member.getId(), "찬성", "반대", "주제");
 
             Poll createdPoll = pollDomainRepository.create(poll);
 
