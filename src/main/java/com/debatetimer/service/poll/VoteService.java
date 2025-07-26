@@ -26,7 +26,7 @@ public class VoteService {
     @Transactional
     public VoteCreateResponse vote(long pollId, VoteRequest voteRequest) {
         validateProgressPoll(pollId);
-        validateAlreadyVoted(voteRequest.participateCode());
+        validateAlreadyVoted(pollId, voteRequest.participateCode());
         Vote vote = new Vote(pollId, voteRequest.team(), voteRequest.name(), voteRequest.participateCode());
         Vote savedVote = voteDomainRepository.vote(vote);
         return new VoteCreateResponse(savedVote);
@@ -39,9 +39,9 @@ public class VoteService {
         }
     }
 
-    private void validateAlreadyVoted(String participateCode) {
+    private void validateAlreadyVoted(long pollId, String participateCode) {
         ParticipateCode code = new ParticipateCode(participateCode);
-        if (voteDomainRepository.alreadyVoted(code)) {
+        if (voteDomainRepository.alreadyVoted(pollId, code)) {
             throw new DTClientErrorException(ClientErrorCode.ALREADY_VOTED_PARTICIPANT);
         }
     }

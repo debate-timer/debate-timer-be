@@ -8,5 +8,5 @@ public interface VoteRepository extends JpaRepository<VoteEntity, Long> {
 
     List<VoteEntity> findAllByPollId(long pollId);
 
-    boolean existsByParticipateCode(String participateCode);
+    boolean existsByPollIdAndParticipateCode(long pollId, String participateCode);
 }

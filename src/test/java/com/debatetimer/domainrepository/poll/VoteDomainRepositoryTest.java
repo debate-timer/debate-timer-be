@@ -1,15 +1,21 @@
 package com.debatetimer.domainrepository.poll;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.poll.ParticipateCode;
 import com.debatetimer.domain.poll.PollStatus;
+import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteInfo;
 import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,4 +48,60 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         }
     }
 
+    @Nested
+    class AlreadyVoted {
+
+        @Test
+        void 이미_참여한_투표인지_알_수_있다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity alreadyParticipatedPoll = pollGenerator.generate(table, PollStatus.PROGRESS);
+            PollEntity notYetParticipatedPoll = pollGenerator.generate(table, PollStatus.PROGRESS);
+            ParticipateCode participateCode = new ParticipateCode(UUID.randomUUID().toString());
+            voteGenerator.generate(alreadyParticipatedPoll, VoteTeam.PROS, "콜리", participateCode.getValue());
+
+            boolean participated = voteDomainRepository.alreadyVoted(alreadyParticipatedPoll.getId(), participateCode);
+            boolean notYetParticipated = voteDomainRepository.alreadyVoted(notYetParticipatedPoll.getId(),
+                    participateCode);
+
+            assertAll(
+                    () -> assertThat(participated).isTrue(),
+                    () -> assertThat(notYetParticipated).isFalse()
+            );
+        }
+    }
+
+    @Nested
+    class VoteTest {
+
+        @Test
+        void 투표할_수_있다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", UUID.randomUUID().toString());
+
+            Vote savedVote = voteDomainRepository.vote(vote);
+
+            assertAll(
+                    () -> assertThat(savedVote.getName().getValue()).isEqualTo(vote.getName().getValue()),
+                    () -> assertThat(savedVote.getCode().getValue()).isEqualTo(vote.getCode().getValue()),
+                    () -> assertThat(savedVote.getTeam()).isEqualTo(vote.getTeam())
+            );
+        }
+
+        @Test
+        void 중복_투표할_수_없다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            String participateCode = UUID.randomUUID().toString();
+            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
+            Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", participateCode);
+
+            assertThatThrownBy(() -> voteDomainRepository.vote(vote))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.ALREADY_VOTED_PARTICIPANT.getMessage());
+        }
+    }
 }

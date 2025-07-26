@@ -38,8 +38,8 @@ public class VoteDomainRepository {
         return new VoteInfo(pollId, prosCount, consCount);
     }
 
-    public boolean alreadyVoted(ParticipateCode code) {
-        return voteRepository.existsByParticipateCode(code.getValue());
+    public boolean alreadyVoted(long pollId, ParticipateCode code) {
+        return voteRepository.existsByPollIdAndParticipateCode(pollId, code.getValue());
     }
 
     public Vote vote(Vote vote) {

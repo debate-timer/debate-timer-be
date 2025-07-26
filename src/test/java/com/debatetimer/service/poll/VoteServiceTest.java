@@ -38,8 +38,8 @@ class VoteServiceTest extends BaseServiceTest {
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
             voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            String participatecode = UUID.randomUUID().toString();
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            String participateCode = UUID.randomUUID().toString();
+            VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
             VoteCreateResponse response = voteService.vote(pollEntity.getId(), voteRequest);
 
@@ -55,9 +55,9 @@ class VoteServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            String participatecode = UUID.randomUUID().toString();
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participatecode);
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            String participateCode = UUID.randomUUID().toString();
+            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
+            VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
             assertThatThrownBy(() -> voteService.vote(pollEntity.getId(), voteRequest))
                     .isInstanceOf(DTClientErrorException.class)
@@ -69,10 +69,10 @@ class VoteServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            String participatecode = UUID.randomUUID().toString();
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            String participateCode = UUID.randomUUID().toString();
+            VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
-            runAtSameTime(10, () -> voteService.vote(pollEntity.getId(), voteRequest));
+            runAtSameTime(2, () -> voteService.vote(pollEntity.getId(), voteRequest));
 
             long voteCount = voteRepository.count();
             assertThat(voteCount).isEqualTo(1);
@@ -83,8 +83,8 @@ class VoteServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity alreadyDonePoll = pollGenerator.generate(table, PollStatus.DONE);
-            String participatecode = UUID.randomUUID().toString();
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            String participateCode = UUID.randomUUID().toString();
+            VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
             assertThatThrownBy(() -> voteService.vote(alreadyDonePoll.getId(), voteRequest))
                     .isInstanceOf(DTClientErrorException.class)
