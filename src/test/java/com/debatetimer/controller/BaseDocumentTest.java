@@ -13,6 +13,7 @@ import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.customize.CustomizeService;
 import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.poll.PollService;
+import com.debatetimer.service.poll.VoteService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -65,6 +66,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected PollService pollService;
+
+    @MockitoBean
+    protected VoteService voteService;
 
     @MockitoBean
     protected AuthManager authManager;

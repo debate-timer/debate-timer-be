@@ -74,7 +74,7 @@ class VoteControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.name()).isEqualTo(voteRequest.name()),
-                    () -> assertThat(response.participantCode()).isEqualTo(voteRequest.participateCode()),
+                    () -> assertThat(response.participateCode()).isEqualTo(voteRequest.participateCode()),
                     () -> assertThat(response.team()).isEqualTo(voteRequest.team())
             );
         }
