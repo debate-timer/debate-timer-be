@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record VoteRequest(
         @NotBlank String name,
-        @NotBlank String participantCode,
+        @NotBlank String participateCode,
         @NotNull VoteTeam team
 ) {
 

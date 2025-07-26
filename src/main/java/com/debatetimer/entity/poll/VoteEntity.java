@@ -2,6 +2,7 @@ package com.debatetimer.entity.poll;
 
 import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteTeam;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -43,7 +44,12 @@ public class VoteEntity {
     private String name;
 
     @NotBlank
+    @Column(unique = true)
     private String participantCode;
+
+    public VoteEntity(Vote vote, PollEntity pollEntity) {
+        this(vote.getId(), pollEntity, vote.getTeam(), vote.getName().getValue(), vote.getCode().getValue());
+    }
 
     public Vote toDomain() {
         return new Vote(id, poll.getId(), team, name, participantCode);
