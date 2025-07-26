@@ -24,7 +24,7 @@ class PollControllerTest extends BaseControllerTest {
         @Test
         void 선거를_생성할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             given()
@@ -42,11 +42,11 @@ class PollControllerTest extends BaseControllerTest {
         @Test
         void 선거정보를_읽을_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             PollInfoResponse response = given()
@@ -75,8 +75,8 @@ class PollControllerTest extends BaseControllerTest {
         @Test
         void 선거정보를_완료상태로_변경한다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             PollInfoResponse response = given()

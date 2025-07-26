@@ -25,9 +25,9 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
         void 특정_회원의_테이블만_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member bito = memberGenerator.generate("default2@gmail.com");
-            CustomizeTableEntity chanTable1 = customizeTableGenerator.generate(chan);
-            CustomizeTableEntity chanTable2 = customizeTableGenerator.generate(chan);
-            customizeTableGenerator.generate(bito);
+            CustomizeTableEntity chanTable1 = customizeTableEntityGenerator.generate(chan);
+            CustomizeTableEntity chanTable2 = customizeTableEntityGenerator.generate(chan);
+            customizeTableEntityGenerator.generate(bito);
 
             List<CustomizeTableEntity> foundKeoChanTables = tableRepository.findAllByMember(chan);
 
@@ -41,7 +41,7 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_회원의_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(chan);
 
             CustomizeTableEntity foundTable = tableRepository.getByIdAndMember(table.getId(), chan);
 
@@ -51,7 +51,7 @@ class CustomizeTableRepositoryTest extends BaseRepositoryTest {
         @Test
         void 존재하지_않는_테이블을_조회하면_예외를_던진다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            customizeTableGenerator.generate(chan);
+            customizeTableEntityGenerator.generate(chan);
             long nonExistTableId = 99999999L;
 
             assertThatThrownBy(() -> tableRepository.getByIdAndMember(nonExistTableId, chan))

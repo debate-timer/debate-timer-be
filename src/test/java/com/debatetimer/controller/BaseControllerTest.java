@@ -8,13 +8,13 @@ import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
-import com.debatetimer.fixture.CustomizeTableGenerator;
-import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
+import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
+import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
-import com.debatetimer.fixture.MemberGenerator;
-import com.debatetimer.fixture.PollGenerator;
+import com.debatetimer.fixture.entity.MemberGenerator;
+import com.debatetimer.fixture.entity.PollEntityGenerator;
 import com.debatetimer.fixture.TokenGenerator;
-import com.debatetimer.fixture.VoteGenerator;
+import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import com.navercorp.fixturemonkey.FixtureMonkey;
@@ -42,16 +42,16 @@ public abstract class BaseControllerTest {
     protected MemberGenerator memberGenerator;
 
     @Autowired
-    protected CustomizeTableGenerator customizeTableGenerator;
+    protected CustomizeTableEntityGenerator customizeTableEntityGenerator;
 
     @Autowired
-    protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+    protected CustomizeTimeBoxEntityGenerator customizeTimeBoxEntityGenerator;
 
     @Autowired
-    protected PollGenerator pollGenerator;
+    protected PollEntityGenerator pollEntityGenerator;
 
     @Autowired
-    protected VoteGenerator voteGenerator;
+    protected VoteEntityGenerator voteEntityGenerator;
 
     @Autowired
     protected HeaderGenerator headerGenerator;

@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.entity.poll.PollEntity;
@@ -8,11 +8,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VoteGenerator {
+public class VoteEntityGenerator {
 
     private final VoteRepository voteRepository;
 
-    public VoteGenerator(VoteRepository voteRepository) {
+    public VoteEntityGenerator(VoteRepository voteRepository) {
         this.voteRepository = voteRepository;
     }
 

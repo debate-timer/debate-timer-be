@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
@@ -8,11 +8,11 @@ import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomizeTimeBoxGenerator {
+public class CustomizeTimeBoxEntityGenerator {
 
     private final CustomizeTimeBoxRepository customizeTimeBoxRepository;
 
-    public CustomizeTimeBoxGenerator(CustomizeTimeBoxRepository customizeTimeBoxRepository) {
+    public CustomizeTimeBoxEntityGenerator(CustomizeTimeBoxRepository customizeTimeBoxRepository) {
         this.customizeTimeBoxRepository = customizeTimeBoxRepository;
     }
 

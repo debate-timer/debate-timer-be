@@ -25,11 +25,11 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 팀별_투표_현황을_알_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             VoteInfo voteInfo = voteDomainRepository.findVoteInfoByPollId(pollEntity.getId());
 

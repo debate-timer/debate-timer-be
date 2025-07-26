@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.entity.customize.BellEntity;
@@ -7,11 +7,11 @@ import com.debatetimer.repository.customize.BellRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BellGenerator {
+public class BellEntityGenerator {
 
     private final BellRepository bellRepository;
 
-    public BellGenerator(BellRepository bellRepository) {
+    public BellEntityGenerator(BellRepository bellRepository) {
         this.bellRepository = bellRepository;
     }
 

@@ -27,7 +27,7 @@ class PollServiceTest extends BaseServiceTest {
         @Test
         void 선거를_생성한다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
 
             PollCreateResponse createdPoll = pollService.create(table.getId(), member);
 
@@ -42,11 +42,11 @@ class PollServiceTest extends BaseServiceTest {
         @Test
         void 선거_정보를_읽어온다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             PollInfoResponse pollInfo = pollService.getPollInfo(table.getId(), member);
 
@@ -68,8 +68,8 @@ class PollServiceTest extends BaseServiceTest {
         @Test
         void 선거를_완료상태로_변경한다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            pollEntityGenerator.generate(table, PollStatus.PROGRESS);
 
             PollInfoResponse pollInfo = pollService.finishPoll(table.getId(), member);
 
