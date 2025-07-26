@@ -4,7 +4,7 @@ import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.VoteInfo;
-import com.debatetimer.domainrepository.poll.CustomizeTableDomainRepository;
+import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
 import com.debatetimer.domainrepository.poll.PollDomainRepository;
 import com.debatetimer.domainrepository.poll.VoteDomainRepository;
 import com.debatetimer.dto.poll.response.PollCreateResponse;
