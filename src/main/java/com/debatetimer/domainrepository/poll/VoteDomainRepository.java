@@ -35,7 +35,7 @@ public class VoteDomainRepository {
     }
 
     public boolean alreadyVoted(ParticipateCode code) {
-        return voteRepository.existsByParticipantCode(code);
+        return voteRepository.existsByParticipateCode(code.getValue());
     }
 
     public Vote vote(Vote vote) {

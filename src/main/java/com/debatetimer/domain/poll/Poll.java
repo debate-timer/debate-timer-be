@@ -26,4 +26,8 @@ public class Poll {
                 String prosTeamName, String consTeamName, String agenda) {
         this(id, tableId, memberId, status, new TeamName(prosTeamName), new TeamName(consTeamName), new Agenda(agenda));
     }
+
+    public boolean isProgress() {
+        return status.isProgress();
+    }
 }

@@ -50,6 +50,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_POLL_PARTICIPANT_NAME(HttpStatus.BAD_REQUEST, "잘못된 투표자 이름입니다"),
     INVALID_POLL_PARTICIPANT_CODE(HttpStatus.BAD_REQUEST, "잘못된 투표참여 코드입니다"),
+    ALREADY_DONE_POLL(HttpStatus.BAD_REQUEST, "이미 완료된 투표 입니다"),
     ALREADY_VOTED_PARTICIPANT(HttpStatus.BAD_REQUEST, "이미 참여한 투표자 입니다"),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),

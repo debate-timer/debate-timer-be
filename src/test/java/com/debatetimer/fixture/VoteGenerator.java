@@ -17,7 +17,11 @@ public class VoteGenerator {
     }
 
     public VoteEntity generate(PollEntity pollEntity, VoteTeam team, String name) {
-        VoteEntity vote = new VoteEntity(null, pollEntity, team, name, UUID.randomUUID().toString());
+        return generate(pollEntity, team, name, UUID.randomUUID().toString());
+    }
+
+    public VoteEntity generate(PollEntity pollEntity, VoteTeam team, String name, String code) {
+        VoteEntity vote = new VoteEntity(null, pollEntity, team, name, code);
         return voteRepository.save(vote);
     }
 }
