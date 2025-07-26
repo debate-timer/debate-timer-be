@@ -29,7 +29,7 @@ public class CustomizeService {
     @Transactional
     public CustomizeTableResponse save(CustomizeTableCreateRequest tableCreateRequest, Member member) {
         CustomizeTable table = tableCreateRequest.toTable(member);
-        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
+        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxes();
 
         CustomizeTableEntity savedTableEntity = tableRepository.save(new CustomizeTableEntity(table));
         saveTimeBoxes(savedTableEntity, timeBoxes);
@@ -57,7 +57,7 @@ public class CustomizeService {
 
         bellRepository.deleteAllByTable(tableEntity.getId());
         timeBoxRepository.deleteAllByTable(tableEntity.getId());
-        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxList();
+        List<CustomizeTimeBox> timeBoxes = tableCreateRequest.toTimeBoxes();
         saveTimeBoxes(tableEntity, timeBoxes);
         return new CustomizeTableResponse(tableEntity.toDomain(), timeBoxes);
     }
