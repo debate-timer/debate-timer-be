@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
@@ -12,6 +13,7 @@ import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
+import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -40,19 +42,22 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), 60, null, "발언자2")
                     )
             );
 
             CustomizeTableResponse savedTableResponse = customizeService.save(customizeTableCreateRequest, chan);
             CustomizeTableEntity foundTable = customizeTableRepository.getByIdAndMember(savedTableResponse.id(), chan);
-            List<CustomizeTimeBoxEntity> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(foundTable);
+            List<CustomizeTimeBoxEntity> foundTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+                    foundTable);
+            List<BellEntity> foundBells = bellRepository.findAllByCustomizeTimeBoxIn(foundTimeBoxes);
 
             assertAll(
                     () -> assertThat(foundTable.getName()).isEqualTo(customizeTableCreateRequest.info().name()),
-                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size())
+                    () -> assertThat(foundTimeBoxes).hasSize(customizeTableCreateRequest.table().size()),
+                    () -> assertThat(foundBells).hasSize(3)
             );
         }
     }
@@ -64,14 +69,19 @@ class CustomizeServiceTest extends BaseServiceTest {
         void 사용자_지정_토론_테이블을_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            CustomizeTimeBoxEntity customizeTimeBox = customizeTimeBoxGenerator.generate(
+                    chanTable, CustomizeBoxType.NORMAL, 1);
             customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+            bellGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 1);
+            bellGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 2);
 
             CustomizeTableResponse foundResponse = customizeService.findTable(chanTable.getId(), chan);
 
             assertAll(
                     () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
-                    () -> assertThat(foundResponse.table()).hasSize(2)
+                    () -> assertThat(foundResponse.table()).hasSize(2),
+                    () -> assertThat(foundResponse.table().get(0).bell()).hasSize(2),
+                    () -> assertThat(foundResponse.table().get(1).bell()).isNull()
             );
         }
 
@@ -100,21 +110,24 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), 60, null, "발언자2")
                     )
             );
 
             customizeService.updateTable(renewTableRequest, chanTable.getId(), chan);
 
             CustomizeTableEntity updatedTable = customizeTableRepository.getByIdAndMember(chanTable.getId(), chan);
-            List<CustomizeTimeBoxEntity> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(updatedTable);
+            List<CustomizeTimeBoxEntity> updatedTimeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
+                    updatedTable);
+            List<BellEntity> bells = bellRepository.findAllByCustomizeTimeBoxIn(updatedTimeBoxes);
 
             assertAll(
                     () -> assertThat(updatedTable.getId()).isEqualTo(chanTable.getId()),
                     () -> assertThat(updatedTable.getName()).isEqualTo(renewTableRequest.info().name()),
-                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size())
+                    () -> assertThat(updatedTimeBoxes).hasSize(renewTableRequest.table().size()),
+                    () -> assertThat(bells).hasSize(3)
             );
         }
 
@@ -129,9 +142,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -149,9 +162,9 @@ class CustomizeServiceTest extends BaseServiceTest {
                             "반대", true, true),
                     List.of(
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론1", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1)), 60, null, "발언자1"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), 60, null, "발언자1"),
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론2", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(90, 1), new BellRequest(120, 2)), 60, null, "발언자2")
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), 60, null, "발언자2")
                     )
             );
 
@@ -207,10 +220,12 @@ class CustomizeServiceTest extends BaseServiceTest {
             Optional<CustomizeTableEntity> foundTable = customizeTableRepository.findById(chanTable.getId());
             List<CustomizeTimeBoxEntity> timeBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(
                     chanTable);
+            List<BellEntity> bells = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxes);
 
             assertAll(
                     () -> assertThat(foundTable).isEmpty(),
-                    () -> assertThat(timeBoxes).isEmpty()
+                    () -> assertThat(timeBoxes).isEmpty(),
+                    () -> assertThat(bells).isEmpty()
             );
         }
 

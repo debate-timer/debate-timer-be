@@ -1,10 +1,13 @@
 package com.debatetimer.entity.customize;
 
 import com.debatetimer.domain.customize.Bell;
+import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,21 +37,28 @@ public class BellEntity {
     @JoinColumn(name = "customize_time_box_id")
     private CustomizeTimeBoxEntity customizeTimeBox;
 
+    @Column(name = "bell_type")
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    private BellType type;
+
     @Column(name = "bell_time")
     private int time;
     private int count;
 
-    public BellEntity(CustomizeTimeBoxEntity customizeTimeBox, int time, int count) {
+    public BellEntity(CustomizeTimeBoxEntity customizeTimeBox, BellType type, int time, int count) {
         validateTime(time);
         validateCount(count);
 
         this.customizeTimeBox = customizeTimeBox;
+        this.type = type;
         this.time = time;
         this.count = count;
     }
 
     public BellEntity(CustomizeTimeBoxEntity customizeTimeBox, Bell bell) {
         this.customizeTimeBox = customizeTimeBox;
+        this.type = bell.getType();
         this.time = bell.getTime();
         this.count = bell.getCount();
     }
@@ -66,7 +76,7 @@ public class BellEntity {
     }
 
     public Bell toDomain() {
-        return new Bell(time, count);
+        return new Bell(type, time, count);
     }
 
     public boolean isContained(CustomizeTimeBoxEntity timeBox) {
