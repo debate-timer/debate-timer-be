@@ -9,12 +9,14 @@ public class Bell {
 
     public static final int MAX_BELL_COUNT = 3;
 
+    private final BellType type;
     private final int time;
     private final int count;
 
-    public Bell(int time, int count) {
+    public Bell(BellType type, int time, int count) {
         validateTime(time);
         validateCount(count);
+        this.type = type;
         this.time = time;
         this.count = count;
     }
