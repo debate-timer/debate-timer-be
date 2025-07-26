@@ -9,6 +9,8 @@ import com.debatetimer.domainrepository.poll.VoteDomainRepository;
 import com.debatetimer.dto.poll.request.VoteRequest;
 import com.debatetimer.dto.poll.response.VoteCreateResponse;
 import com.debatetimer.dto.poll.response.VoterPollInfoResponse;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,17 @@ public class VoteService {
 
     @Transactional
     public VoteCreateResponse vote(long pollId, VoteRequest voteRequest) {
+        validateAlreadyVoted(voteRequest.participateCode());
         Vote vote = new Vote(pollId, voteRequest.team(), voteRequest.name(), voteRequest.participateCode());
         Vote savedVote = voteDomainRepository.vote(vote);
         return new VoteCreateResponse(savedVote);
+    }
+
+    private void validateAlreadyVoted(String participateCode) {
+        ParticipateCode code = new ParticipateCode(participateCode);
+        if (voteDomainRepository.alreadyVoted(code)) {
+            throw new DTClientErrorException(ClientErrorCode.ALREADY_VOTED_PARTICIPANT);
+        }
     }
 
     @Transactional(readOnly = true)

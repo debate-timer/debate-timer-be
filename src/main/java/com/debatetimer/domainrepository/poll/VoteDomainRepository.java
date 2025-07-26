@@ -1,5 +1,6 @@
 package com.debatetimer.domainrepository.poll;
 
+import com.debatetimer.domain.poll.ParticipateCode;
 import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteInfo;
 import com.debatetimer.domain.poll.VoteTeam;
@@ -31,6 +32,10 @@ public class VoteDomainRepository {
         long prosCount = teamCount.getOrDefault(VoteTeam.PROS, 0L);
         long consCount = teamCount.getOrDefault(VoteTeam.CONS, 0L);
         return new VoteInfo(pollId, prosCount, consCount);
+    }
+
+    public boolean alreadyVoted(ParticipateCode code) {
+        return voteRepository.existsByParticipantCode(code);
     }
 
     public Vote vote(Vote vote) {
