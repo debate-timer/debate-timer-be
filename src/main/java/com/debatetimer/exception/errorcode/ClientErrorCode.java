@@ -48,8 +48,12 @@ public enum ClientErrorCode implements ResponseErrorCode {
             "토론 주제는 1자 이상 %d자 이하여야 합니다.".formatted(Agenda.AGENDA_MAX_LENGTH)
     ),
 
+    INVALID_POLL_PARTICIPANT_NAME(HttpStatus.BAD_REQUEST, "잘못된 투표자 이름입니다"),
+    INVALID_POLL_PARTICIPANT_CODE(HttpStatus.BAD_REQUEST, "잘못된 투표참여 코드입니다"),
+
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
+    POLL_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 

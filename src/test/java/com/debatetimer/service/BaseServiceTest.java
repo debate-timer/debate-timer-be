@@ -5,10 +5,13 @@ import com.debatetimer.fixture.BellGenerator;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.MemberGenerator;
+import com.debatetimer.fixture.PollGenerator;
+import com.debatetimer.fixture.VoteGenerator;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
 import com.debatetimer.repository.member.MemberRepository;
+import com.debatetimer.repository.poll.PollRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +35,9 @@ public abstract class BaseServiceTest {
     protected BellRepository bellRepository;
 
     @Autowired
+    protected PollRepository pollRepository;
+
+    @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
@@ -42,6 +48,12 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected BellGenerator bellGenerator;
+
+    @Autowired
+    protected PollGenerator pollGenerator;
+
+    @Autowired
+    protected VoteGenerator voteGenerator;
 
     protected void runAtSameTime(int count, Runnable task) throws InterruptedException {
         List<Thread> threads = IntStream.range(0, count)

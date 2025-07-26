@@ -1,5 +1,6 @@
 package com.debatetimer.entity.poll;
 
+import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteTeam;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,11 +15,15 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "vote")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class VoteEntity {
 
     @Id
@@ -39,4 +44,8 @@ public class VoteEntity {
 
     @NotBlank
     private String participantCode;
+
+    public Vote toDomain() {
+        return new Vote(id, poll.getId(), team, name, participantCode);
+    }
 }
