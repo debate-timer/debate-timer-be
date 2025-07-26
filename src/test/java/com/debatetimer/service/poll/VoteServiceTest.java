@@ -14,6 +14,7 @@ import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.repository.poll.VoteRepository;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,9 @@ class VoteServiceTest extends BaseServiceTest {
 
     @Autowired
     private VoteService voteService;
+
+    @Autowired
+    private VoteRepository voteRepository;
 
     @Nested
     class Vote {
@@ -58,6 +62,20 @@ class VoteServiceTest extends BaseServiceTest {
             assertThatThrownBy(() -> voteService.vote(pollEntity.getId(), voteRequest))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.ALREADY_VOTED_PARTICIPANT.getMessage());
+        }
+
+        @Test
+        void 투표_동시성_이슈에_단일_표만_유효하게_취급한다() throws InterruptedException {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            String participatecode = UUID.randomUUID().toString();
+            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+
+            runAtSameTime(10, () -> voteService.vote(pollEntity.getId(), voteRequest));
+
+            long voteCount = voteRepository.count();
+            assertThat(voteCount).isEqualTo(1);
         }
 
         @Test
