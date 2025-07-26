@@ -52,8 +52,8 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 회원의_전체_토론_시간표를_조회한다() {
             Member member = memberGenerator.generate("default@gmail.com");
-            customizeTableGenerator.generate(member);
-            customizeTableGenerator.generate(member);
+            customizeTableEntityGenerator.generate(member);
+            customizeTableEntityGenerator.generate(member);
 
             TableResponses response = memberService.getTables(member.getId());
 
@@ -63,7 +63,7 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 회원의_전체_토론_시간표는_정해진_순서대로_반환한다() throws InterruptedException {
             Member member = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
             Thread.sleep(1);
 
             TableResponses response = memberService.getTables(member.getId());

@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
@@ -8,11 +8,11 @@ import com.debatetimer.repository.poll.PollRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PollGenerator {
+public class PollEntityGenerator {
 
     private final PollRepository pollRepository;
 
-    public PollGenerator(final PollRepository pollRepository) {
+    public PollEntityGenerator(final PollRepository pollRepository) {
         this.pollRepository = pollRepository;
     }
 

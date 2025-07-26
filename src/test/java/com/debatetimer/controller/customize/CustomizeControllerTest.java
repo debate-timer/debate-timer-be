@@ -154,9 +154,9 @@ class CustomizeControllerTest extends BaseControllerTest {
         @Test
         void 사용자_지정_테이블을_조회한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             CustomizeTableResponse response = given()
@@ -180,7 +180,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @Test
         void 사용자_지정_토론_테이블을_업데이트한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest renewTableRequest = getCustomizeTableCreateRequestBuilder()
                     .set("table[1].speaker", null)
@@ -201,7 +201,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 사용자_지정_테이블을_업데이트할때_테이블_이름은_개행문자_외_다른_글자가_포함되야한다(String tableName) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("info.name", tableName)
@@ -218,7 +218,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @ParameterizedTest
         void 사용자_지정_테이블을_업데이트할때_테이블_주제는_null이_올_수_없다(String agenda) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("info.agenda", agenda)
@@ -235,7 +235,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 사용자_지정_테이블을_업데이트할때_찬성팀_이름은_개행문자_외_다른_글자가_포함되야한다(String prosTeamName) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("info.prosTeamName", prosTeamName)
@@ -252,7 +252,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 사용자_지정_테이블을_업데이트할때_반대팀_이름은_개행문자_외_다른_글자가_포함되야한다(String consTeamName) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
@@ -270,7 +270,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @ParameterizedTest
         void 사용자_지정_테이블을_업데이트할때_타임박스_입장은_null이_올_수_없다(Stance stance) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("table[0].stance", stance)
@@ -287,7 +287,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 사용자_지정_테이블을_업데이트할때_타임박스_발언_유형은_개행문자_외_다른_글자가_포함되야한다(String speechType) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("table[0].speechType", speechType)
@@ -304,7 +304,7 @@ class CustomizeControllerTest extends BaseControllerTest {
         @ParameterizedTest
         void 사용자_지정_테이블을_업데이트할때_타임박스_타입은_null이_올_수_없다(CustomizeBoxType boxType) {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             CustomizeTableCreateRequest request = getCustomizeTableCreateRequestBuilder()
                     .set("table[0].boxType", boxType)
@@ -339,9 +339,9 @@ class CustomizeControllerTest extends BaseControllerTest {
         @Test
         void 사용자_지정_토론을_시작한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             CustomizeTableResponse response = given()
@@ -366,9 +366,9 @@ class CustomizeControllerTest extends BaseControllerTest {
         @Test
         void 사용자_지정_토론_테이블을_삭제한다() {
             Member bito = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generateNotExistSpeaker(bitoTable, CustomizeBoxType.NORMAL, 2);
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
             given()
