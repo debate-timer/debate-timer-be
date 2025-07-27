@@ -2,6 +2,7 @@ package com.debatetimer.controller;
 
 import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.oauth.OAuthClient;
+import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.poll.VoteTeam;
@@ -9,6 +10,8 @@ import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
+import com.debatetimer.fixture.HeaderGenerator;
+import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
 import com.debatetimer.dto.poll.request.VoteRequest;
@@ -17,7 +20,6 @@ import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
 import com.debatetimer.fixture.entity.MemberGenerator;
 import com.debatetimer.fixture.entity.PollEntityGenerator;
-import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -126,6 +128,7 @@ public abstract class BaseControllerTest {
 
     private ArbitraryBuilder<BellRequest> getBellRequestBuilder() {
         return fixtureMonkey.giveMeBuilder(BellRequest.class)
+                .set("type", BellType.AFTER_START)
                 .set("time", 30)
                 .set("count", 1);
     }
