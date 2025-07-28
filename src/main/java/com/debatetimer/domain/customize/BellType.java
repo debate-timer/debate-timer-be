@@ -1,6 +1,8 @@
 package com.debatetimer.domain.customize;
 
-import java.util.function.Predicate;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.function.IntPredicate;
 
 public enum BellType {
 
@@ -9,13 +11,15 @@ public enum BellType {
     AFTER_END(time -> time <= 0),
     ;
 
-    private final Predicate<Integer> timeValidator;
+    private final IntPredicate timeValidator;
 
-    BellType(Predicate<Integer> timeValidator) {
+    BellType(IntPredicate timeValidator) {
         this.timeValidator = timeValidator;
     }
 
-    public boolean isValidTime(int time) {
-        return timeValidator.test(time);
+    public void validateTime(int time) {
+        if (!timeValidator.test(time)) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_TIME);
+        }
     }
 }

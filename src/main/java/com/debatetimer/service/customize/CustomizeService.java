@@ -28,8 +28,8 @@ public class CustomizeService {
     @Transactional(readOnly = true)
     public CustomizeTableResponse findTable(long tableId, Member member) {
         CustomizeTable table = customizeTableDomainRepository.getByIdAndMember(tableId, member);
-        List<CustomizeTimeBox> timeBoxEntities = customizeTableDomainRepository.getCustomizeTimeBoxes(tableId, member);
-        return new CustomizeTableResponse(table, timeBoxEntities);
+        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(tableId, member);
+        return new CustomizeTableResponse(table, timeBoxes);
     }
 
     @Transactional
