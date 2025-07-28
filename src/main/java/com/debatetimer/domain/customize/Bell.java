@@ -14,17 +14,11 @@ public class Bell {
     private final int count;
 
     public Bell(BellType type, int time, int count) {
-        validateTime(type, time);
+        type.validateTime(time);
         validateCount(count);
         this.type = type;
         this.time = time;
         this.count = count;
-    }
-
-    private void validateTime(BellType type, int time) {
-        if (!type.isValidTime(time)) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_TIME);
-        }
     }
 
     private void validateCount(int count) {
