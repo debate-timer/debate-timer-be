@@ -12,10 +12,12 @@ import com.debatetimer.dto.poll.response.VoteCreateResponse;
 import com.debatetimer.dto.poll.response.VoterPollInfoResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
+import com.debatetimer.fixture.NullAndEmptyAndBlankSource;
 import io.restassured.http.ContentType;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.http.HttpStatus;
 
 class VoteControllerTest extends BaseControllerTest {
@@ -61,8 +63,7 @@ class VoteControllerTest extends BaseControllerTest {
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
             voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            String participatecode = UUID.randomUUID().toString();
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            VoteRequest voteRequest = getVoteRequestBuilder().sample();
 
             VoteCreateResponse response = given()
                     .contentType(ContentType.JSON)
@@ -79,6 +80,62 @@ class VoteControllerTest extends BaseControllerTest {
             );
         }
 
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 투표_시_이름은_널이거나_빈_문자열일_수_없다(String invalidName) {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            VoteRequest voteRequest = getVoteRequestBuilder()
+                    .set("name", invalidName)
+                    .sample();
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .body(voteRequest)
+                    .pathParam("pollId", pollEntity.getId())
+                    .when().post("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 투표_시_팀은_널일_수_없다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            VoteRequest voteRequest = getVoteRequestBuilder()
+                    .set("team", null)
+                    .sample();
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .body(voteRequest)
+                    .pathParam("pollId", pollEntity.getId())
+                    .when().post("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 투표_시_참여코드는_널이거나_빈_문자열일_수_없다(String participateCode) {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableGenerator.generate(member);
+            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            VoteRequest voteRequest = getVoteRequestBuilder()
+                    .set("participateCode", participateCode)
+                    .sample();
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .body(voteRequest)
+                    .pathParam("pollId", pollEntity.getId())
+                    .when().post("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
         @Test
         void 이미_참여한_선거에_투표_할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
@@ -86,7 +143,9 @@ class VoteControllerTest extends BaseControllerTest {
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
             String participatecode = UUID.randomUUID().toString();
             voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participatecode);
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            VoteRequest voteRequest = getVoteRequestBuilder()
+                    .set("participateCode", participatecode)
+                    .sample();
 
             given()
                     .contentType(ContentType.JSON)
@@ -101,8 +160,7 @@ class VoteControllerTest extends BaseControllerTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity alreadyDonePoll = pollGenerator.generate(table, PollStatus.DONE);
-            String participatecode = UUID.randomUUID().toString();
-            VoteRequest voteRequest = new VoteRequest("콜리", participatecode, VoteTeam.PROS);
+            VoteRequest voteRequest = getVoteRequestBuilder().sample();
 
             given()
                     .contentType(ContentType.JSON)
