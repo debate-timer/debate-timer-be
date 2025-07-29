@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "customize_table")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTableEntity {
+public class CustomizeTableEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
