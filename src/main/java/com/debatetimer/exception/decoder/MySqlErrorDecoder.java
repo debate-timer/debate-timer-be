@@ -6,8 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 public class MySqlErrorDecoder implements RepositoryErrorDecoder {
 
-    public static final String MYSQL_UNIQUE_VIOLATION = "23000";
-    public static final int MYSQL_DUP_ERROR_CODE = 1062;
+    protected static final String MYSQL_UNIQUE_VIOLATION = "23000";
+    protected static final int MYSQL_DUP_ERROR_CODE = 1062;
 
     @Override
     public boolean isUniqueConstraintViolation(DataIntegrityViolationException e) {

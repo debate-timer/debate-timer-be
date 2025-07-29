@@ -5,7 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 public class H2ErrorDecoder implements RepositoryErrorDecoder {
 
-    public static final String UNIQUE_CONSTRAINT_VIOLATION_SQL_STATE = "23505";
+    protected static final String UNIQUE_CONSTRAINT_VIOLATION_SQL_STATE = "23505";
 
     @Override
     public boolean isUniqueConstraintViolation(DataIntegrityViolationException e) {
