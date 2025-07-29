@@ -75,7 +75,7 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
     class Save {
 
         @Test
-        void 투표할_수_있다() {
+        void 투표를_저장할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableGenerator.generate(member);
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);

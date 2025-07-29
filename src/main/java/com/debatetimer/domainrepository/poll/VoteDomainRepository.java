@@ -7,10 +7,10 @@ import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.entity.poll.VoteEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.decoder.RepositoryErrorDecoder;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.poll.PollRepository;
 import com.debatetimer.repository.poll.VoteRepository;
-import com.debatetimer.repository.util.RepositoryErrorDecoder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +24,7 @@ public class VoteDomainRepository {
 
     private final PollRepository pollRepository;
     private final VoteRepository voteRepository;
+    private final RepositoryErrorDecoder errorDecoder;
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
         List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
@@ -49,7 +50,7 @@ public class VoteDomainRepository {
             return voteRepository.save(voteEntity)
                     .toDomain();
         } catch (DataIntegrityViolationException exception) {
-            if (RepositoryErrorDecoder.isUniqueConstraintViolation(exception)) {
+            if (errorDecoder.isUniqueConstraintViolation(exception)) {
                 throw new DTClientErrorException(ClientErrorCode.ALREADY_VOTED_PARTICIPANT);
             }
             throw exception;
