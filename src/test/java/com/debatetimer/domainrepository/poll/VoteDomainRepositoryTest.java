@@ -49,7 +49,7 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
     }
 
     @Nested
-    class AlreadyVoted {
+    class isExists {
 
         @Test
         void 이미_참여한_투표인지_알_수_있다() {
@@ -60,8 +60,8 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
             ParticipateCode participateCode = new ParticipateCode(UUID.randomUUID().toString());
             voteGenerator.generate(alreadyParticipatedPoll, VoteTeam.PROS, "콜리", participateCode.getValue());
 
-            boolean participated = voteDomainRepository.alreadyVoted(alreadyParticipatedPoll.getId(), participateCode);
-            boolean notYetParticipated = voteDomainRepository.alreadyVoted(notYetParticipatedPoll.getId(),
+            boolean participated = voteDomainRepository.isExists(alreadyParticipatedPoll.getId(), participateCode);
+            boolean notYetParticipated = voteDomainRepository.isExists(notYetParticipatedPoll.getId(),
                     participateCode);
 
             assertAll(
@@ -72,7 +72,7 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
     }
 
     @Nested
-    class VoteTest {
+    class Save {
 
         @Test
         void 투표할_수_있다() {
@@ -81,7 +81,7 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
             PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
             Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", UUID.randomUUID().toString());
 
-            Vote savedVote = voteDomainRepository.vote(vote);
+            Vote savedVote = voteDomainRepository.save(vote);
 
             assertAll(
                     () -> assertThat(savedVote.getName().getValue()).isEqualTo(vote.getName().getValue()),
@@ -99,7 +99,7 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
             voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
             Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", participateCode);
 
-            assertThatThrownBy(() -> voteDomainRepository.vote(vote))
+            assertThatThrownBy(() -> voteDomainRepository.save(vote))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.ALREADY_VOTED_PARTICIPANT.getMessage());
         }

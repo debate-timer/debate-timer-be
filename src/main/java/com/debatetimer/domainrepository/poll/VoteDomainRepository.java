@@ -38,11 +38,11 @@ public class VoteDomainRepository {
         return new VoteInfo(pollId, prosCount, consCount);
     }
 
-    public boolean alreadyVoted(long pollId, ParticipateCode code) {
+    public boolean isExists(long pollId, ParticipateCode code) {
         return voteRepository.existsByPollIdAndParticipateCode(pollId, code.getValue());
     }
 
-    public Vote vote(Vote vote) {
+    public Vote save(Vote vote) {
         try {
             PollEntity pollEntity = pollRepository.getById(vote.getPollId());
             VoteEntity voteEntity = new VoteEntity(vote, pollEntity);
