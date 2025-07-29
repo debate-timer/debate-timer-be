@@ -22,14 +22,14 @@ public class VoteController {
 
     @GetMapping("/api/polls/{pollId}/votes")
     @ResponseStatus(HttpStatus.OK)
-    public VoterPollInfoResponse getVotersPollInfo(@PathVariable int pollId) {
+    public VoterPollInfoResponse getVotersPollInfo(@PathVariable long pollId) {
         return voteService.getVoterPollInfo(pollId);
     }
 
     @PostMapping("/api/polls/{pollId}/votes")
     @ResponseStatus(HttpStatus.CREATED)
     public VoteCreateResponse votePoll(
-            @PathVariable int pollId,
+            @PathVariable long pollId,
             @RequestBody @Valid VoteRequest voteRequest
     ) {
         return voteService.vote(pollId, voteRequest);
