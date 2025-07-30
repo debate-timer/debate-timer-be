@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "develop"
+      - "chore/#210"
 
 jobs:
   build:
@@ -49,7 +50,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deploy-scripts
-          path: ./scripts/dev/*
+          path: ./scripts/dev/replace-new-version.sh
+          if-no-files-found: error
+
+      - name: Upload health check scripts
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-check-scripts
+          path: ./scripts/dev/health-check.sh
           if-no-files-found: error
 
   deploy:
@@ -67,6 +75,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: deploy-scripts
+          path: ~/app/scripts
+
+      - name: Download deploy scripts
+        uses: actions/download-artifact@v4
+        with:
+          name: health-check-scripts
           path: ~/app/scripts
 
       - name: Replace application to latest
