@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
-        with:
-          ref: "develop"
+      #        with:
+      #          ref: "develop"
 
       - name: Setting dev-secret.yml
         run: |
