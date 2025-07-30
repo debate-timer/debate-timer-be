@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deploy-scripts
-          path: ./scripts/dev/
+          path: ./scripts/dev/*
           if-no-files-found: error
 
   deploy:
@@ -80,5 +80,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\":\":x: DEV 배포 실패! 확인이 필요합니다.\n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+               -d "{\"content\":\":x: [DEV] 배포 실패! 확인이 필요합니다.\n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
                ${{ secrets.DISCORD_WEB_HOOK }}
