@@ -35,9 +35,9 @@ class VoteServiceTest extends BaseServiceTest {
         @Test
         void 진행_중인_선거에_최초로_투표_할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
             String participateCode = UUID.randomUUID().toString();
             VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
@@ -53,10 +53,10 @@ class VoteServiceTest extends BaseServiceTest {
         @Test
         void 이미_참여한_선거에_투표_할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             String participateCode = UUID.randomUUID().toString();
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
             VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
             assertThatThrownBy(() -> voteService.vote(pollEntity.getId(), voteRequest))
@@ -67,8 +67,8 @@ class VoteServiceTest extends BaseServiceTest {
         @Test
         void 투표_동시성_이슈에_단일_표만_유효하게_취급한다() throws InterruptedException {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             String participateCode = UUID.randomUUID().toString();
             VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
@@ -81,8 +81,8 @@ class VoteServiceTest extends BaseServiceTest {
         @Test
         void 끝난_선거에_투표_할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity alreadyDonePoll = pollGenerator.generate(table, PollStatus.DONE);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity alreadyDonePoll = pollEntityGenerator.generate(table, PollStatus.DONE);
             String participateCode = UUID.randomUUID().toString();
             VoteRequest voteRequest = new VoteRequest("콜리", participateCode, VoteTeam.PROS);
 
@@ -98,11 +98,11 @@ class VoteServiceTest extends BaseServiceTest {
         @Test
         void 투표자가_선거정보를_조회할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             VoterPollInfoResponse response = voteService.getVoterPollInfo(pollEntity.getId());
 
