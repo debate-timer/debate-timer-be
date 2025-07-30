@@ -79,5 +79,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\":\":x: PROD 배포 실패! 확인이 필요합니다.\"}" \
+               -d "{\"content\":\":x: PROD 배포 실패! 확인이 필요합니다.\nJob: ${{ github.job }}\"}" \
                ${{ secrets.DISCORD_WEB_HOOK }}
