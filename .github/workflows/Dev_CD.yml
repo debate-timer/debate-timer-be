@@ -48,7 +48,7 @@ jobs:
       - name: Upload deploy scripts
         uses: actions/upload-artifact@v4
         with:
-          name: deploy-scripts
+          name: dev-deploy-scripts
           path: ./scripts/dev/*
           if-no-files-found: error
 
