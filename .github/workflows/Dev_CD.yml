@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - "develop"
-      - "chore/#210"
 
 jobs:
   build:
@@ -14,8 +13,8 @@ jobs:
     steps:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
-      #        with:
-      #          ref: "develop"
+        with:
+          ref: "develop"
 
       - name: Setting dev-secret.yml
         run: |
@@ -77,7 +76,7 @@ jobs:
           name: deploy-scripts
           path: ~/app/scripts
 
-      - name: Download deploy scripts
+      - name: Download health check scripts
         uses: actions/download-artifact@v4
         with:
           name: health-check-scripts
