@@ -1,2 +1,0 @@
-ALTER TABLE bell
-    ADD COLUMN bell_type enum ('AFTER_START','BEFORE_END','AFTER_END') NOT NULL
