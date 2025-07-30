@@ -2,8 +2,6 @@ package com.debatetimer.domainrepository.poll;
 
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.entity.poll.PollEntity;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.poll.PollRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,19 +22,20 @@ public class PollDomainRepository {
 
     @Transactional(readOnly = true)
     public Poll getByIdAndMemberId(long id, long memberId) {
-        return findPoll(id, memberId)
+        return pollRepository.getByIdAndMemberId(id, memberId)
+                .toDomain();
+    }
+
+    @Transactional(readOnly = true)
+    public Poll getById(long id) {
+        return pollRepository.getById(id)
                 .toDomain();
     }
 
     @Transactional
     public Poll finishPoll(long pollId, long memberId) {
-        PollEntity pollEntity = findPoll(pollId, memberId);
+        PollEntity pollEntity = pollRepository.getByIdAndMemberId(pollId, memberId);
         pollEntity.updateToDone();
         return pollEntity.toDomain();
-    }
-
-    private PollEntity findPoll(long pollId, long memberId) {
-        return pollRepository.findByIdAndMemberId(pollId, memberId)
-                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.POLL_NOT_FOUND));
     }
 }

@@ -3,6 +3,7 @@ package com.debatetimer.entity.customize;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.TableType;
+import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "customize_table")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomizeTableEntity {
+public class CustomizeTableEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

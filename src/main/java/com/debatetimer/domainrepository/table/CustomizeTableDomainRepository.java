@@ -1,4 +1,4 @@
-package com.debatetimer.domainrepository.poll;
+package com.debatetimer.domainrepository.table;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;

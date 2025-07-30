@@ -4,10 +4,12 @@ import com.debatetimer.DataBaseCleaner;
 import com.debatetimer.client.oauth.OAuthClient;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.dto.customize.request.BellRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
 import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
+import com.debatetimer.dto.poll.request.VoteRequest;
 import com.debatetimer.fixture.CustomizeTableGenerator;
 import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.HeaderGenerator;
@@ -24,6 +26,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +91,13 @@ public abstract class BaseControllerTest {
         return fixtureMonkey.giveMeBuilder(CustomizeTableCreateRequest.class)
                 .set("info", getCustomizeTableInfoCreateRequestBuilder().sample())
                 .set("table", getCustomizeTimeBoxCreateRequestBuilder().sampleList(2));
+    }
+
+    protected ArbitraryBuilder<VoteRequest> getVoteRequestBuilder() {
+        return fixtureMonkey.giveMeBuilder(VoteRequest.class)
+                .set("name", "콜리")
+                .set("team", VoteTeam.PROS)
+                .set("participateCode", UUID.randomUUID().toString());
     }
 
     private ArbitraryBuilder<CustomizeTableInfoCreateRequest> getCustomizeTableInfoCreateRequestBuilder() {

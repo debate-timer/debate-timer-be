@@ -2,7 +2,7 @@ package com.debatetimer.entity.poll;
 
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
-import com.debatetimer.entity.customize.BaseTimeEntity;
+import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

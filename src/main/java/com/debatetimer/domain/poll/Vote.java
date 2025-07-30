@@ -13,6 +13,10 @@ public class Vote {
     private final ParticipantName name;
     private final ParticipateCode code;
 
+    public Vote(long pollId, VoteTeam team, String name, String code) {
+        this(null, pollId, team, name, code);
+    }
+
     public Vote(Long id, long pollId, VoteTeam team, String name, String code) {
         this(id, pollId, team, new ParticipantName(name), new ParticipateCode(code));
     }
