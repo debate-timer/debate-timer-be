@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 최대 반복 횟수
-MAX_RETRIES=0 # TODO : 60으로 수정
+MAX_RETRIES=60
 
 # 성공 상태 코드와 요청 URL
 SUCCESS_STATUS=200
