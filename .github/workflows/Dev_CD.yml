@@ -73,12 +73,12 @@ jobs:
         run: sudo sh ~/app/scripts/replace-new-version.sh
 
       - name: Health Check
-        run: sudo sh ~/app/scripts/health-check.sh
+        run: sh ~/app/scripts/health-check.sh
 
       - name: Send Discord Alert on Failure
         if: failure()
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\":\":x: DEV 배포 실패! 확인이 필요합니다.\nJob: ${{ github.job }}\"}" \
+               -d "{\"content\":\":x: DEV 배포 실패! 확인이 필요합니다.\n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
                ${{ secrets.DISCORD_WEB_HOOK }}
