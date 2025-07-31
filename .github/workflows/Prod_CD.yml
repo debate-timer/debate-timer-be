@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deploy-scripts
-          path: ./scripts/prod/*
+          path: ./scripts/prod/
           if-no-files-found: error
 
   deploy:
@@ -65,7 +65,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: deploy-scripts
-          path: ~/app/scripts
+          path: ~/app/scripts/
 
       - name: Replace application to latest
         run: sudo sh ~/app/scripts/replace-new-version.sh
