@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
-        with:
-          ref: "main"
 
       - name: Setting prod-secret.yml
         run: |

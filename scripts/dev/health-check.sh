@@ -19,8 +19,8 @@ while [ "$i" -le "$MAX_RETRIES" ]; do
     exit 0
   fi
 
-  # 1초 대기
-  sleep 1
+  # 2초 대기
+  sleep 2
 
   # 반복 변수 증가
   i=$((i + 1))
