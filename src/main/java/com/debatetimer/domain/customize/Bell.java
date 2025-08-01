@@ -9,20 +9,16 @@ public class Bell {
 
     public static final int MAX_BELL_COUNT = 3;
 
+    private final BellType type;
     private final int time;
     private final int count;
 
-    public Bell(int time, int count) {
-        validateTime(time);
+    public Bell(BellType type, int time, int count) {
+        type.validateTime(time);
         validateCount(count);
+        this.type = type;
         this.time = time;
         this.count = count;
-    }
-
-    private void validateTime(int time) {
-        if (time < 0) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_BELL_TIME);
-        }
     }
 
     private void validateCount(int count) {

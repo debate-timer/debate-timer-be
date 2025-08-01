@@ -28,11 +28,11 @@ class VoteControllerTest extends BaseControllerTest {
         @Test
         void 투표자가_선거정보를_조회할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             VoterPollInfoResponse response = given()
                     .contentType(ContentType.JSON)
@@ -60,9 +60,9 @@ class VoteControllerTest extends BaseControllerTest {
         @Test
         void 진행_중인_선거에_최초로_투표_할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
             VoteRequest voteRequest = getVoteRequestBuilder().sample();
 
             VoteCreateResponse response = given()
@@ -84,9 +84,9 @@ class VoteControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 투표_시_이름은_널이거나_빈_문자열일_수_없다(String invalidName) {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
             VoteRequest voteRequest = getVoteRequestBuilder()
                     .set("name", invalidName)
                     .sample();
@@ -102,9 +102,9 @@ class VoteControllerTest extends BaseControllerTest {
         @Test
         void 투표_시_팀은_널일_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
             VoteRequest voteRequest = getVoteRequestBuilder()
                     .set("team", null)
                     .sample();
@@ -121,9 +121,9 @@ class VoteControllerTest extends BaseControllerTest {
         @NullAndEmptyAndBlankSource
         void 투표_시_참여코드는_널이거나_빈_문자열일_수_없다(String participateCode) {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
             VoteRequest voteRequest = getVoteRequestBuilder()
                     .set("participateCode", participateCode)
                     .sample();
@@ -139,10 +139,10 @@ class VoteControllerTest extends BaseControllerTest {
         @Test
         void 이미_참여한_선거에_투표_할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             String participatecode = UUID.randomUUID().toString();
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participatecode);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participatecode);
             VoteRequest voteRequest = getVoteRequestBuilder()
                     .set("participateCode", participatecode)
                     .sample();
@@ -158,8 +158,8 @@ class VoteControllerTest extends BaseControllerTest {
         @Test
         void 끝난_선거에_투표_할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity alreadyDonePoll = pollGenerator.generate(table, PollStatus.DONE);
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity alreadyDonePoll = pollEntityGenerator.generate(table, PollStatus.DONE);
             VoteRequest voteRequest = getVoteRequestBuilder().sample();
 
             given()

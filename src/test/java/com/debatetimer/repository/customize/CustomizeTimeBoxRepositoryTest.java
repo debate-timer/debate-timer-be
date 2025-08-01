@@ -25,12 +25,14 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
         void 특정_테이블의_타임박스를_모두_조회한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
             Member bito = memberGenerator.generate("default2@gmail.com");
-            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            CustomizeTableEntity bitoTable = customizeTableGenerator.generate(bito);
-            CustomizeTimeBoxEntity chanBox1 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
-            CustomizeTimeBoxEntity chanBox2 = customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
-            customizeTimeBoxGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity chanTable = customizeTableEntityGenerator.generate(chan);
+            CustomizeTableEntity bitoTable = customizeTableEntityGenerator.generate(bito);
+            CustomizeTimeBoxEntity chanBox1 = customizeTimeBoxEntityGenerator.generate(chanTable,
+                    CustomizeBoxType.NORMAL, 1);
+            CustomizeTimeBoxEntity chanBox2 = customizeTimeBoxEntityGenerator.generate(chanTable,
+                    CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxEntityGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
+            customizeTimeBoxEntityGenerator.generate(bitoTable, CustomizeBoxType.NORMAL, 2);
 
             List<CustomizeTimeBoxEntity> foundBoxes = customizeTimeBoxRepository.findAllByCustomizeTable(chanTable);
 
@@ -44,9 +46,9 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_테이블의_타임박스를_모두_삭제한다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity chanTable = customizeTableGenerator.generate(chan);
-            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity chanTable = customizeTableEntityGenerator.generate(chan);
+            customizeTimeBoxEntityGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
 
             customizeTimeBoxRepository.deleteAllByTable(chanTable.getId());
 
@@ -57,11 +59,11 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_테이블의_타임_박스를_삭제해도_다른_테이블의_타임_박스는_삭제되지_않는다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity filledTable = customizeTableGenerator.generate(chan);
-            customizeTimeBoxGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 1);
-            customizeTimeBoxGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 2);
-            CustomizeTableEntity deletedTable = customizeTableGenerator.generate(chan);
-            customizeTimeBoxGenerator.generate(deletedTable, CustomizeBoxType.NORMAL, 1);
+            CustomizeTableEntity filledTable = customizeTableEntityGenerator.generate(chan);
+            customizeTimeBoxEntityGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generate(filledTable, CustomizeBoxType.NORMAL, 2);
+            CustomizeTableEntity deletedTable = customizeTableEntityGenerator.generate(chan);
+            customizeTimeBoxEntityGenerator.generate(deletedTable, CustomizeBoxType.NORMAL, 1);
 
             customizeTimeBoxRepository.deleteAllByTable(deletedTable.getId());
 
@@ -72,7 +74,7 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
         @Test
         void 테이블의_타임_박스가_없을_경우_타임_박스_삭제_시_예외가_발생하지_않는다() {
             Member chan = memberGenerator.generate("default@gmail.com");
-            CustomizeTableEntity emptyTable = customizeTableGenerator.generate(chan);
+            CustomizeTableEntity emptyTable = customizeTableEntityGenerator.generate(chan);
 
             assertThatCode(() -> customizeTimeBoxRepository.deleteAllByTable(emptyTable.getId()))
                     .doesNotThrowAnyException();

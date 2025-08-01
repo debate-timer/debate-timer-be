@@ -3,6 +3,7 @@ package com.debatetimer.repository.customize;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
@@ -24,15 +25,15 @@ class BellRepositoryTest extends BaseRepositoryTest {
         @Test
         void 특정_테이블에_해당하는_벨을_삭제한다() {
             Member member = memberGenerator.generate("chan@gmail.com");
-            CustomizeTableEntity deleteBellTable = customizeTableGenerator.generate(member);
-            CustomizeTableEntity otherTable = customizeTableGenerator.generate(member);
-            CustomizeTimeBoxEntity deleteBellTimeBox = customizeTimeBoxGenerator.generate(deleteBellTable,
+            CustomizeTableEntity deleteBellTable = customizeTableEntityGenerator.generate(member);
+            CustomizeTableEntity otherTable = customizeTableEntityGenerator.generate(member);
+            CustomizeTimeBoxEntity deleteBellTimeBox = customizeTimeBoxEntityGenerator.generate(deleteBellTable,
                     CustomizeBoxType.NORMAL, 1);
-            CustomizeTimeBoxEntity otherTimeBox = customizeTimeBoxGenerator.generate(otherTable,
+            CustomizeTimeBoxEntity otherTimeBox = customizeTimeBoxEntityGenerator.generate(otherTable,
                     CustomizeBoxType.NORMAL, 1);
-            bellGenerator.generate(deleteBellTimeBox, 45, 1);
-            bellGenerator.generate(deleteBellTimeBox, 60, 1);
-            bellGenerator.generate(otherTimeBox, 45, 1);
+            bellEntityGenerator.generate(deleteBellTimeBox, BellType.AFTER_START, 45, 1);
+            bellEntityGenerator.generate(deleteBellTimeBox, BellType.AFTER_START, 60, 1);
+            bellEntityGenerator.generate(otherTimeBox, BellType.AFTER_START, 45, 1);
 
             bellRepository.deleteAllByTable(deleteBellTable.getId());
 

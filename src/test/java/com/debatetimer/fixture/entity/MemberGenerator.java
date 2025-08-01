@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.repository.member.MemberRepository;

@@ -1,12 +1,12 @@
 package com.debatetimer.service;
 
 import com.debatetimer.DataBaseCleaner;
-import com.debatetimer.fixture.BellGenerator;
-import com.debatetimer.fixture.CustomizeTableGenerator;
-import com.debatetimer.fixture.CustomizeTimeBoxGenerator;
-import com.debatetimer.fixture.MemberGenerator;
-import com.debatetimer.fixture.PollGenerator;
-import com.debatetimer.fixture.VoteGenerator;
+import com.debatetimer.fixture.entity.BellEntityGenerator;
+import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
+import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
+import com.debatetimer.fixture.entity.MemberGenerator;
+import com.debatetimer.fixture.entity.PollEntityGenerator;
+import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
@@ -41,19 +41,19 @@ public abstract class BaseServiceTest {
     protected MemberGenerator memberGenerator;
 
     @Autowired
-    protected CustomizeTableGenerator customizeTableGenerator;
+    protected CustomizeTableEntityGenerator customizeTableEntityGenerator;
 
     @Autowired
-    protected CustomizeTimeBoxGenerator customizeTimeBoxGenerator;
+    protected CustomizeTimeBoxEntityGenerator customizeTimeBoxEntityGenerator;
 
     @Autowired
-    protected BellGenerator bellGenerator;
+    protected BellEntityGenerator bellEntityGenerator;
 
     @Autowired
-    protected PollGenerator pollGenerator;
+    protected PollEntityGenerator pollEntityGenerator;
 
     @Autowired
-    protected VoteGenerator voteGenerator;
+    protected VoteEntityGenerator voteEntityGenerator;
 
     protected void runAtSameTime(int count, Runnable task) throws InterruptedException {
         List<Thread> threads = IntStream.range(0, count)

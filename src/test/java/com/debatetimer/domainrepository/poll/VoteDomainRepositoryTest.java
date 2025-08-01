@@ -31,11 +31,11 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 팀별_투표_현황을_알_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             VoteInfo voteInfo = voteDomainRepository.findVoteInfoByPollId(pollEntity.getId());
 
@@ -54,11 +54,11 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 이미_참여한_투표인지_알_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity alreadyParticipatedPoll = pollGenerator.generate(table, PollStatus.PROGRESS);
-            PollEntity notYetParticipatedPoll = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+            PollEntity alreadyParticipatedPoll = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            PollEntity notYetParticipatedPoll = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             ParticipateCode participateCode = new ParticipateCode(UUID.randomUUID().toString());
-            voteGenerator.generate(alreadyParticipatedPoll, VoteTeam.PROS, "콜리", participateCode.getValue());
+            voteEntityGenerator.generate(alreadyParticipatedPoll, VoteTeam.PROS, "콜리", participateCode.getValue());
 
             boolean participated = voteDomainRepository.isExists(alreadyParticipatedPoll.getId(), participateCode);
             boolean notYetParticipated = voteDomainRepository.isExists(notYetParticipatedPoll.getId(),
@@ -77,8 +77,8 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 투표를_저장할_수_있다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", UUID.randomUUID().toString());
 
             Vote savedVote = voteDomainRepository.save(vote);
@@ -93,10 +93,10 @@ class VoteDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 중복_투표할_수_없다() {
             Member member = memberGenerator.generate("email@email.com");
-            CustomizeTableEntity table = customizeTableGenerator.generate(member);
-            PollEntity pollEntity = pollGenerator.generate(table, PollStatus.PROGRESS);
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
             String participateCode = UUID.randomUUID().toString();
-            voteGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
+            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리", participateCode);
             Vote vote = new Vote(pollEntity.getId(), VoteTeam.PROS, "콜리", participateCode);
 
             assertThatThrownBy(() -> voteDomainRepository.save(vote))

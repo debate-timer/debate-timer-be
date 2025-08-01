@@ -1,4 +1,4 @@
-package com.debatetimer.fixture;
+package com.debatetimer.fixture.entity;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomizeTableGenerator {
+public class CustomizeTableEntityGenerator {
 
     private final CustomizeTableRepository customizeTableRepository;
 
-    public CustomizeTableGenerator(CustomizeTableRepository customizeTableRepository) {
+    public CustomizeTableEntityGenerator(CustomizeTableRepository customizeTableRepository) {
         this.customizeTableRepository = customizeTableRepository;
     }
 
