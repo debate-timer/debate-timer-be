@@ -119,7 +119,7 @@ public class CustomizeTimeBoxEntity {
         this.customizeTable = customizeTable;
         this.sequence = sequence;
         this.stance = timeBox.getStance();
-        this.time = timeBox.getTime() == null ? null : timeBox.getTimePerTeam() * 2;  // TODO : Nullable 의논
+        this.time = timeBox.getTime() == null ? timeBox.getTimePerTeam() * 2 : timeBox.getTime();  // TODO : Nullable 의논
         this.speaker = timeBox.getSpeaker();
         this.speechType = timeBox.getSpeechType();
         this.boxType = timeBox.getBoxType();
