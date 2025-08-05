@@ -1,11 +1,11 @@
 package com.debatetimer.domainrepository.customize;
 
+import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
@@ -55,8 +55,21 @@ public class CustomizeTableDomainRepository {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
         List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
-        CustomizeTimeBoxEntities timeBoxEntities = new CustomizeTimeBoxEntities(timeBoxEntityList, bellEntityList);
-        return timeBoxEntities.toDomain();
+        return toCustomizeTimeBoxes(timeBoxEntityList, bellEntityList);
+    }
+
+    private List<CustomizeTimeBox> toCustomizeTimeBoxes(List<CustomizeTimeBoxEntity> timeBoxEntities,
+                                                        List<BellEntity> bellEntities) {
+        return timeBoxEntities.stream()
+                .map(timebox -> timebox.toDomain(getBells(timebox, bellEntities)))
+                .toList();
+    }
+
+    private List<Bell> getBells(CustomizeTimeBoxEntity timeBox, List<BellEntity> bells) {
+        return bells.stream()
+                .filter(bell -> bell.isContained(timeBox))
+                .map(BellEntity::toDomain)
+                .toList();
     }
 
     @Transactional
