@@ -68,16 +68,45 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
     class GetCustomizeTimeBoxes {
 
         @Test
-        void 테이블의_시간박스를_가져온다() {
+        void 테이블의_시간박스는_순서대로_가져온다() {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity tableEntity = tableEntityGenerator.generate(member);
-            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 1);
-            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 2);
+            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 1, 60);
+            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 2, 180);
+            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 3, 120);
 
             List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
                     tableEntity.getId(), member);
 
-            assertThat(timeBoxes).hasSize(2);
+            assertThat(timeBoxes).hasSize(3)
+                    .extracting(CustomizeTimeBox::getTime)
+                    .containsExactly(60, 180, 120);
+        }
+
+        @Test
+        void 테이블의_시간박스와_벨을_가져온다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity tableEntity = tableEntityGenerator.generate(member);
+            CustomizeTimeBoxEntity timeBoxEntity1 = timeBoxEntityGenerator.generate(tableEntity,
+                    CustomizeBoxType.NORMAL, 1);
+            CustomizeTimeBoxEntity timeBoxEntity2 = timeBoxEntityGenerator.generate(tableEntity,
+                    CustomizeBoxType.NORMAL, 2);
+            bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 20, 1);
+            bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 30, 1);
+            bellEntityGenerator.generate(timeBoxEntity2, BellType.BEFORE_END, 10, 1);
+
+            List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
+                    tableEntity.getId(), member);
+
+            assertAll(
+                    () -> assertThat(timeBoxes).hasSize(2),
+                    () -> assertThat(timeBoxes.get(0).getBells()).hasSize(2)
+                            .extracting(Bell::getTime)
+                            .containsExactly(20, 30),
+                    () -> assertThat(timeBoxes.get(1).getBells()).hasSize(1)
+                            .extracting(Bell::getTime)
+                            .containsExactlyInAnyOrder(10)
+            );
         }
     }
 

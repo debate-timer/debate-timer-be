@@ -5,12 +5,15 @@ import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.BellEntity;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.entity.customize.CustomizeTimeBoxEntities;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -55,8 +58,27 @@ public class CustomizeTableDomainRepository {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
         List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
-        CustomizeTimeBoxEntities timeBoxEntities = new CustomizeTimeBoxEntities(timeBoxEntityList, bellEntityList);
-        return timeBoxEntities.toDomain();
+        return toCustomizeTimeBoxes(timeBoxEntityList, bellEntityList);
+    }
+
+    private List<CustomizeTimeBox> toCustomizeTimeBoxes(
+            List<CustomizeTimeBoxEntity> timeBoxEntities,
+            List<BellEntity> bellEntities
+    ) {
+        Map<Long, List<BellEntity>> timeBoxIdToBellEntities = bellEntities.stream()
+                .collect(Collectors.groupingBy(bellEntity -> bellEntity.getCustomizeTimeBox().getId()));
+        return timeBoxEntities.stream()
+                .sorted(Comparator.comparing(CustomizeTimeBoxEntity::getSequence))
+                .map(timeBoxEntity -> toTimeBox(
+                        timeBoxEntity,
+                        timeBoxIdToBellEntities.getOrDefault(timeBoxEntity.getId(), Collections.emptyList()))
+                ).toList();
+    }
+
+    private CustomizeTimeBox toTimeBox(CustomizeTimeBoxEntity timeBoxEntity, List<BellEntity> bellEntities) {
+        return bellEntities.stream()
+                .map(BellEntity::toDomain)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), timeBoxEntity::toDomain));
     }
 
     @Transactional
