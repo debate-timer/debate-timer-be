@@ -29,6 +29,22 @@ public class CustomizeTimeBoxEntityGenerator {
         return customizeTimeBoxRepository.save(timeBox);
     }
 
+    public CustomizeTimeBoxEntity generate(CustomizeTableEntity testTable,
+                                           CustomizeBoxType boxType,
+                                           int sequence,
+                                           int time) {
+        CustomizeTimeBoxEntity timeBox = new CustomizeTimeBoxEntity(
+                testTable,
+                sequence,
+                Stance.PROS,
+                "입론",
+                boxType,
+                time,
+                "콜리"
+        );
+        return customizeTimeBoxRepository.save(timeBox);
+    }
+
     public CustomizeTimeBoxEntity generateNotExistSpeaker(CustomizeTableEntity testTable, CustomizeBoxType boxType,
                                                           int sequence) {
         CustomizeTimeBoxEntity timeBox = new CustomizeTimeBoxEntity(
