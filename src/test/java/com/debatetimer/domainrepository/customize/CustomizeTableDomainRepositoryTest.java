@@ -72,15 +72,15 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity tableEntity = tableEntityGenerator.generate(member);
             timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 1, 60);
-            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 2, 120);
-            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 3, 180);
+            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 2, 180);
+            timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 3, 120);
 
             List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
                     tableEntity.getId(), member);
 
             assertThat(timeBoxes).hasSize(3)
                     .extracting(CustomizeTimeBox::getTime)
-                    .containsExactly(60, 120, 180);
+                    .containsExactly(60, 180, 120);
         }
 
         @Test
@@ -91,8 +91,8 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
                     CustomizeBoxType.NORMAL, 1);
             CustomizeTimeBoxEntity timeBoxEntity2 = timeBoxEntityGenerator.generate(tableEntity,
                     CustomizeBoxType.NORMAL, 2);
-            bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 30, 1);
             bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 20, 1);
+            bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 30, 1);
             bellEntityGenerator.generate(timeBoxEntity2, BellType.BEFORE_END, 10, 1);
 
             List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
@@ -100,8 +100,12 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
 
             assertAll(
                     () -> assertThat(timeBoxes).hasSize(2),
-                    () -> assertThat(timeBoxes.get(0).getBells()).hasSize(2),
+                    () -> assertThat(timeBoxes.get(0).getBells()).hasSize(2)
+                            .extracting(Bell::getTime)
+                            .containsExactly(20, 30),
                     () -> assertThat(timeBoxes.get(1).getBells()).hasSize(1)
+                            .extracting(Bell::getTime)
+                            .containsExactlyInAnyOrder(10)
             );
         }
     }
