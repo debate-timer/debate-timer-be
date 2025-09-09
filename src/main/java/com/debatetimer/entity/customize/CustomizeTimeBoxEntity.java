@@ -1,0 +1,205 @@
+package com.debatetimer.entity.customize;
+
+import com.debatetimer.domain.customize.Bell;
+import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.NormalTimeBox;
+import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.customize.TimeBasedTimeBox;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Table(name = "customize_time_box")
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class CustomizeTimeBoxEntity {
+
+    public static final int SPEECH_TYPE_MAX_LENGTH = 10;
+    public static final int TIME_MULTIPLIER = 2;
+    public static final int SPEAKER_MAX_LENGTH = 5;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "table_id")
+    private CustomizeTableEntity customizeTable;
+
+    private int sequence;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Stance stance;
+
+    private Integer time;
+    private String speaker;
+
+    @NotBlank
+    private String speechType;
+
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    private CustomizeBoxType boxType;
+
+    private Integer timePerTeam;
+    private Integer timePerSpeaking;
+
+    public CustomizeTimeBoxEntity(
+            CustomizeTableEntity customizeTableEntity,
+            int sequence,
+            Stance stance,
+            String speechType,
+            CustomizeBoxType boxType,
+            Integer time,
+            String speaker
+    ) {
+        validateNotTimeBasedType(boxType);
+        validateSpeechType(speechType);
+        validateSpeaker(speaker);
+        validateSequence(sequence);
+        validateTime(time);
+
+        this.customizeTable = customizeTableEntity;
+        this.sequence = sequence;
+        this.stance = stance;
+        this.time = time;
+        this.speaker = initializeSpeaker(speaker);
+        this.speechType = speechType;
+        this.boxType = boxType;
+    }
+
+    public CustomizeTimeBoxEntity(
+            CustomizeTableEntity customizeTableEntity,
+            int sequence,
+            Stance stance,
+            String speechType,
+            CustomizeBoxType boxType,
+            Integer timePerTeam,
+            Integer timePerSpeaking,
+            String speaker
+    ) {
+        validateTimeBasedTimes(timePerTeam, timePerSpeaking);
+        validateTimeBasedType(boxType);
+        validateSpeechType(speechType);
+        validateSpeaker(speaker);
+        validateSequence(sequence);
+        validateTime(convertToTime(timePerTeam));
+
+        this.sequence = sequence;
+        this.stance = stance;
+        this.time = convertToTime(timePerTeam);
+        this.speaker = initializeSpeaker(speaker);
+        this.customizeTable = customizeTableEntity;
+        this.speechType = speechType;
+        this.boxType = boxType;
+        this.timePerTeam = timePerTeam;
+        this.timePerSpeaking = timePerSpeaking;
+    }
+
+    public CustomizeTimeBoxEntity(CustomizeTableEntity customizeTable, CustomizeTimeBox timeBox, int sequence) {
+        this.customizeTable = customizeTable;
+        this.sequence = sequence;
+        this.stance = timeBox.getStance();
+        this.time = timeBox.getTime() == null ? timeBox.getTimePerTeam() * 2 : timeBox.getTime();  // TODO : Nullable 의논
+        this.speaker = timeBox.getSpeaker();
+        this.speechType = timeBox.getSpeechType();
+        this.boxType = timeBox.getBoxType();
+        this.timePerTeam = timeBox.getTimePerTeam();
+        this.timePerSpeaking = timeBox.getTimePerSpeaking();
+    }
+
+    private static int convertToTime(Integer timePerTeam) {
+        if (timePerTeam == null) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+        return timePerTeam * TIME_MULTIPLIER;
+    }
+
+
+    private String initializeSpeaker(String speaker) {
+        if (speaker == null || speaker.isBlank()) {
+            return null;
+        }
+        return speaker;
+    }
+
+    private void validateSpeaker(String speaker) {
+        if (speaker != null && speaker.length() > SPEAKER_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEAKER_LENGTH);
+        }
+    }
+
+    private void validateSequence(int sequence) {
+        if (sequence <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SEQUENCE);
+        }
+    }
+
+    private void validateTime(int time) {
+        if (time <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
+        }
+    }
+
+    private void validateTime(Integer time) {
+        if (time == null || time <= 0) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_TIME);
+        }
+    }
+
+    private void validateTimeBasedTimes(Integer timePerTeam, Integer timePerSpeaking) {
+        validateTime(timePerTeam);
+        if (timePerSpeaking == null) {
+            return;
+        }
+
+        validateTime(timePerSpeaking);
+        if (timePerTeam < timePerSpeaking) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIME);
+        }
+    }
+
+    private void validateTimeBasedType(CustomizeBoxType boxType) {
+        if (boxType.isNotTimeBased()) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+    }
+
+    private void validateNotTimeBasedType(CustomizeBoxType boxType) {
+        if (boxType.isTimeBased()) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_FORMAT);
+        }
+    }
+
+    private void validateSpeechType(String speechType) {
+        if (speechType.length() > SPEECH_TYPE_MAX_LENGTH) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BOX_SPEECH_TYPE_LENGTH);
+        }
+    }
+
+    public CustomizeTimeBox toDomain(List<Bell> bells) {
+        if (boxType.isTimeBased()) {
+            return new TimeBasedTimeBox(stance, speechType, speaker, timePerTeam, timePerSpeaking);
+        }
+        return new NormalTimeBox(stance, speechType, speaker, time, bells);
+    }
+}

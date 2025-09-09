@@ -4,6 +4,7 @@ import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 public record CustomizeTableInfoCreateRequest(
         @NotBlank
@@ -23,6 +24,7 @@ public record CustomizeTableInfoCreateRequest(
 ) {
 
     public CustomizeTable toTable(Member member) {
-        return new CustomizeTable(member, name, agenda, warningBell, finishBell, prosTeamName, consTeamName);
+        return new CustomizeTable(member, name, agenda, prosTeamName, consTeamName, warningBell, finishBell,
+                LocalDateTime.now());
     }
 }

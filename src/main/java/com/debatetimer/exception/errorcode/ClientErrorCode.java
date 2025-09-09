@@ -1,7 +1,10 @@
 package com.debatetimer.exception.errorcode;
 
-import com.debatetimer.domain.customize.CustomizeTable;
-import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.customize.Agenda;
+import com.debatetimer.domain.customize.Bell;
+import com.debatetimer.domain.customize.TableName;
+import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -10,7 +13,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     INVALID_TABLE_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(CustomizeTable.TABLE_NAME_MAX_LENGTH)
+            "테이블 이름은 1자 이상 %d자 이하여야 합니다".formatted(TableName.NAME_MAX_LENGTH)
     ),
     INVALID_TABLE_NAME_FORM(
             HttpStatus.BAD_REQUEST,
@@ -26,23 +29,33 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_TIME_BASED_TIME(HttpStatus.BAD_REQUEST, "팀 발언 시간은 개인 발언 시간보다 길어야합니다"),
     INVALID_TIME_BOX_SPEECH_TYPE_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "발언 유형 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBox.SPEECH_TYPE_MAX_LENGTH)
+            "발언 유형 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBoxEntity.SPEECH_TYPE_MAX_LENGTH)
     ),
     INVALID_TIME_BOX_SPEAKER_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "발언자 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBox.SPEAKER_MAX_LENGTH)
+            "발언자 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTimeBoxEntity.SPEAKER_MAX_LENGTH)
     ),
     INVALID_TEAM_NAME_LENGTH(
             HttpStatus.BAD_REQUEST,
-            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(CustomizeTable.TEAM_NAME_MAX_LENGTH)
+            "팀 이름은 1자 이상 %d자 이하여야 합니다.".formatted(TeamName.NAME_MAX_LENGTH)
     ),
     INVALID_TEAM_NAME_FORM(
             HttpStatus.BAD_REQUEST,
             "팀 이름에 이모지를 넣을 수 없습니다"
     ),
+    INVALID_AGENDA_LENGTH(
+            HttpStatus.BAD_REQUEST,
+            "토론 주제는 1자 이상 %d자 이하여야 합니다.".formatted(Agenda.AGENDA_MAX_LENGTH)
+    ),
+
+    INVALID_POLL_PARTICIPANT_NAME(HttpStatus.BAD_REQUEST, "잘못된 투표자 이름입니다"),
+    INVALID_POLL_PARTICIPANT_CODE(HttpStatus.BAD_REQUEST, "잘못된 투표참여 코드입니다"),
+    ALREADY_DONE_POLL(HttpStatus.BAD_REQUEST, "이미 완료된 투표 입니다"),
+    ALREADY_VOTED_PARTICIPANT(HttpStatus.BAD_REQUEST, "이미 참여한 투표자 입니다"),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
+    POLL_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
@@ -59,6 +72,9 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ALREADY_DISCONNECTED(HttpStatus.BAD_REQUEST, "이미 클라이언트에서 요청이 종료되었습니다."),
     NO_COOKIE_FOUND(HttpStatus.BAD_REQUEST, "필수 쿠키 값이 존재하지 않습니다."),
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
+
+    INVALID_BELL_TIME(HttpStatus.BAD_REQUEST, "벨 시간은 0 이상의 정수여야 합니다."),
+    INVALID_BELL_COUNT(HttpStatus.BAD_REQUEST, "벨 카운트는 1 이상 %d 이하의 정수여야 합니다.".formatted(Bell.MAX_BELL_COUNT)),
     ;
 
     private final HttpStatus status;

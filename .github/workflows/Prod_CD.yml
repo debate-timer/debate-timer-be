@@ -1,6 +1,7 @@
 name: prod-cd
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "main"
@@ -12,8 +13,6 @@ jobs:
     steps:
       - name: Checkout Develop Branch
         uses: actions/checkout@v4
-        with:
-          ref: "main"
 
       - name: Setting prod-secret.yml
         run: |
@@ -66,7 +65,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: deploy-scripts
-          path: ~/app/scripts
+          path: ~/app/scripts/
 
       - name: Replace application to latest
         run: sudo sh ~/app/scripts/replace-new-version.sh
+
+      - name: Health Check
+        run: sh ~/app/scripts/health-check.sh
+
+      - name: Send Discord Alert on Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\":\":warning: :warning: [PROD] 배포 실패! :warning: :warning: \n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+               ${{ secrets.DISCORD_WEB_HOOK }}
