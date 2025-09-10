@@ -3,6 +3,7 @@ package com.debatetimer.dto.poll.response;
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.domain.poll.VoteInfo;
+import java.util.List;
 
 public record PollInfoResponse(
         long id,
@@ -11,7 +12,8 @@ public record PollInfoResponse(
         String consTeamName,
         long totalCount,
         long prosCount,
-        long consCount
+        long consCount,
+        List<String> voterNames
 ) {
 
     public PollInfoResponse(Poll poll, VoteInfo voteInfo) {
@@ -22,7 +24,8 @@ public record PollInfoResponse(
                 poll.getConsTeamName().getValue(),
                 voteInfo.getTotalCount(),
                 voteInfo.getProsCount(),
-                voteInfo.getConsCount()
+                voteInfo.getConsCount(),
+                voteInfo.getVoterNames()
         );
     }
 }

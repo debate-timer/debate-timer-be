@@ -28,15 +28,18 @@ public class VoteDomainRepository {
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
         List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
-        return countVotes(pollId, pollVotes);
+        return resolveVoteInfo(pollId, pollVotes);
     }
 
-    private VoteInfo countVotes(long pollId, List<VoteEntity> voteEntities) {
-        Map<VoteTeam, Long> teamCount = voteEntities.stream()
+    private VoteInfo resolveVoteInfo(long pollId, List<VoteEntity> voteEntities) {
+        List<String> voterNames = voteEntities.stream()
+                .map(VoteEntity::getName)
+                .toList();
+
+        Map<VoteTeam, Long> voteCount = voteEntities.stream()
                 .collect(Collectors.groupingBy(VoteEntity::getTeam, Collectors.counting()));
-        long prosCount = teamCount.getOrDefault(VoteTeam.PROS, 0L);
-        long consCount = teamCount.getOrDefault(VoteTeam.CONS, 0L);
-        return new VoteInfo(pollId, prosCount, consCount);
+
+        return new VoteInfo(pollId, voteCount, voterNames);
     }
 
     public boolean isExists(long pollId, ParticipateCode code) {
