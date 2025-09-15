@@ -28,15 +28,11 @@ public class VoteDomainRepository {
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
         List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
-        return resolveVoteInfo(pollId, pollVotes);
-    }
-
-    private VoteInfo resolveVoteInfo(long pollId, List<VoteEntity> voteEntities) {
-        List<String> voterNames = voteEntities.stream()
+        List<String> voterNames = pollVotes.stream()
                 .map(VoteEntity::getName)
                 .toList();
 
-        Map<VoteTeam, Long> voteCount = voteEntities.stream()
+        Map<VoteTeam, Long> voteCount = pollVotes.stream()
                 .collect(Collectors.groupingBy(VoteEntity::getTeam, Collectors.counting()));
 
         return new VoteInfo(pollId, voteCount, voterNames);
