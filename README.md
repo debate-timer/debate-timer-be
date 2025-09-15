@@ -62,6 +62,9 @@ src/
 └── test/                      # 테스트 코드
 ```
 
+## Infra & Deployment
+<img src="./docs/debate_timer_infra.png"/>
+
 ## BE 팀원 소개
 | <img src="https://avatars.githubusercontent.com/u/148152234?v=4" width="100" height="100"/> | <img src="https://avatars.githubusercontent.com/u/44027393?v=4" width="100" height="100"/> | <img src="https://avatars.githubusercontent.com/u/121424793?v=4" width="100" height="100"/> |
 |:-------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------:|
