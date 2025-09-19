@@ -3,7 +3,6 @@ package com.debatetimer.domainrepository.poll;
 import com.debatetimer.domain.poll.ParticipateCode;
 import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteInfo;
-import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.entity.poll.VoteEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -12,8 +11,6 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.poll.PollRepository;
 import com.debatetimer.repository.poll.VoteRepository;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -27,15 +24,11 @@ public class VoteDomainRepository {
     private final RepositoryErrorDecoder errorDecoder;
 
     public VoteInfo findVoteInfoByPollId(long pollId) {
-        List<VoteEntity> pollVotes = voteRepository.findAllByPollId(pollId);
-        List<String> voterNames = pollVotes.stream()
-                .map(VoteEntity::getName)
+        List<Vote> pollVotes = voteRepository.findAllByPollId(pollId)
+                .stream()
+                .map(VoteEntity::toDomain)
                 .toList();
-
-        Map<VoteTeam, Long> voteCount = pollVotes.stream()
-                .collect(Collectors.groupingBy(VoteEntity::getTeam, Collectors.counting()));
-
-        return new VoteInfo(pollId, voteCount, voterNames);
+        return new VoteInfo(pollId, pollVotes);
     }
 
     public boolean isExists(long pollId, ParticipateCode code) {
