@@ -1,11 +1,13 @@
 # Debate Timer Backend
 
 ## 프로젝트 소개
+
 디베이트 타이머는 더 쉬운 토론 진행을 위한, 오직 토론을 위한 타이머입니다.
 
 ## 기술 스택
 
 ### Backend
+
 <div>
 <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white">
 <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
@@ -13,6 +15,7 @@
 </div>
 
 ### Database
+
 <div>
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
 <img src="https://img.shields.io/badge/H2-003545?style=for-the-badge&logo=h2&logoColor=white">
@@ -20,6 +23,7 @@
 </div>
 
 ### DevOps & Monitoring
+
 <div>
 <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
 <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
@@ -27,6 +31,7 @@
 </div>
 
 ### Documentation & Testing
+
 <div>
 <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black">
 <img src="https://img.shields.io/badge/Spring_REST_Docs-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
@@ -63,9 +68,11 @@ src/
 ```
 
 ## Infra & Deployment
-<img src="./docs/debate_timer_infra.png"/>
+
+![img.png](./docs/debate_timer_infra_v0-1.png)
 
 ## BE 팀원 소개
+
 | <img src="https://avatars.githubusercontent.com/u/148152234?v=4" width="100" height="100"/> | <img src="https://avatars.githubusercontent.com/u/44027393?v=4" width="100" height="100"/> | <img src="https://avatars.githubusercontent.com/u/121424793?v=4" width="100" height="100"/> |
 |:-------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------:|
 |                            [콜리](https://github.com/coli-geonwoo)                            |                            [커찬](https://github.com/leegwichan)                             |                             [비토](https://github.com/unifolio0)                              |
