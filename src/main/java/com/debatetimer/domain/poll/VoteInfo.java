@@ -9,14 +9,14 @@ import lombok.Getter;
 @Getter
 public class VoteInfo {
 
-    private static final Comparator<Vote> VOTE_COMPARATOR = Comparator.comparing(Vote::getCreateAt);
+    private static final Comparator<Vote> VOTE_COMPARATOR = Comparator.comparing(Vote::getCreatedAt);
     private static final long INITIAL_VOTE_COUNT = 0L;
 
     private final long pollId;
     private final long totalCount;
     private final long prosCount;
     private final long consCount;
-    private final List<String> voterNames;
+    private final List<ParticipantName> voterNames;
 
     public VoteInfo(long pollId, List<Vote> votes) {
         Map<VoteTeam, Long> voteCounts = createVoteCounts(votes);
@@ -27,7 +27,6 @@ public class VoteInfo {
         this.voterNames = votes.stream()
                 .sorted(VOTE_COMPARATOR)
                 .map(Vote::getName)
-                .map(ParticipantName::getValue)
                 .toList();
     }
 

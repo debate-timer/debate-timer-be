@@ -1,5 +1,6 @@
 package com.debatetimer.dto.poll.response;
 
+import com.debatetimer.domain.poll.ParticipantName;
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.domain.poll.VoteInfo;
@@ -25,7 +26,9 @@ public record PollInfoResponse(
                 voteInfo.getTotalCount(),
                 voteInfo.getProsCount(),
                 voteInfo.getConsCount(),
-                voteInfo.getVoterNames()
+                voteInfo.getVoterNames().stream()
+                        .map(ParticipantName::getValue)
+                        .toList()
         );
     }
 }

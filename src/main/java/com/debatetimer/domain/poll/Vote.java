@@ -13,13 +13,13 @@ public class Vote {
     private final VoteTeam team;
     private final ParticipantName name;
     private final ParticipateCode code;
-    private final LocalDateTime createAt;
+    private final LocalDateTime createdAt;
 
     public Vote(long pollId, VoteTeam team, String name, String code) {
         this(null, pollId, team, name, code, LocalDateTime.now());
     }
 
-    public Vote(Long id, long pollId, VoteTeam team, String name, String code, LocalDateTime createAt) {
-        this(id, pollId, team, new ParticipantName(name), new ParticipateCode(code), createAt);
+    public Vote(Long id, long pollId, VoteTeam team, String name, String code, LocalDateTime createdAt) {
+        this(id, pollId, team, new ParticipantName(name), new ParticipateCode(code), createdAt);
     }
 }

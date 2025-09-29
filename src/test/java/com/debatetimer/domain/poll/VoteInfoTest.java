@@ -23,8 +23,12 @@ class VoteInfoTest {
             Vote twoMinutesAgoVote = new Vote(3L, pollId, VoteTeam.PROS, "콜리3", "code3", twoMinutesAgo);
 
             VoteInfo voteInfo = new VoteInfo(pollId, List.of(nowVote, oneMinutesAgoVote, twoMinutesAgoVote));
+            List<String> voterNames = voteInfo.getVoterNames()
+                    .stream()
+                    .map(ParticipantName::getValue)
+                    .toList();
 
-            assertThat(voteInfo.getVoterNames())
+            assertThat(voterNames)
                     .containsExactly(
                             twoMinutesAgoVote.getName().getValue(),
                             oneMinutesAgoVote.getName().getValue(),
