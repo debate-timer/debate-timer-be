@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -18,6 +19,7 @@ import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.dto.poll.response.PollCreateResponse;
 import com.debatetimer.dto.poll.response.PollInfoResponse;
 import io.restassured.http.ContentType;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -85,7 +87,8 @@ public class PollDocumentTest extends BaseDocumentTest {
                         fieldWithPath("consTeamName").type(STRING).description("반대측 팀 이름"),
                         fieldWithPath("totalCount").type(NUMBER).description("전체 투표 수"),
                         fieldWithPath("prosCount").type(NUMBER).description("찬성 투표 수"),
-                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수")
+                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수"),
+                        fieldWithPath("voterNames").type(ARRAY).description("투표자 이름 정보")
                 );
 
         @Test
@@ -97,7 +100,8 @@ public class PollDocumentTest extends BaseDocumentTest {
                     "반대",
                     3L,
                     2L,
-                    1L
+                    1L,
+                    List.of("콜리", "비토", "커찬")
             );
             doReturn(response).when(pollService).getPollInfo(anyLong(), any(Member.class));
 
@@ -136,7 +140,8 @@ public class PollDocumentTest extends BaseDocumentTest {
                         fieldWithPath("consTeamName").type(STRING).description("반대측 팀 이름"),
                         fieldWithPath("totalCount").type(NUMBER).description("전체 투표 수"),
                         fieldWithPath("prosCount").type(NUMBER).description("찬성 투표 수"),
-                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수")
+                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수"),
+                        fieldWithPath("voterNames").type(ARRAY).description("투표자 이름 정보")
                 );
 
         @Test
@@ -148,7 +153,9 @@ public class PollDocumentTest extends BaseDocumentTest {
                     "반대",
                     3L,
                     2L,
-                    1L
+                    1L,
+                    List.of("콜리", "비토", "커찬")
+
             );
             doReturn(response).when(pollService).finishPoll(anyLong(), any(Member.class));
 

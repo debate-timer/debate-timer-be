@@ -2,6 +2,7 @@ package com.debatetimer.entity.poll;
 
 import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteTeam;
+import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class VoteEntity {
+public class VoteEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,6 +56,6 @@ public class VoteEntity {
     }
 
     public Vote toDomain() {
-        return new Vote(id, poll.getId(), team, name, participateCode);
+        return new Vote(id, poll.getId(), team, name, participateCode, getCreatedAt());
     }
 }

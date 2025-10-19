@@ -10,6 +10,7 @@ import com.debatetimer.dto.poll.response.PollCreateResponse;
 import com.debatetimer.dto.poll.response.PollInfoResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
+import com.debatetimer.entity.poll.VoteEntity;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -44,9 +45,9 @@ class PollServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
             PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
-            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            VoteEntity voter1 = voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            VoteEntity voter2 = voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            VoteEntity voter3 = voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
 
             PollInfoResponse pollInfo = pollService.getPollInfo(table.getId(), member);
 
@@ -57,7 +58,9 @@ class PollServiceTest extends BaseServiceTest {
                     () -> assertThat(pollInfo.status()).isEqualTo(pollEntity.getStatus()),
                     () -> assertThat(pollInfo.totalCount()).isEqualTo(3L),
                     () -> assertThat(pollInfo.prosCount()).isEqualTo(2L),
-                    () -> assertThat(pollInfo.consCount()).isEqualTo(1L)
+                    () -> assertThat(pollInfo.consCount()).isEqualTo(1L),
+                    () -> assertThat(pollInfo.voterNames()).containsExactly(
+                            voter1.getName(), voter2.getName(), voter3.getName())
             );
         }
     }

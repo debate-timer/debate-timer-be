@@ -10,6 +10,7 @@ import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.dto.poll.response.PollInfoResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.poll.PollEntity;
+import com.debatetimer.entity.poll.VoteEntity;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
 import org.junit.jupiter.api.Nested;
@@ -44,9 +45,9 @@ class PollControllerTest extends BaseControllerTest {
             Member member = memberGenerator.generate("email@email.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
             PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
-            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
-            voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
-            voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
+            VoteEntity voter1 = voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "콜리");
+            VoteEntity voter2 = voteEntityGenerator.generate(pollEntity, VoteTeam.PROS, "비토");
+            VoteEntity voter3 = voteEntityGenerator.generate(pollEntity, VoteTeam.CONS, "커찬");
             Headers headers = headerGenerator.generateAccessTokenHeader(member);
 
             PollInfoResponse response = given()
@@ -64,7 +65,9 @@ class PollControllerTest extends BaseControllerTest {
                     () -> assertThat(response.status()).isEqualTo(pollEntity.getStatus()),
                     () -> assertThat(response.totalCount()).isEqualTo(3L),
                     () -> assertThat(response.prosCount()).isEqualTo(2L),
-                    () -> assertThat(response.consCount()).isEqualTo(1L)
+                    () -> assertThat(response.consCount()).isEqualTo(1L),
+                    () -> assertThat(response.voterNames()).containsExactly(
+                            voter1.getName(), voter2.getName(), voter3.getName())
             );
         }
     }
