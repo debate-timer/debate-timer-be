@@ -2,12 +2,14 @@ package com.debatetimer.event.sharing;
 
 import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RoomSubscribeListener {
@@ -19,15 +21,17 @@ public class RoomSubscribeListener {
 
     @EventListener
     public void handleSubscribeEvent(SessionSubscribeEvent event) {
+        log.info("구독정보가 들어오긴 함");
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-
         String destination = accessor.getDestination();
+        System.out.println("destination = " + destination);
         if (destination == null) {
             return;
         }
 
         if (destination.startsWith(AUDIENCE_SUBSCRIBE_PREFIX)) {
             long roomId = Long.parseLong(destination.replace(AUDIENCE_SUBSCRIBE_PREFIX, ""));
+            System.out.println("roomId = " + roomId);
             messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, new ChairmanSharingRequest(roomId));
         }
     }
