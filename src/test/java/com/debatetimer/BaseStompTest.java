@@ -24,7 +24,7 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BaseStompTest {
+public abstract class BaseStompTest {
 
     private static final String SOCKET_ENDPOINT = "/ws";
 
