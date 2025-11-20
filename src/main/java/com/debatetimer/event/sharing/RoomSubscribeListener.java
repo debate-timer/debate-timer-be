@@ -1,6 +1,8 @@
 package com.debatetimer.event.sharing;
 
 import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -28,8 +30,17 @@ public class RoomSubscribeListener {
         }
 
         if (destination.startsWith(AUDIENCE_SUBSCRIBE_PREFIX)) {
-            long roomId = Long.parseLong(destination.replace(AUDIENCE_SUBSCRIBE_PREFIX, ""));
+            long roomId = parseRoomId(destination);
             messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, new ChairmanSharingRequest(roomId));
+        }
+    }
+
+    private long parseRoomId(String destination) {
+        try {
+            String parsedRoomId = destination.substring(AUDIENCE_SUBSCRIBE_PREFIX.length());
+            return Long.parseLong(parsedRoomId);
+        } catch (NumberFormatException exception) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_ROOM_ID);
         }
     }
 }
