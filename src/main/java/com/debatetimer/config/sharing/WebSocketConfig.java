@@ -1,5 +1,6 @@
 package com.debatetimer.config.sharing;
 
+import com.debatetimer.config.CorsProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final CorsProperties corsProperties;
     private final WebSocketAuthMemberResolver webSocketAuthMemberResolver;
 
     @Override
@@ -30,7 +32,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns(corsProperties.getCorsOrigin())
                 .withSockJS();
     }
 }
