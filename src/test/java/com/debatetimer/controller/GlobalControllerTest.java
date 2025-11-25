@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class GlobalControllerTest extends BaseControllerTest {
 
-    @Value("${cors.origin}")
+    @Value("${cors.origin.cors-origin[0]}")
     private String corsOrigin;
 
     @Nested

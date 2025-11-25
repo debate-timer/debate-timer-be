@@ -3,7 +3,9 @@ spring:
     active: test
 
 cors:
-  origin: http://test.debate-timer.com
+  origin:
+    cors-origin:
+      - http://test.debate-timer.com
 
 oauth:
   client_id: oauth_client_id

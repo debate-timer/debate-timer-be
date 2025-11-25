@@ -6,6 +6,7 @@ import com.debatetimer.dto.member.MemberInfo;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import org.springframework.http.HttpHeaders;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,5 +21,13 @@ public class HeaderGenerator {
     public Headers generateAccessTokenHeader(Member member) {
         String accessToken = jwtTokenProvider.createAccessToken(new MemberInfo(member));
         return new Headers(new Header(HttpHeaders.AUTHORIZATION, accessToken));
+    }
+
+    public StompHeaders generateAccessTokenHeader(String destination, Member member) {
+        String accessToken = jwtTokenProvider.createAccessToken(new MemberInfo(member));
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination(destination);
+        stompHeaders.add(HttpHeaders.AUTHORIZATION, accessToken);
+        return stompHeaders;
     }
 }
