@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "develop"
+      - "chore/#224"
 
 jobs:
   build:
