@@ -1,6 +1,11 @@
 spring:
   profiles:
     default: local
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  shutdown: graceful
 
 springdoc:
   swagger-ui:

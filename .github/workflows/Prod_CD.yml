@@ -67,11 +67,11 @@ jobs:
           name: deploy-scripts
           path: ~/app/scripts/
 
-      - name: Replace application to latest
-        run: sudo sh ~/app/scripts/replace-new-version.sh
+      - name: Make deploy script executable
+        run: chmod +x ~/app/scripts/zero-downtime-deploy.sh
 
-      - name: Health Check
-        run: sh ~/app/scripts/health-check.sh
+      - name: Zero Downtime Deployment
+        run: sh ~/app/scripts/zero-downtime-deploy.sh
 
       - name: Send Discord Alert on Failure
         if: failure()
