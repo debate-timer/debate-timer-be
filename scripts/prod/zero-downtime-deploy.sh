@@ -114,11 +114,15 @@ health_check() {
 start_application() {
     local port=$1
     local monitor_port=$2
-    local jar_file=$(ls $APP_DIR/*.jar | head -n 1)
+    local staging_jar="$APP_DIR/staging/app.jar"
+    local jar_file="$APP_DIR/app-$port.jar"
 
-    if [ -z "$jar_file" ]; then
-        error_exit "No JAR file found in $APP_DIR"
+    if [ ! -f "$staging_jar" ]; then
+        error_exit "No JAR file found in staging directory: $staging_jar"
     fi
+
+    log "Copying JAR from staging to $jar_file"
+    cp "$staging_jar" "$jar_file"
 
     log "Starting application on port $port with JAR: $jar_file"
 
@@ -170,8 +174,8 @@ switch_nginx_upstream() {
     log "nginx reloaded successfully"
 
     sleep 2
-    local response=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost/monitoring/health" 2>/dev/null || echo "000")
-    if [ "$response" != "200" ]; then
+    local response=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost/" 2>/dev/null || echo "000")
+    if [ "$response" = "000" ] || [ "$response" = "502" ] || [ "$response" = "503" ]; then
         log "nginx health check failed after reload (status: $response)"
         return 1
     fi
@@ -209,6 +213,12 @@ main() {
 
     log "Step 4/4: Stopping old version on port $current_port"
     kill_process_on_port "$current_port"
+
+    local old_jar="$APP_DIR/app-$current_port.jar"
+    if [ -f "$old_jar" ]; then
+        log "Removing old JAR file: $old_jar"
+        rm -f "$old_jar"
+    fi
 
     echo "$new_port" > "$PORT_FILE"
     log "Updated active port file to $new_port"

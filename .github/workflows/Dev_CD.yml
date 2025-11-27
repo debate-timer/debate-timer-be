@@ -60,7 +60,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-artifact
-          path: ~/app
+          path: ~/app/staging
 
       - name: Download deploy scripts
         uses: actions/download-artifact@v4
