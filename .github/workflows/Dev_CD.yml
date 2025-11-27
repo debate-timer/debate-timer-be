@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "develop"
+      - "chore/#224"
 
 jobs:
   build:
@@ -66,6 +67,12 @@ jobs:
         with:
           name: deploy-scripts
           path: ~/app/scripts/
+
+      - name: Setup log directory
+        run: |
+          sudo mkdir -p /home/ubuntu/logs
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/logs
+          chmod 755 /home/ubuntu/logs
 
       - name: Make deploy script executable
         run: chmod +x ~/app/scripts/zero-downtime-deploy.sh
