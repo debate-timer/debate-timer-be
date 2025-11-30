@@ -60,7 +60,7 @@ is_port_in_use() {
 
 kill_process_on_port() {
     local port=$1
-    local pid=$(lsof -t -i:$port 2>/dev/null)
+    local pid=$(sudo lsof -t -i:$port 2>/dev/null)
 
     if [ -z "$pid" ]; then
         log "No process running on port $port"
@@ -68,7 +68,7 @@ kill_process_on_port() {
     fi
 
     log "Sending graceful shutdown signal to process $pid on port $port"
-    kill -15 "$pid"
+    sudo kill -15 "$pid"
 
     local wait_count=0
     while [ $wait_count -lt 65 ] && is_port_in_use "$port"; do
@@ -78,7 +78,7 @@ kill_process_on_port() {
 
     if is_port_in_use "$port"; then
         log "Process didn't stop gracefully, forcing shutdown"
-        kill -9 "$pid" 2>/dev/null || true
+        sudo kill -9 "$pid" 2>/dev/null || true
         sleep 2
     fi
 
@@ -131,7 +131,7 @@ start_application() {
         kill_process_on_port "$port"
     fi
 
-    nohup java \
+    sudo nohup java \
         -Dspring.profiles.active=$PROFILE,monitor \
         -Duser.timezone=$TIMEZONE \
         -Dserver.port=$port \
