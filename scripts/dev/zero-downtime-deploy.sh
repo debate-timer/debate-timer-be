@@ -54,7 +54,7 @@ get_monitor_port() {
 
 is_port_in_use() {
     local port=$1
-    lsof -t -i:$port > /dev/null 2>&1
+    sudo lsof -t -i:$port > /dev/null 2>&1
     return $?
 }
 
