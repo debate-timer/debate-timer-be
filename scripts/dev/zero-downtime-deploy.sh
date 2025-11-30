@@ -71,7 +71,7 @@ kill_process_on_port() {
     kill -15 "$pid"
 
     local wait_count=0
-    while [ $wait_count -lt 35 ] && is_port_in_use "$port"; do
+    while [ $wait_count -lt 65 ] && is_port_in_use "$port"; do
         sleep 1
         wait_count=$((wait_count + 1))
     done

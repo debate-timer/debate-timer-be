@@ -19,7 +19,7 @@ Configuration:
         properties: true
         stacktraceAsString: true
         objectMessageAsJsonObject: true
-      immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
+      immediateFlush: true #true로 설정하여 종료 시 로그 손실 방지
 
       Policies:
         SizeBasedTriggeringPolicy:
