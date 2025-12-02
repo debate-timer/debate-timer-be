@@ -1,7 +1,9 @@
 package com.debatetimer.domain.organization;
 
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 public class Organization {
 
     private final Long id;

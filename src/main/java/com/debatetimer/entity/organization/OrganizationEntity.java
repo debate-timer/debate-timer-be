@@ -36,6 +36,12 @@ public class OrganizationEntity extends BaseTimeEntity {
     @NotBlank
     private String iconPath;
 
+    public OrganizationEntity(String name, String affiliation, String iconPath) {
+        this.name = name;
+        this.affiliation = affiliation;
+        this.iconPath = iconPath;
+    }
+
     public Organization toDomain(List<OrganizationTemplate> templates) {
         return new Organization(this.id, this.name, this.affiliation, this.iconPath, templates);
     }

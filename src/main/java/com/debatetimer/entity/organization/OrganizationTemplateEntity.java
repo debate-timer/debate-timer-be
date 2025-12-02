@@ -40,7 +40,17 @@ public class OrganizationTemplateEntity extends BaseTimeEntity {
     @Column(length = 8191)
     private String data;
 
+    public OrganizationTemplateEntity(OrganizationEntity organization, String name, String data) {
+        this.organization = organization;
+        this.name = name;
+        this.data = data;
+    }
+
     public OrganizationTemplate toDomain() {
         return new OrganizationTemplate(this.id, this.name, this.data);
+    }
+
+    public Long getOrganizationId() {
+        return this.organization.getId();
     }
 }
