@@ -154,19 +154,22 @@ switch_nginx_upstream() {
     local new_port=$1
     local nginx_conf="/etc/nginx/sites-available/api.prod.debate-timer.com"
     local temp_conf="/tmp/api.prod.debate-timer.com.tmp"
+    local backup_conf="${nginx_conf}.bak"
 
     if [ ! -f "$nginx_conf" ]; then
         error_exit "nginx configuration not found at $nginx_conf"
     fi
 
     log "Switching nginx upstream to port $new_port"
+    sudo cp "$nginx_conf" "$backup_conf"
 
     sed "s/server 127\.0\.0\.1:[0-9]\+;/server 127.0.0.1:$new_port;/" "$nginx_conf" > "$temp_conf"
-
     sudo cp "$temp_conf" "$nginx_conf"
+
     if ! sudo nginx -t 2>/dev/null; then
-        log "nginx configuration test failed"
-        git checkout "$nginx_conf" 2>/dev/null || true
+        log "nginx configuration test failed, rolling back."
+        sudo cp "$backup_conf" "$nginx_conf"
+        sudo rm "$backup_conf"
         return 1
     fi
 
@@ -174,13 +177,17 @@ switch_nginx_upstream() {
     log "nginx reloaded successfully"
 
     sleep 2
-    local response=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost/" 2>/dev/null || echo "000")
+    local response=$(curl -s -o /dev/null -w "%"{http_code}"" "http://localhost/" 2>/dev/null || echo "000")
     if [ "$response" = "000" ] || [ "$response" = "502" ] || [ "$response" = "503" ]; then
-        log "nginx health check failed after reload (status: $response)"
+        log "nginx health check failed after reload (status: $response). Rolling back nginx config."
+        sudo cp "$backup_conf" "$nginx_conf"
+        sudo nginx -s reload
+        sudo rm "$backup_conf"
         return 1
     fi
 
     log "nginx is now routing traffic to port $new_port"
+    sudo rm "$backup_conf"
     return 0
 }
 
