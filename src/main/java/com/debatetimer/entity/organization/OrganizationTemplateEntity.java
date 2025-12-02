@@ -1,6 +1,7 @@
 package com.debatetimer.entity.organization;
 
 
+import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,4 +39,8 @@ public class OrganizationTemplateEntity extends BaseTimeEntity {
     @NotBlank
     @Column(length = 8191)
     private String data;
+
+    public OrganizationTemplate toDomain() {
+        return new OrganizationTemplate(this.id, this.name, this.data);
+    }
 }
