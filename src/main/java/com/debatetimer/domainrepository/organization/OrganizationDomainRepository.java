@@ -9,6 +9,7 @@ import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.organization.OrganizationTemplateEntity;
 import com.debatetimer.repository.organization.OrganizationRepository;
 import com.debatetimer.repository.organization.OrganizationTemplateRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,10 @@ import org.springframework.stereotype.Repository;
 public class OrganizationDomainRepository {
 
     private final OrganizationRepository organizationRepository;
-    private final OrganizationTemplateRepository organizationTemplateDomainRepository;
+    private final OrganizationTemplateRepository organizationTemplateRepository;
 
     public List<Organization> findAll() {
-        Map<Long, List<OrganizationTemplate>> idToTemplatesEntity = organizationTemplateDomainRepository.findAll()
+        Map<Long, List<OrganizationTemplate>> idToTemplatesEntity = organizationTemplateRepository.findAll()
                 .stream()
                 .collect(groupingBy(
                         OrganizationTemplateEntity::getOrganizationId,
@@ -31,7 +32,8 @@ public class OrganizationDomainRepository {
 
         return organizationRepository.findAll()
                 .stream()
-                .map(entity -> entity.toDomain(idToTemplatesEntity.get(entity.getId())))
-                .toList();
+                .map(entity -> entity.toDomain(
+                        idToTemplatesEntity.getOrDefault(entity.getId(), Collections.emptyList()))
+                ).toList();
     }
 }
