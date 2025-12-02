@@ -1,7 +1,6 @@
 package com.debatetimer.scheduler;
 
 import com.debatetimer.domain.poll.PollStatus;
-import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.repository.poll.PollRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ public class PollCleanupScheduler {
     @Transactional
     public void cleanupStalePolls() {
         LocalDateTime threshold = LocalDateTime.now().minusHours(TIMEOUT_HOURS);
-        pollRepository.findAllByStatusAndCreatedAtBefore(PollStatus.PROGRESS, threshold)
-                .forEach(PollEntity::updateToDone);
+        pollRepository.updateStatusToDoneForOldPolls(PollStatus.PROGRESS, threshold);
     }
 }
