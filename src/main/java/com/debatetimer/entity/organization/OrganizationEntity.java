@@ -3,7 +3,6 @@ package com.debatetimer.entity.organization;
 import com.debatetimer.domain.organization.Organization;
 import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,7 +31,6 @@ public class OrganizationEntity extends BaseTimeEntity {
     @NotNull
     private String affiliation;
 
-    @Column(name = "icon_path")
     @NotBlank
     private String iconPath;
 
