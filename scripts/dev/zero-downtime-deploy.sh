@@ -177,7 +177,7 @@ switch_nginx_upstream() {
     log "nginx reloaded successfully"
 
     sleep 2
-    local response=$(curl -s -o /dev/null -w "%"{http_code}"" "http://localhost/" 2>/dev/null || echo "000")
+    local response=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost/" 2>/dev/null || echo "000")
     if [ "$response" = "000" ] || [ "$response" = "502" ] || [ "$response" = "503" ]; then
         log "nginx health check failed after reload (status: $response). Rolling back nginx config."
         sudo cp "$backup_conf" "$nginx_conf"
