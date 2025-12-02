@@ -30,6 +30,7 @@ public interface PollRepository extends Repository<PollEntity, Long> {
     }
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE PollEntity p SET p.status = com.debatetimer.domain.poll.PollStatus.DONE WHERE p.status = :status AND p.createdAt <= :threshold")
-    void updateStatusToDoneForOldPolls(@Param("status") PollStatus status, @Param("threshold") LocalDateTime threshold);
+    @Query("UPDATE PollEntity p SET p.status = :doneStatus WHERE p.status = :status AND p.createdAt <= :threshold")
+    void updateStatusToDoneForOldPolls(@Param("doneStatus") PollStatus doneStatus, @Param("status") PollStatus status,
+                                       @Param("threshold") LocalDateTime threshold);
 }

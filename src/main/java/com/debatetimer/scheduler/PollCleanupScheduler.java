@@ -22,6 +22,6 @@ public class PollCleanupScheduler {
     @Transactional
     public void cleanupStalePolls() {
         LocalDateTime threshold = LocalDateTime.now().minusHours(TIMEOUT_HOURS);
-        pollRepository.updateStatusToDoneForOldPolls(PollStatus.PROGRESS, threshold);
+        pollRepository.updateStatusToDoneForOldPolls(PollStatus.DONE, PollStatus.PROGRESS, threshold);
     }
 }
