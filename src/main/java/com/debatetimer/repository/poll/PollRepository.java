@@ -29,7 +29,7 @@ public interface PollRepository extends Repository<PollEntity, Long> {
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.POLL_NOT_FOUND));
     }
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE PollEntity p SET p.status = :doneStatus WHERE p.status = :status AND p.createdAt <= :threshold")
     void updateStatusToDoneForOldPolls(@Param("doneStatus") PollStatus doneStatus, @Param("status") PollStatus status,
                                        @Param("threshold") LocalDateTime threshold);

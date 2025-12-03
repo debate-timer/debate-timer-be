@@ -18,7 +18,7 @@ public class PollCleanupScheduler {
 
     private final PollDomainRepository pollDomainRepository;
 
-    @Scheduled(fixedRate = INTERVAL_MILLIS)
+    @Scheduled(fixedRate = INTERVAL_MILLIS, zone = "Asia/Seoul")
     @Transactional
     public void cleanupStalePolls() {
         LocalDateTime threshold = LocalDateTime.now().minusHours(TIMEOUT_HOURS);
