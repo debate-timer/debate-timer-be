@@ -1,8 +1,10 @@
 package com.debatetimer.domainrepository.poll;
 
 import com.debatetimer.domain.poll.Poll;
+import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.entity.poll.PollEntity;
 import com.debatetimer.repository.poll.PollRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +39,10 @@ public class PollDomainRepository {
         PollEntity pollEntity = pollRepository.getByIdAndMemberId(pollId, memberId);
         pollEntity.updateToDone();
         return pollEntity.toDomain();
+    }
+
+    @Transactional
+    public void updateStatusToDoneForOldPolls(PollStatus pollStatus, LocalDateTime threshold) {
+        pollRepository.updateStatusToDoneForOldPolls(PollStatus.DONE, pollStatus, threshold);
     }
 }
