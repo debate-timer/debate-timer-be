@@ -27,8 +27,8 @@ public class OrganizationDomainRepository {
                 .stream()
                 .collect(groupingBy(
                         OrganizationTemplateEntity::getOrganizationId,
-                        mapping(OrganizationTemplateEntity::toDomain, toList()))
-                );
+                        mapping(OrganizationTemplateEntity::toDomain, toList())
+                ));
 
         return organizationRepository.findAll()
                 .stream()
