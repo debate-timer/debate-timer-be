@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.dto.organization.OrganizationsResponse;
-import com.debatetimer.dto.poll.response.PollInfoResponse;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
