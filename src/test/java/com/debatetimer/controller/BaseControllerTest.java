@@ -16,6 +16,8 @@ import com.debatetimer.fixture.TokenGenerator;
 import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
 import com.debatetimer.fixture.entity.MemberGenerator;
+import com.debatetimer.fixture.entity.OrganizationEntityGenerator;
+import com.debatetimer.fixture.entity.OrganizationTemplateEntityGenerator;
 import com.debatetimer.fixture.entity.PollEntityGenerator;
 import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
@@ -56,6 +58,12 @@ public abstract class BaseControllerTest {
 
     @Autowired
     protected VoteEntityGenerator voteEntityGenerator;
+
+    @Autowired
+    protected OrganizationEntityGenerator organizationEntityGenerator;
+
+    @Autowired
+    protected OrganizationTemplateEntityGenerator organizationTemplateEntityGenerator;
 
     @Autowired
     protected HeaderGenerator headerGenerator;

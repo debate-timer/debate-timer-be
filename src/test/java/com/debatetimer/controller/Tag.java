@@ -7,7 +7,7 @@ public enum Tag {
     TIME_BASED_API("Time Based Table API"),
     CUSTOMIZE_API("Customize Table API"),
     POLL_API("Poll API"),
-    ;
+    ORGANIZATION_API("Organization API");
 
     private final String displayName;
 
