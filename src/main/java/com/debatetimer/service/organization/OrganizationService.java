@@ -1,4 +1,4 @@
-package com.debatetimer.service;
+package com.debatetimer.service.organization;
 
 import com.debatetimer.domainrepository.organization.OrganizationDomainRepository;
 import com.debatetimer.dto.organization.OrganizationsResponse;

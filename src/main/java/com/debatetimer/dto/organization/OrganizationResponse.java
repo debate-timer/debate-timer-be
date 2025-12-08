@@ -8,7 +8,7 @@ public record OrganizationResponse(
         String organization,
         String affiliation,
         String iconPath,
-        List<OrganizationTemplatesResponse> templates
+        List<OrganizationTemplateResponse> templates
 ) {
 
     public OrganizationResponse(Organization organization) {
@@ -20,9 +20,9 @@ public record OrganizationResponse(
         );
     }
 
-    private static List<OrganizationTemplatesResponse> toTemplatesResponse(List<OrganizationTemplate> templates) {
+    private static List<OrganizationTemplateResponse> toTemplatesResponse(List<OrganizationTemplate> templates) {
         return templates.stream()
-                .map(OrganizationTemplatesResponse::new)
+                .map(OrganizationTemplateResponse::new)
                 .toList();
     }
 }
