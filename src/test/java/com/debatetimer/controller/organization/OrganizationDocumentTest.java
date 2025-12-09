@@ -10,8 +10,8 @@ import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.dto.organization.OrganizationResponse;
+import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.dto.organization.OrganizationTemplateResponse;
-import com.debatetimer.dto.organization.OrganizationsResponse;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -41,7 +41,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
 
         @Test
         void 기관_템플릿_조회_성공() {
-            OrganizationsResponse response = new OrganizationsResponse(List.of(
+            OrganizationResponses response = new OrganizationResponses(List.of(
                     new OrganizationResponse("한앎", "한양대", "/icons/icon1.png", List.of(
                             new OrganizationTemplateResponse("템플릿1", DEFAULT_TEMPLATE_CONTENT),
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)

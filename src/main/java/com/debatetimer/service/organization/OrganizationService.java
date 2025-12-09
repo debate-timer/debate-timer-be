@@ -1,7 +1,7 @@
 package com.debatetimer.service.organization;
 
 import com.debatetimer.domainrepository.organization.OrganizationDomainRepository;
-import com.debatetimer.dto.organization.OrganizationsResponse;
+import com.debatetimer.dto.organization.OrganizationResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ public class OrganizationService {
 
     private final OrganizationDomainRepository organizationDomainRepository;
 
-    public OrganizationsResponse findAll() {
-        return OrganizationsResponse.from(organizationDomainRepository.findAll());
+    public OrganizationResponses findAll() {
+        return OrganizationResponses.from(organizationDomainRepository.findAll());
     }
 }
