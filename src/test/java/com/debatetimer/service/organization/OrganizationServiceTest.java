@@ -3,7 +3,7 @@ package com.debatetimer.service.organization;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.debatetimer.dto.organization.OrganizationsResponse;
+import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import com.debatetimer.service.BaseServiceTest;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +26,7 @@ class OrganizationServiceTest extends BaseServiceTest {
             organizationTemplateEntityGenerator.generate(organization1, "템플릿2");
             organizationTemplateEntityGenerator.generate(organization2, "릿플템1");
 
-            OrganizationsResponse response = organizationService.findAll();
+            OrganizationResponses response = organizationService.findAll();
 
             assertAll(
                     () -> assertThat(response.organizations()).hasSize(2),
@@ -37,7 +37,7 @@ class OrganizationServiceTest extends BaseServiceTest {
 
         @Test
         void 비어있을_경우_빈_객체를_반환한다() {
-            OrganizationsResponse response = organizationService.findAll();
+            OrganizationResponses response = organizationService.findAll();
 
             assertThat(response.organizations()).isEmpty();
         }

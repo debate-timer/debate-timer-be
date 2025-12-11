@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.dto.organization.OrganizationsResponse;
+import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
@@ -24,11 +24,11 @@ class OrganizationControllerTest extends BaseControllerTest {
             organizationTemplateEntityGenerator.generate(organization1, "템플릿2");
             organizationTemplateEntityGenerator.generate(organization2, "릿플템1");
 
-            OrganizationsResponse response = given()
+            OrganizationResponses response = given()
                     .contentType(ContentType.JSON)
                     .when().get("/api/organizations/templates")
                     .then().statusCode(HttpStatus.OK.value())
-                    .extract().as(OrganizationsResponse.class);
+                    .extract().as(OrganizationResponses.class);
 
             assertAll(
                     () -> assertThat(response.organizations()).hasSize(2),
