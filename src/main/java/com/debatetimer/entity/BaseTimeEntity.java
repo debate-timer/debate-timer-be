@@ -2,6 +2,7 @@ package com.debatetimer.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -21,4 +22,14 @@ public abstract class BaseTimeEntity {
     @NotNull
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (modifiedAt == null) {
+            modifiedAt = LocalDateTime.now();
+        }
+    }
 }
