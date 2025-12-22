@@ -60,7 +60,7 @@ public class CustomizeTableEntity extends BaseTimeEntity {
         this.consTeamName = customizeTable.getConsTeamName();
         this.warningBell = customizeTable.isWarningBell();
         this.finishBell = customizeTable.isFinishBell();
-        this.usedAt = LocalDateTime.now();
+        this.usedAt = customizeTable.getUsedAt();
     }
 
     public CustomizeTable toDomain() {
