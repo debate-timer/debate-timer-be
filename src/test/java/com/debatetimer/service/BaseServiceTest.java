@@ -5,6 +5,8 @@ import com.debatetimer.fixture.entity.BellEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
 import com.debatetimer.fixture.entity.MemberGenerator;
+import com.debatetimer.fixture.entity.OrganizationEntityGenerator;
+import com.debatetimer.fixture.entity.OrganizationTemplateEntityGenerator;
 import com.debatetimer.fixture.entity.PollEntityGenerator;
 import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.BellRepository;
@@ -54,6 +56,12 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected VoteEntityGenerator voteEntityGenerator;
+
+    @Autowired
+    protected OrganizationEntityGenerator organizationEntityGenerator;
+
+    @Autowired
+    protected OrganizationTemplateEntityGenerator organizationTemplateEntityGenerator;
 
     protected void runAtSameTime(int count, Runnable task) throws InterruptedException {
         List<Thread> threads = IntStream.range(0, count)

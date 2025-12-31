@@ -30,7 +30,7 @@ class CustomizeTableEntityTest {
         void 테이블의_사용_시각을_업데이트한다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
-                    true, true, LocalDateTime.now().minusNanos(1L));
+                    true, true, LocalDateTime.now().minusSeconds(1L));
             CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             LocalDateTime beforeUsedAt = customizeTableEntity.getUsedAt();
 
@@ -68,7 +68,7 @@ class CustomizeTableEntityTest {
         void 테이블_업데이트_할_때_사용_시간을_변경한다() {
             Member member = new Member("default@gmail.com");
             CustomizeTable table = new CustomizeTable(member, "tableName", "agenda", "찬성", "반대",
-                    true, true, LocalDateTime.now().minusNanos(1L));
+                    true, true, LocalDateTime.now().minusSeconds(1L));
             CustomizeTableEntity customizeTableEntity = new CustomizeTableEntity(table);
             CustomizeTable renewTable = new CustomizeTable(member, "newName", "newAgenda",
                     "newPros", "newCons", false, false, LocalDateTime.now());

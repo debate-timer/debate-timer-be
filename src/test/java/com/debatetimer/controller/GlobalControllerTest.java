@@ -4,11 +4,13 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Value;
 
 public class GlobalControllerTest extends BaseControllerTest {
 
-    @Value("${cors.origin}")
+    @Value("${cors.origin.cors-origin[0]}")
     private String corsOrigin;
 
     @Nested
@@ -40,6 +42,19 @@ public class GlobalControllerTest extends BaseControllerTest {
                     .header("Access-Control-Request-Headers", "Authorization, Content-Type")
                     .when().options("/")
                     .then().statusCode(403);
+        }
+    }
+
+    @Nested
+    class StaticFileTest {
+
+        @ValueSource(strings = {"/icon/government_icon.png", "/icon/han_alm_icon.png"})
+        @ParameterizedTest
+        void 정적_파일을_정상적으로_조회할_수_있다(String filePath) {
+            given()
+                    .when().get(filePath)
+                    .then().statusCode(200)
+                    .contentType("image/png");
         }
     }
 }

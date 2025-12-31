@@ -8,6 +8,8 @@ import com.debatetimer.fixture.entity.BellEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
 import com.debatetimer.fixture.entity.MemberGenerator;
+import com.debatetimer.fixture.entity.OrganizationEntityGenerator;
+import com.debatetimer.fixture.entity.OrganizationTemplateEntityGenerator;
 import com.debatetimer.fixture.entity.PollEntityGenerator;
 import com.debatetimer.fixture.entity.VoteEntityGenerator;
 import com.debatetimer.repository.customize.BellRepository;
@@ -48,6 +50,12 @@ public abstract class BaseDomainRepositoryTest {
 
     @Autowired
     protected VoteEntityGenerator voteEntityGenerator;
+
+    @Autowired
+    protected OrganizationEntityGenerator organizationEntityGenerator;
+
+    @Autowired
+    protected OrganizationTemplateEntityGenerator organizationTemplateEntityGenerator;
 
     @Autowired
     protected PollRepository pollRepository;
