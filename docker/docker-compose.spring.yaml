@@ -1,0 +1,34 @@
+services:
+  app-blue:
+    image: my-app:latest
+    container_name: app-blue
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app-blue.rule=Host(`test.debate-timer.com`)"
+      - "traefik.http.services.app-blue.loadbalancer.server.port=8080"
+      - "traefik.http.routers.app-blue.entrypoints=websecure"
+      - "traefik.http.routers.app-blue.tls=true"
+      - "traefik.http.routers.app-blue.tls.certresolver=myresolver"
+    networks:
+      - web-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      retries: 3
+
+  app-green:
+    image: my-app:latest
+    container_name: app-green
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app-green.rule=Host(`test.debate-timer.com`)"
+      - "traefik.http.services.app-green.loadbalancer.server.port=8080"
+      - "traefik.http.routers.app-green.entrypoints=websecure"
+      - "traefik.http.routers.app-green.tls=true"
+      - "traefik.http.routers.app-green.tls.certresolver=myresolver"
+    networks:
+      - web-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      retries: 3
