@@ -19,10 +19,14 @@ services:
 
       # 3. 인증서 발급 설정 (Let's Encrypt)
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=debatetimekepping@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.email=debatetimekeeping@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
     networks:
       - web-gateway
+
+networks:
+  web-gateway:
+    external: true

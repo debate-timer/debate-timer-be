@@ -1,10 +1,10 @@
 services:
   app-blue:
-    image: my-app:latest
+    image: debatetimer/debate_timer:${TAG:-latest}
     container_name: app-blue
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app-blue.rule=Host(`test.debate-timer.com`)"
+      - "traefik.http.routers.app-blue.rule=Host(`api.test.debate-timer.com`)"
       - "traefik.http.services.app-blue.loadbalancer.server.port=8080"
       - "traefik.http.routers.app-blue.entrypoints=websecure"
       - "traefik.http.routers.app-blue.tls=true"
@@ -12,16 +12,16 @@ services:
     networks:
       - web-gateway
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
       retries: 3
 
   app-green:
-    image: my-app:latest
+    image: debatetimer/debate_timer:${TAG:-latest}
     container_name: app-green
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app-green.rule=Host(`test.debate-timer.com`)"
+      - "traefik.http.routers.app-green.rule=Host(`api.test.debate-timer.com`)"
       - "traefik.http.services.app-green.loadbalancer.server.port=8080"
       - "traefik.http.routers.app-green.entrypoints=websecure"
       - "traefik.http.routers.app-green.tls=true"
@@ -29,6 +29,10 @@ services:
     networks:
       - web-gateway
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
       retries: 3
+
+networks:
+  web-gateway:
+    external: true

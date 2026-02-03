@@ -1,10 +1,10 @@
-FROM openjdk:17-jdk-slim as builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /workspace
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /workspace
 
 COPY --from=builder /workspace/dependencies/ ./
