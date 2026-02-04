@@ -1,10 +1,27 @@
 services:
   app-blue:
-    image: debatetimer/debate_timer:${TAG:-latest}
+    image: debatetimer/debate_timer:${TAG}
     container_name: app-blue
     environment:
+      - SERVER_FORWARD_HEADERS_STRATEGY=framework
       - SPRING_PROFILES_ACTIVE=${PROFILE:-dev,monitor}
       - TZ=Asia/Seoul
+
+      - DD_AGENT_HOST=datadog-agent
+      - DD_SERVICE=debate-timer
+      - DD_ENV=${TAG}
+      - DD_VERSION=1.0.0
+      - DD_LOGS_INJECTION=true
+      - DD_PROFILING_ENABLED=true
+      - DD_PROFILING_ALLOCATION_ENABLED=true
+      - DD_PROFILING_HEAP_ENABLED=true
+
+      - MANAGEMENT_METRICS_EXPORT_STATSD_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_STATSD_FLAVOR=datadog
+      - MANAGEMENT_METRICS_EXPORT_STATSD_HOST=datadog-agent
+      - MANAGEMENT_METRICS_EXPORT_STATSD_PORT=8125
+      - MANAGEMENT_METRICS_EXPORT_STATSD_PROTOCOL=UDP
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app-blue.rule=Host(`api.test.debate-timer.com`)"
@@ -18,22 +35,45 @@ services:
       - "traefik.http.routers.app-blue-monitor.entrypoints=monitoring"
       - "traefik.http.routers.app-blue-monitor.service=app-blue-monitor-svc"
       - "traefik.http.services.app-blue-monitor-svc.loadbalancer.server.port=8083"
+
+      - "com.datadoghq.ad.logs=[{\"source\": \"java\", \"service\": \"debate-timer\"}]"
+
     networks:
       - debate-timer-net
     depends_on:
       traefik:
         condition: service_healthy
+      datadog-agent:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/monitoring/health" ]
       interval: 10s
       retries: 3
+      start_period: 300s
 
   app-green:
-    image: debatetimer/debate_timer:${TAG:-latest}
+    image: debatetimer/debate_timer:${TAG}
     container_name: app-green
     environment:
+      - SERVER_FORWARD_HEADERS_STRATEGY=framework
       - SPRING_PROFILES_ACTIVE=${PROFILE:-dev,monitor}
       - TZ=Asia/Seoul
+
+      - DD_AGENT_HOST=datadog-agent
+      - DD_SERVICE=debate-timer
+      - DD_ENV=${TAG}
+      - DD_VERSION=1.0.0
+      - DD_LOGS_INJECTION=true
+      - DD_PROFILING_ENABLED=true
+      - DD_PROFILING_ALLOCATION_ENABLED=true
+      - DD_PROFILING_HEAP_ENABLED=true
+
+      - MANAGEMENT_METRICS_EXPORT_STATSD_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_STATSD_FLAVOR=datadog
+      - MANAGEMENT_METRICS_EXPORT_STATSD_HOST=datadog-agent
+      - MANAGEMENT_METRICS_EXPORT_STATSD_PORT=8125
+      - MANAGEMENT_METRICS_EXPORT_STATSD_PROTOCOL=UDP
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app-green.rule=Host(`api.test.debate-timer.com`)"
@@ -46,13 +86,18 @@ services:
       - "traefik.http.routers.app-green-monitor.entrypoints=monitoring"
       - "traefik.http.routers.app-green-monitor.service=app-green-monitor-svc"
       - "traefik.http.services.app-green-monitor-svc.loadbalancer.server.port=8083"
+
+      - "com.datadoghq.ad.logs=[{\"source\": \"java\", \"service\": \"debate-timer\"}]"
+
     networks:
       - debate-timer-net
     depends_on:
       traefik:
         condition: service_healthy
+      datadog-agent:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/monitoring/health" ]
       interval: 10s
       retries: 3
-      start_period: 180s
+      start_period: 300s

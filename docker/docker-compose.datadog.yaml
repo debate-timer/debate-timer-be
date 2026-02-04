@@ -1,0 +1,30 @@
+services:
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: datadog-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=us5.datadoghq.com
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_APM_IGNORE_RESOURCES=/monitoring/health
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_TAGS=env:${TAG:-dev},project:debate-timer
+    ports:
+      - "8125:8125/udp" # Metrics (StatsD)
+      - "8126:8126/tcp" # APM (Trace)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # 로그 수집 필수
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup/:ro
+    networks:
+      - debate-timer-net
+    healthcheck:
+      test: ["CMD", "agent", "health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
