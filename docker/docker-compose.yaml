@@ -5,6 +5,7 @@ include:
   - docker-compose.spring.yaml
 
 networks:
-  web-gateway:
-    name: web-gateway
+  debate-timer-net:
+    name: debate-timer-net
     driver: bridge
+

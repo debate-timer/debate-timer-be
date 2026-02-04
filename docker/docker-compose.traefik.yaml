@@ -1,32 +1,40 @@
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:v2.11
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
+      - "8083:8083"
+    environment:
+      - DOCKER_API_VERSION=1.44
     command:
-      # 1. 기본 설정
       - "--api.insecure=true"
+      - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
 
-      # 2. EntryPoints 설정 (HTTP -> HTTPS 리다이렉트)
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
 
-      # 3. 인증서 발급 설정 (Let's Encrypt)
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=debatetimekeeping@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+      - "--entrypoints.monitoring.address=:8083"
+
+      - "--api.insecure=true"
+      - "--ping=true"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8080/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
+      - ../letsencrypt:/letsencrypt
     networks:
-      - web-gateway
-
-networks:
-  web-gateway:
-    external: true
+      - debate-timer-net

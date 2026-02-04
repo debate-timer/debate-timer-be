@@ -2,23 +2,38 @@ services:
   app-blue:
     image: debatetimer/debate_timer:${TAG:-latest}
     container_name: app-blue
+    environment:
+      - SPRING_PROFILES_ACTIVE=${PROFILE:-dev,monitor}
+      - TZ=Asia/Seoul
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app-blue.rule=Host(`api.test.debate-timer.com`)"
-      - "traefik.http.services.app-blue.loadbalancer.server.port=8080"
       - "traefik.http.routers.app-blue.entrypoints=websecure"
       - "traefik.http.routers.app-blue.tls=true"
       - "traefik.http.routers.app-blue.tls.certresolver=myresolver"
+      - "traefik.http.services.app-blue.loadbalancer.server.port=8080"
+      - "traefik.http.routers.app-blue.service=app-blue"
+
+      - "traefik.http.routers.app-blue-monitor.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app-blue-monitor.entrypoints=monitoring"
+      - "traefik.http.routers.app-blue-monitor.service=app-blue-monitor-svc"
+      - "traefik.http.services.app-blue-monitor-svc.loadbalancer.server.port=8083"
     networks:
-      - web-gateway
+      - debate-timer-net
+    depends_on:
+      traefik:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/monitoring/health" ]
       interval: 10s
       retries: 3
 
   app-green:
     image: debatetimer/debate_timer:${TAG:-latest}
     container_name: app-green
+    environment:
+      - SPRING_PROFILES_ACTIVE=${PROFILE:-dev,monitor}
+      - TZ=Asia/Seoul
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app-green.rule=Host(`api.test.debate-timer.com`)"
@@ -26,13 +41,18 @@ services:
       - "traefik.http.routers.app-green.entrypoints=websecure"
       - "traefik.http.routers.app-green.tls=true"
       - "traefik.http.routers.app-green.tls.certresolver=myresolver"
+
+      - "traefik.http.routers.app-green-monitor.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app-green-monitor.entrypoints=monitoring"
+      - "traefik.http.routers.app-green-monitor.service=app-green-monitor-svc"
+      - "traefik.http.services.app-green-monitor-svc.loadbalancer.server.port=8083"
     networks:
-      - web-gateway
+      - debate-timer-net
+    depends_on:
+      traefik:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/monitoring/health" ]
       interval: 10s
       retries: 3
-
-networks:
-  web-gateway:
-    external: true
+      start_period: 180s
