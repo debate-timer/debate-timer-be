@@ -30,9 +30,8 @@ sudo usermod -aG docker $USER
 echo "5. 로그인 진행 (변수 입력했을 경우에만)"
 if [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_TOKEN" ]; then
     echo "입력된 정보로 Docker Hub 로그인을 시도합니다..."
-    echo "$DOCKER_TOKEN" | sg docker -c "docker login -u $DOCKER_USER --password-stdin"
-    
-    if [ $? -eq 0 ]; then
+
+    if echo "$DOCKER_TOKEN" | sg docker -c "docker login -u \"$DOCKER_USER\" --password-stdin"; then
         echo "✅ 로그인 성공! (config.json이 생성되었습니다)"
     else
         echo "❌ 로그인 실패. 아이디/토큰을 확인하거나 'newgrp docker' 후 다시 시도하세요."
