@@ -11,6 +11,7 @@ services:
       - DOCKER_API_VERSION=1.44
     command:
       - "--api.insecure=true"
+      - "--ping=true"
       - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -25,15 +26,12 @@ services:
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 
       - "--entrypoints.monitoring.address=:8083"
-
-      - "--api.insecure=true"
-      - "--ping=true"
     healthcheck:
       test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8080/ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ../letsencrypt:/letsencrypt

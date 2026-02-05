@@ -4,7 +4,7 @@ management:
       export:
         enabled: true
         flavor: datadog
-        host: ${MANAGEMENT_METRICS_EXPORT_STATSD_HOST:localhost}
+        host: ${MANAGEMENT_STATSD_METRICS_EXPORT_HOST:localhost}
         port: 8125
         protocol: UDP
 
