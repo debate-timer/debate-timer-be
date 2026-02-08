@@ -2,7 +2,7 @@
 
 # --- 설정 변수 ---
 SWAP_FILE="/swapfile"
-SWAP_SIZE="2G"
+SWAP_SIZE=${1:-"2G"}
 FSTAB_FILE="/etc/fstab"
 
 # 1. 루트 권한 확인
@@ -40,6 +40,5 @@ if ! grep -q "$SWAP_FILE" "$FSTAB_FILE"; then
 fi
 
 echo "=== 모든 작업이 완료되었습니다 ==="
-echo ""
 echo "[현재 메모리 상태]"
 free -h
