@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e # 스크립트 실행 중 에러 발생 시 즉시 중단 (안전 장치)
+
 # --- 설정 변수 ---
 SWAP_FILE="/swapfile"
 SWAP_SIZE=${1:-"2G"}
