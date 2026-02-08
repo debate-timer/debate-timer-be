@@ -12,7 +12,7 @@ services:
     command:
       - "--api.insecure=true"
       - "--ping=true"
-      - "--log.level=DEBUG"
+      - "--log.level=INFO"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
 

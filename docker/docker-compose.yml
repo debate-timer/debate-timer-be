@@ -1,9 +1,9 @@
 name: debate-timer-server
 
 include:
-  - docker-compose.traefik.yaml
-  - docker-compose.spring.yaml
-  - docker-compose.datadog.yaml
+  - docker-compose.traefik.yml
+  - docker-compose.spring.yml
+  - docker-compose.datadog.yml
 
 networks:
   debate-timer-net:
