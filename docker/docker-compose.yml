@@ -2,6 +2,7 @@ name: debate-timer-server
 
 include:
   - docker-compose.traefik.yml
+  - docker-compose.webhook.yml
   - docker-compose.spring.yml
   - docker-compose.datadog.yml
 

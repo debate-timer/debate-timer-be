@@ -1,0 +1,10 @@
+[
+  {
+    "id": "deploy",
+    "execute-command": "/home/ubuntu/scripts/deploy-docker.sh",
+    "command-working-directory": "/home/ubuntu",
+    "pass-arguments-to-command": [
+      { "source": "entire-payload" }
+    ]
+  }
+]
