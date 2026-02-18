@@ -59,7 +59,8 @@ dependencies {
 
     // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.micrometer:micrometer-registry-statsd'
+    implementation 'io.micrometer:micrometer-registry-prometheus' // Before
+    implementation 'io.micrometer:micrometer-registry-statsd' // After
 
     // DB schema manager
     implementation 'org.flywaydb:flyway-mysql'
