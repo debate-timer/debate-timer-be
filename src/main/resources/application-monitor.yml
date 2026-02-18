@@ -1,4 +1,13 @@
 management:
+  statsd:
+    metrics:
+      export:
+        enabled: true
+        flavor: datadog
+        host: ${MANAGEMENT_STATSD_METRICS_EXPORT_HOST:localhost}
+        port: 8125
+        protocol: UDP
+
   server:
     port: 8083
 

@@ -1,0 +1,11 @@
+name: debate-timer-server
+
+include:
+  - docker-compose.traefik.yml
+  - docker-compose.spring.yml
+  - docker-compose.datadog.yml
+
+networks:
+  debate-timer-net:
+    name: debate-timer-net
+    driver: bridge
