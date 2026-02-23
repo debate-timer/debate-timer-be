@@ -2,7 +2,7 @@ x-app-template: &app-template
   image: debatetimer/debate_timer:${ENV:-dev}
   environment:
     - SERVER_FORWARD_HEADERS_STRATEGY=framework
-    - SPRING_PROFILES_ACTIVE=${PROFILE:-dev,monitor}
+    - SPRING_PROFILES_ACTIVE=${ENV:-dev},monitor
     - TZ=Asia/Seoul
 
     - DD_AGENT_HOST=datadog-agent
@@ -26,14 +26,12 @@ x-app-template: &app-template
   depends_on:
     traefik:
       condition: service_healthy
-    datadog-agent:
-      condition: service_healthy
 
   healthcheck:
     test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/monitoring/health" ]
     interval: 60s
-    retries: 5
-    start_period: 300s
+    retries: 10
+    start_period: 450s
 
 services:
   app-blue:

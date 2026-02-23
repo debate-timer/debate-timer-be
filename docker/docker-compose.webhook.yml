@@ -8,8 +8,6 @@ services:
     command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
     environment:
       - ENV=${ENV:-dev}
-      - DOCKER_USER=${DOCKER_USER:-blank}
-      - DOCKER_TOKEN=${DOCKER_TOKEN:-blank}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.webhook.rule=Host(`webhook.${ENV:-dev}.debate-timer.com`)"
@@ -19,6 +17,7 @@ services:
       - "traefik.http.services.webhook.loadbalancer.server.port=9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ubuntu/.docker:/root/.docker:ro
       - ./hooks.json:/etc/webhook/hooks.json
       - ../scripts/deploy:/home/ubuntu/scripts
       - ../docker:/home/ubuntu/docker

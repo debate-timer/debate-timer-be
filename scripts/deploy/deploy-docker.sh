@@ -21,17 +21,16 @@ fi
 
 echo "현재 실행중인 서비스: ${CURRENT_SERVICE:-없음}"
 echo "앞으로 띄울 서비스: $TARGET_SERVICE"
-
-export ENV=$TARGET_ENV # docker-compose.yml에서 ENV 변수를 사용할 수 있도록 설정
+export ENV=$TARGET_ENV
 
 echo "최근 이미지 가져오는 중 (ENV: $TARGET_ENV)"
 docker-compose pull $TARGET_SERVICE
 
 echo "컨테이너 실행 중 - $TARGET_SERVICE..."
-docker-compose up -d $TARGET_SERVICE
+docker-compose up -d --no-deps $TARGET_SERVICE
 
 echo "헬스 체크 진행 중 - $TARGET_SERVICE"
-MAX_RETRIES=60
+MAX_RETRIES=90
 SLEEP_SECOND=10
 COUNT=0
 
@@ -45,7 +44,7 @@ while [ $COUNT -lt $MAX_RETRIES ]; do
     fi
 
     echo "헬스체크 진행 중 ($COUNT/$MAX_RETRIES) - 현재 상태: $HEALTH_STATUS"
-    # sleep $SLEEP_SECOND
+    sleep $SLEEP_SECOND
     COUNT=$((COUNT + 1))
 done
 
