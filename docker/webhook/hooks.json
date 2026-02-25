@@ -6,5 +6,11 @@
     "pass-arguments-to-command": [
       { "source": "entire-payload" }
     ]
+  },
+  {
+    "id": "status",
+    "execute-command": "/home/ubuntu/scripts/check-deploy-status.sh",
+    "command-working-directory": "/home/ubuntu",
+    "include-command-output-in-response": true
   }
 ]

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo "스크립트 실행 여부를 확인합니다."
+LOCK_FILE="/tmp/deploy-application.lock"
+exec 200>"$LOCK_FILE"
+flock -n 200 || { echo "⚠️ 이미 배포 스크립트가 실행 중입니다. 중복 실행을 차단합니다."; exit 1; }
+echo "스크립트를 실행하고 있지 않습니다. 배포를 시작합니다."
+
 TARGET_ENV=${ENV:-dev}
 PROJECT_DIR="/home/ubuntu/docker"
 TARGET_SERVICE="application"
