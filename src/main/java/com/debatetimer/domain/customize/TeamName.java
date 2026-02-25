@@ -8,7 +8,7 @@ import lombok.Getter;
 public class TeamName {
 
     private static final String NAME_REGEX = "^[\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\s]+$";
-    public static final int NAME_MAX_LENGTH = 8;
+    public static final int NAME_MAX_LENGTH = 15;
 
     private final String value;
 
