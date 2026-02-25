@@ -41,6 +41,7 @@ services:
       - "traefik.http.routers.application.entrypoints=websecure"
       - "traefik.http.routers.application.tls=true"
       - "traefik.http.routers.application.tls.certresolver=myresolver"
+      - "traefik.http.routers.application.service=application"
       - "traefik.http.services.application.loadbalancer.server.port=8080"
 
       - "traefik.http.routers.application-monitor.rule=PathPrefix(`/`)"

@@ -2,7 +2,7 @@ services:
   webhook:
     build:
       context: ..
-      dockerfile: ./webhook.Dockerfile
+      dockerfile: ./webhook/webhook.Dockerfile
     container_name: webhook
     user: root
     command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
