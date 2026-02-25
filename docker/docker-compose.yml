@@ -1,10 +1,10 @@
 name: debate-timer-server
 
 include:
-  - docker-compose.traefik.yml
-  - docker-compose.webhook.yml
-  - docker-compose.spring.yml
-  - docker-compose.datadog.yml
+  - ./application/docker-compose.application.yml
+  - ./datadog/docker-compose.datadog.yml
+  - ./traefik/docker-compose.traefik.yml
+  - ./webhook/docker-compose.webhook.yml
 
 networks:
   debate-timer-net:

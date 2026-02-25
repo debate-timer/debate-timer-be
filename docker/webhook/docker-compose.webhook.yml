@@ -1,8 +1,8 @@
 services:
   webhook:
     build:
-      context: .
-      dockerfile: webhook.Dockerfile
+      context: ..
+      dockerfile: ./webhook.Dockerfile
     container_name: webhook
     user: root
     command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
@@ -19,8 +19,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/ubuntu/.docker:/root/.docker:ro
       - ./hooks.json:/etc/webhook/hooks.json
-      - ../scripts/deploy:/home/ubuntu/scripts
-      - ../docker:/home/ubuntu/docker
+      - ../../scripts/deploy:/home/ubuntu/scripts
+      - ..:/home/ubuntu/docker
     networks:
       - debate-timer-net
     depends_on:
