@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "$SECRET_TOKEN" ] || [ "$REQUEST_TOKEN" != "$SECRET_TOKEN" ]; then
+    echo '{"status": "error", "message": "Unauthorized request. Invalid Token."}'
+    exit 0
+fi
+
 LOCK_FILE="/tmp/deploy-application.lock"
 
 exec 200>"$LOCK_FILE"

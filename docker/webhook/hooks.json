@@ -3,6 +3,13 @@
     "id": "deploy",
     "execute-command": "/home/ubuntu/scripts/deploy-docker.sh",
     "command-working-directory": "/home/ubuntu",
+    "pass-environment-to-command": [
+      {
+        "source": "header",
+        "name": "X-Deploy-Token",
+        "envname": "REQUEST_TOKEN"
+      }
+    ],
     "pass-arguments-to-command": [
       { "source": "entire-payload" }
     ]
@@ -11,6 +18,19 @@
     "id": "status",
     "execute-command": "/home/ubuntu/scripts/check-deploy-status.sh",
     "command-working-directory": "/home/ubuntu",
-    "include-command-output-in-response": true
+    "include-command-output-in-response": true,
+    "response-headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "pass-environment-to-command": [
+      {
+        "source": "header",
+        "name": "X-Deploy-Token",
+        "envname": "REQUEST_TOKEN"
+      }
+    ]
   }
 ]

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "$SECRET_TOKEN" ] || [ "$REQUEST_TOKEN" != "$SECRET_TOKEN" ]; then
+    echo "[$(date)] 🚨 보안 경고: 유효하지 않은 배포 요청입니다. (Unauthorized)"
+    exit 1
+fi
+
 echo "스크립트 실행 여부를 확인합니다."
 LOCK_FILE="/tmp/deploy-application.lock"
 exec 200>"$LOCK_FILE"

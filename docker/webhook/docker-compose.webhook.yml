@@ -8,6 +8,7 @@ services:
     command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
     environment:
       - ENV=${ENV:-dev}
+      - SECRET_TOKEN=${WEBHOOK_KEY:-blank}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.webhook.rule=Host(`webhook.${ENV:-dev}.debate-timer.com`)"
