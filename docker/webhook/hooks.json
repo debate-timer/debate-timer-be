@@ -1,8 +1,8 @@
 [
   {
     "id": "deploy",
-    "execute-command": "/home/ubuntu/scripts/deploy-docker.sh",
-    "command-working-directory": "/home/ubuntu",
+    "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/deploy-docker.sh",
+    "command-working-directory": "/home/ubuntu/debate-timer",
     "pass-environment-to-command": [
       {
         "source": "header",
@@ -16,8 +16,8 @@
   },
   {
     "id": "status",
-    "execute-command": "/home/ubuntu/scripts/check-deploy-status.sh",
-    "command-working-directory": "/home/ubuntu",
+    "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/check-deploy-status.sh",
+    "command-working-directory": "/home/ubuntu/debate-timer",
     "include-command-output-in-response": true,
     "response-headers": [
       {

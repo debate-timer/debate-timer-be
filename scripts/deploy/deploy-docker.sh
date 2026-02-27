@@ -12,23 +12,43 @@ flock -n 200 || { echo "⚠️ 이미 배포 스크립트가 실행 중입니다
 echo "스크립트를 실행하고 있지 않습니다. 배포를 시작합니다."
 
 TARGET_ENV=${ENV:-dev}
-PROJECT_DIR="/home/ubuntu/docker"
+PROJECT_DIR="/home/ubuntu/debate-timer"
+DOCKER_DIR="/home/ubuntu/debate-timer/docker"
 TARGET_SERVICE="application"
 
-cd $PROJECT_DIR || { echo "디렉토리 이동 실패"; exit 1; }
+echo "--- Git 저장소 최신화 시작 ---"
+cd $PROJECT_DIR || { echo "프로젝트 디렉토리 이동 실패"; exit 1; }
 
+if [ "$TARGET_ENV" = "prod" ]; then
+    echo "▶ [ENV: prod] main 브랜치로 이동하여 최신 코드를 가져옵니다."
+    git fetch origin main
+    git switch main
+    git reset --hard origin/main # 로컬 변경사항 무시하고 원격과 완벽히 일치시킴
+elif [ "$TARGET_ENV" = "dev" ]; then
+    echo "▶ [ENV: dev] develop 브랜치로 이동하여 최신 코드를 가져옵니다."
+    git fetch origin develop
+    git switch develop
+    git reset --hard origin/develop
+else
+    CURRENT_BRANCH=$(git branch --show-current)
+    echo "▶ [ENV: $TARGET_ENV] 현재 브랜치($CURRENT_BRANCH)에서 최신 코드를 가져옵니다."
+    git fetch origin "$CURRENT_BRANCH"
+    git reset --hard origin/"$CURRENT_BRANCH"
+fi
+
+cd $DOCKER_DIR || { echo "디렉토리 이동 실패"; exit 1; }
 echo "--- 중단 배포 시작 ENV: $TARGET_ENV at $(date) ---"
 export ENV=$TARGET_ENV
 
 echo "최근 이미지 가져오는 중 (ENV: $TARGET_ENV)"
-docker-compose pull $TARGET_SERVICE
+docker compose pull $TARGET_SERVICE
 if docker ps --format '{{.Names}}' | grep -q "^${TARGET_SERVICE}$"; then
     echo "기존 $TARGET_SERVICE 중지 및 제거 중..."
-    docker-compose stop $TARGET_SERVICE
+    docker compose stop $TARGET_SERVICE
 fi
 
 echo "새 컨테이너 실행 중 - $TARGET_SERVICE..."
-docker-compose up -d --no-deps $TARGET_SERVICE
+docker compose up -d --no-deps $TARGET_SERVICE
 
 echo "헬스 체크 진행 중 - $TARGET_SERVICE"
 MAX_RETRIES=100

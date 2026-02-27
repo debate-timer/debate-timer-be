@@ -20,8 +20,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/ubuntu/.docker:/root/.docker:ro
       - ./hooks.json:/etc/webhook/hooks.json
-      - ../../scripts/deploy:/home/ubuntu/scripts
-      - ..:/home/ubuntu/docker
+      - ../..:/home/ubuntu/debate-timer
     networks:
       - debate-timer-net
     depends_on:
