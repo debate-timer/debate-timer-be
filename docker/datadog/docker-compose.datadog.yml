@@ -3,7 +3,7 @@ services:
     image: gcr.io/datadoghq/agent:7
     container_name: datadog-agent
     environment:
-      - DD_API_KEY=${DD_API_KEY:-blank}
+      - DD_API_KEY=${DD_API_KEY}
       - DD_SITE=us5.datadoghq.com
       - DD_HOSTNAME=debate-timer-${ENV:-dev}-server
       - DD_APM_ENABLED=true

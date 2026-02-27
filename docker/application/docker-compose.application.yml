@@ -10,7 +10,7 @@ services:
       - DD_AGENT_HOST=datadog-agent
       - DD_SERVICE=debate-timer
       - DD_ENV=${ENV:-dev}
-      - DD_VERSION=1.0.0
+      - DD_VERSION=${APP_VERSION:-1.0.0}
       - DD_LOGS_INJECTION=true
       - DD_PROFILING_ENABLED=true
       - DD_PROFILING_ALLOCATION_ENABLED=true

@@ -1,6 +1,7 @@
 [
   {
     "id": "deploy",
+    "http-methods": ["POST"],
     "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/deploy-docker.sh",
     "command-working-directory": "/home/ubuntu/debate-timer",
     "pass-environment-to-command": [
@@ -16,6 +17,7 @@
   },
   {
     "id": "status",
+    "http-methods": ["GET"],
     "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/check-deploy-status.sh",
     "command-working-directory": "/home/ubuntu/debate-timer",
     "include-command-output-in-response": true,

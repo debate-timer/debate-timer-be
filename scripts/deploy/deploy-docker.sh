@@ -31,6 +31,10 @@ elif [ "$TARGET_ENV" = "dev" ]; then
     git reset --hard origin/develop
 else
     CURRENT_BRANCH=$(git branch --show-current)
+    if [ -z "$CURRENT_BRANCH" ]; then
+        echo "❌ 현재 브랜치를 확인할 수 없습니다 (detached HEAD 상태일 수 있음)"
+        exit 1
+    fi
     echo "▶ [ENV: $TARGET_ENV] 현재 브랜치($CURRENT_BRANCH)에서 최신 코드를 가져옵니다."
     git fetch origin "$CURRENT_BRANCH"
     git reset --hard origin/"$CURRENT_BRANCH"
@@ -41,7 +45,7 @@ echo "--- 중단 배포 시작 ENV: $TARGET_ENV at $(date) ---"
 export ENV=$TARGET_ENV
 
 echo "최근 이미지 가져오는 중 (ENV: $TARGET_ENV)"
-docker compose pull $TARGET_SERVICE
+docker compose pull $TARGET_SERVICE || { echo "❌ 이미지 풀 실패"; exit 1; }
 if docker ps --format '{{.Names}}' | grep -q "^${TARGET_SERVICE}$"; then
     echo "기존 $TARGET_SERVICE 중지 및 제거 중..."
     docker compose stop $TARGET_SERVICE
