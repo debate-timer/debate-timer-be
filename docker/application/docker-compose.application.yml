@@ -51,4 +51,4 @@ services:
 
       - "com.datadoghq.ad.logs=[{\"source\": \"java\", \"service\": \"debate-timer\"}]"
 
-    restart: always
+    restart: unless-stopped
