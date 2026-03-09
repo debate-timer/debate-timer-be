@@ -1,0 +1,12 @@
+name: debate-timer-server
+
+include:
+  - ./application/docker-compose.application.yml
+  - ./datadog/docker-compose.datadog.yml
+  - ./traefik/docker-compose.traefik.yml
+  - ./webhook/docker-compose.webhook.yml
+
+networks:
+  debate-timer-net:
+    name: debate-timer-net
+    driver: bridge

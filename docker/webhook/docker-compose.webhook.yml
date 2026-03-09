@@ -1,0 +1,35 @@
+services:
+  webhook:
+    build:
+      context: ..
+      dockerfile: ./webhook/webhook.Dockerfile
+    container_name: webhook
+    user: root
+    command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
+    environment:
+      - ENV=${ENV:-dev}
+      - SECRET_TOKEN=${WEBHOOK_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webhook.rule=Host(`webhook.${ENV:-dev}.debate-timer.com`)"
+      - "traefik.http.routers.webhook.entrypoints=websecure"
+      - "traefik.http.routers.webhook.tls=true"
+      - "traefik.http.routers.webhook.tls.certresolver=myresolver"
+      - "traefik.http.services.webhook.loadbalancer.server.port=9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ubuntu/.docker:/root/.docker:ro
+      - ./hooks.json:/etc/webhook/hooks.json
+      - ../..:/home/ubuntu/debate-timer
+    networks:
+      - debate-timer-net
+    depends_on:
+      traefik:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9000 || exit 1"]
+      interval: 120s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: always

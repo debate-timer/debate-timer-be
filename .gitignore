@@ -36,6 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### deploy
+/letsencrypt/acme.json
+
 ### Rest Docs
 /src/main/resources/static/docs/openapi3.yaml
 
