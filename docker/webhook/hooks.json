@@ -1,0 +1,38 @@
+[
+  {
+    "id": "deploy",
+    "http-methods": ["POST"],
+    "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/deploy-docker.sh",
+    "command-working-directory": "/home/ubuntu/debate-timer",
+    "pass-environment-to-command": [
+      {
+        "source": "header",
+        "name": "X-Deploy-Token",
+        "envname": "REQUEST_TOKEN"
+      }
+    ],
+    "pass-arguments-to-command": [
+      { "source": "entire-payload" }
+    ]
+  },
+  {
+    "id": "status",
+    "http-methods": ["GET"],
+    "execute-command": "/home/ubuntu/debate-timer/scripts/deploy/check-deploy-status.sh",
+    "command-working-directory": "/home/ubuntu/debate-timer",
+    "include-command-output-in-response": true,
+    "response-headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "pass-environment-to-command": [
+      {
+        "source": "header",
+        "name": "X-Deploy-Token",
+        "envname": "REQUEST_TOKEN"
+      }
+    ]
+  }
+]

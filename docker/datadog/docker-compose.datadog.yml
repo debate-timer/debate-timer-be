@@ -5,6 +5,7 @@ services:
     environment:
       - DD_API_KEY=${DD_API_KEY}
       - DD_SITE=us5.datadoghq.com
+      - DD_HOSTNAME=debate-timer-${ENV:-dev}-server
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
       - DD_APM_IGNORE_RESOURCES=/monitoring/health
@@ -25,6 +26,6 @@ services:
     healthcheck:
       test: ["CMD", "agent", "health"]
       interval: 60s
-      timeout: 10s
+      timeout: 30s
       retries: 5
       start_period: 120s

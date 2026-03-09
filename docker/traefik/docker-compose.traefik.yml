@@ -34,6 +34,6 @@ services:
       start_period: 120s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../letsencrypt:/letsencrypt
+      - ../../letsencrypt:/letsencrypt
     networks:
       - debate-timer-net
