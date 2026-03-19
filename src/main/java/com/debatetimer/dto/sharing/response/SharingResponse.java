@@ -1,9 +1,18 @@
 package com.debatetimer.dto.sharing.response;
 
-import java.time.LocalDateTime;
+import com.debatetimer.domain.sharing.TimerEventInfo;
+import com.debatetimer.domain.sharing.TimerEventType;
 
 public record SharingResponse(
-        LocalDateTime time
+        TimerEventType eventType,
+        TimerEventInfoResponse data
 ) {
+
+    public SharingResponse(TimerEventType eventType, TimerEventInfo timerEventInfo) {
+        this(
+                eventType,
+                new TimerEventInfoResponse(timerEventInfo)
+        );
+    }
 
 }

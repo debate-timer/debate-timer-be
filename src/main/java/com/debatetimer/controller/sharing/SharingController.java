@@ -1,9 +1,8 @@
 package com.debatetimer.controller.sharing;
 
-import com.debatetimer.controller.auth.AuthMember;
-import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
+import jakarta.validation.Valid;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,10 +15,9 @@ public class SharingController {
     @MessageMapping("/event/{roomId}")
     @SendTo("/room/{roomId}")
     public SharingResponse share(
-            @AuthMember Member member,
             @DestinationVariable(value = "roomId") long roomId,
-            @Payload SharingRequest request
+            @Valid @Payload SharingRequest request
     ) {
-        return new SharingResponse(request.time());
+        return new SharingResponse(request.eventType(), request.toTimerEventInfo());
     }
 }
