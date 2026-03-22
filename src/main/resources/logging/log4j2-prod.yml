@@ -18,7 +18,7 @@ Configuration:
         eventEol: true
         properties: true
         stacktraceAsString: true
-        objectMessageAsJsonObject: true
+        objectMessageAsJsonObject: false
       immediateFlush: false #false로 설정되어야 Async로 buffer에 저장됨
 
       Policies:
@@ -43,7 +43,7 @@ Configuration:
     Logger:
       name: debate-timer-prod
       additivity: false
-      level: debug
+      level: info
       includeLocation: false
       AppenderRef:
         ref: RollingFile_Appender
