@@ -53,7 +53,7 @@ class SharingControllerTest extends BaseStompTest {
                     () -> assertThat(response.data().timerType()).isEqualTo(request.data().timerType()),
                     () -> assertThat(response.data().sequence()).isEqualTo(request.data().sequence()),
                     () -> assertThat(response.data().currentTeam()).isEqualTo(request.data().currentTeam()),
-                    () -> assertThat(response.data().time()).isEqualTo(request.data().time())
+                    () -> assertThat(response.data().remainingTime()).isEqualTo(request.data().remainingTime())
             );
         }
 
@@ -76,7 +76,7 @@ class SharingControllerTest extends BaseStompTest {
                     () -> assertThat(response.data().timerType()).isEqualTo(request.data().timerType()),
                     () -> assertThat(response.data().sequence()).isEqualTo(request.data().sequence()),
                     () -> assertThat(response.data().currentTeam()).isEqualTo(request.data().currentTeam()),
-                    () -> assertThat(response.data().time()).isEqualTo(request.data().time())
+                    () -> assertThat(response.data().remainingTime()).isEqualTo(request.data().remainingTime())
             );
         }
 

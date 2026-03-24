@@ -124,7 +124,7 @@ public abstract class BaseControllerTest {
                 .set("stance", Stance.PROS)
                 .set("speechType", "입론1")
                 .set("boxType", CustomizeBoxType.NORMAL)
-                .set("time", 120)
+                .set("remainingTime", 120)
                 .set("bell", getBellRequestBuilder().sampleList(2))
                 .set("timePerTeam", 60)
                 .set("timePerSpeaking", null)
@@ -134,7 +134,7 @@ public abstract class BaseControllerTest {
     private ArbitraryBuilder<BellRequest> getBellRequestBuilder() {
         return fixtureMonkey.giveMeBuilder(BellRequest.class)
                 .set("type", BellType.AFTER_START)
-                .set("time", 30)
+                .set("remainingTime", 30)
                 .set("count", 1);
     }
 }

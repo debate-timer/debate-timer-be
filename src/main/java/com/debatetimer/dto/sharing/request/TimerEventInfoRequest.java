@@ -10,7 +10,7 @@ public record TimerEventInfoRequest(
         @NotNull CustomizeBoxType timerType,
         int sequence,
         @Nullable Stance currentTeam,
-        long time
+        long remainingTime
 ) {
 
     public TimerEventInfo toTimerEventInfo() {
@@ -18,7 +18,7 @@ public record TimerEventInfoRequest(
                 timerType,
                 sequence,
                 currentTeam,
-                time
+                remainingTime
         );
     }
 }
