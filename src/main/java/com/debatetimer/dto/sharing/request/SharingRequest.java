@@ -4,9 +4,11 @@ import com.debatetimer.domain.sharing.TimerEventInfo;
 import com.debatetimer.domain.sharing.TimerEventType;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 
 public record SharingRequest(
+        @NotNull
         TimerEventType eventType,
 
         @Valid
@@ -14,8 +16,8 @@ public record SharingRequest(
         TimerEventInfoRequest data
 ) {
 
-    public boolean hasEvent() {
-        return eventType != null;
+    public boolean hasEventData() {
+        return data != null;
     }
 
     public TimerEventInfo toTimerEventInfo() {

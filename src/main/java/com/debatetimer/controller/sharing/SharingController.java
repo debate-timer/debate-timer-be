@@ -19,7 +19,7 @@ public class SharingController {
             @DestinationVariable(value = "roomId") long roomId,
             @Valid @Payload SharingRequest request
     ) {
-        if (!request.hasEvent()) {
+        if (!request.hasEventData()) {
             return new SharingResponse(request.eventType(), null);
         }
 
