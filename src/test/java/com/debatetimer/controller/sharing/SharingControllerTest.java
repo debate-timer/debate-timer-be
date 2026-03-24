@@ -57,6 +57,29 @@ class SharingControllerTest extends BaseStompTest {
             );
         }
 
+        @Test
+        void 사회자가_발생시킨_토론_종료_이벤트를_청중이_공유받는다() throws ExecutionException, InterruptedException, TimeoutException {
+            long roomId = 1L;
+            MessageFrameHandler<SharingResponse> handler = new MessageFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateAccessTokenHeader("/app/event/" + roomId, member);
+            SharingRequest request = new SharingRequest(TimerEventType.FINISHED, null);
+            stompSession.subscribe("/room/" + roomId, handler); //청중의 구독
+
+            stompSession.send(headers, request); //사회자의 이벤트 발생
+
+            SharingResponse response = handler.getCompletableFuture()
+                    .get(3L, TimeUnit.SECONDS);
+
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(request.eventType()),
+                    () -> assertThat(response.data().timerType()).isEqualTo(request.data().timerType()),
+                    () -> assertThat(response.data().sequence()).isEqualTo(request.data().sequence()),
+                    () -> assertThat(response.data().currentTeam()).isEqualTo(request.data().currentTeam()),
+                    () -> assertThat(response.data().time()).isEqualTo(request.data().time())
+            );
+        }
+
         @ParameterizedTest
         @NullSource
         void 타이머_타입은_빈_값일_수_없다(CustomizeBoxType boxType) {
