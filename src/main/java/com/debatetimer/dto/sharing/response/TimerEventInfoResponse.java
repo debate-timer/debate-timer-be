@@ -8,17 +8,21 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 public record TimerEventInfoResponse(
-        @NotNull CustomizeBoxType timerType,
+        @NotNull
+        CustomizeBoxType timerType,
+
+        @Nullable
+        Stance currentTeam,
+
         int sequence,
-        @Nullable Stance currentTeam,
         long remainingTime
 ) {
 
     public TimerEventInfoResponse(TimerEventInfo timerEventInfo) {
         this(
                 timerEventInfo.getTimerType(),
-                timerEventInfo.getSequence(),
                 timerEventInfo.getCurrentTeam(),
+                timerEventInfo.getSequence(),
                 timerEventInfo.getRemainingTime()
         );
     }

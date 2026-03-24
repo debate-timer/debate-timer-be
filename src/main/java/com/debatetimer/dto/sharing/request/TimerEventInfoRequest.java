@@ -7,9 +7,13 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 public record TimerEventInfoRequest(
-        @NotNull CustomizeBoxType timerType,
+        @NotNull
+        CustomizeBoxType timerType,
+
+        @Nullable
+        Stance currentTeam,
+
         int sequence,
-        @Nullable Stance currentTeam,
         long remainingTime
 ) {
 

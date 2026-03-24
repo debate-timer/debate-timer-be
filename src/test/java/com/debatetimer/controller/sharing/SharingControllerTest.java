@@ -36,8 +36,8 @@ class SharingControllerTest extends BaseStompTest {
                     TimerEventType.NEXT,
                     new TimerEventInfoRequest(
                             CustomizeBoxType.NORMAL,
-                            2,
                             null,
+                            2,
                             30
                     )
             );
@@ -88,8 +88,8 @@ class SharingControllerTest extends BaseStompTest {
                     TimerEventType.NEXT,
                     new TimerEventInfoRequest(
                             boxType,
-                            2,
                             null,
+                            2,
                             30
                     )
             );
