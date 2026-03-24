@@ -9,13 +9,12 @@ import org.springframework.stereotype.Service;
 public class SharingService {
 
     public SharingResponse share(SharingRequest request) {
-        if (!request.hasEventData()) {
-            return new SharingResponse(request.eventType(), null);
-        }
 
-        return new SharingResponse(
-                request.eventType(),
-                new TimerEventInfoResponse(request.toTimerEventInfo())
-        );
+        return request.toTimerEventInfo()
+                .map(eventInfo -> new SharingResponse(
+                        request.eventType(),
+                        new TimerEventInfoResponse(eventInfo)
+                ))
+                .orElse(new SharingResponse(request.eventType(), null));
     }
 }

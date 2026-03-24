@@ -16,13 +16,8 @@ public record SharingRequest(
         TimerEventInfoRequest data
 ) {
 
-    public boolean hasEventData() {
-        return data != null;
-    }
-
-    public TimerEventInfo toTimerEventInfo() {
+    public Optional<TimerEventInfo> toTimerEventInfo() {
         return Optional.ofNullable(data)
-                .map(TimerEventInfoRequest::toTimerEventInfo)
-                .orElse(null);
+                .map(TimerEventInfoRequest::toTimerEventInfo);
     }
 }
