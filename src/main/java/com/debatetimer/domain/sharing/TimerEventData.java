@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class TimerEventInfo {
+public class TimerEventData {
 
     @NotNull
     private final CustomizeBoxType timerType;
@@ -21,7 +21,7 @@ public class TimerEventInfo {
 
     private final long remainingTime;
 
-    public TimerEventInfo(
+    public TimerEventData(
             CustomizeBoxType timerType,
             int sequence,
             @Nullable Stance currentTeam,
@@ -36,11 +36,11 @@ public class TimerEventInfo {
 
     private void validateCurrentTeam(CustomizeBoxType timerType, Stance currentTeam) {
         if (timerType.isTimeBased() && currentTeam == null) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIMER_EVENT_INFO);
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIME_BASED_TIMER_EVENT_DATA);
         }
 
         if (!timerType.isTimeBased() && currentTeam != null) {
-            throw new DTClientErrorException(ClientErrorCode.INVALID_NORMAL_TIMER_EVENT_INFO);
+            throw new DTClientErrorException(ClientErrorCode.INVALID_NORMAL_TIMER_EVENT_DATA);
         }
     }
 }

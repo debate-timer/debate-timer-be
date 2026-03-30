@@ -78,8 +78,10 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_BELL_TIME(HttpStatus.BAD_REQUEST, "벨 시간은 0 이상의 정수여야 합니다."),
     INVALID_BELL_COUNT(HttpStatus.BAD_REQUEST, "벨 카운트는 1 이상 %d 이하의 정수여야 합니다.".formatted(Bell.MAX_BELL_COUNT)),
 
-    INVALID_NORMAL_TIMER_EVENT_INFO(HttpStatus.BAD_REQUEST, "잘못된 일반 타이머 이벤트 데이터입니다"),
-    INVALID_TIME_BASED_TIMER_EVENT_INFO(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다");
+    INVALID_NORMAL_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 일반 타이머 이벤트 데이터입니다"),
+    INVALID_TIME_BASED_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다"),
+    INVALID_TIMER_EVENT(HttpStatus.BAD_REQUEST, "잘못된 타이머 이벤트 데이터입니다"),
+    ;
 
     private final HttpStatus status;
     private final String message;

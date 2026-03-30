@@ -7,7 +7,10 @@ public record SharingResponse(
         TimerEventType eventType,
 
         @Nullable
-        TimerEventInfoResponse data
+        TimerEventDataResponse data
 ) {
 
+    public SharingResponse(TimerEventType eventType) {
+        this(eventType, null);
+    }
 }

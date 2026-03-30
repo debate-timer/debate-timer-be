@@ -2,7 +2,7 @@ package com.debatetimer.dto.sharing.request;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
-import com.debatetimer.domain.sharing.TimerEventInfo;
+import com.debatetimer.domain.sharing.TimerEventData;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
@@ -17,8 +17,8 @@ public record TimerEventInfoRequest(
         long remainingTime
 ) {
 
-    public TimerEventInfo toTimerEventInfo() {
-        return new TimerEventInfo(
+    public TimerEventData toTimerEventInfo() {
+        return new TimerEventData(
                 timerType,
                 sequence,
                 currentTeam,
