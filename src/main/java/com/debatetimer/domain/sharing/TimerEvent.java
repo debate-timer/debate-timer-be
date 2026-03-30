@@ -21,4 +21,8 @@ public class TimerEvent {
         this.eventType = eventType;
         this.timerEventData = timerEventData;
     }
+
+    public TimerEvent(TimerEventType eventType) {
+        this(eventType, null);
+    }
 }

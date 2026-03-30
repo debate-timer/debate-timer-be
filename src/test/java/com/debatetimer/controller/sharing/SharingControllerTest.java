@@ -50,6 +50,7 @@ class SharingControllerTest extends BaseStompTest {
 
             assertAll(
                     () -> assertThat(response.eventType()).isEqualTo(request.eventType()),
+                    () -> assertThat(response.data()).isNotNull(),
                     () -> assertThat(response.data().timerType()).isEqualTo(request.data().timerType()),
                     () -> assertThat(response.data().sequence()).isEqualTo(request.data().sequence()),
                     () -> assertThat(response.data().currentTeam()).isEqualTo(request.data().currentTeam()),
