@@ -21,7 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 
-class SharingControllerTest extends BaseStompTest {
+class SharingWebSocketControllerTest extends BaseStompTest {
 
     @Nested
     class Share {

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class SharingController {
+public class SharingWebSocketController {
 
     private final SharingService sharingService;
 
