@@ -16,7 +16,7 @@ public class SharingRestController {
     private final SharingService sharingService;
 
     @GetMapping("/api/share/{tableId}/chairman-token")
-    public ChairmanTokenResponse publishChairmanToken(
+    public ChairmanTokenResponse issueChairmanToken(
             @AuthMember Member member,
             @PathVariable("tableId") long tableId
     ) {

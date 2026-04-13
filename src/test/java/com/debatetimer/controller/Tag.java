@@ -6,6 +6,7 @@ public enum Tag {
     PARLIAMENTARY_API("Parliamentary Table API"),
     TIME_BASED_API("Time Based Table API"),
     CUSTOMIZE_API("Customize Table API"),
+    SHARING_API("Sharing API"),
     POLL_API("Poll API"),
     ORGANIZATION_API("Organization API");
 
