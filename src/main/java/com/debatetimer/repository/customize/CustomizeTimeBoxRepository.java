@@ -13,6 +13,8 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBoxE
 
     List<CustomizeTimeBoxEntity> findAllByCustomizeTable(CustomizeTableEntity table);
 
+    long sumTimeByTableId(long tableId);
+
     @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable.id = :tableId")
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteAllByTable(long tableId);

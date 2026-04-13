@@ -23,6 +23,10 @@ public class JwtTokenProvider {
         return createToken(memberInfo, refreshTokenExpiration, TokenType.REFRESH_TOKEN);
     }
 
+    public String createChairmanToken(MemberInfo memberInfo, long expirationSeconds) {
+        return createToken(memberInfo, Duration.ofSeconds(expirationSeconds), TokenType.CHAIRMAN_TOKEN);
+    }
+
     private String createToken(MemberInfo memberInfo, Duration expiration, TokenType tokenType) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expiration.toMillis());
