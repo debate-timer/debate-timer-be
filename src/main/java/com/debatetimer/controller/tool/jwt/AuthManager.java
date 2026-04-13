@@ -39,6 +39,6 @@ public class AuthManager {
     }
 
     public String resolveChairmanToken(String chairmanToken) {
-        return jwtTokenResolver.resolveAccessToken(chairmanToken);
+        return jwtTokenResolver.resolveChairmanToken(chairmanToken);
     }
 }
