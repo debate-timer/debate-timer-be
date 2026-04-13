@@ -23,6 +23,10 @@ public class JwtTokenResolver {
         return resolveToken(refreshToken, TokenType.REFRESH_TOKEN);
     }
 
+    public String resolveChairmanToken(String chairmanToken) {
+        return resolveToken(chairmanToken, TokenType.CHAIRMAN_TOKEN);
+    }
+
     private String resolveToken(String token, TokenType tokenType) {
         try {
             Claims claims = Jwts.parserBuilder()

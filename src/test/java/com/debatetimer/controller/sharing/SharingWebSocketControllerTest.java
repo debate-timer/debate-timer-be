@@ -31,7 +31,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             long roomId = 1L;
             MessageFrameHandler<SharingResponse> handler = new MessageFrameHandler<>(SharingResponse.class);
             Member member = memberGenerator.generate("example@email.com");
-            StompHeaders headers = headerGenerator.generateAccessTokenHeader("/app/event/" + roomId, member);
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + roomId, member);
             SharingRequest request = new SharingRequest(
                     TimerEventType.NEXT,
                     new TimerEventInfoRequest(
@@ -59,11 +59,33 @@ class SharingWebSocketControllerTest extends BaseStompTest {
         }
 
         @Test
+        void 사회자가_아니면_이벤트를_발행할_수_없다() throws ExecutionException, InterruptedException, TimeoutException {
+            long roomId = 1L;
+            MessageFrameHandler<SharingResponse> handler = new MessageFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            SharingRequest request = new SharingRequest(
+                    TimerEventType.NEXT,
+                    new TimerEventInfoRequest(
+                            CustomizeBoxType.NORMAL,
+                            null,
+                            2,
+                            30
+                    )
+            );
+            stompSession.subscribe("/room/" + roomId, handler); //청중의 구독
+            stompSession.send("/app/event/" + roomId, request); //사회자의 이벤트 발생
+
+            assertThatThrownBy(() -> handler.getCompletableFuture()
+                    .get(2L, TimeUnit.SECONDS))
+                    .isInstanceOf(TimeoutException.class);
+        }
+
+        @Test
         void 사회자가_발생시킨_토론_종료_이벤트를_청중이_공유받는다() throws ExecutionException, InterruptedException, TimeoutException {
             long roomId = 1L;
             MessageFrameHandler<SharingResponse> handler = new MessageFrameHandler<>(SharingResponse.class);
             Member member = memberGenerator.generate("example@email.com");
-            StompHeaders headers = headerGenerator.generateAccessTokenHeader("/app/event/" + roomId, member);
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + roomId, member);
             SharingRequest request = new SharingRequest(TimerEventType.FINISHED, null);
             stompSession.subscribe("/room/" + roomId, handler); //청중의 구독
 
@@ -84,7 +106,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             long roomId = 1L;
             MessageFrameHandler<SharingResponse> handler = new MessageFrameHandler<>(SharingResponse.class);
             Member member = memberGenerator.generate("example@email.com");
-            StompHeaders headers = headerGenerator.generateAccessTokenHeader("/app/event/" + roomId, member);
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + roomId, member);
             SharingRequest request = new SharingRequest(
                     TimerEventType.NEXT,
                     new TimerEventInfoRequest(
