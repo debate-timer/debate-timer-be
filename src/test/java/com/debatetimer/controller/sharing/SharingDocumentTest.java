@@ -13,13 +13,13 @@ import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.member.Member;
-import com.debatetimer.dto.sharing.response.ChairmanTokenResponse;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
 public class SharingDocumentTest extends BaseDocumentTest {
+
 
     @Nested
     class IssueChairmanToken {
@@ -38,9 +38,11 @@ public class SharingDocumentTest extends BaseDocumentTest {
         @Test
         void 사회자_용_토큰_생성_성공() {
             long requestTableId = 1L;
-            ChairmanTokenResponse chairmanTokenResponse = new ChairmanTokenResponse("testToken");
-            doReturn(chairmanTokenResponse).when(sharingService)
-                    .issueChairmanToken(eq(requestTableId), any(Member.class));
+            long debateTime = 500L;
+            doReturn(debateTime).when(customizeService)
+                    .findDebateTime(eq(requestTableId), any(Member.class));
+            doReturn("testToken").when(authManager)
+                    .issueChairmanToken(any(Member.class), eq(debateTime * 2));
 
             var document = document("sharing/get", 200)
                     .request(requestDocument)

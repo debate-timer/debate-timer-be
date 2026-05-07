@@ -32,6 +32,11 @@ public class CustomizeService {
         return new CustomizeTableResponse(table, timeBoxes);
     }
 
+    public long findDebateTime(long tableId, Member member) {
+        CustomizeTable customizeTable = customizeTableDomainRepository.getByIdAndMember(tableId, member);
+        return customizeTableDomainRepository.getTotalTimeBoxTimes(customizeTable.getId());
+    }
+
     @Transactional
     public CustomizeTableResponse updateTable(
             CustomizeTableCreateRequest tableCreateRequest,
