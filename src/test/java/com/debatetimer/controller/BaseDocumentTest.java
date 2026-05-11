@@ -15,6 +15,7 @@ import com.debatetimer.service.member.MemberService;
 import com.debatetimer.service.organization.OrganizationService;
 import com.debatetimer.service.poll.PollService;
 import com.debatetimer.service.poll.VoteService;
+import com.debatetimer.service.sharing.SharingService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -70,6 +71,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected VoteService voteService;
+
+    @MockitoBean
+    protected SharingService sharingService;
 
     @MockitoBean
     protected OrganizationService organizationService;

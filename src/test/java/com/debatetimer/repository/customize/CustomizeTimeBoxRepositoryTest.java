@@ -80,4 +80,22 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
                     .doesNotThrowAnyException();
         }
     }
+
+    @Nested
+    class SumTimeByTableId {
+
+        @Test
+        void 특정_테이블의_타임_박스시간의_합을_반환한다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTableEntity debateTable = customizeTableEntityGenerator.generate(chan);
+            CustomizeTimeBoxEntity timeBox1 = customizeTimeBoxEntityGenerator.generate(debateTable,
+                    CustomizeBoxType.NORMAL, 1, 10);
+            CustomizeTimeBoxEntity timeBox2 = customizeTimeBoxEntityGenerator.generate(debateTable,
+                    CustomizeBoxType.NORMAL, 2, 20);
+
+            long summedTimeByTableId = customizeTimeBoxRepository.sumTimeByTableId(debateTable.getId());
+
+            assertThat(summedTimeByTableId).isEqualTo(timeBox1.getTime() + timeBox2.getTime());
+        }
+    }
 }

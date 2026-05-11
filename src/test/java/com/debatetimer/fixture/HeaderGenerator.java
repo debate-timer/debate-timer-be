@@ -23,11 +23,11 @@ public class HeaderGenerator {
         return new Headers(new Header(HttpHeaders.AUTHORIZATION, accessToken));
     }
 
-    public StompHeaders generateAccessTokenHeader(String destination, Member member) {
-        String accessToken = jwtTokenProvider.createAccessToken(new MemberInfo(member));
+    public StompHeaders generateChairmanTokenHeader(String destination, Member member) {
+        String chairmanToken = jwtTokenProvider.createChairmanToken(new MemberInfo(member), 5L);
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination(destination);
-        stompHeaders.add(HttpHeaders.AUTHORIZATION, accessToken);
+        stompHeaders.add(HttpHeaders.AUTHORIZATION, chairmanToken);
         return stompHeaders;
     }
 }

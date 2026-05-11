@@ -5,9 +5,11 @@ import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.dto.sharing.response.TimerEventDataResponse;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SharingService {
 
     public SharingResponse share(SharingRequest request) {
