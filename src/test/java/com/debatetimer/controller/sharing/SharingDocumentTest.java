@@ -20,7 +20,6 @@ import org.springframework.http.HttpHeaders;
 
 public class SharingDocumentTest extends BaseDocumentTest {
 
-
     @Nested
     class IssueChairmanToken {
 
