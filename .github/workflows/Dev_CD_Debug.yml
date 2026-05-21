@@ -78,7 +78,7 @@ jobs:
 
       - name: Zero Downtime Deployment (Debug)
         env:
-          FORCE_STOP_OLD_FIRST: "true"
+          FORCE_STOP_OLD_FIRST: "false"
         run: sh ~/app/scripts/zero-downtime-deploy-debug.sh
 
       - name: Collect failure diagnostics
