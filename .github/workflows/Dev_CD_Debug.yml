@@ -101,10 +101,10 @@ jobs:
           path: ~/app/diagnostics/
           if-no-files-found: warn
 
-      - name: Send Discord Alert on Failure
-        if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\":\":x: [DEV-DEBUG] 배포 실패! 확인이 필요합니다.\n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
-               ${{ secrets.DISCORD_WEB_HOOK }}
+#      - name: Send Discord Alert on Failure
+#        if: failure()
+#        run: |
+#          curl -H "Content-Type: application/json" \
+#               -X POST \
+#               -d "{\"content\":\":x: [DEV-DEBUG] 배포 실패! 확인이 필요합니다.\n링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+#               ${{ secrets.DISCORD_WEB_HOOK }}
