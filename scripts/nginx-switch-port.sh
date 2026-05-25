@@ -33,7 +33,7 @@ log "Backing up current nginx configuration"
 sudo cp "$NGINX_CONF" "$BACKUP_CONF"
 
 log "Updating nginx upstream to port $NEW_PORT"
-sed "s/server 127\.0\.0\.1:[0-9]\+;/server 127.0.0.1:$NEW_PORT;/" "$NGINX_CONF" > "$TEMP_CONF"
+sed "s|proxy_pass http://127\.0\.0\.1:[0-9]\+;|proxy_pass http://127.0.0.1:$NEW_PORT;|" "$NGINX_CONF" > "$TEMP_CONF"
 
 log "Configuration changes:"
 diff "$NGINX_CONF" "$TEMP_CONF" || true
