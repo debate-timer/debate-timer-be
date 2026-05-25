@@ -77,7 +77,7 @@ jobs:
         run: chmod +x ~/app/scripts/zero-downtime-deploy-debug.sh
 
       - name: Zero Downtime Deployment (Debug)
-        run: sh ~/app/scripts/zero-downtime-deploy-debug.sh
+        run: bash ~/app/scripts/zero-downtime-deploy-debug.sh
 
       - name: Print deploy log
         if: always()

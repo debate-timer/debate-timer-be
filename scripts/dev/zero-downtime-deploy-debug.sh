@@ -188,14 +188,16 @@ switch_nginx_upstream() {
     debug_log "OLD sed pattern (original): $old_sed_pattern"
     debug_log "NEW sed pattern (fix):      $new_sed_pattern"
 
-    local old_result=$(sed "$old_sed_pattern" "$nginx_conf")
-    local old_diff=$(diff "$nginx_conf" <(echo "$old_result") 2>&1 || true)
+    local old_tmp="/tmp/old_sed_result.tmp"
+    sed "$old_sed_pattern" "$nginx_conf" > "$old_tmp"
+    local old_diff=$(diff "$nginx_conf" "$old_tmp" 2>&1 || true)
     if [ -z "$old_diff" ]; then
         debug_log "OLD pattern produced NO changes (confirms the bug!)"
     else
         debug_log "OLD pattern produced changes:"
         debug_log "$old_diff"
     fi
+    rm -f "$old_tmp"
 
     # ===== Apply the fixed sed pattern =====
     sed "$new_sed_pattern" "$nginx_conf" > "$temp_conf"
