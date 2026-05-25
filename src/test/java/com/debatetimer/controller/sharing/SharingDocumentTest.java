@@ -52,7 +52,7 @@ public class SharingDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .headers(EXIST_MEMBER_HEADER)
                     .pathParam("tableId", String.valueOf(requestTableId))
-                    .when().get("/api/share/{tableId}/chairman-token")
+                    .when().get("/api/live/{tableId}/chairman-token")
                     .then().statusCode(200);
         }
     }

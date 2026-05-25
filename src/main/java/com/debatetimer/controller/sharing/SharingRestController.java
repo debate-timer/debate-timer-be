@@ -17,7 +17,7 @@ public class SharingRestController {
     private final CustomizeService customizeService;
     private final AuthManager authManager;
 
-    @GetMapping("/api/share/{tableId}/chairman-token")
+    @GetMapping("/api/live/{tableId}/chairman-token")
     public ChairmanTokenResponse issueChairmanToken(
             @AuthMember Member member,
             @PathVariable("tableId") long tableId
