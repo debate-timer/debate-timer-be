@@ -1,5 +1,7 @@
 package com.debatetimer.controller.sharing;
 
+import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.service.sharing.SharingService;
@@ -22,7 +24,7 @@ public class SharingWebSocketController {
     @MessageMapping("/event/{roomId}")
     @SendTo("/room/{roomId}")
     public SharingResponse share(
-//            @AuthMember Member member,
+            @AuthMember Member member,
             @DestinationVariable(value = "roomId") long roomId,
             @Valid @Payload SharingRequest request
     ) {
