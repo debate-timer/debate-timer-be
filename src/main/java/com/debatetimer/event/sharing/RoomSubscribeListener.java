@@ -31,7 +31,9 @@ public class RoomSubscribeListener {
 
         if (destination.startsWith(AUDIENCE_SUBSCRIBE_PREFIX)) {
             long roomId = parseRoomId(destination);
+            log.info("관객 구독 발생: roomId={}, sessionId={}", roomId, accessor.getSessionId());
             messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, new ChairmanSharingRequest(roomId));
+            log.info("사회자 구독 알림 발행: roomId={}", roomId);
         }
     }
 
@@ -40,6 +42,7 @@ public class RoomSubscribeListener {
             String parsedRoomId = destination.substring(AUDIENCE_SUBSCRIBE_PREFIX.length());
             return Long.parseLong(parsedRoomId);
         } catch (NumberFormatException exception) {
+            log.warn("유효하지 않은 roomId 구독 시도: destination={}", destination);
             throw new DTClientErrorException(ClientErrorCode.INVALID_ROOM_ID);
         }
     }

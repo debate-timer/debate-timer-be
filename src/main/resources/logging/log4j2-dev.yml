@@ -8,6 +8,12 @@ Configuration:
       value: "/home/ubuntu/logs"
 
   Appenders:
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] [%highlight{%-5level}] %logger{35} - %msg%n"
+
     RollingFile:
       name: RollingFile_Appender
       fileName: ${log-dir}/logfile.log
@@ -40,11 +46,13 @@ Configuration:
     Root:
       level: info
       AppenderRef:
-        ref: RollingFile_Appender
+        - ref: Console_Appender
+        - ref: RollingFile_Appender
     Logger:
       name: debate-timer-dev
       additivity: false
       level: debug
       includeLocation: false
       AppenderRef:
-        ref: RollingFile_Appender
+        - ref: Console_Appender
+        - ref: RollingFile_Appender
