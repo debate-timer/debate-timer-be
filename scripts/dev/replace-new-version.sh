@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PID=$(lsof -t -i:8080)
+상PID=$(lsof -t -i:8080 -sTCP:LISTEN)
 
 # 프로세스 종료
 if [ -z "$PID" ]; then

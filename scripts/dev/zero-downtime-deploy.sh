@@ -54,13 +54,13 @@ get_monitor_port() {
 
 is_port_in_use() {
     local port=$1
-    sudo lsof -t -i:$port > /dev/null 2>&1
+    sudo lsof -t -i:$port -sTCP:LISTEN > /dev/null 2>&1
     return $?
 }
 
 kill_process_on_port() {
     local port=$1
-    local pid=$(sudo lsof -t -i:$port 2>/dev/null)
+    local pid=$(sudo lsof -t -i:$port -sTCP:LISTEN 2>/dev/null)
 
     if [ -z "$pid" ]; then
         log "No process running on port $port"
