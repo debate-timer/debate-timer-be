@@ -76,7 +76,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             bellEntityGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 1);
             bellEntityGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 2);
 
-            CustomizeTableResponse foundResponse = customizeService.findTable(chanTable.getId(), chan);
+            CustomizeTableResponse foundResponse = customizeService.findMemberTable(chanTable.getId(), chan);
 
             assertAll(
                     () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
@@ -93,7 +93,7 @@ class CustomizeServiceTest extends BaseServiceTest {
             CustomizeTableEntity chanTable = customizeTableEntityGenerator.generate(chan);
             long chanTableId = chanTable.getId();
 
-            assertThatThrownBy(() -> customizeService.findTable(chanTableId, coli))
+            assertThatThrownBy(() -> customizeService.findMemberTable(chanTableId, coli))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
         }
