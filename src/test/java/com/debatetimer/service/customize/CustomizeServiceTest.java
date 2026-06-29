@@ -100,6 +100,39 @@ class CustomizeServiceTest extends BaseServiceTest {
     }
 
     @Nested
+    class FindTableForGuest {
+
+        @Test
+        void 비회원이_사용자_지정_토론_테이블을_조회한다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTableEntity chanTable = customizeTableEntityGenerator.generate(chan);
+            CustomizeTimeBoxEntity customizeTimeBox = customizeTimeBoxEntityGenerator.generate(
+                    chanTable, CustomizeBoxType.NORMAL, 1);
+            customizeTimeBoxEntityGenerator.generate(chanTable, CustomizeBoxType.NORMAL, 2);
+            bellEntityGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 1);
+            bellEntityGenerator.generate(customizeTimeBox, BellType.AFTER_START, 1, 2);
+
+            CustomizeTableResponse foundResponse = customizeService.findTable(chanTable.getId());
+
+            assertAll(
+                    () -> assertThat(foundResponse.id()).isEqualTo(chanTable.getId()),
+                    () -> assertThat(foundResponse.table()).hasSize(2),
+                    () -> assertThat(foundResponse.table().get(0).bell()).hasSize(2),
+                    () -> assertThat(foundResponse.table().get(1).bell()).isNull()
+            );
+        }
+
+        @Test
+        void 존재하지_않는_테이블_조회_시_예외를_발생시킨다() {
+            long notExistTableId = 999L;
+
+            assertThatThrownBy(() -> customizeService.findTable(notExistTableId))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
     class FindDebateTime {
 
         @Test
