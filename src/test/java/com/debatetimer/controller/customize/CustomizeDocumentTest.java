@@ -263,7 +263,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                                     null, null, 360, null, null)
                     )
             );
-            doReturn(response).when(customizeService).findTable(eq(tableId), any());
+            doReturn(response).when(customizeService).findMemberTable(eq(tableId), any());
 
             var document = document("customize/get", 200)
                     .request(requestDocument)
@@ -282,7 +282,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND"})
         void 사용자_지정_테이블_조회_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
-            doThrow(new DTClientErrorException(errorCode)).when(customizeService).findTable(eq(tableId), any());
+            doThrow(new DTClientErrorException(errorCode)).when(customizeService).findMemberTable(eq(tableId), any());
 
             var document = document("customize/get", errorCode)
                     .request(requestDocument)

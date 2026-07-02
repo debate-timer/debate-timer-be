@@ -75,7 +75,7 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
             timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 2, 180);
             timeBoxEntityGenerator.generate(tableEntity, CustomizeBoxType.NORMAL, 3, 120);
 
-            List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
+            List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getMemberCustomizeTimeBoxes(
                     tableEntity.getId(), member);
 
             assertThat(timeBoxes).hasSize(3)
@@ -95,7 +95,7 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
             bellEntityGenerator.generate(timeBoxEntity1, BellType.BEFORE_END, 30, 1);
             bellEntityGenerator.generate(timeBoxEntity2, BellType.BEFORE_END, 10, 1);
 
-            List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(
+            List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getMemberCustomizeTimeBoxes(
                     tableEntity.getId(), member);
 
             assertAll(

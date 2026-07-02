@@ -39,7 +39,7 @@ public class CustomizeController {
             @PathVariable Long tableId,
             @AuthMember Member member
     ) {
-        return customizeService.findTable(tableId, member);
+        return customizeService.findMemberTable(tableId, member);
     }
 
     @PutMapping("/api/table/customize/{tableId}")
