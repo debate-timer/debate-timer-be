@@ -1,5 +1,6 @@
 package com.debatetimer.fixture.entity;
 
+import com.debatetimer.domain.organization.Language;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import com.debatetimer.entity.organization.OrganizationTemplateEntity;
 import com.debatetimer.repository.organization.OrganizationTemplateRepository;
@@ -17,8 +18,12 @@ public class OrganizationTemplateEntityGenerator {
     }
 
     public OrganizationTemplateEntity generate(OrganizationEntity organization, String name) {
+        return generate(organization, name, Language.KR);
+    }
+
+    public OrganizationTemplateEntity generate(OrganizationEntity organization, String name, Language language) {
         OrganizationTemplateEntity template =
-                new OrganizationTemplateEntity(organization, name, DEFAULT_TEMPLATE_CONTENT);
+                new OrganizationTemplateEntity(organization, name, DEFAULT_TEMPLATE_CONTENT, language);
         return organizationTemplateRepository.save(template);
     }
 }
