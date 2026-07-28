@@ -18,7 +18,7 @@ public class OrganizationTemplateEntityGenerator {
     }
 
     public OrganizationTemplateEntity generate(OrganizationEntity organization, String name) {
-        return generate(organization, name, Language.KR);
+        return generate(organization, name, Language.KO_KR);
     }
 
     public OrganizationTemplateEntity generate(OrganizationEntity organization, String name, Language language) {

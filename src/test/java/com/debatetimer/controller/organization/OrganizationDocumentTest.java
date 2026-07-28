@@ -29,7 +29,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                 .summary("기관별 템플릿 조회")
                 .queryParameter(
                         parameterWithName("language").optional()
-                                .description("조회 언어 (EN | KR, 기본값 KR)")
+                                .description("조회 언어 (US_EN | KO_KR, 기본값 KO_KR)")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
@@ -66,7 +66,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("language", "KR")
+                    .queryParam("language", "KO_KR")
                     .when().get("/api/organizations/templates")
                     .then().statusCode(200);
         }

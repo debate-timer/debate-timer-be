@@ -17,7 +17,7 @@ public class OrganizationController {
 
     @GetMapping("/api/organizations/templates")
     public ResponseEntity<OrganizationResponses> getOrganizationTemplates(
-            @RequestParam(defaultValue = "KR") Language language) {
+            @RequestParam(defaultValue = "KO_KR") Language language) {
         return ResponseEntity.ok(organizationService.findAll(language));
     }
 }
