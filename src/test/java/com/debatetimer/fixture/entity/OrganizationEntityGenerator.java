@@ -17,7 +17,7 @@ public class OrganizationEntityGenerator {
     }
 
     public OrganizationEntity generate(String name, String affiliation) {
-        return generate(name, affiliation, Language.KR);
+        return generate(name, affiliation, Language.KO_KR);
     }
 
     public OrganizationEntity generate(String name, String affiliation, Language language) {
