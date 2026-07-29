@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
+import com.debatetimer.domain.organization.Language;
 import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import io.restassured.http.ContentType;
@@ -17,12 +18,14 @@ class OrganizationControllerTest extends BaseControllerTest {
     class GetOrganizationTemplates {
 
         @Test
-        void 모든_기관의_토론_템플릿을_조회할_수_있다() {
-            OrganizationEntity organization1 = organizationEntityGenerator.generate("한앎", "한양대");
-            OrganizationEntity organization2 = organizationEntityGenerator.generate("한모름", "양한대");
-            organizationTemplateEntityGenerator.generate(organization1, "템플릿1");
-            organizationTemplateEntityGenerator.generate(organization1, "템플릿2");
-            organizationTemplateEntityGenerator.generate(organization2, "릿플템1");
+        void language_파라미터가_없으면_KR_기관의_토론_템플릿을_조회한다() {
+            OrganizationEntity korean1 = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            OrganizationEntity korean2 = organizationEntityGenerator.generate("한모름", "양한대", Language.KO_KR);
+            OrganizationEntity english = organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
+            organizationTemplateEntityGenerator.generate(korean1, "템플릿1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(korean1, "템플릿2", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(korean2, "릿플템1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(english, "template1", Language.US_EN);
 
             OrganizationResponses response = given()
                     .contentType(ContentType.JSON)
@@ -35,6 +38,37 @@ class OrganizationControllerTest extends BaseControllerTest {
                     () -> assertThat(response.organizations().get(0).templates()).hasSize(2),
                     () -> assertThat(response.organizations().get(1).templates()).hasSize(1)
             );
+        }
+
+        @Test
+        void 요청한_언어의_기관_토론_템플릿만_조회한다() {
+            OrganizationEntity korean = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            OrganizationEntity english = organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
+            organizationTemplateEntityGenerator.generate(korean, "템플릿1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(english, "template1", Language.US_EN);
+            organizationTemplateEntityGenerator.generate(english, "template2", Language.US_EN);
+
+            OrganizationResponses response = given()
+                    .contentType(ContentType.JSON)
+                    .queryParam("language", "US_EN")
+                    .when().get("/api/organizations/templates")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(OrganizationResponses.class);
+
+            assertAll(
+                    () -> assertThat(response.organizations()).hasSize(1),
+                    () -> assertThat(response.organizations().get(0).organization()).isEqualTo("english"),
+                    () -> assertThat(response.organizations().get(0).templates()).hasSize(2)
+            );
+        }
+
+        @Test
+        void 지원하지_않는_언어를_요청하면_400을_반환한다() {
+            given()
+                    .contentType(ContentType.JSON)
+                    .queryParam("language", "JP")
+                    .when().get("/api/organizations/templates")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
         }
     }
 }

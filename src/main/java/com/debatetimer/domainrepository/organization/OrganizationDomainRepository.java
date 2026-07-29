@@ -1,5 +1,6 @@
 package com.debatetimer.domainrepository.organization;
 
+import com.debatetimer.domain.organization.Language;
 import com.debatetimer.domain.organization.Organization;
 import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.organization.OrganizationTemplateEntity;
@@ -19,15 +20,15 @@ public class OrganizationDomainRepository {
     private final OrganizationRepository organizationRepository;
     private final OrganizationTemplateRepository organizationTemplateRepository;
 
-    public List<Organization> findAll() {
-        Map<Long, List<OrganizationTemplate>> idToTemplatesEntity = organizationTemplateRepository.findAll()
+    public List<Organization> findAllByLanguage(Language language) {
+        Map<Long, List<OrganizationTemplate>> idToTemplatesEntity = organizationTemplateRepository.findAllByLanguage(language)
                 .stream()
                 .collect(Collectors.groupingBy(
                         OrganizationTemplateEntity::getOrganizationId,
                         Collectors.mapping(OrganizationTemplateEntity::toDomain, Collectors.toList())
                 ));
 
-        return organizationRepository.findAll()
+        return organizationRepository.findAllByLanguage(language)
                 .stream()
                 .map(entity -> entity.toDomain(
                         idToTemplatesEntity.getOrDefault(entity.getId(), Collections.emptyList())
