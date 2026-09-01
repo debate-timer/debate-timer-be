@@ -163,7 +163,7 @@ switch_nginx_upstream() {
     log "Switching nginx upstream to port $new_port"
     sudo cp "$nginx_conf" "$backup_conf"
 
-    sed "s/server 127\.0\.0\.1:[0-9]\+;/server 127.0.0.1:$new_port;/" "$nginx_conf" > "$temp_conf"
+    sed "s|proxy_pass http://127\.0\.0\.1:[0-9]\+;|proxy_pass http://127.0.0.1:$new_port;|" "$nginx_conf" > "$temp_conf"
     sudo cp "$temp_conf" "$nginx_conf"
 
     if ! sudo nginx -t 2>/dev/null; then

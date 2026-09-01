@@ -1,9 +1,12 @@
 package com.debatetimer.entity.organization;
 
+import com.debatetimer.domain.organization.Language;
 import com.debatetimer.domain.organization.Organization;
 import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,10 +37,15 @@ public class OrganizationEntity extends BaseTimeEntity {
     @NotBlank
     private String iconPath;
 
-    public OrganizationEntity(String name, String affiliation, String iconPath) {
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
+    public OrganizationEntity(String name, String affiliation, String iconPath, Language language) {
         this.name = name;
         this.affiliation = affiliation;
         this.iconPath = iconPath;
+        this.language = language;
     }
 
     public Organization toDomain(List<OrganizationTemplate> templates) {

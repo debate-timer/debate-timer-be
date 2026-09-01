@@ -13,6 +13,9 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBoxE
 
     List<CustomizeTimeBoxEntity> findAllByCustomizeTable(CustomizeTableEntity table);
 
+    @Query("SELECT COALESCE(SUM(ctb.time), 0)  FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable.id = :tableId")
+    long sumTimeByTableId(long tableId);
+
     @Query("DELETE FROM CustomizeTimeBoxEntity ctb WHERE ctb.customizeTable.id = :tableId")
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteAllByTable(long tableId);

@@ -34,7 +34,7 @@ public class WebSocketAuthMemberResolver implements HandlerMethodArgumentResolve
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
 
-        String email = authManager.resolveAccessToken(token);
+        String email = authManager.resolveChairmanToken(token);
         return authService.getMember(email);
     }
 }

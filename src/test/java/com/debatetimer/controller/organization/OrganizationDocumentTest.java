@@ -1,9 +1,11 @@
 package com.debatetimer.controller.organization;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
@@ -24,7 +26,11 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.ORGANIZATION_API)
-                .summary("기관별 템플릿 조회");
+                .summary("기관별 템플릿 조회")
+                .queryParameter(
+                        parameterWithName("language").optional()
+                                .description("조회 언어 (US_EN | KO_KR, 기본값 KO_KR)")
+                );
 
         private final RestDocumentationResponse responseDocument = response()
                 .responseBodyField(
@@ -51,7 +57,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)
                     ))
             ));
-            doReturn(response).when(organizationService).findAll();
+            doReturn(response).when(organizationService).findAll(any());
 
             var document = document("organization/get-templates", 200)
                     .request(requestDocument)
@@ -60,6 +66,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("language", "KO_KR")
                     .when().get("/api/organizations/templates")
                     .then().statusCode(200);
         }

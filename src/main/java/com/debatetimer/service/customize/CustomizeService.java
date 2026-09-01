@@ -26,10 +26,23 @@ public class CustomizeService {
     }
 
     @Transactional(readOnly = true)
-    public CustomizeTableResponse findTable(long tableId, Member member) {
+    public CustomizeTableResponse findMemberTable(long tableId, Member member) {
         CustomizeTable table = customizeTableDomainRepository.getByIdAndMember(tableId, member);
-        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(tableId, member);
+        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getMemberCustomizeTimeBoxes(tableId, member);
         return new CustomizeTableResponse(table, timeBoxes);
+    }
+
+    @Transactional(readOnly = true)
+    public CustomizeTableResponse findTable(long tableId) {
+        CustomizeTable table = customizeTableDomainRepository.getById(tableId);
+        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(tableId);
+        return new CustomizeTableResponse(table, timeBoxes);
+    }
+
+    @Transactional(readOnly = true)
+    public long findDebateTime(long tableId, Member member) {
+        CustomizeTable customizeTable = customizeTableDomainRepository.getByIdAndMember(tableId, member);
+        return customizeTableDomainRepository.getTotalTimeBoxTimes(customizeTable.getId());
     }
 
     @Transactional
@@ -48,7 +61,7 @@ public class CustomizeService {
     @Transactional
     public CustomizeTableResponse updateUsedAt(long tableId, Member member) {
         CustomizeTable table = customizeTableDomainRepository.updateUsedAt(tableId, member);
-        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getCustomizeTimeBoxes(tableId, member);
+        List<CustomizeTimeBox> timeBoxes = customizeTableDomainRepository.getMemberCustomizeTimeBoxes(tableId, member);
         return new CustomizeTableResponse(table, timeBoxes);
     }
 

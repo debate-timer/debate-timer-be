@@ -114,7 +114,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1),
+                                    new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -129,7 +130,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellResponse(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1), new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1),
+                                    new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -173,7 +175,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1),
+                                    new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -252,14 +255,15 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellResponse(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1), new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1),
+                                    new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, null, null)
                     )
             );
-            doReturn(response).when(customizeService).findTable(eq(tableId), any());
+            doReturn(response).when(customizeService).findMemberTable(eq(tableId), any());
 
             var document = document("customize/get", 200)
                     .request(requestDocument)
@@ -278,7 +282,7 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
         @EnumSource(value = ClientErrorCode.class, names = {"TABLE_NOT_FOUND"})
         void 사용자_지정_테이블_조회_실패(ClientErrorCode errorCode) {
             long tableId = 5L;
-            doThrow(new DTClientErrorException(errorCode)).when(customizeService).findTable(eq(tableId), any());
+            doThrow(new DTClientErrorException(errorCode)).when(customizeService).findMemberTable(eq(tableId), any());
 
             var document = document("customize/get", errorCode)
                     .request(requestDocument)
@@ -370,7 +374,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1),
+                                    new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -385,7 +390,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellResponse(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1), new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1),
+                                    new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -432,7 +438,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxCreateRequest(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1), new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellRequest(BellType.AFTER_START, 90, 1),
+                                    new BellRequest(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxCreateRequest(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,
@@ -514,7 +521,8 @@ public class CustomizeDocumentTest extends BaseDocumentTest {
                             new CustomizeTimeBoxResponse(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
                                     120, List.of(new BellResponse(BellType.AFTER_START, 90, 1)), null, null, "콜리"),
                             new CustomizeTimeBoxResponse(Stance.CONS, "입론", CustomizeBoxType.NORMAL,
-                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1), new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
+                                    120, List.of(new BellResponse(BellType.AFTER_START, 90, 1),
+                                    new BellResponse(BellType.AFTER_START, 120, 2)), null, null, "비토"),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "난상 토론", CustomizeBoxType.TIME_BASED,
                                     null, null, 360, 120, null),
                             new CustomizeTimeBoxResponse(Stance.NEUTRAL, "존중 토론", CustomizeBoxType.TIME_BASED,

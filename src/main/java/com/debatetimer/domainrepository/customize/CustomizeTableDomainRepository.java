@@ -54,11 +54,30 @@ public class CustomizeTableDomainRepository {
     }
 
     @Transactional(readOnly = true)
-    public List<CustomizeTimeBox> getCustomizeTimeBoxes(long tableId, Member member) {
+    public CustomizeTable getById(long tableId) {
+        return tableRepository.getById(tableId)
+                .toDomain();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomizeTimeBox> getMemberCustomizeTimeBoxes(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
         List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
         return toCustomizeTimeBoxes(timeBoxEntityList, bellEntityList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomizeTimeBox> getCustomizeTimeBoxes(long tableId) {
+        CustomizeTableEntity tableEntity = tableRepository.getById(tableId);
+        List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
+        List<BellEntity> bellEntityList = bellRepository.findAllByCustomizeTimeBoxIn(timeBoxEntityList);
+        return toCustomizeTimeBoxes(timeBoxEntityList, bellEntityList);
+    }
+
+    @Transactional(readOnly = true)
+    public long getTotalTimeBoxTimes(long tableId) {
+        return timeBoxRepository.sumTimeByTableId(tableId);
     }
 
     private List<CustomizeTimeBox> toCustomizeTimeBoxes(

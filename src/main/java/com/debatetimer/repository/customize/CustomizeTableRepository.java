@@ -23,5 +23,10 @@ public interface CustomizeTableRepository extends Repository<CustomizeTableEntit
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
     }
 
+    default CustomizeTableEntity getById(long tableId) {
+        return findById(tableId)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
+    }
+
     void delete(CustomizeTableEntity table);
 }

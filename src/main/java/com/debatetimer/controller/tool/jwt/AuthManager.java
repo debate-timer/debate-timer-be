@@ -1,5 +1,6 @@
 package com.debatetimer.controller.tool.jwt;
 
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import java.time.Duration;
@@ -20,6 +21,11 @@ public class AuthManager {
         return new JwtTokenResponse(accessToken, refreshToken, refreshTokenExpiration);
     }
 
+    public String issueChairmanToken(Member member, long expiration) {
+        MemberInfo memberInfo = new MemberInfo(member.getEmail());
+        return jwtTokenProvider.createChairmanToken(memberInfo, expiration);
+    }
+
     public JwtTokenResponse reissueToken(String refreshToken) {
         String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
         MemberInfo memberInfo = new MemberInfo(email);
@@ -36,5 +42,9 @@ public class AuthManager {
 
     public String resolveRefreshToken(String refreshToken) {
         return jwtTokenResolver.resolveRefreshToken(refreshToken);
+    }
+
+    public String resolveChairmanToken(String chairmanToken) {
+        return jwtTokenResolver.resolveChairmanToken(chairmanToken);
     }
 }
