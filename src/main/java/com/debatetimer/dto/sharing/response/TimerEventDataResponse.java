@@ -15,7 +15,16 @@ public record TimerEventDataResponse(
         Stance currentTeam,
 
         int sequence,
-        long remainingTime
+        long remainingTime,
+
+        @Nullable
+        Boolean isRunning,
+
+        @Nullable
+        Long prosRemainingTime,
+
+        @Nullable
+        Long consRemainingTime
 ) {
 
     public TimerEventDataResponse(TimerEventData timerEventInfo) {
@@ -23,7 +32,10 @@ public record TimerEventDataResponse(
                 timerEventInfo.getTimerType(),
                 timerEventInfo.getCurrentTeam(),
                 timerEventInfo.getSequence(),
-                timerEventInfo.getRemainingTime()
+                timerEventInfo.getRemainingTime(),
+                timerEventInfo.getIsRunning(),
+                timerEventInfo.getProsRemainingTime(),
+                timerEventInfo.getConsRemainingTime()
         );
     }
 }

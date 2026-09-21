@@ -15,6 +15,7 @@ public enum TimerEventType {
     PLAY(Objects::nonNull),
     RESET(Objects::nonNull),
     TEAM_SWITCH(Objects::nonNull),
+    SYNC(Objects::nonNull),
     FINISHED(Objects::isNull),
     ;
 
@@ -24,5 +25,9 @@ public enum TimerEventType {
         if (!eventDataValidator.test(eventData)) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_TIMER_EVENT);
         }
+    }
+
+    public boolean isSync() {
+        return this == SYNC;
     }
 }

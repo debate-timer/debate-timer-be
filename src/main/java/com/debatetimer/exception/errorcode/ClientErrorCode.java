@@ -81,6 +81,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_NORMAL_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 일반 타이머 이벤트 데이터입니다"),
     INVALID_TIME_BASED_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다"),
     INVALID_TIMER_EVENT(HttpStatus.BAD_REQUEST, "잘못된 타이머 이벤트 데이터입니다"),
+    INVALID_SYNC_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 동기화 타이머 이벤트 데이터입니다"),
     ;
 
     private final HttpStatus status;

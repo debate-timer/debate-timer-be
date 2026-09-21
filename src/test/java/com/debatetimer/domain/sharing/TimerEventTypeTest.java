@@ -1,11 +1,13 @@
 package com.debatetimer.domain.sharing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -23,6 +25,7 @@ class TimerEventTypeTest {
                         "PLAY",
                         "RESET",
                         "TEAM_SWITCH",
+                        "SYNC",
                 }
         )
         @ParameterizedTest
@@ -40,11 +43,29 @@ class TimerEventTypeTest {
                     CustomizeBoxType.NORMAL,
                     2,
                     null,
-                    30L
+                    30L,
+                    null,
+                    null,
+                    null
             );
             assertThatThrownBy(() -> eventType.validateEventData(timerEventData))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIMER_EVENT.getMessage());
+        }
+    }
+
+    @Nested
+    class IsSync {
+
+        @Test
+        void 동기화_이벤트인지_판단한다() {
+            assertThat(TimerEventType.SYNC.isSync()).isTrue();
+        }
+
+        @EnumSource(value = TimerEventType.class, names = {"SYNC"}, mode = EnumSource.Mode.EXCLUDE)
+        @ParameterizedTest
+        void 동기화_이벤트가_아니면_거짓을_반환한다(TimerEventType eventType) {
+            assertThat(eventType.isSync()).isFalse();
         }
     }
 }

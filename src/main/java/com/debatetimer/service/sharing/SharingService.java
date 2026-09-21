@@ -1,6 +1,7 @@
 package com.debatetimer.service.sharing;
 
 import com.debatetimer.domain.sharing.TimerEvent;
+import com.debatetimer.domain.sharing.TimerEventType;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.dto.sharing.response.TimerEventDataResponse;
@@ -12,13 +13,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SharingService {
 
-    public SharingResponse share(SharingRequest request) {
+    private final SharingRoomRegistry sharingRoomRegistry;
+
+    public SharingResponse share(long roomId, SharingRequest request) {
         TimerEvent timerEvent = request.toTimerEvent();
-        return Optional.ofNullable(timerEvent.getTimerEventData())
-                .map(eventData -> new SharingResponse(
-                        request.eventType(),
-                        new TimerEventDataResponse(eventData)
-                ))
-                .orElse(new SharingResponse(request.eventType(), null));
+        updateRoomStatus(roomId, timerEvent.getEventType());
+        TimerEventDataResponse data = Optional.ofNullable(timerEvent.getTimerEventData())
+                .map(TimerEventDataResponse::new)
+                .orElse(null);
+        return new SharingResponse(request.eventType(), request.version(), data);
+    }
+
+    private void updateRoomStatus(long roomId, TimerEventType eventType) {
+        if (eventType == TimerEventType.FINISHED) {
+            sharingRoomRegistry.markFinished(roomId);
+            return;
+        }
+        sharingRoomRegistry.reopen(roomId);
     }
 }

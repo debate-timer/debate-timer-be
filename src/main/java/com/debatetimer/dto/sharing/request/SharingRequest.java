@@ -11,6 +11,9 @@ public record SharingRequest(
         @NotNull
         TimerEventType eventType,
 
+        @Nullable
+        Long version,
+
         @Valid
         @Nullable
         TimerEventInfoRequest data
