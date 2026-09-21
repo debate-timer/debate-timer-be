@@ -1,12 +1,14 @@
 package com.debatetimer.config.sharing;
 
 import com.debatetimer.config.CorsProperties;
+import com.debatetimer.event.sharing.RoomSubscribeInterceptor;
 import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -26,10 +28,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final CorsProperties corsProperties;
     private final WebSocketAuthMemberResolver webSocketAuthMemberResolver;
+    private final RoomSubscribeInterceptor roomSubscribeInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(webSocketAuthMemberResolver);
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(roomSubscribeInterceptor);
     }
 
     @Override

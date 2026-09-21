@@ -7,10 +7,13 @@ public record SharingResponse(
         TimerEventType eventType,
 
         @Nullable
+        Long version,
+
+        @Nullable
         TimerEventDataResponse data
 ) {
 
     public SharingResponse(TimerEventType eventType) {
-        this(eventType, null);
+        this(eventType, null, null);
     }
 }

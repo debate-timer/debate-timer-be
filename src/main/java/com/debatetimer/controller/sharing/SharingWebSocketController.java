@@ -26,6 +26,6 @@ public class SharingWebSocketController {
             @DestinationVariable(value = "roomId") long roomId,
             @Valid @Payload SharingRequest request
     ) {
-        return sharingService.share(request);
+        return sharingService.share(roomId, request);
     }
 }
