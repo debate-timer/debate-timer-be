@@ -46,13 +46,30 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
 
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
         String destination = accessor.getDestination();
-        if (accessor.getMessageType() != SimpMessageType.SUBSCRIBE
-                || destination == null
-                || !destination.startsWith(AUDIENCE_SUBSCRIBE_PREFIX)) {
+        if (accessor.getMessageType() != SimpMessageType.SUBSCRIBE || destination == null) {
             return;
         }
 
-        long roomId = parseRoomId(destination);
+        if (destination.startsWith(CHAIRMAN_CHANNEL_PREFIX)) {
+            handleChairmanSubscribe(destination);
+            return;
+        }
+
+        if (destination.startsWith(AUDIENCE_SUBSCRIBE_PREFIX)) {
+            handleAudienceSubscribe(destination);
+        }
+    }
+
+    /**
+     * 사회자의 구독은 공유 시작을 뜻하므로, 이전에 종료된 룸이라도 다시 진행 상태로 되돌린다.
+     */
+    private void handleChairmanSubscribe(String destination) {
+        long roomId = parseRoomId(destination, CHAIRMAN_CHANNEL_PREFIX);
+        sharingRoomRegistry.reopen(roomId);
+    }
+
+    private void handleAudienceSubscribe(String destination) {
+        long roomId = parseRoomId(destination, AUDIENCE_SUBSCRIBE_PREFIX);
         if (sharingRoomRegistry.isFinished(roomId)) {
             messagingTemplate.convertAndSend(AUDIENCE_SUBSCRIBE_PREFIX + roomId,
                     new SharingResponse(TimerEventType.FINISHED));
@@ -61,9 +78,9 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
         messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, new ChairmanSharingRequest(roomId));
     }
 
-    private long parseRoomId(String destination) {
+    private long parseRoomId(String destination, String prefix) {
         try {
-            String parsedRoomId = destination.substring(AUDIENCE_SUBSCRIBE_PREFIX.length());
+            String parsedRoomId = destination.substring(prefix.length());
             return Long.parseLong(parsedRoomId);
         } catch (NumberFormatException exception) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_ROOM_ID);

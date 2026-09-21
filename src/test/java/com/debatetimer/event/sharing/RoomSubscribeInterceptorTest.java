@@ -14,13 +14,17 @@ import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.service.sharing.SharingRoomRegistry;
+import java.lang.reflect.Type;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 
 class RoomSubscribeInterceptorTest extends BaseStompTest {
@@ -79,17 +83,41 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
         }
 
         @Test
-        void 종료된_룸에_청중이_구독하면_사회자에게_정보공유_트리거를_발송하지_않는다() {
+        void 종료된_룸에_청중이_구독하면_사회자에게_정보공유_트리거를_발송하지_않는다() throws InterruptedException {
+            QueueFrameHandler<ChairmanSharingRequest> chairmanHandler = new QueueFrameHandler<>(
+                    ChairmanSharingRequest.class);
+            stompSession.subscribe("/chairman/" + ROOM_ID, chairmanHandler);
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+            assertThat(chairmanHandler.poll(3L)).isNotNull(); // 사회자 구독 처리 완료 대기
+            sharingRoomRegistry.markFinished(ROOM_ID);
+
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+
+            assertThat(chairmanHandler.poll(2L)).isNull();
+        }
+
+        @Test
+        void 사회자가_구독하면_종료된_룸을_다시_진행_상태로_되돌린다() throws InterruptedException {
+            sharingRoomRegistry.markFinished(ROOM_ID);
+
+            stompSession.subscribe("/chairman/" + ROOM_ID, new MessageFrameHandler<>(ChairmanSharingRequest.class));
+
+            assertThat(awaitReopened(3L)).isTrue();
+        }
+
+        @Test
+        void 종료된_룸에_사회자가_다시_구독하면_새로운_청중에_대해_사회자에게_정보공유_트리거를_발송한다() throws ExecutionException, InterruptedException, TimeoutException {
             sharingRoomRegistry.markFinished(ROOM_ID);
             MessageFrameHandler<ChairmanSharingRequest> chairmanHandler = new MessageFrameHandler<>(
                     ChairmanSharingRequest.class);
             stompSession.subscribe("/chairman/" + ROOM_ID, chairmanHandler);
+            assertThat(awaitReopened(3L)).isTrue();
 
             stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
 
-            assertThatThrownBy(() -> chairmanHandler.getCompletableFuture()
-                    .get(2L, TimeUnit.SECONDS))
-                    .isInstanceOf(TimeoutException.class);
+            ChairmanSharingRequest sharingRequest = chairmanHandler.getCompletableFuture()
+                    .get(3L, TimeUnit.SECONDS);
+            assertThat(sharingRequest.roomId()).isEqualTo(ROOM_ID);
         }
 
         @Test
@@ -152,6 +180,42 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
             ChairmanSharingRequest sharingRequest = secondChairmanHandler.getCompletableFuture()
                     .get(3L, TimeUnit.SECONDS);
             assertThat(sharingRequest.roomId()).isEqualTo(ROOM_ID);
+        }
+    }
+
+    private boolean awaitReopened(long timeoutSeconds) throws InterruptedException {
+        long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSeconds);
+        while (System.currentTimeMillis() < deadline) {
+            if (!sharingRoomRegistry.isFinished(ROOM_ID)) {
+                return true;
+            }
+            Thread.sleep(50L);
+        }
+        return !sharingRoomRegistry.isFinished(ROOM_ID);
+    }
+
+    private static class QueueFrameHandler<T> implements StompFrameHandler {
+
+        private final BlockingQueue<T> messages = new LinkedBlockingQueue<>();
+        private final Class<T> tClass;
+
+        QueueFrameHandler(Class<T> tClass) {
+            this.tClass = tClass;
+        }
+
+        @Override
+        public Type getPayloadType(StompHeaders headers) {
+            return tClass;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void handleFrame(StompHeaders headers, Object payload) {
+            messages.add((T) payload);
+        }
+
+        T poll(long timeoutSeconds) throws InterruptedException {
+            return messages.poll(timeoutSeconds, TimeUnit.SECONDS);
         }
     }
 }
