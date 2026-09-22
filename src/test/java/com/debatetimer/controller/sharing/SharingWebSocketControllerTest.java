@@ -101,6 +101,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             );
             stompSession.subscribe("/room/" + ROOM_ID, handler);
 
+            long sentAt = System.currentTimeMillis();
             stompSession.send(headers, request);
 
             SharingResponse response = handler.getCompletableFuture()
@@ -109,6 +110,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             assertAll(
                     () -> assertThat(response.eventType()).isEqualTo(TimerEventType.PLAY),
                     () -> assertThat(response.version()).isEqualTo(request.version()),
+                    () -> assertThat(response.serverTime()).isBetween(sentAt, System.currentTimeMillis()),
                     () -> assertThat(response.data().isRunning()).isTrue()
             );
         }
