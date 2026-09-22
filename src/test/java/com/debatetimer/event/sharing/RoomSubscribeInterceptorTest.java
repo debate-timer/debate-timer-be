@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseStompTest;
 import com.debatetimer.MessageFrameHandler;
+import com.debatetimer.QueueFrameHandler;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.sharing.TimerEventType;
@@ -14,17 +15,13 @@ import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.service.sharing.SharingRoomRegistry;
-import java.lang.reflect.Type;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 
 class RoomSubscribeInterceptorTest extends BaseStompTest {
@@ -37,6 +34,7 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
     @AfterEach
     void reopenRoom() {
         sharingRoomRegistry.reopen(ROOM_ID);
+        sharingRoomRegistry.resetVersion(ROOM_ID);
     }
 
     @Nested
@@ -103,6 +101,15 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
             stompSession.subscribe("/chairman/" + ROOM_ID, new MessageFrameHandler<>(ChairmanSharingRequest.class));
 
             assertThat(awaitReopened(3L)).isTrue();
+        }
+
+        @Test
+        void 사회자가_구독하면_룸의_버전_기준을_초기화한다() throws InterruptedException {
+            sharingRoomRegistry.acceptVersion(ROOM_ID, 1_000L);
+
+            stompSession.subscribe("/chairman/" + ROOM_ID, new MessageFrameHandler<>(ChairmanSharingRequest.class));
+
+            assertThat(awaitVersionReset(3L)).isTrue();
         }
 
         @Test
@@ -183,6 +190,17 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
         }
     }
 
+    private boolean awaitVersionReset(long timeoutSeconds) throws InterruptedException {
+        long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSeconds);
+        while (System.currentTimeMillis() < deadline) {
+            if (sharingRoomRegistry.acceptVersion(ROOM_ID, 1L)) {
+                return true;
+            }
+            Thread.sleep(50L);
+        }
+        return false;
+    }
+
     private boolean awaitReopened(long timeoutSeconds) throws InterruptedException {
         long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSeconds);
         while (System.currentTimeMillis() < deadline) {
@@ -192,30 +210,5 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
             Thread.sleep(50L);
         }
         return !sharingRoomRegistry.isFinished(ROOM_ID);
-    }
-
-    private static class QueueFrameHandler<T> implements StompFrameHandler {
-
-        private final BlockingQueue<T> messages = new LinkedBlockingQueue<>();
-        private final Class<T> tClass;
-
-        QueueFrameHandler(Class<T> tClass) {
-            this.tClass = tClass;
-        }
-
-        @Override
-        public Type getPayloadType(StompHeaders headers) {
-            return tClass;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void handleFrame(StompHeaders headers, Object payload) {
-            messages.add((T) payload);
-        }
-
-        T poll(long timeoutSeconds) throws InterruptedException {
-            return messages.poll(timeoutSeconds, TimeUnit.SECONDS);
-        }
     }
 }

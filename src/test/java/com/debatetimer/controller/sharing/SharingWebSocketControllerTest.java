@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseStompTest;
 import com.debatetimer.MessageFrameHandler;
+import com.debatetimer.QueueFrameHandler;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
@@ -37,6 +38,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
     @AfterEach
     void reopenRoom() {
         sharingRoomRegistry.reopen(ROOM_ID);
+        sharingRoomRegistry.resetVersion(ROOM_ID);
     }
 
     @Nested
@@ -101,6 +103,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             );
             stompSession.subscribe("/room/" + ROOM_ID, handler);
 
+            long sentAt = System.currentTimeMillis();
             stompSession.send(headers, request);
 
             SharingResponse response = handler.getCompletableFuture()
@@ -109,6 +112,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             assertAll(
                     () -> assertThat(response.eventType()).isEqualTo(TimerEventType.PLAY),
                     () -> assertThat(response.version()).isEqualTo(request.version()),
+                    () -> assertThat(response.serverTime()).isBetween(sentAt, System.currentTimeMillis()),
                     () -> assertThat(response.data().isRunning()).isTrue()
             );
         }
@@ -231,6 +235,72 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             assertThatThrownBy(() -> handler.getCompletableFuture()
                     .get(2L, TimeUnit.SECONDS))
                     .isInstanceOf(TimeoutException.class);
+        }
+    }
+
+    @Nested
+    class ShareVersion {
+
+        @Test
+        void 이미_공유된_버전보다_오래된_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, normalEvent(TimerEventType.PLAY, 200L));
+            stompSession.send(headers, normalEvent(TimerEventType.STOP, 100L));
+            stompSession.send(headers, normalEvent(TimerEventType.NEXT, 300L));
+
+            SharingResponse first = handler.poll(3L);
+            SharingResponse second = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(first.version()).isEqualTo(200L),
+                    () -> assertThat(second.version()).isEqualTo(300L),
+                    () -> assertThat(handler.poll(1L)).isNull()
+            );
+        }
+
+        @Test
+        void 같은_버전의_이벤트가_다시_오면_중복으로_보고_공유하지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, normalEvent(TimerEventType.NEXT, 200L));
+            stompSession.send(headers, normalEvent(TimerEventType.NEXT, 200L));
+
+            assertAll(
+                    () -> assertThat(handler.poll(3L).version()).isEqualTo(200L),
+                    () -> assertThat(handler.poll(2L)).isNull()
+            );
+        }
+
+        @Test
+        void 오래된_종료_이벤트는_룸을_종료_상태로_만들지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, normalEvent(TimerEventType.PLAY, 200L));
+            stompSession.send(headers, new SharingRequest(TimerEventType.FINISHED, 100L, null));
+            stompSession.send(headers, normalEvent(TimerEventType.STOP, 300L));
+
+            assertAll(
+                    () -> assertThat(handler.poll(3L).version()).isEqualTo(200L),
+                    () -> assertThat(handler.poll(3L).version()).isEqualTo(300L),
+                    () -> assertThat(sharingRoomRegistry.isFinished(ROOM_ID)).isFalse()
+            );
+        }
+
+        private SharingRequest normalEvent(TimerEventType eventType, long version) {
+            return new SharingRequest(
+                    eventType,
+                    version,
+                    new TimerEventInfoRequest(CustomizeBoxType.NORMAL, null, 0, 30, null, null, null)
+            );
         }
     }
 
