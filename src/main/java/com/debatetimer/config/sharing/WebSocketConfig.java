@@ -46,6 +46,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setHeartbeatValue(new long[]{SERVER_TO_CLIENT_HEARTBEAT_DURATION, CLIENT_TO_SERVER_HEARTBEAT_DURATION})
                 .setTaskScheduler(heartBeatScheduler());
         registry.setApplicationDestinationPrefixes("/app");
+        // 룸 단위로 순서를 맞춰 중계한 이벤트가 각 구독자에게도 같은 순서로 전달되도록 세션별 발행 순서를 보존
+        registry.setPreservePublishOrder(true);
     }
 
     @Override

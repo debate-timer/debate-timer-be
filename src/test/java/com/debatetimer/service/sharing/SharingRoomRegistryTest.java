@@ -8,6 +8,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -171,6 +174,71 @@ class SharingRoomRegistryTest {
                     () -> assertThat(sharingRoomRegistry.isFinished(1L)).isFalse(),
                     () -> assertThat(sharingRoomRegistry.isFinished(2L)).isTrue()
             );
+        }
+    }
+
+    @Nested
+    class RunExclusively {
+
+        @Test
+        void 같은_룸의_작업은_동시에_실행되지_않는다() throws InterruptedException {
+            CountDownLatch firstStarted = new CountDownLatch(1);
+            CountDownLatch releaseFirst = new CountDownLatch(1);
+            AtomicBoolean secondRanWhileFirstHeld = new AtomicBoolean(false);
+            AtomicBoolean firstFinished = new AtomicBoolean(false);
+
+            Thread first = new Thread(() -> sharingRoomRegistry.runExclusively(1L, () -> {
+                firstStarted.countDown();
+                await(releaseFirst);
+                firstFinished.set(true);
+            }));
+            first.start();
+            firstStarted.await(1, TimeUnit.SECONDS);
+
+            Thread second = new Thread(() -> sharingRoomRegistry.runExclusively(1L,
+                    () -> secondRanWhileFirstHeld.set(!firstFinished.get())));
+            second.start();
+            second.join(300);
+            releaseFirst.countDown();
+            first.join(1000);
+            second.join(1000);
+
+            assertThat(secondRanWhileFirstHeld).isFalse();
+        }
+
+        @Test
+        void 버전_초기화도_같은_룸의_작업이_끝난_뒤_실행된다() throws InterruptedException {
+            CountDownLatch firstStarted = new CountDownLatch(1);
+            CountDownLatch releaseFirst = new CountDownLatch(1);
+
+            Thread first = new Thread(() -> sharingRoomRegistry.runExclusively(1L, () -> {
+                sharingRoomRegistry.acceptVersion(1L, 100L);
+                firstStarted.countDown();
+                await(releaseFirst);
+            }));
+            first.start();
+            firstStarted.await(1, TimeUnit.SECONDS);
+
+            Thread reset = new Thread(() -> sharingRoomRegistry.resetVersion(1L));
+            reset.start();
+            reset.join(300);
+            boolean resetBlocked = reset.isAlive();
+            releaseFirst.countDown();
+            first.join(1000);
+            reset.join(1000);
+
+            assertAll(
+                    () -> assertThat(resetBlocked).isTrue(),
+                    () -> assertThat(sharingRoomRegistry.acceptVersion(1L, 50L)).isTrue()
+            );
+        }
+
+        private void await(CountDownLatch latch) {
+            try {
+                latch.await(2, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
