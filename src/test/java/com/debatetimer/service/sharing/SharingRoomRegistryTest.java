@@ -91,6 +91,70 @@ class SharingRoomRegistryTest {
     }
 
     @Nested
+    class AcceptVersion {
+
+        @Test
+        void 처음_받은_버전은_수락한다() {
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 100L)).isTrue();
+        }
+
+        @Test
+        void 마지막_버전보다_큰_버전은_수락한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 101L)).isTrue();
+        }
+
+        @Test
+        void 마지막_버전과_같은_버전은_중복으로_보고_거절한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 100L)).isFalse();
+        }
+
+        @Test
+        void 마지막_버전보다_작은_버전은_오래된_이벤트로_보고_거절한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 99L)).isFalse();
+        }
+
+        @Test
+        void 거절된_버전은_마지막_버전을_바꾸지_않는다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+            sharingRoomRegistry.acceptVersion(1L, 99L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 100L)).isFalse();
+        }
+
+        @Test
+        void 버전이_없는_이벤트는_하위_호환을_위해_항상_수락한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            assertAll(
+                    () -> assertThat(sharingRoomRegistry.acceptVersion(1L, null)).isTrue(),
+                    () -> assertThat(sharingRoomRegistry.acceptVersion(1L, 101L)).isTrue()
+            );
+        }
+
+        @Test
+        void 룸마다_버전을_따로_관리한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(2L, 50L)).isTrue();
+        }
+
+        @Test
+        void 버전을_초기화하면_작은_버전도_수락한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+
+            sharingRoomRegistry.resetVersion(1L);
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 50L)).isTrue();
+        }
+    }
+
+    @Nested
     class RemoveExpired {
 
         @Test
@@ -107,6 +171,30 @@ class SharingRoomRegistryTest {
                     () -> assertThat(sharingRoomRegistry.isFinished(1L)).isFalse(),
                     () -> assertThat(sharingRoomRegistry.isFinished(2L)).isTrue()
             );
+        }
+    }
+
+    @Nested
+    class RemoveExpiredVersion {
+
+        @Test
+        void 마지막_수락_후_유지_시간이_지난_버전을_제거한다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+            clock.advance(SharingRoomRegistry.VERSION_TTL);
+
+            sharingRoomRegistry.removeExpired();
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 50L)).isTrue();
+        }
+
+        @Test
+        void 유지_시간이_지나지_않은_버전은_제거하지_않는다() {
+            sharingRoomRegistry.acceptVersion(1L, 100L);
+            clock.advance(SharingRoomRegistry.VERSION_TTL.minusSeconds(1));
+
+            sharingRoomRegistry.removeExpired();
+
+            assertThat(sharingRoomRegistry.acceptVersion(1L, 50L)).isFalse();
         }
     }
 

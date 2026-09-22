@@ -26,6 +26,8 @@ public class SharingWebSocketController {
             @DestinationVariable(value = "roomId") long roomId,
             @Valid @Payload SharingRequest request
     ) {
-        return sharingService.share(roomId, request);
+        // null을 반환하면 @SendTo가 메시지를 보내지 않으므로, 거절된 이벤트는 청중에게 전달되지 않는다
+        return sharingService.share(roomId, request)
+                .orElse(null);
     }
 }

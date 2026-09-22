@@ -27,15 +27,20 @@ public class SharingService {
     }
 
     /**
+     * 이미 공유한 버전 이하의 이벤트(중복·순서가 뒤바뀐 이벤트)는 공유하지 않는다.
      * 청중이 수신 시점까지 흐른 시간을 보정할 수 있도록, 서버가 이벤트를 중계한 시각(epoch ms)을 함께 담는다.
      */
-    public SharingResponse share(long roomId, SharingRequest request) {
+    public Optional<SharingResponse> share(long roomId, SharingRequest request) {
         TimerEvent timerEvent = request.toTimerEvent();
+        if (!sharingRoomRegistry.acceptVersion(roomId, request.version())) {
+            return Optional.empty();
+        }
+
         updateRoomStatus(roomId, timerEvent.getEventType());
         TimerEventDataResponse data = Optional.ofNullable(timerEvent.getTimerEventData())
                 .map(TimerEventDataResponse::new)
                 .orElse(null);
-        return new SharingResponse(request.eventType(), request.version(), clock.millis(), data);
+        return Optional.of(new SharingResponse(request.eventType(), request.version(), clock.millis(), data));
     }
 
     private void updateRoomStatus(long roomId, TimerEventType eventType) {

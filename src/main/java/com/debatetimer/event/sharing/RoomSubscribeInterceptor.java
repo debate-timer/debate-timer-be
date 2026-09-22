@@ -62,10 +62,12 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
 
     /**
      * 사회자의 구독은 공유 시작을 뜻하므로, 이전에 종료된 룸이라도 다시 진행 상태로 되돌린다.
+     * 다른 기기에서 공유를 이어갈 수 있으므로 이전 세션의 버전 기준도 초기화한다.
      */
     private void handleChairmanSubscribe(String destination) {
         long roomId = parseRoomId(destination, CHAIRMAN_CHANNEL_PREFIX);
         sharingRoomRegistry.reopen(roomId);
+        sharingRoomRegistry.resetVersion(roomId);
     }
 
     private void handleAudienceSubscribe(String destination) {
