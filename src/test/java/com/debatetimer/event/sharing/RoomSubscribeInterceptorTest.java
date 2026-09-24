@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.BaseStompTest;
+import com.debatetimer.controller.sharing.SharingWebSocketController;
 import com.debatetimer.MessageFrameHandler;
 import com.debatetimer.QueueFrameHandler;
 import com.debatetimer.domain.customize.CustomizeBoxType;
@@ -15,6 +16,7 @@ import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
+import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.service.sharing.ChairmanSessionRegistry;
 import com.debatetimer.service.sharing.SharingRoomRegistry;
 import java.util.UUID;
@@ -22,11 +24,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
 
 class RoomSubscribeInterceptorTest extends BaseStompTest {
 
@@ -39,6 +43,17 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
 
     @Autowired
     private ChairmanSessionRegistry chairmanSessionRegistry;
+
+    @Autowired
+    private CustomizeTableEntityGenerator customizeTableEntityGenerator;
+
+    private Member owner;
+
+    @BeforeEach
+    void setUpRoomOwner() {
+        owner = memberGenerator.generate("owner@email.com");
+        customizeTableEntityGenerator.generate(owner); // ROOM_ID(1)번 테이블
+    }
 
     @AfterEach
     void reopenRoom() {
@@ -226,7 +241,7 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
         @Test
         void 사회자_세션_식별자_없이_구독한_사회자는_활성_사회자로_등록되지_않는다() throws ExecutionException, InterruptedException, TimeoutException {
             MessageFrameHandler<SharingResponse> audienceHandler = new MessageFrameHandler<>(SharingResponse.class);
-            stompSession.subscribe("/chairman/" + ROOM_ID, new QueueFrameHandler<>(ChairmanSharingRequest.class));
+            stompSession.subscribe(headerGenerator.generateChairmanSubscribeHeaderWithoutSession("/chairman/" + ROOM_ID, owner), new QueueFrameHandler<>(ChairmanSharingRequest.class));
 
             stompSession.subscribe("/room/" + ROOM_ID, audienceHandler);
 
@@ -264,9 +279,53 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
         }
     }
 
+    @Nested
+    class ChairmanAuthorization {
+
+        @Test
+        void 사회자_토큰_없이_사회자_채널을_구독하면_활성_사회자가_되지_못한다() throws InterruptedException {
+            StompHeaders headers = new StompHeaders();
+            headers.setDestination("/chairman/" + ROOM_ID);
+            headers.add(SharingWebSocketController.CHAIRMAN_SESSION_HEADER, chairmanSessionId);
+
+            stompSession.subscribe(headers, new QueueFrameHandler<>(ChairmanSharingRequest.class));
+
+            assertThat(awaitActiveChairman(true, 2L)).isFalse();
+        }
+
+        @Test
+        void 테이블_소유자가_아닌_회원은_사회자_채널을_구독해도_활성_사회자가_되지_못한다() throws InterruptedException {
+            Member other = memberGenerator.generate("other@email.com");
+
+            stompSession.subscribe(
+                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, other, chairmanSessionId),
+                    new QueueFrameHandler<>(ChairmanSharingRequest.class)
+            );
+
+            assertThat(awaitActiveChairman(true, 2L)).isFalse();
+        }
+
+        @Test
+        void 권한_없는_구독은_기존_활성_사회자를_밀어내지_못한다() throws Exception {
+            subscribeChairman(new QueueFrameHandler<>(ChairmanSharingRequest.class));
+            assertThat(awaitActiveChairman(true, 3L)).isTrue();
+            StompSession ownerSession = stompSession;
+            connect(); // 공격자용 새 연결
+            StompHeaders headers = new StompHeaders();
+            headers.setDestination("/chairman/" + ROOM_ID);
+            headers.add(SharingWebSocketController.CHAIRMAN_SESSION_HEADER, UUID.randomUUID().toString());
+
+            stompSession.subscribe(headers, new QueueFrameHandler<>(ChairmanSharingRequest.class));
+
+            Thread.sleep(1000L);
+            assertThat(chairmanSessionRegistry.isActive(ROOM_ID, chairmanSessionId)).isTrue();
+            ownerSession.disconnect();
+        }
+    }
+
     private void subscribeChairman(StompFrameHandler handler) {
         stompSession.subscribe(
-                headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, chairmanSessionId),
+                headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, owner, chairmanSessionId),
                 handler
         );
     }

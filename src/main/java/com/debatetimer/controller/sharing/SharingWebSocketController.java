@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -28,12 +27,11 @@ public class SharingWebSocketController {
             @AuthMember Member member,
             @DestinationVariable(value = "roomId") long roomId,
             @Header(name = CHAIRMAN_SESSION_HEADER, required = false) String chairmanSessionId,
-            @Header(SimpMessageHeaderAccessor.SESSION_ID_HEADER) String simpSessionId,
             @Valid @Payload SharingRequest request
     ) {
         if (chairmanSessionId == null || chairmanSessionId.isBlank()) {
             throw new DTClientErrorException(ClientErrorCode.CHAIRMAN_SESSION_REQUIRED);
         }
-        sharingService.share(roomId, chairmanSessionId, simpSessionId, request);
+        sharingService.share(roomId, chairmanSessionId, request);
     }
 }

@@ -74,9 +74,14 @@ class SharingServiceTest {
     @Nested
     class Share {
 
+        @BeforeEach
+        void startChairman() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+        }
+
         @Test
         void 룸_채널로_서버_시각을_담은_응답을_보낸다() {
-            sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, normalEvent(TimerEventType.PLAY, 1L));
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.PLAY, 1L));
 
             SharingResponse response = sentResponses(1).get(0);
             assertAll(
@@ -88,17 +93,17 @@ class SharingServiceTest {
 
         @Test
         void 데이터가_없는_종료_이벤트에도_서버_시각을_담는다() {
-            sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, new SharingRequest(TimerEventType.FINISHED, 1L, null));
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
 
             assertThat(sentResponses(1).get(0).serverTime()).isEqualTo(NOW.toEpochMilli());
         }
 
         @Test
         void 이미_공유된_버전_이하의_이벤트는_보내지_않고_룸_상태도_바꾸지_않는다() {
-            sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, new SharingRequest(TimerEventType.FINISHED, 200L, null));
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 200L, null));
             sharingRoomRegistry.reopen(ROOM_ID);
 
-            sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, new SharingRequest(TimerEventType.FINISHED, 100L, null));
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 100L, null));
 
             assertAll(
                     () -> assertThat(sentResponses(1)).extracting(SharingResponse::version).containsExactly(200L),
@@ -109,11 +114,11 @@ class SharingServiceTest {
         @Test
         void 형식이_잘못된_이벤트는_보내지_않고_버전도_소비하지_않는다() {
             SharingRequest invalid = new SharingRequest(TimerEventType.NEXT, 200L, null);
-            assertThatThrownBy(() -> sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, invalid))
+            assertThatThrownBy(() -> sharingService.share(ROOM_ID, CHAIRMAN, invalid))
                     .isInstanceOf(DTClientErrorException.class);
             verify(messagingTemplate, never()).convertAndSend(anyString(), any(Object.class));
 
-            sharingService.share(ROOM_ID, CHAIRMAN, SIMP_SESSION, new SharingRequest(TimerEventType.FINISHED, 200L, null));
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 200L, null));
 
             assertThat(sentResponses(1)).extracting(SharingResponse::version).containsExactly(200L);
         }
@@ -127,7 +132,7 @@ class SharingServiceTest {
             sharingService.startChairman(ROOM_ID, "tab-a", "simp-1");
             sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
 
-            sharingService.share(ROOM_ID, "tab-a", "simp-1", normalEvent(TimerEventType.PLAY, 1L));
+            sharingService.share(ROOM_ID, "tab-a", normalEvent(TimerEventType.PLAY, 1L));
 
             verify(messagingTemplate, never()).convertAndSend(eq("/room/" + ROOM_ID), any(Object.class));
         }
@@ -137,7 +142,7 @@ class SharingServiceTest {
             sharingService.startChairman(ROOM_ID, "tab-a", "simp-1");
             sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
 
-            sharingService.share(ROOM_ID, "tab-a", "simp-1", normalEvent(TimerEventType.PLAY, 1L));
+            sharingService.share(ROOM_ID, "tab-a", normalEvent(TimerEventType.PLAY, 1L));
 
             assertThat(sentChairmanNotices(2))
                     .allSatisfy(notice -> assertAll(
@@ -148,19 +153,35 @@ class SharingServiceTest {
 
         @Test
         void 새_사회자가_공유를_시작하면_이전_사회자의_버전_기준을_초기화한다() {
-            sharingService.share(ROOM_ID, "tab-a", "simp-1", normalEvent(TimerEventType.PLAY, 200L));
+            sharingService.startChairman(ROOM_ID, "tab-a", "simp-1");
+            sharingService.share(ROOM_ID, "tab-a", normalEvent(TimerEventType.PLAY, 200L));
             sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
 
-            sharingService.share(ROOM_ID, "tab-b", "simp-2", normalEvent(TimerEventType.PLAY, 100L));
+            sharingService.share(ROOM_ID, "tab-b", normalEvent(TimerEventType.PLAY, 100L));
 
             assertThat(sentResponses(2)).extracting(SharingResponse::version).containsExactly(200L, 100L);
         }
 
         @Test
-        void 사회자가_없는_룸에서_이벤트를_보내면_활성_사회자가_된다() {
-            sharingService.share(ROOM_ID, "tab-a", "simp-1", normalEvent(TimerEventType.PLAY, 1L));
+        void 공유를_시작하지_않은_세션의_이벤트는_중계하지_않고_활성_사회자로_등록하지도_않는다() {
+            sharingService.share(ROOM_ID, "tab-a", normalEvent(TimerEventType.PLAY, 1L));
 
-            assertThat(chairmanSessionRegistry.isActive(ROOM_ID, "tab-a")).isTrue();
+            assertAll(
+                    () -> verify(messagingTemplate, never()).convertAndSend(eq("/room/" + ROOM_ID), any(Object.class)),
+                    () -> assertThat(chairmanSessionRegistry.hasActiveChairman(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 다른_사회자가_공유_중일_때_등록되지_않은_세션이_이벤트를_보내면_권한을_넘겨받지_못한다() {
+            sharingService.startChairman(ROOM_ID, "tab-a", "simp-1");
+
+            sharingService.share(ROOM_ID, "tab-b", normalEvent(TimerEventType.PLAY, 1L));
+
+            assertAll(
+                    () -> verify(messagingTemplate, never()).convertAndSend(eq("/room/" + ROOM_ID), any(Object.class)),
+                    () -> assertThat(chairmanSessionRegistry.isActive(ROOM_ID, "tab-a")).isTrue()
+            );
         }
     }
 

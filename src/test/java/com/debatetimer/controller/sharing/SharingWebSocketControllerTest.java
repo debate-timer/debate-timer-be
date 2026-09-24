@@ -16,6 +16,7 @@ import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
+import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.service.sharing.ChairmanSessionRegistry;
 import com.debatetimer.service.sharing.SharingRoomRegistry;
 import java.util.UUID;
@@ -44,10 +45,17 @@ class SharingWebSocketControllerTest extends BaseStompTest {
     @Autowired
     private ChairmanSessionRegistry chairmanSessionRegistry;
 
+    @Autowired
+    private CustomizeTableEntityGenerator customizeTableEntityGenerator;
+
+    private Member owner;
+
     @BeforeEach
     void startChairman() throws InterruptedException {
+        owner = memberGenerator.generate("owner@email.com");
+        customizeTableEntityGenerator.generate(owner); // ROOM_ID(1)번 테이블
         stompSession.subscribe(
-                headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, chairmanSessionId),
+                headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, owner, chairmanSessionId),
                 new QueueFrameHandler<>(ChairmanSharingRequest.class)
         );
         assertThat(awaitActive(chairmanSessionId, 3L)).isTrue();
@@ -213,7 +221,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
                             null
                     )
             );
-            stompSession.subscribe("/chairman/" + ROOM_ID, chairmanHandler);
+            stompSession.subscribe(headerGenerator.generateChairmanSubscribeHeaderWithoutSession("/chairman/" + ROOM_ID, owner), chairmanHandler);
             stompSession.subscribe("/room/" + ROOM_ID, audienceHandler);
             chairmanHandler.getCompletableFuture().get(3L, TimeUnit.SECONDS); // 청중 구독 처리 완료 대기
             sharingRoomRegistry.markFinished(ROOM_ID);
@@ -492,7 +500,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             StompHeaders newHeaders = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member,
                     newChairmanSessionId);
             stompSession.subscribe(
-                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, newChairmanSessionId),
+                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, owner, newChairmanSessionId),
                     new QueueFrameHandler<>(ChairmanSharingRequest.class)
             );
             stompSession.subscribe("/room/" + ROOM_ID, handler);
@@ -512,10 +520,10 @@ class SharingWebSocketControllerTest extends BaseStompTest {
             QueueFrameHandler<ChairmanSharingRequest> chairmanHandler = new QueueFrameHandler<>(
                     ChairmanSharingRequest.class);
             String newChairmanSessionId = UUID.randomUUID().toString();
-            stompSession.subscribe("/chairman/" + ROOM_ID, chairmanHandler);
+            stompSession.subscribe(headerGenerator.generateChairmanSubscribeHeaderWithoutSession("/chairman/" + ROOM_ID, owner), chairmanHandler);
 
             stompSession.subscribe(
-                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, newChairmanSessionId),
+                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, owner, newChairmanSessionId),
                     new QueueFrameHandler<>(ChairmanSharingRequest.class)
             );
 
@@ -532,9 +540,9 @@ class SharingWebSocketControllerTest extends BaseStompTest {
                     ChairmanSharingRequest.class);
             Member member = memberGenerator.generate("example@email.com");
             String newChairmanSessionId = UUID.randomUUID().toString();
-            stompSession.subscribe("/chairman/" + ROOM_ID, chairmanHandler);
+            stompSession.subscribe(headerGenerator.generateChairmanSubscribeHeaderWithoutSession("/chairman/" + ROOM_ID, owner), chairmanHandler);
             stompSession.subscribe(
-                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, newChairmanSessionId),
+                    headerGenerator.generateChairmanSubscribeHeader("/chairman/" + ROOM_ID, owner, newChairmanSessionId),
                     new QueueFrameHandler<>(ChairmanSharingRequest.class)
             );
             assertThat(chairmanHandler.poll(3L)).isNotNull(); // 교체 알림 대기

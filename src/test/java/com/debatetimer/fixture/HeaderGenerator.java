@@ -38,10 +38,13 @@ public class HeaderGenerator {
         return stompHeaders;
     }
 
-    public StompHeaders generateChairmanSubscribeHeader(String destination, String chairmanSessionId) {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination(destination);
+    public StompHeaders generateChairmanSubscribeHeader(String destination, Member member, String chairmanSessionId) {
+        StompHeaders stompHeaders = generateChairmanSubscribeHeaderWithoutSession(destination, member);
         stompHeaders.add(SharingWebSocketController.CHAIRMAN_SESSION_HEADER, chairmanSessionId);
         return stompHeaders;
+    }
+
+    public StompHeaders generateChairmanSubscribeHeaderWithoutSession(String destination, Member member) {
+        return generateChairmanTokenHeaderWithoutSession(destination, member);
     }
 }

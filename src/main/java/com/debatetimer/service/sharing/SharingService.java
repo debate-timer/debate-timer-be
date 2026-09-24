@@ -46,15 +46,17 @@ public class SharingService {
 
     /**
      * 사회자 이벤트를 룸 채널로 중계한다.
-     * - 룸의 활성 사회자 세션이 보낸 이벤트만 중계한다. 밀려난 세션의 이벤트는 버리고 밀려났음을 다시 알린다.
+     * - 룸의 활성 사회자 세션이 보낸 이벤트만 중계한다. 활성 사회자는 권한을 확인한 사회자 채널 구독으로만 정해지며,
+     *   그 외 세션의 이벤트는 버리고 현재 활성 사회자를 다시 알린다.
      * - 이미 공유한 버전 이하의 이벤트(중복·순서가 뒤바뀐 이벤트)는 중계하지 않고 룸 상태도 바꾸지 않는다.
      * - 버전 수락부터 중계까지 룸 단위로 하나씩 실행해, 낮은 버전이 높은 버전보다 늦게 반영되지 않게 한다.
      * - 청중이 수신 시점까지 흐른 시간을 보정할 수 있도록, 서버가 이벤트를 중계한 시각(epoch ms)을 함께 담는다.
      */
-    public void share(long roomId, String chairmanSessionId, String simpSessionId, SharingRequest request) {
+    public void share(long roomId, String chairmanSessionId, SharingRequest request) {
         TimerEvent timerEvent = request.toTimerEvent();
         sharingRoomRegistry.runExclusively(roomId, () -> {
-            if (!claimChairman(roomId, chairmanSessionId, simpSessionId).isAccepted()) {
+            if (!chairmanSessionRegistry.isActive(roomId, chairmanSessionId)) {
+                notifyActiveChairman(roomId);
                 return;
             }
             if (!sharingRoomRegistry.acceptVersion(roomId, request.version())) {
