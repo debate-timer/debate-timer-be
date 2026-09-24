@@ -21,6 +21,7 @@ import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.sharing.ChairmanTokenExpiration;
 import com.debatetimer.dto.customize.response.BellResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableInfoResponse;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
@@ -59,7 +60,7 @@ public class SharingDocumentTest extends BaseDocumentTest {
             doReturn(debateTime).when(customizeService)
                     .findDebateTime(eq(requestTableId), any(Member.class));
             doReturn("testToken").when(authManager)
-                    .issueChairmanToken(any(Member.class), eq(debateTime * 2));
+                    .issueChairmanToken(any(Member.class), eq(ChairmanTokenExpiration.secondsFor(debateTime)));
 
             var document = document("sharing/get", 200)
                     .request(requestDocument)
