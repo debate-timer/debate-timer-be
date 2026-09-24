@@ -2,6 +2,7 @@ package com.debatetimer.domain.sharing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -51,6 +52,25 @@ class TimerEventTypeTest {
             assertThatThrownBy(() -> eventType.validateEventData(timerEventData))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_TIMER_EVENT.getMessage());
+        }
+
+        @Test
+        void 사회자_부재_이벤트는_서버_전용이라_데이터와_관계없이_검증에_실패한다() {
+            TimerEventData timerEventData = new TimerEventData(
+                    CustomizeBoxType.NORMAL,
+                    2,
+                    null,
+                    30L,
+                    null,
+                    null,
+                    null
+            );
+            assertAll(
+                    () -> assertThatThrownBy(() -> TimerEventType.CHAIRMAN_ABSENT.validateEventData(null))
+                            .isInstanceOf(DTClientErrorException.class),
+                    () -> assertThatThrownBy(() -> TimerEventType.CHAIRMAN_ABSENT.validateEventData(timerEventData))
+                            .isInstanceOf(DTClientErrorException.class)
+            );
         }
     }
 

@@ -1,18 +1,15 @@
 package com.debatetimer.event.sharing;
 
-import com.debatetimer.domain.sharing.TimerEventType;
-import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
-import com.debatetimer.dto.sharing.response.SharingResponse;
+import com.debatetimer.controller.sharing.SharingWebSocketController;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
-import com.debatetimer.service.sharing.SharingRoomRegistry;
+import com.debatetimer.service.sharing.SharingService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.stereotype.Component;
@@ -27,15 +24,10 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
     private static final String AUDIENCE_SUBSCRIBE_PREFIX = "/room/";
     private static final String CHAIRMAN_CHANNEL_PREFIX = "/chairman/";
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final SharingRoomRegistry sharingRoomRegistry;
+    private final SharingService sharingService;
 
-    public RoomSubscribeInterceptor(
-            @Lazy SimpMessagingTemplate messagingTemplate,
-            SharingRoomRegistry sharingRoomRegistry
-    ) {
-        this.messagingTemplate = messagingTemplate;
-        this.sharingRoomRegistry = sharingRoomRegistry;
+    public RoomSubscribeInterceptor(@Lazy SharingService sharingService) {
+        this.sharingService = sharingService;
     }
 
     @Override
@@ -51,7 +43,7 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
         }
 
         if (destination.startsWith(CHAIRMAN_CHANNEL_PREFIX)) {
-            handleChairmanSubscribe(destination);
+            handleChairmanSubscribe(accessor, destination);
             return;
         }
 
@@ -61,23 +53,21 @@ public class RoomSubscribeInterceptor implements ExecutorChannelInterceptor {
     }
 
     /**
-     * 사회자의 구독은 공유 시작을 뜻하므로, 이전에 종료된 룸이라도 다시 진행 상태로 되돌린다.
-     * 다른 기기에서 공유를 이어갈 수 있으므로 이전 세션의 버전 기준도 초기화한다.
+     * 사회자의 구독은 공유 시작을 뜻한다.
+     * 사회자 세션 식별자가 없는 구독은 발행 권한을 얻을 수 없으므로 활성 사회자로 등록하지 않는다.
      */
-    private void handleChairmanSubscribe(String destination) {
+    private void handleChairmanSubscribe(SimpMessageHeaderAccessor accessor, String destination) {
         long roomId = parseRoomId(destination, CHAIRMAN_CHANNEL_PREFIX);
-        sharingRoomRegistry.reopen(roomId);
-        sharingRoomRegistry.resetVersion(roomId);
+        String chairmanSessionId = accessor.getFirstNativeHeader(SharingWebSocketController.CHAIRMAN_SESSION_HEADER);
+        if (chairmanSessionId == null || chairmanSessionId.isBlank()) {
+            return;
+        }
+        sharingService.startChairman(roomId, chairmanSessionId, accessor.getSessionId());
     }
 
     private void handleAudienceSubscribe(String destination) {
         long roomId = parseRoomId(destination, AUDIENCE_SUBSCRIBE_PREFIX);
-        if (sharingRoomRegistry.isFinished(roomId)) {
-            messagingTemplate.convertAndSend(AUDIENCE_SUBSCRIBE_PREFIX + roomId,
-                    new SharingResponse(TimerEventType.FINISHED));
-            return;
-        }
-        messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, new ChairmanSharingRequest(roomId));
+        sharingService.joinAudience(roomId);
     }
 
     private long parseRoomId(String destination, String prefix) {

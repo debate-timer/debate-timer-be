@@ -52,6 +52,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // 사회자의 구독(공유 시작)이 이어서 보낸 이벤트보다 먼저 처리되도록 세션별 수신 순서를 보존
+        registry.setPreserveReceiveOrder(true);
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns(corsProperties.getCorsOrigin())
                 .withSockJS()

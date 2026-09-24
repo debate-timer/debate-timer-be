@@ -54,6 +54,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ALREADY_VOTED_PARTICIPANT(HttpStatus.BAD_REQUEST, "이미 참여한 투표자 입니다"),
 
     INVALID_ROOM_ID(HttpStatus.BAD_REQUEST, "잘못된 roomId 값입니다"),
+    CHAIRMAN_SESSION_REQUIRED(HttpStatus.BAD_REQUEST, "사회자 세션 식별자가 필요합니다"),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
