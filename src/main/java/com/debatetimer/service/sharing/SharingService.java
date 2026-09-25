@@ -84,6 +84,8 @@ public class SharingService {
      * - 종료된 룸이면 청중에게 종료를 알린다.
      * - 활성 사회자가 없으면 청중에게 사회자 부재를 알린다.
      * - 그 외에는 사회자에게 현재 상태 공유를 요청한다.
+     * 사회자의 응답은 룸 전체로 중계되므로, 짧은 간격의 뒤따르는 요청은 직전 요청의 응답이 대신한다.
+     * 그래서 룸별 최소 간격 안의 요청은 보내지 않는다.
      */
     public void joinAudience(long roomId) {
         if (sharingRoomRegistry.isFinished(roomId)) {
@@ -93,6 +95,9 @@ public class SharingService {
         if (!chairmanSessionRegistry.hasActiveChairman(roomId)) {
             messagingTemplate.convertAndSend(ROOM_CHANNEL_PREFIX + roomId,
                     new SharingResponse(TimerEventType.CHAIRMAN_ABSENT));
+            return;
+        }
+        if (!sharingRoomRegistry.tryAcquireSyncRequest(roomId)) {
             return;
         }
         messagingTemplate.convertAndSend(CHAIRMAN_CHANNEL_PREFIX + roomId, ChairmanSharingRequest.syncRequest(roomId));
