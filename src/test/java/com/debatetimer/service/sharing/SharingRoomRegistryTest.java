@@ -284,6 +284,13 @@ class SharingRoomRegistryTest {
         }
 
         @Test
+        void 같은_시각의_연속_요청은_거절한다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isFalse();
+        }
+
+        @Test
         void 최소_간격이_지난_요청은_허용한다() {
             sharingRoomRegistry.tryAcquireSyncRequest(1L);
 

@@ -89,13 +89,15 @@ public class SharingRoomRegistry {
      */
     public boolean tryAcquireSyncRequest(long roomId) {
         Instant now = clock.instant();
-        Instant lastRequestedAt = lastSyncRequestedAt.compute(roomId, (id, lastRequested) -> {
+        AtomicBoolean acquired = new AtomicBoolean(false);
+        lastSyncRequestedAt.compute(roomId, (id, lastRequested) -> {
             if (lastRequested != null && now.isBefore(lastRequested.plus(SYNC_REQUEST_INTERVAL))) {
                 return lastRequested;
             }
+            acquired.set(true);
             return now;
         });
-        return now.equals(lastRequestedAt);
+        return acquired.get();
     }
 
     /**
