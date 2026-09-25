@@ -70,11 +70,13 @@ public class SharingService {
 
     /**
      * 사회자의 구독은 공유 시작을 뜻하므로, 최신 사회자로 등록하고 이전에 종료된 룸이라도 다시 진행 상태로 되돌린다.
+     * 새 사회자는 직전 공유 요청의 응답을 보낸 적이 없으므로, 상태 공유 요청 간격 기준도 함께 지운다.
      */
     public void startChairman(long roomId, String chairmanSessionId, String simpSessionId) {
         sharingRoomRegistry.runExclusively(roomId, () -> {
             if (claimChairman(roomId, chairmanSessionId, simpSessionId).isAccepted()) {
                 sharingRoomRegistry.reopen(roomId);
+                sharingRoomRegistry.resetSyncRequest(roomId);
             }
         });
     }

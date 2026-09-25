@@ -99,6 +99,13 @@ public class SharingRoomRegistry {
     }
 
     /**
+     * 룸의 상태 공유 요청 간격 기준을 지운다. 다음 요청은 간격과 무관하게 허용된다.
+     */
+    public void resetSyncRequest(long roomId) {
+        lastSyncRequestedAt.remove(roomId);
+    }
+
+    /**
      * 같은 룸의 작업(버전 수락·룸 상태 변경·중계, 버전 초기화)을 하나씩 실행한다.
      * 인바운드 메시지는 여러 스레드에서 동시에 처리될 수 있어, 낮은 버전의 상태 변경이나 중계가
      * 높은 버전보다 늦게 반영되는 것을 막는다. 룸 수만큼 락이 늘지 않도록 고정 개수의 락을 나눠 쓴다.
