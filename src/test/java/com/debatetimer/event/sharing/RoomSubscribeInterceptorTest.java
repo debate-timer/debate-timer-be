@@ -59,6 +59,7 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
     void reopenRoom() {
         sharingRoomRegistry.reopen(ROOM_ID);
         sharingRoomRegistry.resetVersion(ROOM_ID);
+        sharingRoomRegistry.resetSyncRequest(ROOM_ID);
         chairmanSessionRegistry.remove(ROOM_ID);
     }
 
@@ -217,6 +218,41 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
             ChairmanSharingRequest sharingRequest = secondChairmanHandler.getCompletableFuture()
                     .get(3L, TimeUnit.SECONDS);
             assertThat(sharingRequest.roomId()).isEqualTo(ROOM_ID);
+        }
+    }
+
+    @Nested
+    class SyncRequestInterval {
+
+        @Test
+        void 청중이_연달아_구독해도_사회자에게_정보공유_트리거를_한_번만_발송한다() throws Exception {
+            QueueFrameHandler<ChairmanSharingRequest> chairmanHandler = new QueueFrameHandler<>(
+                    ChairmanSharingRequest.class);
+            subscribeChairman(chairmanHandler);
+
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+            assertThat(chairmanHandler.poll(3L)).isNotNull(); // 첫 구독 처리 완료 대기
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+
+            assertThat(chairmanHandler.poll(2L)).isNull();
+        }
+
+        @Test
+        void 요청_간격_기준을_지우면_사회자에게_정보공유_트리거를_다시_발송한다() throws Exception {
+            QueueFrameHandler<ChairmanSharingRequest> chairmanHandler = new QueueFrameHandler<>(
+                    ChairmanSharingRequest.class);
+            subscribeChairman(chairmanHandler);
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+            assertThat(chairmanHandler.poll(3L)).isNotNull(); // 첫 구독 처리 완료 대기
+
+            sharingRoomRegistry.resetSyncRequest(ROOM_ID);
+            stompSession.subscribe("/room/" + ROOM_ID, new MessageFrameHandler<>(SharingResponse.class));
+
+            ChairmanSharingRequest sharingRequest = chairmanHandler.poll(3L);
+            assertAll(
+                    () -> assertThat(sharingRequest).isNotNull(),
+                    () -> assertThat(sharingRequest.type()).isEqualTo(ChairmanNoticeType.SYNC_REQUEST)
+            );
         }
     }
 

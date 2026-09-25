@@ -65,6 +65,7 @@ class SharingWebSocketControllerTest extends BaseStompTest {
     void reopenRoom() {
         sharingRoomRegistry.reopen(ROOM_ID);
         sharingRoomRegistry.resetVersion(ROOM_ID);
+        sharingRoomRegistry.resetSyncRequest(ROOM_ID);
         chairmanSessionRegistry.remove(ROOM_ID);
     }
 

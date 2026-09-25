@@ -20,7 +20,9 @@ import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +39,7 @@ class SharingServiceTest {
     private static final String CHAIRMAN = "tab-a";
     private static final String SIMP_SESSION = "simp-1";
 
+    private MutableClock clock;
     private SharingRoomRegistry sharingRoomRegistry;
     private ChairmanSessionRegistry chairmanSessionRegistry;
     private SimpMessageSendingOperations messagingTemplate;
@@ -44,7 +47,7 @@ class SharingServiceTest {
 
     @BeforeEach
     void setUp() {
-        Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
+        clock = new MutableClock(NOW);
         sharingRoomRegistry = new SharingRoomRegistry(clock);
         chairmanSessionRegistry = new ChairmanSessionRegistry(clock);
         messagingTemplate = mock(SimpMessageSendingOperations.class);
@@ -281,6 +284,57 @@ class SharingServiceTest {
                     () -> assertThat(notice.roomId()).isEqualTo(ROOM_ID),
                     () -> verify(messagingTemplate, never()).convertAndSend(eq("/room/" + ROOM_ID), any(Object.class))
             );
+        }
+
+        @Test
+        void 최소_간격_안에_다시_입장하면_상태_공유를_요청하지_않는다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.joinAudience(ROOM_ID);
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_INTERVAL.minusMillis(1));
+            sharingService.joinAudience(ROOM_ID);
+
+            assertThat(sentChairmanNotices(1)).hasSize(1);
+        }
+
+        @Test
+        void 최소_간격이_지난_뒤_입장하면_상태_공유를_다시_요청한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.joinAudience(ROOM_ID);
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_INTERVAL);
+            sharingService.joinAudience(ROOM_ID);
+
+            assertThat(sentChairmanNotices(2))
+                    .allMatch(notice -> notice.type() == ChairmanNoticeType.SYNC_REQUEST);
+        }
+    }
+
+    private static class MutableClock extends Clock {
+
+        private Instant instant;
+
+        private MutableClock(Instant instant) {
+            this.instant = instant;
+        }
+
+        private void advance(Duration duration) {
+            instant = instant.plus(duration);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            return this;
+        }
+
+        @Override
+        public Instant instant() {
+            return instant;
         }
     }
 }
