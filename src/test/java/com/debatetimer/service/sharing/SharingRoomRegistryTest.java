@@ -266,6 +266,62 @@ class SharingRoomRegistryTest {
         }
     }
 
+    @Nested
+    class TryAcquireSyncRequest {
+
+        @Test
+        void 처음_요청은_허용한다() {
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isTrue();
+        }
+
+        @Test
+        void 최소_간격_안의_뒤따르는_요청은_거절한다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_INTERVAL.minusMillis(1));
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isFalse();
+        }
+
+        @Test
+        void 최소_간격이_지난_요청은_허용한다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_INTERVAL);
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isTrue();
+        }
+
+        @Test
+        void 거절된_요청은_마지막_요청_시각을_바꾸지_않는다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_INTERVAL.minusMillis(1));
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+
+            clock.advance(Duration.ofMillis(1));
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isTrue();
+        }
+
+        @Test
+        void 룸마다_요청_간격을_따로_관리한다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(2L)).isTrue();
+        }
+
+        @Test
+        void 유지_시간이_지난_요청_기록을_제거한다() {
+            sharingRoomRegistry.tryAcquireSyncRequest(1L);
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_TTL);
+
+            sharingRoomRegistry.removeExpired();
+            clock.advance(SharingRoomRegistry.SYNC_REQUEST_TTL.negated().plusMillis(1)); // 제거되지 않았다면 거절되는 시점
+
+            assertThat(sharingRoomRegistry.tryAcquireSyncRequest(1L)).isTrue();
+        }
+    }
+
     private static class MutableClock extends Clock {
 
         private Instant instant;
