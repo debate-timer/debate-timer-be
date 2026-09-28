@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SharingRoomRegistry {
 
-    static final Duration FINISHED_TTL = Duration.ofDays(1);
+    // 종료 직후 입장한 청중에게만 종료를 알린다. 이후 같은 룸을 다시 공유할 때 먼저 입장한 청중은 대기 화면을 보게 한다.
+    static final Duration FINISHED_TTL = Duration.ofMinutes(5);
     static final Duration VERSION_TTL = Duration.ofDays(1);
     static final Duration SYNC_REQUEST_TTL = Duration.ofDays(1);
     static final Duration SYNC_REQUEST_INTERVAL = Duration.ofMillis(500);

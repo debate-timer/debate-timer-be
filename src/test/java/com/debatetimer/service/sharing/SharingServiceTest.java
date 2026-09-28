@@ -251,6 +251,18 @@ class SharingServiceTest {
         }
 
         @Test
+        void 종료_유지_시간이_지난_룸에_사회자보다_먼저_입장하면_청중에게_사회자_부재를_알린다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            sharingRoomRegistry.markFinished(ROOM_ID);
+            sharingService.leave(SIMP_SESSION);
+            clock.advance(SharingRoomRegistry.FINISHED_TTL);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            assertThat(sentResponses(1).get(0).eventType()).isEqualTo(TimerEventType.CHAIRMAN_ABSENT);
+        }
+
+        @Test
         void 활성_사회자가_없으면_청중에게_사회자_부재를_알린다() {
             sharingService.joinAudience(ROOM_ID);
 
