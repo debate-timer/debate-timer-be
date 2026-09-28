@@ -163,12 +163,12 @@ class SharingRoomRegistryTest {
         @Test
         void 종료_유지_시간이_지난_룸만_제거한다() {
             sharingRoomRegistry.markFinished(1L);
-            clock.advance(Duration.ofHours(1));
+            clock.advance(Duration.ofMinutes(2));
             sharingRoomRegistry.markFinished(2L);
-            clock.advance(SharingRoomRegistry.FINISHED_TTL.minusMinutes(30));
+            clock.advance(SharingRoomRegistry.FINISHED_TTL.minusMinutes(1));
 
             sharingRoomRegistry.removeExpired();
-            clock.advance(Duration.ofHours(-1)); // 제거되지 않았다면 다시 종료 상태로 보이는 시점
+            clock.advance(Duration.ofMinutes(-2)); // 제거되지 않았다면 다시 종료 상태로 보이는 시점
 
             assertAll(
                     () -> assertThat(sharingRoomRegistry.isFinished(1L)).isFalse(),
