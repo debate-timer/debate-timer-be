@@ -109,7 +109,6 @@ public class GlobalExceptionHandler {
         return toResponse(ClientErrorCode.FILE_UPLOAD_ERROR);
     }
 
-    // SockJS xhr 폴백처럼 Content-Type 이 미리 지정된 응답은 본문을 쓸 수 없으므로 알림 없이 빈 응답으로 종료
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public ResponseEntity<Void> handleHttpMessageNotWritableException(HttpMessageNotWritableException exception) {
         logClientError(exception);
