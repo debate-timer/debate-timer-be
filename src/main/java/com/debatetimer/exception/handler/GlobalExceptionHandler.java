@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -106,6 +107,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMultipartException(MultipartException exception) {
         logClientError(exception);
         return toResponse(ClientErrorCode.FILE_UPLOAD_ERROR);
+    }
+
+    // SockJS xhr 폴백처럼 Content-Type 이 미리 지정된 응답은 본문을 쓸 수 없으므로 알림 없이 빈 응답으로 종료
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public ResponseEntity<Void> handleHttpMessageNotWritableException(HttpMessageNotWritableException exception) {
+        logClientError(exception);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @ExceptionHandler(DTOAuthClientException.class)
