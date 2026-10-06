@@ -8,10 +8,12 @@ import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.dto.sharing.response.TimerEventDataResponse;
 import java.time.Clock;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class SharingService {
 
@@ -20,6 +22,7 @@ public class SharingService {
 
     private final SharingRoomRegistry sharingRoomRegistry;
     private final ChairmanSessionRegistry chairmanSessionRegistry;
+    private final SharingLogService sharingLogService;
     private final SimpMessageSendingOperations messagingTemplate;
     private final Clock clock;
 
@@ -27,19 +30,22 @@ public class SharingService {
     public SharingService(
             SharingRoomRegistry sharingRoomRegistry,
             ChairmanSessionRegistry chairmanSessionRegistry,
+            SharingLogService sharingLogService,
             SimpMessageSendingOperations messagingTemplate
     ) {
-        this(sharingRoomRegistry, chairmanSessionRegistry, messagingTemplate, Clock.systemUTC());
+        this(sharingRoomRegistry, chairmanSessionRegistry, sharingLogService, messagingTemplate, Clock.systemUTC());
     }
 
     SharingService(
             SharingRoomRegistry sharingRoomRegistry,
             ChairmanSessionRegistry chairmanSessionRegistry,
+            SharingLogService sharingLogService,
             SimpMessageSendingOperations messagingTemplate,
             Clock clock
     ) {
         this.sharingRoomRegistry = sharingRoomRegistry;
         this.chairmanSessionRegistry = chairmanSessionRegistry;
+        this.sharingLogService = sharingLogService;
         this.messagingTemplate = messagingTemplate;
         this.clock = clock;
     }
@@ -65,6 +71,7 @@ public class SharingService {
 
             updateRoomStatus(roomId, timerEvent.getEventType());
             messagingTemplate.convertAndSend(ROOM_CHANNEL_PREFIX + roomId, createResponse(request, timerEvent));
+            recordSharingLog(roomId, timerEvent);
         });
     }
 
@@ -77,6 +84,7 @@ public class SharingService {
             if (claimChairman(roomId, chairmanSessionId, simpSessionId).isAccepted()) {
                 sharingRoomRegistry.reopen(roomId);
                 sharingRoomRegistry.resetSyncRequest(roomId);
+                runSharingLog(() -> sharingLogService.start(roomId));
             }
         });
     }
@@ -94,6 +102,7 @@ public class SharingService {
             messagingTemplate.convertAndSend(ROOM_CHANNEL_PREFIX + roomId, new SharingResponse(TimerEventType.FINISHED));
             return;
         }
+        runSharingLog(() -> sharingLogService.joinAudience(roomId));
         if (!chairmanSessionRegistry.hasActiveChairman(roomId)) {
             messagingTemplate.convertAndSend(ROOM_CHANNEL_PREFIX + roomId,
                     new SharingResponse(TimerEventType.CHAIRMAN_ABSENT));
@@ -106,7 +115,8 @@ public class SharingService {
     }
 
     public void leave(String simpSessionId) {
-        chairmanSessionRegistry.release(simpSessionId);
+        chairmanSessionRegistry.release(simpSessionId)
+                .ifPresent(roomId -> runSharingLog(() -> sharingLogService.disconnect(roomId)));
     }
 
     /**
@@ -137,6 +147,25 @@ public class SharingService {
                 .map(TimerEventDataResponse::new)
                 .orElse(null);
         return new SharingResponse(request.eventType(), request.version(), clock.millis(), data);
+    }
+
+    private void recordSharingLog(long roomId, TimerEvent timerEvent) {
+        if (timerEvent.getEventType() == TimerEventType.FINISHED) {
+            runSharingLog(() -> sharingLogService.finish(roomId));
+            return;
+        }
+        runSharingLog(() -> sharingLogService.recordEvent(roomId, timerEvent));
+    }
+
+    /**
+     * 공유 기록은 통계용이므로, 기록에 실패해도 공유 중계는 계속한다.
+     */
+    private void runSharingLog(Runnable action) {
+        try {
+            action.run();
+        } catch (RuntimeException exception) {
+            log.warn("공유 기록에 실패했습니다", exception);
+        }
     }
 
     private void updateRoomStatus(long roomId, TimerEventType eventType) {

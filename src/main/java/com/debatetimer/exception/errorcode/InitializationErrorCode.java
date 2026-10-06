@@ -17,6 +17,8 @@ public enum InitializationErrorCode {
     JWT_SECRET_KEY_EMPTY("JWT secretKey 가 입력되지 않았습니다"),
     JWT_TOKEN_DURATION_EMPTY("토큰 만료 기간이 입력되지 않았습니다"),
     JWT_TOKEN_DURATION_INVALID("토큰 만료 기간은 양수이어야 합니다"),
+
+    ADMIN_PASSWORD_EMPTY("어드민 비밀번호가 입력되지 않았습니다"),
     ;
 
     private final String message;

@@ -11,12 +11,15 @@ public class DiscordProperties {
 
     private final String token;
     private final String channelId;
+    private final String sharingChannelId;
 
-    public DiscordProperties(String token, String channelId) {
+    public DiscordProperties(String token, String channelId, String sharingChannelId) {
         validate(token);
         validate(channelId);
+        validate(sharingChannelId);
         this.token = token;
         this.channelId = channelId;
+        this.sharingChannelId = sharingChannelId;
     }
 
     private void validate(String element) {

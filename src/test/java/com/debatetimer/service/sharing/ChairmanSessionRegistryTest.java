@@ -119,6 +119,28 @@ class ChairmanSessionRegistryTest {
     class Release {
 
         @Test
+        void 활성_사회자의_연결이_끊기면_해제한_룸을_돌려준다() {
+            chairmanSessionRegistry.claim(ROOM_ID, "tab-a", "simp-1");
+
+            assertThat(chairmanSessionRegistry.release("simp-1")).contains(ROOM_ID);
+        }
+
+        @Test
+        void 사회자로_등록되지_않은_연결이_끊기면_해제한_룸이_없다() {
+            chairmanSessionRegistry.claim(ROOM_ID, "tab-a", "simp-1");
+
+            assertThat(chairmanSessionRegistry.release("audience-simp")).isEmpty();
+        }
+
+        @Test
+        void 재연결_전의_옛_연결이_늦게_끊기면_해제한_룸이_없다() {
+            chairmanSessionRegistry.claim(ROOM_ID, "tab-a", "simp-1");
+            chairmanSessionRegistry.claim(ROOM_ID, "tab-a", "simp-2");
+
+            assertThat(chairmanSessionRegistry.release("simp-1")).isEmpty();
+        }
+
+        @Test
         void 활성_사회자의_연결이_끊기면_룸에_활성_사회자가_없다() {
             chairmanSessionRegistry.claim(ROOM_ID, "tab-a", "simp-1");
 

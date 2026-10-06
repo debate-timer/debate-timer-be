@@ -80,6 +80,11 @@ public class CustomizeTableDomainRepository {
         return timeBoxRepository.sumTimeByTableId(tableId);
     }
 
+    @Transactional(readOnly = true)
+    public int countTimeBoxes(long tableId) {
+        return timeBoxRepository.countByCustomizeTableId(tableId);
+    }
+
     private List<CustomizeTimeBox> toCustomizeTimeBoxes(
             List<CustomizeTimeBoxEntity> timeBoxEntities,
             List<BellEntity> bellEntities

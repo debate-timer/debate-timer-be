@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -42,6 +43,7 @@ class SharingServiceTest {
     private MutableClock clock;
     private SharingRoomRegistry sharingRoomRegistry;
     private ChairmanSessionRegistry chairmanSessionRegistry;
+    private SharingLogService sharingLogService;
     private SimpMessageSendingOperations messagingTemplate;
     private SharingService sharingService;
 
@@ -51,7 +53,9 @@ class SharingServiceTest {
         sharingRoomRegistry = new SharingRoomRegistry(clock);
         chairmanSessionRegistry = new ChairmanSessionRegistry(clock);
         messagingTemplate = mock(SimpMessageSendingOperations.class);
-        sharingService = new SharingService(sharingRoomRegistry, chairmanSessionRegistry, messagingTemplate, clock);
+        sharingLogService = mock(SharingLogService.class);
+        sharingService = new SharingService(
+                sharingRoomRegistry, chairmanSessionRegistry, sharingLogService, messagingTemplate, clock);
     }
 
     private List<SharingResponse> sentResponses(int expectedCount) {
@@ -319,6 +323,106 @@ class SharingServiceTest {
 
             assertThat(sentChairmanNotices(2))
                     .allMatch(notice -> notice.type() == ChairmanNoticeType.SYNC_REQUEST);
+        }
+    }
+
+    @Nested
+    class SharingLog {
+
+        @Test
+        void 사회자가_공유를_시작하면_공유_기록을_시작한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            verify(sharingLogService).start(ROOM_ID);
+        }
+
+        @Test
+        void 밀려난_사회자가_다시_공유를_시작하면_공유_기록을_시작하지_않는다() {
+            sharingService.startChairman(ROOM_ID, "tab-a", "simp-1");
+            sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
+
+            sharingService.startChairman(ROOM_ID, "tab-a", "simp-3");
+
+            verify(sharingLogService, times(2)).start(ROOM_ID);
+        }
+
+        @Test
+        void 종료_이벤트를_중계하면_공유_기록을_종료한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
+
+            verify(sharingLogService).finish(ROOM_ID);
+        }
+
+        @Test
+        void 종료가_아닌_이벤트를_중계하면_진행_순서를_기록한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.NEXT, 1L));
+
+            assertAll(
+                    () -> verify(sharingLogService).recordEvent(eq(ROOM_ID), any()),
+                    () -> verify(sharingLogService, never()).finish(ROOM_ID)
+            );
+        }
+
+        @Test
+        void 중계하지_않은_이벤트는_기록하지_않는다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.PLAY, 2L));
+
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
+
+            verify(sharingLogService, never()).finish(ROOM_ID);
+        }
+
+        @Test
+        void 공유_기록에_실패해도_이벤트를_중계한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            doThrow(new IllegalStateException("db down"))
+                    .when(sharingLogService).finish(ROOM_ID);
+
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
+
+            assertThat(sentResponses(1)).extracting(SharingResponse::eventType)
+                    .containsExactly(TimerEventType.FINISHED);
+        }
+
+        @Test
+        void 청중이_입장하면_청중_수를_기록한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            verify(sharingLogService).joinAudience(ROOM_ID);
+        }
+
+        @Test
+        void 종료된_룸에_입장한_청중은_기록하지_않는다() {
+            sharingRoomRegistry.markFinished(ROOM_ID);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            verify(sharingLogService, never()).joinAudience(ROOM_ID);
+        }
+
+        @Test
+        void 활성_사회자의_연결이_끊기면_공유_기록에_알린다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.leave(SIMP_SESSION);
+
+            verify(sharingLogService).disconnect(ROOM_ID);
+        }
+
+        @Test
+        void 사회자가_아닌_연결이_끊기면_공유_기록에_알리지_않는다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.leave("audience-simp");
+
+            verify(sharingLogService, never()).disconnect(ROOM_ID);
         }
     }
 
