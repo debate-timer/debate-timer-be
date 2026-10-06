@@ -13,6 +13,8 @@ public interface CustomizeTimeBoxRepository extends Repository<CustomizeTimeBoxE
 
     List<CustomizeTimeBoxEntity> findAllByCustomizeTable(CustomizeTableEntity table);
 
+    int countByCustomizeTableId(long tableId);
+
     // 시간 총량제 타임 박스는 time이 비어 있을 수 있으므로 양 팀 시간(팀당 시간 x 2)으로 대신 계산
     @Query("""
             SELECT COALESCE(SUM(COALESCE(ctb.time, ctb.timePerTeam * 2, 0)), 0)
