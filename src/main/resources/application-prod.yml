@@ -37,6 +37,7 @@ jwt:
 discord:
   token: ${secret.discord.token}
   channelId: ${secret.discord.channelId}
+  sharingChannelId: ${secret.discord.sharingChannelId}
 
 logging:
   config: classpath:logging/log4j2-prod.yml

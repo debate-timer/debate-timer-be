@@ -19,7 +19,7 @@ class DiscordPropertiesTest {
         @NullAndEmptySource
         @ValueSource(strings = {"\n", "\t "})
         void 디스코드봇_토큰이_비어있을_경우_예외를_발생시킨다(String empty) {
-            assertThatThrownBy(() -> new DiscordProperties(empty, "channelId"))
+            assertThatThrownBy(() -> new DiscordProperties(empty, "channelId", "sharingChannelId"))
                     .isInstanceOf(DTInitializationException.class)
                     .hasMessage(InitializationErrorCode.DISCORD_PROPERTIES_EMPTY.getMessage());
         }
@@ -28,7 +28,16 @@ class DiscordPropertiesTest {
         @NullAndEmptySource
         @ValueSource(strings = {"\n", "\t "})
         void 디스코드_채널_아이디가_비어있을_경우_예외를_발생시킨다(String empty) {
-            assertThatThrownBy(() -> new DiscordProperties("token", empty))
+            assertThatThrownBy(() -> new DiscordProperties("token", empty, "sharingChannelId"))
+                    .isInstanceOf(DTInitializationException.class)
+                    .hasMessage(InitializationErrorCode.DISCORD_PROPERTIES_EMPTY.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"\n", "\t "})
+        void 공유_알림_채널_아이디가_비어있을_경우_예외를_발생시킨다(String empty) {
+            assertThatThrownBy(() -> new DiscordProperties("token", "channelId", empty))
                     .isInstanceOf(DTInitializationException.class)
                     .hasMessage(InitializationErrorCode.DISCORD_PROPERTIES_EMPTY.getMessage());
         }
