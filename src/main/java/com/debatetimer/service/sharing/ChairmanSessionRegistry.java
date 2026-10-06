@@ -82,16 +82,20 @@ public class ChairmanSessionRegistry {
     /**
      * STOMP 연결이 끊기면 그 연결로 활성 사회자가 된 세션을 해제한다.
      * 재연결한 뒤에 옛 연결의 종료가 늦게 도착할 수 있어, 현재 연결과 일치할 때만 해제한다.
+     *
+     * @return 활성 사회자를 해제한 룸
      */
-    public synchronized void release(String simpSessionId) {
+    public synchronized Optional<Long> release(String simpSessionId) {
         Long roomId = roomIdsBySimpSession.remove(simpSessionId);
         if (roomId == null) {
-            return;
+            return Optional.empty();
         }
         ChairmanHolder holder = holders.get(roomId);
-        if (holder != null && simpSessionId.equals(holder.simpSessionId())) {
+        if (holder != null && holder.isConnected() && simpSessionId.equals(holder.simpSessionId())) {
             holders.put(roomId, holder.released(clock.instant()));
+            return Optional.of(roomId);
         }
+        return Optional.empty();
     }
 
     /**
