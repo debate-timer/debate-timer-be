@@ -39,5 +39,8 @@ discord:
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
 
+admin:
+  password: ${secret.admin.password}
+
 logging:
   config: classpath:logging/log4j2-prod.yml
