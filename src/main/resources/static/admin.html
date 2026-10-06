@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="robots" content="noindex, nofollow"/>
+    <title>Debate Timer · 라이브 공유 통계</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --line: #334155;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --count: #3b82f6;
+            --minutes: #10b981;
+            --error: #f87171;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 24px 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+        }
+        main { max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 20px; margin: 0 0 16px; }
+        h2 { font-size: 15px; margin: 0 0 12px; color: var(--muted); font-weight: 600; }
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        label { font-size: 13px; color: var(--muted); }
+        input {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 14px;
+            color-scheme: dark;
+        }
+        button {
+            background: var(--count);
+            color: #fff;
+            border: 0;
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button.secondary { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+        .error { color: var(--error); font-size: 13px; min-height: 18px; margin-top: 8px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+        .stat .label { font-size: 12px; color: var(--muted); }
+        .stat .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+        .chart-box { position: relative; height: 300px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>라이브 공유 통계</h1>
+
+    <section id="login" class="panel">
+        <h2>어드민 비밀번호</h2>
+        <form id="login-form" class="row">
+            <input id="password" type="password" autocomplete="current-password" placeholder="비밀번호" required/>
+            <button type="submit">입장</button>
+        </form>
+        <div id="login-error" class="error"></div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+        <div class="panel">
+            <form id="period-form" class="row">
+                <label for="from">시작일</label>
+                <input id="from" type="date" required/>
+                <label for="to">종료일</label>
+                <input id="to" type="date" required/>
+                <button type="submit">조회</button>
+                <button type="button" class="secondary" data-days="7">최근 7일</button>
+                <button type="button" class="secondary" data-days="30">최근 30일</button>
+                <button type="button" class="secondary" data-days="90">최근 90일</button>
+                <button type="button" class="secondary" id="logout">로그아웃</button>
+            </form>
+            <div id="period-error" class="error"></div>
+        </div>
+
+        <div class="panel summary">
+            <div class="stat"><div class="label">기간 내 FINISHED 공유</div><div class="value" id="total-count">-</div></div>
+            <div class="stat"><div class="label">기간 평균 공유 시간</div><div class="value" id="total-average">-</div></div>
+            <div class="stat"><div class="label">일 평균 공유 횟수</div><div class="value" id="daily-average">-</div></div>
+        </div>
+
+        <div class="panel">
+            <h2>일별 FINISHED 공유 횟수</h2>
+            <div class="chart-box"><canvas id="count-chart"></canvas></div>
+        </div>
+
+        <div class="panel">
+            <h2>일별 평균 공유 시간 (분)</h2>
+            <div class="chart-box"><canvas id="minutes-chart"></canvas></div>
+        </div>
+    </section>
+</main>
+
+<script>
+    const PASSWORD_KEY = 'debate-timer-admin-password';
+    const charts = {};
+
+    const $ = (id) => document.getElementById(id);
+
+    function readPassword() {
+        try { return sessionStorage.getItem(PASSWORD_KEY); } catch (e) { return null; }
+    }
+
+    function savePassword(password) {
+        try { sessionStorage.setItem(PASSWORD_KEY, password); } catch (e) { /* 저장 불가 시 현재 화면에서만 사용 */ }
+    }
+
+    function clearPassword() {
+        try { sessionStorage.removeItem(PASSWORD_KEY); } catch (e) { /* 무시 */ }
+    }
+
+    let currentPassword = readPassword();
+
+    function formatDate(date) {
+        const offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+    }
+
+    function setRecentDays(days) {
+        const to = new Date();
+        const from = new Date();
+        from.setDate(to.getDate() - (days - 1));
+        $('from').value = formatDate(from);
+        $('to').value = formatDate(to);
+    }
+
+    function showLogin(message) {
+        $('dashboard').classList.add('hidden');
+        $('login').classList.remove('hidden');
+        $('login-error').textContent = message || '';
+        $('password').focus();
+    }
+
+    function showDashboard() {
+        $('login').classList.add('hidden');
+        $('dashboard').classList.remove('hidden');
+    }
+
+    async function fetchStats() {
+        const params = new URLSearchParams({ from: $('from').value, to: $('to').value });
+        const response = await fetch(`/api/admin/sharing/stats?${params}`, {
+            headers: { 'X-Admin-Password': currentPassword },
+        });
+        if (response.status === 401) {
+            clearPassword();
+            currentPassword = null;
+            showLogin('비밀번호가 올바르지 않습니다.');
+            return null;
+        }
+        if (!response.ok) {
+            const body = await response.json().catch(() => ({}));
+            throw new Error(body.message || `조회에 실패했습니다 (${response.status})`);
+        }
+        return response.json();
+    }
+
+    function renderChart(key, canvasId, labels, data, color, label) {
+        if (charts[key]) {
+            charts[key].destroy();
+        }
+        charts[key] = new Chart($(canvasId), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{ label, data, backgroundColor: color, borderRadius: 4, maxBarThickness: 36 }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', maxRotation: 0, autoSkip: true }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { color: '#94a3b8', precision: 0 }, grid: { color: '#334155' } },
+                },
+            },
+        });
+    }
+
+    function renderSummary(days) {
+        const totalCount = days.reduce((sum, day) => sum + day.finishedCount, 0);
+        const totalMinutes = days.reduce((sum, day) => sum + day.averageMinutes * day.finishedCount, 0);
+        $('total-count').textContent = `${totalCount}회`;
+        $('total-average').textContent = totalCount === 0 ? '-' : `${(totalMinutes / totalCount).toFixed(1)}분`;
+        $('daily-average').textContent = days.length === 0 ? '-' : `${(totalCount / days.length).toFixed(1)}회`;
+    }
+
+    async function load() {
+        $('period-error').textContent = '';
+        try {
+            const stats = await fetchStats();
+            if (!stats) {
+                return;
+            }
+            showDashboard();
+            const labels = stats.days.map((day) => day.date.slice(5));
+            renderChart('count', 'count-chart', labels, stats.days.map((day) => day.finishedCount),
+                getComputedStyle(document.documentElement).getPropertyValue('--count').trim(), '공유 횟수');
+            renderChart('minutes', 'minutes-chart', labels, stats.days.map((day) => day.averageMinutes),
+                getComputedStyle(document.documentElement).getPropertyValue('--minutes').trim(), '평균 시간(분)');
+            renderSummary(stats.days);
+        } catch (error) {
+            $('period-error').textContent = error.message;
+        }
+    }
+
+    $('login-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        currentPassword = $('password').value;
+        savePassword(currentPassword);
+        $('password').value = '';
+        load();
+    });
+
+    $('period-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        load();
+    });
+
+    document.querySelectorAll('[data-days]').forEach((button) => {
+        button.addEventListener('click', () => {
+            setRecentDays(Number(button.dataset.days));
+            load();
+        });
+    });
+
+    $('logout').addEventListener('click', () => {
+        clearPassword();
+        currentPassword = null;
+        showLogin();
+    });
+
+    setRecentDays(30);
+    if (currentPassword) {
+        load();
+    } else {
+        showLogin();
+    }
+</script>
+</body>
+</html>
