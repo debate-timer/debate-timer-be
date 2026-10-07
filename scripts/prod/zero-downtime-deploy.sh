@@ -60,15 +60,15 @@ is_port_in_use() {
 
 kill_process_on_port() {
     local port=$1
-    local pid=$(sudo lsof -t -i:$port 2>/dev/null)
+    local pids=$(sudo lsof -t -i:$port 2>/dev/null)
 
-    if [ -z "$pid" ]; then
+    if [ -z "$pids" ]; then
         log "No process running on port $port"
         return 0
     fi
 
-    log "Sending graceful shutdown signal to process $pid on port $port"
-    sudo kill -15 "$pid"
+    log "Sending graceful shutdown signal to process(es) $(echo $pids | tr '\n' ' ')on port $port"
+    echo "$pids" | xargs -r sudo kill -15
 
     local wait_count=0
     while [ $wait_count -lt 65 ] && is_port_in_use "$port"; do
@@ -78,7 +78,7 @@ kill_process_on_port() {
 
     if is_port_in_use "$port"; then
         log "Process didn't stop gracefully, forcing shutdown"
-        sudo kill -9 "$pid" 2>/dev/null || true
+        echo "$pids" | xargs -r sudo kill -9 2>/dev/null || true
         sleep 2
     fi
 

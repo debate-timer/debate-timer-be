@@ -18,6 +18,9 @@ public class TimerEvent {
             @Nullable TimerEventData timerEventData
     ) {
         eventType.validateEventData(timerEventData);
+        if (eventType.isSync()) {
+            timerEventData.validateSyncable();
+        }
         this.eventType = eventType;
         this.timerEventData = timerEventData;
     }

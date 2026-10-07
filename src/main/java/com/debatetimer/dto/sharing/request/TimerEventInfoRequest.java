@@ -14,7 +14,16 @@ public record TimerEventInfoRequest(
         Stance currentTeam,
 
         int sequence,
-        long remainingTime
+        long remainingTime,
+
+        @Nullable
+        Boolean isRunning,
+
+        @Nullable
+        Long prosRemainingTime,
+
+        @Nullable
+        Long consRemainingTime
 ) {
 
     public TimerEventData toTimerEventInfo() {
@@ -22,7 +31,10 @@ public record TimerEventInfoRequest(
                 timerType,
                 sequence,
                 currentTeam,
-                remainingTime
+                remainingTime,
+                isRunning,
+                prosRemainingTime,
+                consRemainingTime
         );
     }
 }

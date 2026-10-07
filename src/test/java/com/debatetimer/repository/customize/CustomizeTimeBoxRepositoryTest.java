@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
@@ -96,6 +97,20 @@ class CustomizeTimeBoxRepositoryTest extends BaseRepositoryTest {
             long summedTimeByTableId = customizeTimeBoxRepository.sumTimeByTableId(debateTable.getId());
 
             assertThat(summedTimeByTableId).isEqualTo(timeBox1.getTime() + timeBox2.getTime());
+        }
+
+        @Test
+        void 시간이_비어_있는_시간_총량제_타임_박스는_양_팀_시간으로_합산한다() {
+            Member chan = memberGenerator.generate("default@gmail.com");
+            CustomizeTableEntity debateTable = customizeTableEntityGenerator.generate(chan);
+            customizeTimeBoxEntityGenerator.generate(debateTable, CustomizeBoxType.NORMAL, 1, 10);
+            customizeTimeBoxRepository.save(new CustomizeTimeBoxEntity(
+                    debateTable, 2, Stance.NEUTRAL, "자유토론", CustomizeBoxType.TIME_BASED, 45, 35, null
+            ));
+
+            long summedTimeByTableId = customizeTimeBoxRepository.sumTimeByTableId(debateTable.getId());
+
+            assertThat(summedTimeByTableId).isEqualTo(10 + 45 * 2);
         }
     }
 }

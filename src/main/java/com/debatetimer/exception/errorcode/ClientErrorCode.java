@@ -5,6 +5,7 @@ import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
+import com.debatetimer.service.admin.SharingStatsService;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -54,6 +55,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     ALREADY_VOTED_PARTICIPANT(HttpStatus.BAD_REQUEST, "이미 참여한 투표자 입니다"),
 
     INVALID_ROOM_ID(HttpStatus.BAD_REQUEST, "잘못된 roomId 값입니다"),
+    CHAIRMAN_SESSION_REQUIRED(HttpStatus.BAD_REQUEST, "사회자 세션 식별자가 필요합니다"),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
     NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
@@ -81,6 +83,11 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_NORMAL_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 일반 타이머 이벤트 데이터입니다"),
     INVALID_TIME_BASED_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다"),
     INVALID_TIMER_EVENT(HttpStatus.BAD_REQUEST, "잘못된 타이머 이벤트 데이터입니다"),
+    INVALID_SYNC_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 동기화 타이머 이벤트 데이터입니다"),
+
+    INVALID_ADMIN_PASSWORD(HttpStatus.UNAUTHORIZED, "어드민 비밀번호가 올바르지 않습니다"),
+    INVALID_STATS_PERIOD(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d일까지 조회할 수 있습니다"
+            .formatted(SharingStatsService.MAX_PERIOD_DAYS)),
     ;
 
     private final HttpStatus status;

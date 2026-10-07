@@ -3,6 +3,7 @@ package com.debatetimer.controller.sharing;
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.controller.tool.jwt.AuthManager;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.sharing.ChairmanTokenExpiration;
 import com.debatetimer.dto.customize.response.CustomizeTableResponse;
 import com.debatetimer.dto.sharing.response.ChairmanTokenResponse;
 import com.debatetimer.service.customize.CustomizeService;
@@ -26,7 +27,7 @@ public class SharingRestController {
             @PathVariable("tableId") long tableId
     ) {
         long debateTime = customizeService.findDebateTime(tableId, member);
-        String chairmanToken = authManager.issueChairmanToken(member, debateTime * 2);
+        String chairmanToken = authManager.issueChairmanToken(member, ChairmanTokenExpiration.secondsFor(debateTime));
         return new ChairmanTokenResponse(chairmanToken);
     }
 

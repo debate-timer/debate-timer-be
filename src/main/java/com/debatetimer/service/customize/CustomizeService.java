@@ -40,6 +40,11 @@ public class CustomizeService {
     }
 
     @Transactional(readOnly = true)
+    public void validateTableOwner(long tableId, Member member) {
+        customizeTableDomainRepository.getByIdAndMember(tableId, member);
+    }
+
+    @Transactional(readOnly = true)
     public long findDebateTime(long tableId, Member member) {
         CustomizeTable customizeTable = customizeTableDomainRepository.getByIdAndMember(tableId, member);
         return customizeTableDomainRepository.getTotalTimeBoxTimes(customizeTable.getId());

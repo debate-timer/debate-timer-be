@@ -21,17 +21,32 @@ public class TimerEventData {
 
     private final long remainingTime;
 
+    @Nullable
+    private final Boolean isRunning;
+
+    @Nullable
+    private final Long prosRemainingTime;
+
+    @Nullable
+    private final Long consRemainingTime;
+
     public TimerEventData(
             CustomizeBoxType timerType,
             int sequence,
             @Nullable Stance currentTeam,
-            long remainingTime
+            long remainingTime,
+            @Nullable Boolean isRunning,
+            @Nullable Long prosRemainingTime,
+            @Nullable Long consRemainingTime
     ) {
         validateCurrentTeam(timerType, currentTeam);
         this.timerType = timerType;
         this.sequence = sequence;
         this.currentTeam = currentTeam;
         this.remainingTime = remainingTime;
+        this.isRunning = isRunning;
+        this.prosRemainingTime = prosRemainingTime;
+        this.consRemainingTime = consRemainingTime;
     }
 
     private void validateCurrentTeam(CustomizeBoxType timerType, Stance currentTeam) {
@@ -41,6 +56,16 @@ public class TimerEventData {
 
         if (!timerType.isTimeBased() && currentTeam != null) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_NORMAL_TIMER_EVENT_DATA);
+        }
+    }
+
+    public void validateSyncable() {
+        if (isRunning == null) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_SYNC_TIMER_EVENT_DATA);
+        }
+
+        if (timerType.isTimeBased() && (prosRemainingTime == null || consRemainingTime == null)) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_SYNC_TIMER_EVENT_DATA);
         }
     }
 }
