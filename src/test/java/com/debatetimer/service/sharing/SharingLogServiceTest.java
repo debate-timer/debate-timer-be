@@ -308,17 +308,41 @@ class SharingLogServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 추적하지_못하게_된_오래된_기록은_중단으로_정리한다() {
+        void 추적하지_못하게_된_오래된_기록은_정리하지_않는다() {
             LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).minusSeconds(1));
             sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
 
             sharingLogService.closeExpired();
+
+            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
+        }
+    }
+
+    @Nested
+    class AbandonUntracked {
+
+        @Test
+        void 추적하지_못하게_된_오래된_기록은_중단으로_정리한다() {
+            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).minusSeconds(1));
+            sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
+
+            sharingLogService.abandonUntracked();
 
             SharingLogEntity log = onlyLog();
             assertAll(
                     () -> assertThat(log.getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
                     () -> assertThat(log.getEndedAt()).isNotNull()
             );
+        }
+
+        @Test
+        void 오래되지_않은_기록은_정리하지_않는다() {
+            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).plusSeconds(1));
+            sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
+
+            sharingLogService.abandonUntracked();
+
+            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
         }
     }
 

@@ -139,21 +139,31 @@ public class SharingLogService {
 
     /**
      * 재연결 유예 시간이 지난 공유와 너무 오래 이어진 공유를 정리한다.
-     * 서버 재시작 등으로 추적하지 못하게 된 기록도 중단으로 정리한다.
+     * 진행 중인 공유가 없으면 아무것도 하지 않는다.
      */
     @Transactional
     public synchronized void closeExpired() {
+        if (activeSharings.isEmpty()) {
+            return;
+        }
         Instant now = clock.instant();
         List<Long> expiredRoomIds = activeSharings.entrySet().stream()
                 .filter(entry -> entry.getValue().isReconnectExpired(now) || entry.getValue().isStale(now))
                 .map(Map.Entry::getKey)
                 .toList();
         expiredRoomIds.forEach(roomId -> close(roomId, activeSharings.get(roomId), now));
+    }
 
+    /**
+     * 서버 재시작 등으로 추적하지 못하게 된 기록을 중단으로 정리한다.
+     * 오래된 기록만 대상으로 하므로 진행 중인 공유의 정리보다 드물게 실행해도 된다.
+     */
+    @Transactional
+    public void abandonUntracked() {
         sharingLogRepository.abandonStaleSharings(
                 SharingLogStatus.ABANDONED,
                 SharingLogStatus.SHARING,
-                toLocalDateTime(now.minus(STALE_THRESHOLD))
+                toLocalDateTime(clock.instant().minus(STALE_THRESHOLD))
         );
     }
 
