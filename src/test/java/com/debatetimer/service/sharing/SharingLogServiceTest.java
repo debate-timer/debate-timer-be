@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.sharing.ActiveSharing;
 import com.debatetimer.domain.sharing.SharingLogStatus;
 import com.debatetimer.domain.sharing.TimerEvent;
 import com.debatetimer.domain.sharing.TimerEventData;
@@ -127,10 +128,10 @@ class SharingLogServiceTest extends BaseServiceTest {
         void 연결이_끊긴_뒤_유예_시간_안에_다시_시작하면_같은_기록을_쓴다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE.minusSeconds(1));
+            clock.advance(ActiveSharing.RECONNECT_GRACE.minusSeconds(1));
 
             sharingLogService.start(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
             sharingLogService.closeExpired();
 
             assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
@@ -140,7 +141,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         void 연결이_끊긴_뒤_유예_시간이_지나_다시_시작하면_이전_기록을_정리하고_새_기록을_만든다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.start(roomId);
 
@@ -228,7 +229,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             clock.advance(Duration.ofMinutes(20));
             Instant disconnectedAt = clock.instant();
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -252,7 +253,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.NEXT, TIME_BOX_COUNT - 2));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -264,7 +265,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.BEFORE, TIME_BOX_COUNT - 1));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -276,7 +277,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, 0));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -290,7 +291,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         void 유예_시간이_지나지_않았으면_정리하지_않는다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE.minusSeconds(1));
+            clock.advance(ActiveSharing.RECONNECT_GRACE.minusSeconds(1));
 
             sharingLogService.closeExpired();
 
@@ -300,7 +301,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         @Test
         void 연결이_유지돼도_너무_오래_이어진_공유는_정리한다() {
             sharingLogService.start(roomId);
-            clock.advance(SharingLogService.STALE_THRESHOLD);
+            clock.advance(ActiveSharing.STALE_THRESHOLD);
 
             sharingLogService.closeExpired();
 
@@ -309,7 +310,7 @@ class SharingLogServiceTest extends BaseServiceTest {
 
         @Test
         void 추적하지_못하게_된_오래된_기록은_정리하지_않는다() {
-            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).minusSeconds(1));
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).minusSeconds(1));
             sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
 
             sharingLogService.closeExpired();
@@ -323,7 +324,7 @@ class SharingLogServiceTest extends BaseServiceTest {
 
         @Test
         void 추적하지_못하게_된_오래된_기록은_중단으로_정리한다() {
-            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).minusSeconds(1));
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).minusSeconds(1));
             sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
 
             sharingLogService.abandonUntracked();
@@ -337,7 +338,7 @@ class SharingLogServiceTest extends BaseServiceTest {
 
         @Test
         void 오래되지_않은_기록은_정리하지_않는다() {
-            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).plusSeconds(1));
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).plusSeconds(1));
             sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
 
             sharingLogService.abandonUntracked();
