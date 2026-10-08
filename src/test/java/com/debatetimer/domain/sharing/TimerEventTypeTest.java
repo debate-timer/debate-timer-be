@@ -88,4 +88,29 @@ class TimerEventTypeTest {
             assertThat(eventType.isSync()).isFalse();
         }
     }
+
+    @Nested
+    class ToDisplayedSequence {
+
+        @Test
+        void 다음_이벤트는_이동한_뒤_순서를_구한다() {
+            assertThat(TimerEventType.NEXT.toDisplayedSequence(1)).isEqualTo(2);
+        }
+
+        @Test
+        void 이전_이벤트는_이동한_뒤_순서를_구한다() {
+            assertThat(TimerEventType.BEFORE.toDisplayedSequence(1)).isZero();
+        }
+
+        @Test
+        void 첫_순서에서_이전_이벤트가_와도_첫_순서를_유지한다() {
+            assertThat(TimerEventType.BEFORE.toDisplayedSequence(0)).isZero();
+        }
+
+        @EnumSource(value = TimerEventType.class, names = {"NEXT", "BEFORE"}, mode = EnumSource.Mode.EXCLUDE)
+        @ParameterizedTest
+        void 이동하지_않는_이벤트는_순서를_그대로_쓴다(TimerEventType eventType) {
+            assertThat(eventType.toDisplayedSequence(1)).isEqualTo(1);
+        }
+    }
 }

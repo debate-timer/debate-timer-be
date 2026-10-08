@@ -3,7 +3,7 @@ package com.debatetimer.event.sharing;
 import java.time.LocalDateTime;
 
 /**
- * 사회자가 공유 종료(FINISHED)를 명시적으로 발행해 공유 기록이 종료되었음을 알린다.
+ * 공유 기록이 종료되었음을 알린다. 사회자가 직접 종료했거나, 마지막 타임박스에서 끊긴 뒤 돌아오지 않은 경우이다.
  */
 public record SharingFinishedEvent(
         long sharingLogId,

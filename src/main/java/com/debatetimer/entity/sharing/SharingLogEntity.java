@@ -1,5 +1,6 @@
 package com.debatetimer.entity.sharing;
 
+import com.debatetimer.domain.sharing.SharingLog;
 import com.debatetimer.domain.sharing.SharingLogStatus;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.annotation.Nullable;
@@ -12,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,28 +49,17 @@ public class SharingLogEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private SharingLogStatus status;
 
-    public SharingLogEntity(long tableId, long memberId, LocalDateTime startedAt) {
-        this.tableId = tableId;
-        this.memberId = memberId;
-        this.startedAt = startedAt;
-        this.audienceCount = 0;
-        this.status = SharingLogStatus.SHARING;
+    public SharingLogEntity(SharingLog sharingLog) {
+        this.id = sharingLog.getId();
+        this.tableId = sharingLog.getTableId();
+        this.memberId = sharingLog.getMemberId();
+        this.startedAt = sharingLog.getStartedAt();
+        this.endedAt = sharingLog.getEndedAt();
+        this.audienceCount = sharingLog.getAudienceCount();
+        this.status = sharingLog.getStatus();
     }
 
-    public void finish(LocalDateTime endedAt) {
-        this.status = SharingLogStatus.FINISHED;
-        this.endedAt = endedAt;
-    }
-
-    public void abandon(LocalDateTime endedAt) {
-        this.status = SharingLogStatus.ABANDONED;
-        this.endedAt = endedAt;
-    }
-
-    public long getDurationSeconds() {
-        if (endedAt == null) {
-            return 0;
-        }
-        return Math.max(Duration.between(startedAt, endedAt).toSeconds(), 0);
+    public SharingLog toDomain() {
+        return new SharingLog(id, tableId, memberId, startedAt, endedAt, audienceCount, status);
     }
 }

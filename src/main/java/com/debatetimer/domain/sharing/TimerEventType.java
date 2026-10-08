@@ -32,4 +32,18 @@ public enum TimerEventType {
     public boolean isSync() {
         return this == SYNC;
     }
+
+    /**
+     * 이벤트가 반영된 뒤 청중 화면에 표시될 타임박스 순서를 구한다.
+     * 이전·다음 이벤트는 이동하기 전 순서를 담고 있어, 이동한 뒤 순서로 바꾼다.
+     */
+    public int toDisplayedSequence(int sequence) {
+        if (this == NEXT) {
+            return sequence + 1;
+        }
+        if (this == BEFORE) {
+            return Math.max(sequence - 1, 0);
+        }
+        return sequence;
+    }
 }
