@@ -65,6 +65,20 @@ class CustomizeTableDomainRepositoryTest extends BaseDomainRepositoryTest {
     }
 
     @Nested
+    class GetWithMemberById {
+
+        @Test
+        void 트랜잭션_밖에서도_테이블_소유_회원_정보를_쓸_수_있다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = tableEntityGenerator.generate(member);
+
+            CustomizeTable foundTable = customizeTableDomainRepository.getWithMemberById(table.getId());
+
+            assertThat(foundTable.getMember().getEmail()).isEqualTo("email@email.com");
+        }
+    }
+
+    @Nested
     class GetCustomizeTimeBoxes {
 
         @Test

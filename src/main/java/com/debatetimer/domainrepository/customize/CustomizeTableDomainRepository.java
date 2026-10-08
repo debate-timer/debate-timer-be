@@ -60,6 +60,12 @@ public class CustomizeTableDomainRepository {
     }
 
     @Transactional(readOnly = true)
+    public CustomizeTable getWithMemberById(long tableId) {
+        return tableRepository.getWithMemberById(tableId)
+                .toDomain();
+    }
+
+    @Transactional(readOnly = true)
     public List<CustomizeTimeBox> getMemberCustomizeTimeBoxes(long tableId, Member member) {
         CustomizeTableEntity tableEntity = tableRepository.getByIdAndMember(tableId, member);
         List<CustomizeTimeBoxEntity> timeBoxEntityList = timeBoxRepository.findAllByCustomizeTable(tableEntity);
