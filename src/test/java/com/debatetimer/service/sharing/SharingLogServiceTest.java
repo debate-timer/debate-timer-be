@@ -221,8 +221,9 @@ class SharingLogServiceTest extends BaseServiceTest {
     class CloseExpired {
 
         @Test
-        void 마지막_타임박스에서_연결이_끊긴_뒤_돌아오지_않으면_끊긴_시각으로_종료한다() {
+        void 마지막_타임박스에서_연결이_끊긴_뒤_돌아오지_않으면_끊긴_시각으로_종료하고_종료_이벤트를_발행한다() {
             sharingLogService.start(roomId);
+            sharingLogService.joinAudience(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, TIME_BOX_COUNT - 1));
             clock.advance(Duration.ofMinutes(20));
             Instant disconnectedAt = clock.instant();
@@ -231,11 +232,18 @@ class SharingLogServiceTest extends BaseServiceTest {
 
             sharingLogService.closeExpired();
 
+            ArgumentCaptor<SharingFinishedEvent> captor = ArgumentCaptor.forClass(SharingFinishedEvent.class);
+            verify(eventPublisher).publishEvent(captor.capture());
+            SharingFinishedEvent event = captor.getValue();
             SharingLogEntity log = onlyLog();
             assertAll(
                     () -> assertThat(log.getStatus()).isEqualTo(SharingLogStatus.FINISHED),
                     () -> assertThat(log.getEndedAt()).isEqualTo(at(disconnectedAt)),
-                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+                    () -> assertThat(event.sharingLogId()).isEqualTo(log.getId()),
+                    () -> assertThat(event.memberEmail()).isEqualTo("chairman@email.com"),
+                    () -> assertThat(event.tableId()).isEqualTo(roomId),
+                    () -> assertThat(event.durationSeconds()).isEqualTo(20 * 60),
+                    () -> assertThat(event.audienceCount()).isEqualTo(1)
             );
         }
 
@@ -264,7 +272,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 마지막_타임박스_전에_연결이_끊긴_뒤_돌아오지_않으면_중단으로_기록한다() {
+        void 마지막_타임박스_전에_연결이_끊긴_뒤_돌아오지_않으면_중단으로_기록하고_종료_이벤트를_발행하지_않는다() {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, 0));
             sharingLogService.disconnect(roomId);
@@ -272,7 +280,10 @@ class SharingLogServiceTest extends BaseServiceTest {
 
             sharingLogService.closeExpired();
 
-            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED);
+            assertAll(
+                    () -> assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
         }
 
         @Test

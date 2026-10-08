@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * - 사회자가 공유를 시작하면 기록을 만들고, 사회자가 종료(FINISHED)를 발행할 때까지 같은 기록을 쓴다.
  * - 사회자 연결이 끊긴 뒤 재연결 유예 시간 안에 다시 공유를 시작하면 같은 기록을 이어서 쓴다.
  * - 유예 시간이 지나도록 돌아오지 않으면, 마지막 타임박스까지 진행했을 때는 종료로, 아니면 중단으로 기록한다.
+ * - 종료로 기록할 때는 사회자가 직접 종료했는지와 관계없이 종료 이벤트를 발행한다.
  */
 @Service
 public class SharingLogService {
@@ -116,17 +117,7 @@ public class SharingLogService {
             return;
         }
         sharingLog.finish(toLocalDateTime(clock.instant()));
-        eventPublisher.publishEvent(new SharingFinishedEvent(
-                sharingLog.getId(),
-                sharingLog.getMemberId(),
-                active.memberEmail(),
-                sharingLog.getTableId(),
-                active.tableName(),
-                sharingLog.getStartedAt(),
-                sharingLog.getEndedAt(),
-                sharingLog.getDurationSeconds(),
-                sharingLog.getAudienceCount()
-        ));
+        publishFinished(active, sharingLog);
     }
 
     /**
@@ -175,9 +166,24 @@ public class SharingLogService {
         LocalDateTime endedAt = toLocalDateTime(active.disconnectedAt() == null ? now : active.disconnectedAt());
         if (active.isOnLastTimeBox()) {
             sharingLog.finish(endedAt);
+            publishFinished(active, sharingLog);
             return;
         }
         sharingLog.abandon(endedAt);
+    }
+
+    private void publishFinished(ActiveSharing active, SharingLogEntity sharingLog) {
+        eventPublisher.publishEvent(new SharingFinishedEvent(
+                sharingLog.getId(),
+                sharingLog.getMemberId(),
+                active.memberEmail(),
+                sharingLog.getTableId(),
+                active.tableName(),
+                sharingLog.getStartedAt(),
+                sharingLog.getEndedAt(),
+                sharingLog.getDurationSeconds(),
+                sharingLog.getAudienceCount()
+        ));
     }
 
     private int toDisplayedSequence(TimerEventType eventType, int sequence) {
