@@ -10,6 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * 공유 종료 기록이 저장된 뒤에 공유 통계를 알린다.
+ * 종료 이벤트는 기록을 저장한 트랜잭션이 끝난 뒤 발행되므로, 트랜잭션 밖에서 발행돼도 알린다.
  * 알림은 공유 중계와 무관하므로 별도 스레드에서 보내고, 실패해도 기록만 남긴다.
  */
 @Slf4j
@@ -20,7 +21,7 @@ public class SharingFinishedListener {
     private final SharingNotifier sharingNotifier;
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handleSharingFinished(SharingFinishedEvent event) {
         try {
             sharingNotifier.sendSharingFinished(event);

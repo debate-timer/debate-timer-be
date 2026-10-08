@@ -22,6 +22,7 @@ public class SharingRoomCleanupScheduler {
     public void cleanupExpiredRooms() {
         sharingRoomRegistry.removeExpired();
         chairmanSessionRegistry.removeExpired();
+        sharingLogService.abandonUntracked();
     }
 
     @Scheduled(fixedRate = SHARING_LOG_INTERVAL_MILLIS)

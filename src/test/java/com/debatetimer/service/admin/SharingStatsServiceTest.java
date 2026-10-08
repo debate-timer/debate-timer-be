@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.sharing.SharingLog;
+import com.debatetimer.domain.sharing.SharingLogStatus;
 import com.debatetimer.dto.admin.SharingDailyStatResponse;
 import com.debatetimer.dto.admin.SharingStatsResponse;
 import com.debatetimer.entity.sharing.SharingLogEntity;
@@ -37,15 +39,16 @@ class SharingStatsServiceTest extends BaseServiceTest {
     }
 
     private void saveFinished(LocalDateTime startedAt, long minutes) {
-        SharingLogEntity log = new SharingLogEntity(1L, member.getId(), startedAt);
-        log.finish(startedAt.plusMinutes(minutes));
-        sharingLogRepository.save(log);
+        save(startedAt, startedAt.plusMinutes(minutes), SharingLogStatus.FINISHED);
     }
 
     private void saveAbandoned(LocalDateTime startedAt) {
-        SharingLogEntity log = new SharingLogEntity(1L, member.getId(), startedAt);
-        log.abandon(startedAt.plusMinutes(5));
-        sharingLogRepository.save(log);
+        save(startedAt, startedAt.plusMinutes(5), SharingLogStatus.ABANDONED);
+    }
+
+    private void save(LocalDateTime startedAt, LocalDateTime endedAt, SharingLogStatus status) {
+        sharingLogRepository.save(new SharingLogEntity(
+                new SharingLog(null, 1L, member.getId(), startedAt, endedAt, 0, status)));
     }
 
     @Nested

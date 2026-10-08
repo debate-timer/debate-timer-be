@@ -9,11 +9,14 @@ import static org.mockito.Mockito.verify;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.sharing.ActiveSharing;
+import com.debatetimer.domain.sharing.SharingLog;
 import com.debatetimer.domain.sharing.SharingLogStatus;
 import com.debatetimer.domain.sharing.TimerEvent;
 import com.debatetimer.domain.sharing.TimerEventData;
 import com.debatetimer.domain.sharing.TimerEventType;
 import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
+import com.debatetimer.domainrepository.sharing.SharingLogDomainRepository;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.entity.sharing.SharingLogEntity;
 import com.debatetimer.event.sharing.SharingFinishedEvent;
@@ -30,12 +33,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 class SharingLogServiceTest extends BaseServiceTest {
 
@@ -46,10 +45,10 @@ class SharingLogServiceTest extends BaseServiceTest {
     private SharingLogRepository sharingLogRepository;
 
     @Autowired
-    private CustomizeTableDomainRepository customizeTableDomainRepository;
+    private SharingLogDomainRepository sharingLogDomainRepository;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
+    private CustomizeTableDomainRepository customizeTableDomainRepository;
 
     private MutableClock clock;
     private ApplicationEventPublisher eventPublisher;
@@ -61,8 +60,8 @@ class SharingLogServiceTest extends BaseServiceTest {
     void setUp() {
         clock = new MutableClock(NOW);
         eventPublisher = mock(ApplicationEventPublisher.class);
-        sharingLogService = transactional(new SharingLogService(
-                sharingLogRepository, customizeTableDomainRepository, eventPublisher, clock));
+        sharingLogService = new SharingLogService(
+                sharingLogDomainRepository, customizeTableDomainRepository, eventPublisher, clock);
 
         member = memberGenerator.generate("chairman@email.com");
         CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
@@ -70,15 +69,6 @@ class SharingLogServiceTest extends BaseServiceTest {
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, sequence);
         }
         roomId = table.getId();
-    }
-
-    // 시각을 조정하기 위해 직접 만든 서비스에도 트랜잭션을 적용한다
-    private SharingLogService transactional(SharingLogService target) {
-        ProxyFactory proxyFactory = new ProxyFactory(target);
-        proxyFactory.setProxyTargetClass(true);
-        proxyFactory.addAdvice(new TransactionInterceptor(
-                transactionManager, new AnnotationTransactionAttributeSource()));
-        return (SharingLogService) proxyFactory.getProxy();
     }
 
     private SharingLogEntity onlyLog() {
@@ -127,10 +117,10 @@ class SharingLogServiceTest extends BaseServiceTest {
         void 연결이_끊긴_뒤_유예_시간_안에_다시_시작하면_같은_기록을_쓴다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE.minusSeconds(1));
+            clock.advance(ActiveSharing.RECONNECT_GRACE.minusSeconds(1));
 
             sharingLogService.start(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
             sharingLogService.closeExpired();
 
             assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
@@ -140,7 +130,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         void 연결이_끊긴_뒤_유예_시간이_지나_다시_시작하면_이전_기록을_정리하고_새_기록을_만든다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.start(roomId);
 
@@ -221,21 +211,29 @@ class SharingLogServiceTest extends BaseServiceTest {
     class CloseExpired {
 
         @Test
-        void 마지막_타임박스에서_연결이_끊긴_뒤_돌아오지_않으면_끊긴_시각으로_종료한다() {
+        void 마지막_타임박스에서_연결이_끊긴_뒤_돌아오지_않으면_끊긴_시각으로_종료하고_종료_이벤트를_발행한다() {
             sharingLogService.start(roomId);
+            sharingLogService.joinAudience(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, TIME_BOX_COUNT - 1));
             clock.advance(Duration.ofMinutes(20));
             Instant disconnectedAt = clock.instant();
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
+            ArgumentCaptor<SharingFinishedEvent> captor = ArgumentCaptor.forClass(SharingFinishedEvent.class);
+            verify(eventPublisher).publishEvent(captor.capture());
+            SharingFinishedEvent event = captor.getValue();
             SharingLogEntity log = onlyLog();
             assertAll(
                     () -> assertThat(log.getStatus()).isEqualTo(SharingLogStatus.FINISHED),
                     () -> assertThat(log.getEndedAt()).isEqualTo(at(disconnectedAt)),
-                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+                    () -> assertThat(event.sharingLogId()).isEqualTo(log.getId()),
+                    () -> assertThat(event.memberEmail()).isEqualTo("chairman@email.com"),
+                    () -> assertThat(event.tableId()).isEqualTo(roomId),
+                    () -> assertThat(event.durationSeconds()).isEqualTo(20 * 60),
+                    () -> assertThat(event.audienceCount()).isEqualTo(1)
             );
         }
 
@@ -244,7 +242,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.NEXT, TIME_BOX_COUNT - 2));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -256,7 +254,7 @@ class SharingLogServiceTest extends BaseServiceTest {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.BEFORE, TIME_BOX_COUNT - 1));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
@@ -264,22 +262,41 @@ class SharingLogServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 마지막_타임박스_전에_연결이_끊긴_뒤_돌아오지_않으면_중단으로_기록한다() {
+        void 마지막_타임박스_전에_연결이_끊긴_뒤_돌아오지_않으면_중단으로_기록하고_종료_이벤트를_발행하지_않는다() {
             sharingLogService.start(roomId);
             sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, 0));
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
 
             sharingLogService.closeExpired();
 
-            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED);
+            assertAll(
+                    () -> assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
+        }
+
+        @Test
+        void 다른_경로에서_이미_정리된_기록이면_종료_이벤트를_발행하지_않는다() {
+            sharingLogService.start(roomId);
+            sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, TIME_BOX_COUNT - 1));
+            sharingLogService.disconnect(roomId);
+            clock.advance(ActiveSharing.STALE_THRESHOLD.plusSeconds(1));
+            sharingLogService.abandonUntracked();
+
+            sharingLogService.closeExpired();
+
+            assertAll(
+                    () -> assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
         }
 
         @Test
         void 유예_시간이_지나지_않았으면_정리하지_않는다() {
             sharingLogService.start(roomId);
             sharingLogService.disconnect(roomId);
-            clock.advance(SharingLogService.RECONNECT_GRACE.minusSeconds(1));
+            clock.advance(ActiveSharing.RECONNECT_GRACE.minusSeconds(1));
 
             sharingLogService.closeExpired();
 
@@ -289,7 +306,7 @@ class SharingLogServiceTest extends BaseServiceTest {
         @Test
         void 연결이_유지돼도_너무_오래_이어진_공유는_정리한다() {
             sharingLogService.start(roomId);
-            clock.advance(SharingLogService.STALE_THRESHOLD);
+            clock.advance(ActiveSharing.STALE_THRESHOLD);
 
             sharingLogService.closeExpired();
 
@@ -297,17 +314,41 @@ class SharingLogServiceTest extends BaseServiceTest {
         }
 
         @Test
-        void 추적하지_못하게_된_오래된_기록은_중단으로_정리한다() {
-            LocalDateTime startedAt = at(NOW.minus(SharingLogService.STALE_THRESHOLD).minusSeconds(1));
-            sharingLogRepository.save(new SharingLogEntity(roomId, member.getId(), startedAt));
+        void 추적하지_못하게_된_오래된_기록은_정리하지_않는다() {
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).minusSeconds(1));
+            sharingLogDomainRepository.create(new SharingLog(roomId, member.getId(), startedAt));
 
             sharingLogService.closeExpired();
+
+            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
+        }
+    }
+
+    @Nested
+    class AbandonUntracked {
+
+        @Test
+        void 추적하지_못하게_된_오래된_기록은_중단으로_정리한다() {
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).minusSeconds(1));
+            sharingLogDomainRepository.create(new SharingLog(roomId, member.getId(), startedAt));
+
+            sharingLogService.abandonUntracked();
 
             SharingLogEntity log = onlyLog();
             assertAll(
                     () -> assertThat(log.getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
                     () -> assertThat(log.getEndedAt()).isNotNull()
             );
+        }
+
+        @Test
+        void 오래되지_않은_기록은_정리하지_않는다() {
+            LocalDateTime startedAt = at(NOW.minus(ActiveSharing.STALE_THRESHOLD).plusSeconds(1));
+            sharingLogDomainRepository.create(new SharingLog(roomId, member.getId(), startedAt));
+
+            sharingLogService.abandonUntracked();
+
+            assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.SHARING);
         }
     }
 
