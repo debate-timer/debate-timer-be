@@ -22,6 +22,10 @@ services:
       - MANAGEMENT_STATSD_METRICS_EXPORT_PORT=8125
       - MANAGEMENT_STATSD_METRICS_EXPORT_PROTOCOL=UDP
 
+    # 어드민에서 업로드한 단체 아이콘을 배포 간에 유지한다
+    volumes:
+      - icon-upload:/workspace/icon-upload
+
     networks:
       - debate-timer-net
 
@@ -52,3 +56,7 @@ services:
       - "com.datadoghq.ad.logs=[{\"source\": \"java\", \"service\": \"debate-timer\"}]"
 
     restart: unless-stopped
+
+volumes:
+  icon-upload:
+    name: debate-timer-icon-upload

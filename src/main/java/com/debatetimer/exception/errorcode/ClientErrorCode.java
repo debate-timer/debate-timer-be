@@ -4,6 +4,7 @@ import com.debatetimer.domain.customize.Agenda;
 import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.domain.stats.StatPeriod;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.service.admin.AdminTableService;
@@ -68,6 +69,11 @@ public enum ClientErrorCode implements ResponseErrorCode {
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
     ORGANIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 단체가 존재하지 않습니다"),
+    INVALID_ICON_FILE(HttpStatus.BAD_REQUEST, "아이콘은 PNG, JPEG, WEBP 이미지만 %dMB 이하로 업로드할 수 있습니다"
+            .formatted(OrganizationIcon.MAX_SIZE_BYTES / 1024 / 1024)),
+    INVALID_ICON_NAME(HttpStatus.BAD_REQUEST, "아이콘 이름은 영문 소문자, 숫자, '_', '-'로 %d자 이하여야 합니다"
+            .formatted(OrganizationIcon.MAX_NAME_LENGTH)),
+    ICON_ALREADY_EXISTS(HttpStatus.CONFLICT, "같은 이름의 아이콘이 이미 있습니다"),
 
     INVALID_OAUTH_REQUEST(HttpStatus.BAD_REQUEST, "구글 OAuth 요청 파라미터 값이 잘못되었습니다."),
 

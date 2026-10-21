@@ -20,6 +20,9 @@ jwt:
 admin:
   password: test-admin-password
 
+icon:
+  upload-dir: build/test-icon-upload
+
 ---
 
 spring:

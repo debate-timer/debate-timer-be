@@ -3,6 +3,10 @@ spring:
     default: local
   lifecycle:
     timeout-per-shutdown-phase: 60s
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
 
 server:
   shutdown: graceful
