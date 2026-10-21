@@ -1,7 +1,9 @@
 package com.debatetimer.controller.admin;
 
 import com.debatetimer.domain.stats.StatUnit;
+import com.debatetimer.dto.admin.MemberSignupStatsResponse;
 import com.debatetimer.dto.admin.TableUsageStatsResponse;
+import com.debatetimer.service.admin.MemberSignupStatsService;
 import com.debatetimer.service.admin.TableUsageStatsService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class AdminStatsController {
 
     private final AdminAuthorizer adminAuthorizer;
     private final TableUsageStatsService tableUsageStatsService;
+    private final MemberSignupStatsService memberSignupStatsService;
 
     @GetMapping("/api/admin/tables/stats")
     @ResponseStatus(HttpStatus.OK)
@@ -30,5 +33,17 @@ public class AdminStatsController {
     ) {
         adminAuthorizer.authorize(password);
         return tableUsageStatsService.getStats(unit, from, to);
+    }
+
+    @GetMapping("/api/admin/members/stats")
+    @ResponseStatus(HttpStatus.OK)
+    public MemberSignupStatsResponse getMemberSignupStats(
+            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password,
+            @RequestParam("unit") StatUnit unit,
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        adminAuthorizer.authorize(password);
+        return memberSignupStatsService.getStats(unit, from, to);
     }
 }

@@ -3,6 +3,7 @@ package com.debatetimer.controller.admin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.debatetimer.controller.BaseControllerTest;
+import com.debatetimer.dto.admin.MemberSignupStatsResponse;
 import com.debatetimer.dto.admin.TableUsageStatsResponse;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,34 @@ class AdminStatsControllerTest extends BaseControllerTest {
                     .queryParam("to", "2026-10-07")
                     .when().get("/api/admin/tables/stats")
                     .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+    }
+
+    @Nested
+    class GetMemberSignupStats {
+
+        @Test
+        void 어드민_비밀번호가_맞으면_단위별_회원_통계를_조회한다() {
+            MemberSignupStatsResponse response = given()
+                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .queryParam("unit", "MONTH")
+                    .queryParam("from", "2026-01-01")
+                    .queryParam("to", "2026-12-31")
+                    .when().get("/api/admin/members/stats")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(MemberSignupStatsResponse.class);
+
+            assertThat(response.periods()).hasSize(12);
+        }
+
+        @Test
+        void 어드민_비밀번호가_없으면_조회할_수_없다() {
+            given()
+                    .queryParam("unit", "DAY")
+                    .queryParam("from", "2026-10-01")
+                    .queryParam("to", "2026-10-07")
+                    .when().get("/api/admin/members/stats")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }
