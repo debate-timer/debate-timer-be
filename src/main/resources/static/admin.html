@@ -59,6 +59,27 @@
             color-scheme: dark;
             font-family: inherit;
         }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 34px;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+            min-height: 38px;
+        }
+        select:hover, select:focus { border-color: var(--count); outline: none; }
+        input[type=file] { padding: 6px; font-size: 13px; color: var(--muted); }
+        input[type=file]::file-selector-button {
+            background: transparent; color: var(--text); border: 1px solid var(--line);
+            border-radius: 5px; padding: 5px 10px; margin-right: 10px; cursor: pointer; font-family: inherit;
+        }
+        .icon-picker { display: flex; gap: 10px; align-items: center; }
+        .icon-picker select { flex: 1; min-width: 0; }
+        .icon-preview { width: 38px; height: 38px; flex: none; }
+        .upload-box { border: 1px dashed var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
         textarea { width: 100%; min-height: 90px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
         button {
             background: var(--count);
@@ -105,6 +126,8 @@
         .templates-row td { background: rgba(15, 23, 42, .6); }
         .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--line); color: var(--muted); }
         .chip.on { border-color: var(--success); color: var(--success); }
+        .toggle { display: inline-block; width: 16px; font-size: 14px; color: var(--muted); transition: transform .15s; }
+        .toggle.open { transform: rotate(90deg); }
 
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
         .form-grid .full { grid-column: 1 / -1; }
@@ -299,7 +322,22 @@
                     <form id="organization-form" class="form-grid">
                         <div class="field"><label for="org-name">이름</label><input id="org-name" required maxlength="255"/></div>
                         <div class="field"><label for="org-affiliation">소속</label><input id="org-affiliation" maxlength="255" placeholder="없으면 비워두기"/></div>
-                        <div class="field full"><label for="org-icon">아이콘 경로</label><input id="org-icon" required maxlength="255" placeholder="/icon/default.png"/></div>
+                        <div class="field full">
+                            <label for="org-icon">아이콘</label>
+                            <div class="icon-picker">
+                                <img id="org-icon-preview" class="icon icon-preview" alt=""/>
+                                <select id="org-icon" required></select>
+                            </div>
+                        </div>
+                        <div class="field full upload-box">
+                            <label for="icon-file">새 아이콘 업로드 (PNG · JPEG · WEBP, 2MB 이하)</label>
+                            <input id="icon-file" type="file" accept="image/png,image/jpeg,image/webp"/>
+                            <div class="row">
+                                <input id="icon-name" maxlength="50" placeholder="파일 이름 (영문 소문자·숫자·_·-)" style="flex:1; min-width:0"/>
+                                <button type="button" class="secondary" id="icon-upload">업로드</button>
+                            </div>
+                            <div id="icon-upload-message" class="error" style="margin:0"></div>
+                        </div>
                         <div class="field"><label for="org-language">언어</label>
                             <select id="org-language"><option value="KO_KR">KO_KR</option><option value="US_EN">US_EN</option></select>
                         </div>
@@ -802,10 +840,61 @@
     }
 
     // ---------- 단체 · 템플릿 ----------
+    async function loadIcons(selectedPath) {
+        const result = await api('/api/admin/icons');
+        const select = $('org-icon');
+        const previous = selectedPath || select.value;
+        const group = (label, uploaded) => el('optgroup', { label },
+            result.icons.filter((icon) => icon.uploaded === uploaded)
+                .map((icon) => el('option', { value: icon.path }, icon.path.replace('/icon/', ''))));
+        select.replaceChildren(group('업로드한 아이콘', true), group('기본 아이콘', false));
+        if (previous && result.icons.some((icon) => icon.path === previous)) select.value = previous;
+        updateIconPreview();
+    }
+
+    function updateIconPreview() {
+        const preview = $('org-icon-preview');
+        preview.classList.toggle('hidden', !$('org-icon').value);
+        if ($('org-icon').value) preview.src = $('org-icon').value;
+    }
+
+    function toIconName(fileName) {
+        return fileName.replace(/\.[^.]+$/, '').trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+    }
+
+    async function uploadIcon() {
+        setMessage('icon-upload-message', '');
+        const file = $('icon-file').files[0];
+        if (!file) {
+            setMessage('icon-upload-message', '업로드할 이미지를 선택하세요.');
+            return;
+        }
+        const form = new FormData();
+        form.append('file', file);
+        form.append('name', $('icon-name').value.trim());
+        try {
+            const response = await fetch('/api/admin/icons', {
+                method: 'POST', headers: { 'X-Admin-Password': currentPassword }, body: form,
+            });
+            if (response.status === 401) {
+                logout('비밀번호가 올바르지 않습니다.');
+                return;
+            }
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(body.message || `업로드에 실패했습니다 (${response.status})`);
+            $('icon-file').value = '';
+            $('icon-name').value = '';
+            await loadIcons(body.path);
+            setMessage('icon-upload-message', `${body.path} 로 저장했습니다. 아이콘으로 선택했습니다.`, true);
+        } catch (error) {
+            setMessage('icon-upload-message', error.message);
+        }
+    }
+
     async function loadOrganizations() {
         $('organizations-error').textContent = '';
         try {
-            const result = await api('/api/admin/organizations');
+            const [result] = await Promise.all([api('/api/admin/organizations'), loadIcons()]);
             state.organizations = result.organizations;
             renderOrganizations();
         } catch (error) {
@@ -824,7 +913,7 @@
                     renderOrganizations();
                 },
             },
-                el('td', {}, expanded ? '▾' : '▸'),
+                el('td', {}, el('span', { class: `toggle${expanded ? ' open' : ''}` }, '▸')),
                 el('td', { class: 'num' }, organization.id),
                 el('td', {}, icon),
                 el('td', { class: 'wrap' }, organization.name),
@@ -873,11 +962,13 @@
                 body: JSON.stringify({
                     name: $('org-name').value.trim(),
                     affiliation: $('org-affiliation').value.trim(),
-                    iconPath: $('org-icon').value.trim(),
+                    iconPath: $('org-icon').value,
                     language: $('org-language').value,
                 }),
             });
+            const iconPath = $('org-icon').value;
             $('organization-form').reset();
+            $('org-icon').value = iconPath;
             setMessage('organization-form-message', `'${created.name}' 단체를 추가했습니다 (ID ${created.id}).`, true);
             await loadOrganizations();
             $('tpl-organization').value = created.id;
@@ -965,6 +1056,12 @@
     $('organization-form').addEventListener('submit', createOrganization);
     $('template-form').addEventListener('submit', createTemplate);
     $('tpl-load').addEventListener('click', loadTemplateFromTable);
+    $('org-icon').addEventListener('change', updateIconPreview);
+    $('icon-upload').addEventListener('click', uploadIcon);
+    $('icon-file').addEventListener('change', () => {
+        const file = $('icon-file').files[0];
+        if (file && !$('icon-name').value) $('icon-name').value = toIconName(file.name);
+    });
     $('tpl-preview').addEventListener('click', () => {
         setMessage('template-form-message', '');
         try {
