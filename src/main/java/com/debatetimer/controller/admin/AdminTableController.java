@@ -1,5 +1,6 @@
 package com.debatetimer.controller.admin;
 
+import com.debatetimer.domain.customize.CustomizeTableSortType;
 import com.debatetimer.dto.admin.AdminTableDetailResponse;
 import com.debatetimer.dto.admin.AdminTablePageResponse;
 import com.debatetimer.service.admin.AdminTableService;
@@ -23,11 +24,12 @@ public class AdminTableController {
     @ResponseStatus(HttpStatus.OK)
     public AdminTablePageResponse getTables(
             @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password,
+            @RequestParam(name = "sort", defaultValue = "CREATED_AT") CustomizeTableSortType sort,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size
     ) {
         adminAuthorizer.authorize(password);
-        return adminTableService.getTables(page, size);
+        return adminTableService.getTables(sort, page, size);
     }
 
     @GetMapping("/api/admin/tables/{tableId}")

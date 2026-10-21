@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.customize.BellType;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.CustomizeTableSortType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.admin.AdminTableDetailResponse;
@@ -32,6 +33,12 @@ class AdminTableServiceTest extends BaseServiceTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private CustomizeTableEntity saveTable(Member member, LocalDateTime createdAt, LocalDateTime usedAt) {
+        CustomizeTableEntity table = saveTable(member, createdAt);
+        jdbcTemplate.update("UPDATE customize_table SET used_at = ? WHERE id = ?", usedAt, table.getId());
+        return table;
+    }
+
     private CustomizeTableEntity saveTable(Member member, LocalDateTime createdAt) {
         CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
         jdbcTemplate.update("UPDATE customize_table SET created_at = ? WHERE id = ?", createdAt, table.getId());
@@ -49,8 +56,8 @@ class AdminTableServiceTest extends BaseServiceTest {
             CustomizeTableEntity latest = saveTable(member2, LocalDateTime.of(2026, 10, 3, 0, 0));
             CustomizeTableEntity middle = saveTable(member1, LocalDateTime.of(2026, 10, 2, 0, 0));
 
-            AdminTablePageResponse firstPage = adminTableService.getTables(0, 2);
-            AdminTablePageResponse secondPage = adminTableService.getTables(1, 2);
+            AdminTablePageResponse firstPage = adminTableService.getTables(CustomizeTableSortType.CREATED_AT, 0, 2);
+            AdminTablePageResponse secondPage = adminTableService.getTables(CustomizeTableSortType.CREATED_AT, 1, 2);
 
             assertAll(
                     () -> assertThat(firstPage.tables()).extracting(AdminTableResponse::id)
@@ -63,10 +70,24 @@ class AdminTableServiceTest extends BaseServiceTest {
             );
         }
 
+        @Test
+        void 마지막_사용_시각_최신순으로_조회할_수_있다() {
+            Member member = memberGenerator.generate("member@email.com");
+            CustomizeTableEntity recentlyUsed = saveTable(member, LocalDateTime.of(2026, 10, 1, 0, 0),
+                    LocalDateTime.of(2026, 10, 20, 0, 0));
+            CustomizeTableEntity latestCreated = saveTable(member, LocalDateTime.of(2026, 10, 10, 0, 0),
+                    LocalDateTime.of(2026, 10, 10, 0, 0));
+
+            AdminTablePageResponse response = adminTableService.getTables(CustomizeTableSortType.USED_AT, 0, 10);
+
+            assertThat(response.tables()).extracting(AdminTableResponse::id)
+                    .containsExactly(recentlyUsed.getId(), latestCreated.getId());
+        }
+
         @ParameterizedTest
         @CsvSource({"-1, 20", "0, 0", "0, 101"})
         void 페이지_요청이_잘못되면_예외를_던진다(int page, int size) {
-            assertThatThrownBy(() -> adminTableService.getTables(page, size))
+            assertThatThrownBy(() -> adminTableService.getTables(CustomizeTableSortType.CREATED_AT, page, size))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_PAGE_REQUEST.getMessage());
         }

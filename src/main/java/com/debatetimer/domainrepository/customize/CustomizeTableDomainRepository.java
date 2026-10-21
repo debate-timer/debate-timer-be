@@ -2,6 +2,7 @@ package com.debatetimer.domainrepository.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTableOverview;
+import com.debatetimer.domain.customize.CustomizeTableSortType;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.BellEntity;
@@ -78,10 +79,17 @@ public class CustomizeTableDomainRepository {
     }
 
     @Transactional(readOnly = true)
-    public Page<CustomizeTableOverview> findOverviewsOrderByCreatedAtDesc(int page, int size) {
-        Sort latestFirst = Sort.by(Direction.DESC, "createdAt", "id");
-        return tableRepository.findAllBy(PageRequest.of(page, size, latestFirst))
+    public Page<CustomizeTableOverview> findOverviews(CustomizeTableSortType sortType, int page, int size) {
+        return tableRepository.findAllBy(PageRequest.of(page, size, toLatestFirstSort(sortType)))
                 .map(CustomizeTableEntity::toOverview);
+    }
+
+    private Sort toLatestFirstSort(CustomizeTableSortType sortType) {
+        String property = switch (sortType) {
+            case CREATED_AT -> "createdAt";
+            case USED_AT -> "usedAt";
+        };
+        return Sort.by(Direction.DESC, property, "id");
     }
 
     @Transactional(readOnly = true)

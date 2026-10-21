@@ -92,6 +92,8 @@
         table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
         table.data th, table.data td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
         table.data th { color: var(--muted); font-weight: 600; font-size: 12px; }
+        table.data th.sorted { color: var(--text); }
+        table.data th.sorted::after { content: ' ▼'; font-size: 10px; }
         table.data td.wrap { white-space: normal; min-width: 160px; }
         table.data tbody tr.clickable { cursor: pointer; }
         table.data tbody tr.clickable:hover { background: rgba(148, 163, 184, .08); }
@@ -247,8 +249,12 @@
         <section id="tab-tables" class="tab hidden">
             <div class="panel">
                 <div class="row spread">
-                    <h2 style="margin:0">전체 테이블 (최신 생성순)</h2>
+                    <h2 style="margin:0">전체 테이블</h2>
                     <div class="row">
+                        <div class="row" id="sort-buttons" role="group" aria-label="정렬 기준">
+                            <button type="button" class="secondary small" data-sort="CREATED_AT">최근 생성순</button>
+                            <button type="button" class="secondary small" data-sort="USED_AT">최근 사용순</button>
+                        </div>
                         <span class="hint" id="tables-total" style="margin:0"></span>
                         <select id="page-size" aria-label="페이지 크기">
                             <option value="10">10개씩</option>
@@ -261,7 +267,7 @@
                 <div class="table-wrap" style="margin-top:12px">
                     <table class="data">
                         <thead>
-                        <tr><th>ID</th><th>이름</th><th>주제</th><th>회원</th><th>생성</th><th>마지막 사용</th></tr>
+                        <tr><th>ID</th><th>이름</th><th>주제</th><th>회원</th><th data-sort-column="CREATED_AT">생성</th><th data-sort-column="USED_AT">마지막 사용</th></tr>
                         </thead>
                         <tbody id="tables-body"></tbody>
                     </table>
@@ -362,7 +368,7 @@
     const BOX_LABELS = { NORMAL: '일반 타이머', TIME_BASED: '자유토론 (시간 총량제)' };
 
     const charts = {};
-    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, organizations: [], expanded: new Set() };
+    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set() };
 
     const $ = (id) => document.getElementById(id);
     const color = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -633,7 +639,8 @@
     async function loadTables() {
         $('tables-error').textContent = '';
         try {
-            const params = new URLSearchParams({ page: state.page, size: $('page-size').value });
+            renderSortState();
+            const params = new URLSearchParams({ sort: state.sort, page: state.page, size: $('page-size').value });
             const result = await api(`/api/admin/tables?${params}`);
             if (result.totalPages > 0 && state.page >= result.totalPages) {
                 state.page = result.totalPages - 1;
@@ -654,6 +661,13 @@
         } catch (error) {
             handleError(error, 'tables-error');
         }
+    }
+
+    function renderSortState() {
+        document.querySelectorAll('[data-sort]').forEach((button) =>
+            button.classList.toggle('active', button.dataset.sort === state.sort));
+        document.querySelectorAll('[data-sort-column]').forEach((header) =>
+            header.classList.toggle('sorted', header.dataset.sortColumn === state.sort));
     }
 
     function renderPagination(page, totalPages) {
@@ -940,6 +954,11 @@
     document.querySelectorAll('#tabs button').forEach((button) =>
         button.addEventListener('click', () => selectTab(button.dataset.tab)));
     $('page-size').addEventListener('change', () => { state.page = 0; loadTables(); });
+    document.querySelectorAll('[data-sort]').forEach((button) => button.addEventListener('click', () => {
+        state.sort = button.dataset.sort;
+        state.page = 0;
+        loadTables();
+    }));
     $('modal-close').addEventListener('click', closeModal);
     $('modal').addEventListener('click', (event) => { if (event.target === $('modal')) closeModal(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });

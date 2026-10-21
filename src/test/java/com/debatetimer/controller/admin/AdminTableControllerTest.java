@@ -27,6 +27,7 @@ class AdminTableControllerTest extends BaseControllerTest {
 
             AdminTablePageResponse response = given()
                     .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .queryParam("sort", "USED_AT")
                     .queryParam("page", 0)
                     .queryParam("size", 1)
                     .when().get("/api/admin/tables")
@@ -34,6 +35,15 @@ class AdminTableControllerTest extends BaseControllerTest {
                     .extract().as(AdminTablePageResponse.class);
 
             assertThat(response.totalElements()).isEqualTo(2);
+        }
+
+        @Test
+        void 정렬_기준이_잘못되면_조회할_수_없다() {
+            given()
+                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .queryParam("sort", "NAME")
+                    .when().get("/api/admin/tables")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
         }
 
         @Test

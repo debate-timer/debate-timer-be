@@ -1,6 +1,7 @@
 package com.debatetimer.service.admin;
 
 import com.debatetimer.domain.customize.CustomizeTableOverview;
+import com.debatetimer.domain.customize.CustomizeTableSortType;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
 import com.debatetimer.dto.admin.AdminTableDetailResponse;
@@ -22,10 +23,10 @@ public class AdminTableService {
 
     private final CustomizeTableDomainRepository customizeTableDomainRepository;
 
-    public AdminTablePageResponse getTables(int page, int size) {
+    public AdminTablePageResponse getTables(CustomizeTableSortType sortType, int page, int size) {
         validatePage(page, size);
         return AdminTablePageResponse.from(
-                customizeTableDomainRepository.findOverviewsOrderByCreatedAtDesc(page, size));
+                customizeTableDomainRepository.findOverviews(sortType, page, size));
     }
 
     private void validatePage(int page, int size) {
