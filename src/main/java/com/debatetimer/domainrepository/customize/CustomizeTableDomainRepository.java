@@ -9,6 +9,7 @@ import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
 import com.debatetimer.repository.customize.BellRepository;
 import com.debatetimer.repository.customize.CustomizeTableRepository;
 import com.debatetimer.repository.customize.CustomizeTimeBoxRepository;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -89,6 +90,16 @@ public class CustomizeTableDomainRepository {
     @Transactional(readOnly = true)
     public int countTimeBoxes(long tableId) {
         return timeBoxRepository.countByCustomizeTableId(tableId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocalDateTime> findCreatedAtBetween(LocalDateTime from, LocalDateTime to) {
+        return tableRepository.findCreatedAtBetween(from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocalDateTime> findUsedAtBetween(LocalDateTime from, LocalDateTime to) {
+        return tableRepository.findUsedAtBetween(from, to);
     }
 
     private List<CustomizeTimeBox> toCustomizeTimeBoxes(
