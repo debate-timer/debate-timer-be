@@ -14,4 +14,8 @@ public class OrganizationTemplate {
         this.name = name;
         this.data = data;
     }
+
+    public OrganizationTemplate(String name, String data) {
+        this(null, name, data);
+    }
 }

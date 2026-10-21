@@ -4,8 +4,13 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="robots" content="noindex, nofollow"/>
-    <title>Debate Timer · 라이브 공유 통계</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <title>Debate Timer · 어드민</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
+            integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"
+            integrity="sha384-rNlaE5fs9dGIjmxWDALQh/RBAaGRYT5ChrzHo6tRfgrZ36iRFAiquP5g41Jsv+0j"
+            crossorigin="anonymous"></script>
     <style>
         :root {
             --bg: #0f172a;
@@ -15,7 +20,16 @@
             --muted: #94a3b8;
             --count: #3b82f6;
             --minutes: #10b981;
+            --abandoned: #f87171;
+            --created: #3b82f6;
+            --used: #f59e0b;
+            --members: #8b5cf6;
+            --rate: #10b981;
+            --pros: #2563eb;
+            --cons: #dc2626;
+            --neutral: #475569;
             --error: #f87171;
+            --success: #34d399;
         }
         * { box-sizing: border-box; }
         body {
@@ -26,8 +40,9 @@
             font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
         }
         main { max-width: 1100px; margin: 0 auto; }
-        h1 { font-size: 20px; margin: 0 0 16px; }
+        h1 { font-size: 20px; margin: 0; }
         h2 { font-size: 15px; margin: 0 0 12px; color: var(--muted); font-weight: 600; }
+        h3 { font-size: 14px; margin: 0 0 8px; }
         .panel {
             background: var(--panel);
             border: 1px solid var(--line);
@@ -36,8 +51,9 @@
             margin-bottom: 16px;
         }
         .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .spread { justify-content: space-between; }
         label { font-size: 13px; color: var(--muted); }
-        input {
+        input, select, textarea {
             background: var(--bg);
             color: var(--text);
             border: 1px solid var(--line);
@@ -45,7 +61,30 @@
             padding: 8px 10px;
             font-size: 14px;
             color-scheme: dark;
+            font-family: inherit;
         }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 34px;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+            min-height: 38px;
+        }
+        select:hover, select:focus { border-color: var(--count); outline: none; }
+        input[type=file] { padding: 6px; font-size: 13px; color: var(--muted); }
+        input[type=file]::file-selector-button {
+            background: transparent; color: var(--text); border: 1px solid var(--line);
+            border-radius: 5px; padding: 5px 10px; margin-right: 10px; cursor: pointer; font-family: inherit;
+        }
+        .icon-picker { display: flex; gap: 10px; align-items: center; }
+        .icon-picker select { flex: 1; min-width: 0; }
+        .icon-preview { width: 38px; height: 38px; flex: none; }
+        .upload-box { border: 1px dashed var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        textarea { width: 100%; min-height: 90px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
         button {
             background: var(--count);
             color: #fff;
@@ -55,21 +94,92 @@
             font-size: 14px;
             cursor: pointer;
         }
+        button:disabled { opacity: .4; cursor: default; }
         button.secondary { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+        button.secondary.active { border-color: var(--count); color: var(--text); }
+        button.small { padding: 5px 10px; font-size: 12px; }
         .error { color: var(--error); font-size: 13px; min-height: 18px; margin-top: 8px; }
+        .success { color: var(--success); }
+        .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
         .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
         .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
         .stat .label { font-size: 12px; color: var(--muted); }
         .stat .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
         .chart-box { position: relative; height: 300px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
+
+        header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        nav.tabs button { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+        nav.tabs button.active { background: var(--count); border-color: var(--count); color: #fff; }
+
+        .table-wrap { overflow-x: auto; }
+        table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table.data th, table.data td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+        table.data th { color: var(--muted); font-weight: 600; font-size: 12px; }
+        table.data th.sorted { color: var(--text); }
+        table.data th.sorted::after { content: ' ▼'; font-size: 10px; }
+        table.data td.wrap { white-space: normal; min-width: 160px; }
+        table.data tbody tr.clickable { cursor: pointer; }
+        table.data tbody tr.clickable:hover { background: rgba(148, 163, 184, .08); }
+        table.data td.num { font-variant-numeric: tabular-nums; }
+        .empty { color: var(--muted); text-align: center; padding: 24px; }
+        .pagination { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; margin-top: 12px; }
+        .pagination button { min-width: 34px; }
+        .icon { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; background: #fff; vertical-align: middle; }
+        .templates-row td { background: rgba(15, 23, 42, .6); }
+        .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--line); color: var(--muted); }
+        .chip.on { border-color: var(--success); color: var(--success); }
+        .toggle { display: inline-block; width: 16px; font-size: 14px; color: var(--muted); transition: transform .15s; }
+        .toggle.open { transform: rotate(90deg); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        .form-grid .full { grid-column: 1 / -1; }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(2, 6, 23, .75);
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 32px 16px; overflow-y: auto; z-index: 10;
+        }
+        .modal {
+            width: 100%; max-width: 760px; background: var(--panel);
+            border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+        }
+        .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+        .modal-head .title { font-size: 18px; font-weight: 700; }
+        .modal-head .agenda { color: var(--muted); font-size: 13px; margin-top: 4px; }
+        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 16px; font-size: 12px; }
+        .meta div > span:first-child { display: block; color: var(--muted); margin-bottom: 2px; }
+        .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; text-align: center; font-weight: 700; font-size: 14px; }
+        .teams .pros { color: #93c5fd; }
+        .teams .cons { color: #fca5a5; }
+        .timeboxes { display: flex; flex-direction: column; gap: 8px; }
+        .timebox-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .timebox {
+            border-radius: 8px; padding: 10px 12px; cursor: pointer; border: 2px solid transparent;
+            display: flex; justify-content: space-between; gap: 8px; align-items: center; min-height: 52px;
+        }
+        .timebox:hover { filter: brightness(1.12); }
+        .timebox.selected { border-color: #fff; }
+        .timebox.PROS { background: var(--pros); grid-column: 1; }
+        .timebox.CONS { background: var(--cons); grid-column: 2; }
+        .timebox.NEUTRAL { background: var(--neutral); grid-column: 1 / -1; }
+        .timebox .speech { font-weight: 700; font-size: 14px; }
+        .timebox .speaker { font-size: 12px; opacity: .85; margin-top: 2px; }
+        .timebox .time { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; text-align: right; }
+        .timebox .time small { display: block; font-weight: 400; font-size: 11px; opacity: .85; }
+        .timebox .bell-badge { font-size: 11px; opacity: .9; }
+        .detail { margin-top: 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+        .detail dl { display: grid; grid-template-columns: 120px 1fr; gap: 6px 12px; margin: 0 0 10px; font-size: 13px; }
+        .detail dt { color: var(--muted); }
+        .detail dd { margin: 0; }
     </style>
 </head>
 <body>
 <main>
-    <h1>라이브 공유 통계</h1>
-
-    <section id="login" class="panel">
+    <section id="login" class="panel hidden">
         <h2>어드민 비밀번호</h2>
         <form id="login-form" class="row">
             <input id="password" type="password" autocomplete="current-password" placeholder="비밀번호" required/>
@@ -78,181 +188,930 @@
         <div id="login-error" class="error"></div>
     </section>
 
-    <section id="dashboard" class="hidden">
-        <div class="panel">
+    <div id="app" class="hidden">
+        <header>
+            <h1>Debate Timer 어드민</h1>
+            <button type="button" class="secondary small" id="logout">로그아웃</button>
+        </header>
+
+        <nav class="tabs" id="tabs">
+            <button type="button" data-tab="tables-stats">타이머 통계</button>
+            <button type="button" data-tab="members-stats">회원 통계</button>
+            <button type="button" data-tab="sharing-stats">라이브 공유</button>
+            <button type="button" data-tab="tables">테이블 목록</button>
+            <button type="button" data-tab="organizations">단체 · 템플릿</button>
+        </nav>
+
+        <!-- 통계 공통 기간 선택 -->
+        <div id="period-panel" class="panel">
             <form id="period-form" class="row">
+                <div id="unit-buttons" class="row">
+                    <button type="button" class="secondary" data-unit="DAY">일별</button>
+                    <button type="button" class="secondary" data-unit="WEEK">주간</button>
+                    <button type="button" class="secondary" data-unit="MONTH">월별</button>
+                </div>
                 <label for="from">시작일</label>
                 <input id="from" type="date" required/>
                 <label for="to">종료일</label>
                 <input id="to" type="date" required/>
                 <button type="submit">조회</button>
-                <button type="button" class="secondary" data-days="7">최근 7일</button>
-                <button type="button" class="secondary" data-days="30">최근 30일</button>
-                <button type="button" class="secondary" data-days="90">최근 90일</button>
-                <button type="button" class="secondary" id="logout">로그아웃</button>
+                <span id="quick-buttons" class="row"></span>
             </form>
+            <div id="period-hint" class="hint"></div>
             <div id="period-error" class="error"></div>
         </div>
 
-        <div class="panel summary">
-            <div class="stat"><div class="label">기간 내 FINISHED 공유</div><div class="value" id="total-count">-</div></div>
-            <div class="stat"><div class="label">기간 평균 공유 시간</div><div class="value" id="total-average">-</div></div>
-            <div class="stat"><div class="label">일 평균 공유 횟수</div><div class="value" id="daily-average">-</div></div>
-        </div>
+        <!-- 타이머 통계 -->
+        <section id="tab-tables-stats" class="tab hidden">
+            <div class="panel summary">
+                <div class="stat"><div class="label">기간 내 생성된 타이머</div><div class="value" id="ts-created">-</div></div>
+                <div class="stat"><div class="label">기간 내 사용된 타이머</div><div class="value" id="ts-used">-</div></div>
+                <div class="stat"><div class="label">구간 평균 생성</div><div class="value" id="ts-created-avg">-</div></div>
+                <div class="stat"><div class="label">구간 평균 사용</div><div class="value" id="ts-used-avg">-</div></div>
+            </div>
+            <div class="panel">
+                <h2>타이머 생성 · 사용 추이</h2>
+                <div class="chart-box"><canvas id="tables-chart"></canvas></div>
+                <div class="hint">생성은 created_at, 사용은 used_at 기준입니다. used_at은 테이블마다 마지막 사용 시각만 남으므로, 사용 수는 해당 구간에 마지막으로 사용된 테이블 수입니다.</div>
+            </div>
+        </section>
 
-        <div class="panel">
-            <h2>일별 FINISHED 공유 횟수</h2>
-            <div class="chart-box"><canvas id="count-chart"></canvas></div>
-        </div>
+        <!-- 회원 통계 -->
+        <section id="tab-members-stats" class="tab hidden">
+            <div class="panel summary">
+                <div class="stat"><div class="label">기간 내 신규 회원</div><div class="value" id="ms-new">-</div></div>
+                <div class="stat"><div class="label">기간 말 누적 회원</div><div class="value" id="ms-total">-</div></div>
+                <div class="stat"><div class="label">기간 전체 증가율</div><div class="value" id="ms-rate">-</div></div>
+                <div class="stat"><div class="label">구간 평균 증가율</div><div class="value" id="ms-rate-avg">-</div></div>
+            </div>
+            <div class="panel">
+                <h2>신규 회원 수 · 증가율</h2>
+                <div class="chart-box"><canvas id="members-chart"></canvas></div>
+                <div class="hint">증가율 = 구간 신규 회원 ÷ 구간 시작 전 누적 회원 × 100. 시작 전 회원이 없으면 표시하지 않습니다.</div>
+            </div>
+        </section>
 
-        <div class="panel">
-            <h2>일별 평균 공유 시간 (분)</h2>
-            <div class="chart-box"><canvas id="minutes-chart"></canvas></div>
-        </div>
-    </section>
+        <!-- 라이브 공유 통계 -->
+        <section id="tab-sharing-stats" class="tab hidden">
+            <div class="panel summary">
+                <div class="stat"><div class="label">기간 내 FINISHED 공유</div><div class="value" id="total-count">-</div></div>
+                <div class="stat"><div class="label">기간 내 ABANDONED 공유</div><div class="value" id="abandoned-count">-</div></div>
+                <div class="stat"><div class="label">중단 비율</div><div class="value" id="abandoned-rate">-</div></div>
+                <div class="stat"><div class="label">FINISHED 평균 공유 시간</div><div class="value" id="total-average">-</div></div>
+                <div class="stat"><div class="label">ABANDONED 평균 공유 시간</div><div class="value" id="abandoned-average">-</div></div>
+                <div class="stat"><div class="label">일 평균 공유 횟수</div><div class="value" id="daily-average">-</div></div>
+            </div>
+            <div class="panel">
+                <h2>일별 공유 횟수 (FINISHED · ABANDONED)</h2>
+                <div class="chart-box"><canvas id="count-chart"></canvas></div>
+                <div class="hint">ABANDONED는 사회자 연결이 끊긴 채 정리된 공유입니다. 서버 재시작 등으로 추적이 끊긴 경우 마지막 수정 시각을 종료 시각으로 봅니다.</div>
+            </div>
+            <div class="panel">
+                <h2>일별 평균 공유 시간 (분)</h2>
+                <div class="chart-box"><canvas id="minutes-chart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- 테이블 목록 -->
+        <section id="tab-tables" class="tab hidden">
+            <div class="panel">
+                <div class="row spread">
+                    <h2 style="margin:0">전체 테이블</h2>
+                    <div class="row">
+                        <div class="row" id="sort-buttons" role="group" aria-label="정렬 기준">
+                            <button type="button" class="secondary small" data-sort="CREATED_AT">최근 생성순</button>
+                            <button type="button" class="secondary small" data-sort="USED_AT">최근 사용순</button>
+                        </div>
+                        <span class="hint" id="tables-total" style="margin:0"></span>
+                        <select id="page-size" aria-label="페이지 크기">
+                            <option value="10">10개씩</option>
+                            <option value="20" selected>20개씩</option>
+                            <option value="50">50개씩</option>
+                            <option value="100">100개씩</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrap" style="margin-top:12px">
+                    <table class="data">
+                        <thead>
+                        <tr><th>ID</th><th>이름</th><th>주제</th><th>회원</th><th data-sort-column="CREATED_AT">생성</th><th data-sort-column="USED_AT">마지막 사용</th></tr>
+                        </thead>
+                        <tbody id="tables-body"></tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+                <div id="tables-error" class="error"></div>
+            </div>
+        </section>
+
+        <!-- 단체 · 템플릿 -->
+        <section id="tab-organizations" class="tab hidden">
+            <div class="panel">
+                <h2>단체 목록</h2>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>아이콘 경로</th><th>템플릿</th></tr>
+                        </thead>
+                        <tbody id="organizations-body"></tbody>
+                    </table>
+                </div>
+                <div class="hint">행을 누르면 템플릿 목록이 펼쳐집니다. 템플릿의 미리보기는 타임박스 화면으로 보여줍니다.</div>
+                <div id="organizations-error" class="error"></div>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h2>단체 추가</h2>
+                    <form id="organization-form" class="form-grid">
+                        <div class="field"><label for="org-name">이름</label><input id="org-name" required maxlength="255"/></div>
+                        <div class="field"><label for="org-affiliation">소속</label><input id="org-affiliation" maxlength="255" placeholder="없으면 비워두기"/></div>
+                        <div class="field full">
+                            <label for="org-icon">아이콘</label>
+                            <div class="icon-picker">
+                                <img id="org-icon-preview" class="icon icon-preview" alt=""/>
+                                <select id="org-icon" required></select>
+                            </div>
+                        </div>
+                        <div class="field full upload-box">
+                            <label for="icon-file">새 아이콘 업로드 (PNG · JPEG · WEBP, 2MB 이하)</label>
+                            <input id="icon-file" type="file" accept="image/png,image/jpeg,image/webp"/>
+                            <div class="row">
+                                <input id="icon-name" maxlength="50" placeholder="파일 이름 (영문 소문자·숫자·_·-)" style="flex:1; min-width:0"/>
+                                <button type="button" class="secondary" id="icon-upload">업로드</button>
+                            </div>
+                            <div id="icon-upload-message" class="error" style="margin:0"></div>
+                        </div>
+                        <div class="field"><label for="org-language">언어</label>
+                            <select id="org-language"><option value="KO_KR">KO_KR</option><option value="US_EN">US_EN</option></select>
+                        </div>
+                        <div class="field full"><button type="submit">단체 추가</button></div>
+                    </form>
+                    <div id="organization-form-message" class="error"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>템플릿 추가</h2>
+                    <form id="template-form" class="form-grid">
+                        <div class="field full"><label for="tpl-organization">단체</label><select id="tpl-organization" required></select></div>
+                        <div class="field full"><label for="tpl-name">템플릿 이름</label><input id="tpl-name" required maxlength="255"/></div>
+                        <div class="field full">
+                            <label for="tpl-table-id">테이블에서 가져오기</label>
+                            <div class="row">
+                                <input id="tpl-table-id" type="number" min="1" placeholder="테이블 ID" style="flex:1"/>
+                                <button type="button" class="secondary" id="tpl-load">불러오기</button>
+                            </div>
+                        </div>
+                        <div class="field full">
+                            <label for="tpl-data">데이터 (압축 문자열)</label>
+                            <textarea id="tpl-data" required maxlength="8191"></textarea>
+                        </div>
+                        <div class="full row">
+                            <button type="button" class="secondary" id="tpl-preview">미리보기</button>
+                            <button type="submit">템플릿 추가</button>
+                        </div>
+                    </form>
+                    <div id="template-form-message" class="error"></div>
+                </div>
+            </div>
+        </section>
+    </div>
 </main>
+
+<div id="modal" class="modal-backdrop hidden" role="presentation">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-head">
+            <div>
+                <div class="title" id="modal-title"></div>
+                <div class="agenda" id="modal-agenda"></div>
+            </div>
+            <button type="button" class="secondary small" id="modal-close">닫기</button>
+        </div>
+        <div class="meta" id="modal-meta"></div>
+        <div class="teams"><div class="pros" id="modal-pros"></div><div class="cons" id="modal-cons"></div></div>
+        <div class="timeboxes" id="modal-timeboxes"></div>
+        <div class="detail hidden" id="modal-detail"></div>
+        <div class="hint">읽기 전용 화면입니다. 타임박스를 누르면 세부 설정을 확인할 수 있습니다.</div>
+    </div>
+</div>
 
 <script>
     const PASSWORD_KEY = 'debate-timer-admin-password';
+    const TAB_KEY = 'debate-timer-admin-tab';
+    const STAT_TABS = ['tables-stats', 'members-stats', 'sharing-stats'];
+    const UNIT_LABELS = { DAY: '일', WEEK: '주', MONTH: '월' };
+    const QUICK_RANGES = {
+        DAY: [[7, '최근 7일'], [30, '최근 30일'], [90, '최근 90일']],
+        WEEK: [[8, '최근 8주'], [12, '최근 12주'], [26, '최근 26주']],
+        MONTH: [[6, '최근 6개월'], [12, '최근 12개월'], [24, '최근 24개월']],
+    };
+    const BELL_LABELS = { AFTER_START: '시작 후', BEFORE_END: '종료 전', AFTER_END: '종료 후' };
+    const STANCE_LABELS = { PROS: '찬성', CONS: '반대', NEUTRAL: '중립' };
+    const BOX_LABELS = { NORMAL: '일반 타이머', TIME_BASED: '자유토론 (시간 총량제)' };
+
     const charts = {};
+    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), modalOpener: null };
 
     const $ = (id) => document.getElementById(id);
+    const color = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-    function readPassword() {
-        try { return sessionStorage.getItem(PASSWORD_KEY); } catch (e) { return null; }
+    function storage(action, key, value) {
+        try {
+            if (action === 'get') return sessionStorage.getItem(key);
+            if (action === 'set') sessionStorage.setItem(key, value);
+            if (action === 'remove') sessionStorage.removeItem(key);
+        } catch (e) { /* 저장소를 쓸 수 없으면 현재 화면에서만 유지 */ }
+        return null;
     }
 
-    function savePassword(password) {
-        try { sessionStorage.setItem(PASSWORD_KEY, password); } catch (e) { /* 저장 불가 시 현재 화면에서만 사용 */ }
+    let currentPassword = storage('get', PASSWORD_KEY);
+
+    function el(tag, attrs = {}, ...children) {
+        const node = document.createElement(tag);
+        Object.entries(attrs).forEach(([key, value]) => {
+            if (key === 'class') node.className = value;
+            else if (key.startsWith('on')) node.addEventListener(key.slice(2), value);
+            else if (value !== undefined && value !== null) node.setAttribute(key, value);
+        });
+        children.flat().forEach((child) => {
+            if (child === null || child === undefined) return;
+            node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+        });
+        return node;
     }
 
-    function clearPassword() {
-        try { sessionStorage.removeItem(PASSWORD_KEY); } catch (e) { /* 무시 */ }
+    // ---------- 공통 요청 ----------
+    class UnauthorizedError extends Error {}
+
+    async function api(path, options = {}) {
+        const response = await fetch(path, {
+            ...options,
+            headers: { 'X-Admin-Password': currentPassword, ...(options.body ? { 'Content-Type': 'application/json' } : {}) },
+        });
+        if (response.status === 401) {
+            logout('비밀번호가 올바르지 않습니다.');
+            throw new UnauthorizedError();
+        }
+        if (!response.ok) {
+            const body = await response.json().catch(() => ({}));
+            throw new Error(body.message || `요청에 실패했습니다 (${response.status})`);
+        }
+        return response.json();
     }
 
-    let currentPassword = readPassword();
+    function handleError(error, targetId) {
+        if (error instanceof UnauthorizedError) return;
+        $(targetId).textContent = error.message;
+    }
 
+    // ---------- 날짜 ----------
     function formatDate(date) {
         const offset = date.getTimezoneOffset() * 60000;
         return new Date(date.getTime() - offset).toISOString().slice(0, 10);
     }
 
-    function setRecentDays(days) {
+    function formatDateTime(value) {
+        return value ? value.replace('T', ' ').slice(0, 16) : '-';
+    }
+
+    function setRecentRange(unit, amount) {
         const to = new Date();
         const from = new Date();
-        from.setDate(to.getDate() - (days - 1));
+        if (unit === 'DAY') from.setDate(to.getDate() - (amount - 1));
+        if (unit === 'WEEK') from.setDate(to.getDate() - (amount * 7 - 1));
+        if (unit === 'MONTH') { from.setMonth(to.getMonth() - (amount - 1)); from.setDate(1); }
         $('from').value = formatDate(from);
         $('to').value = formatDate(to);
     }
 
+    function periodLabel(periodStart) {
+        if (state.unit === 'MONTH') return periodStart.slice(0, 7);
+        if (state.unit === 'WEEK') return `${periodStart.slice(5)}~`;
+        return periodStart.slice(5);
+    }
+
+    function formatTime(seconds) {
+        if (seconds === null || seconds === undefined) return '-';
+        const abs = Math.abs(seconds);
+        return `${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`;
+    }
+
+    // ---------- 화면 전환 ----------
     function showLogin(message) {
-        $('dashboard').classList.add('hidden');
+        $('app').classList.add('hidden');
         $('login').classList.remove('hidden');
         $('login-error').textContent = message || '';
         $('password').focus();
     }
 
-    function showDashboard() {
-        $('login').classList.add('hidden');
-        $('dashboard').classList.remove('hidden');
+    function logout(message) {
+        storage('remove', PASSWORD_KEY);
+        currentPassword = null;
+        showLogin(message);
     }
 
-    async function fetchStats() {
-        const params = new URLSearchParams({ from: $('from').value, to: $('to').value });
-        const response = await fetch(`/api/admin/sharing/stats?${params}`, {
-            headers: { 'X-Admin-Password': currentPassword },
-        });
-        if (response.status === 401) {
-            clearPassword();
-            currentPassword = null;
-            showLogin('비밀번호가 올바르지 않습니다.');
-            return null;
-        }
-        if (!response.ok) {
-            const body = await response.json().catch(() => ({}));
-            throw new Error(body.message || `조회에 실패했습니다 (${response.status})`);
-        }
-        return response.json();
+    function selectTab(tab) {
+        state.tab = tab;
+        storage('set', TAB_KEY, tab);
+        document.querySelectorAll('#tabs button').forEach((button) =>
+            button.classList.toggle('active', button.dataset.tab === tab));
+        document.querySelectorAll('.tab').forEach((section) =>
+            section.classList.toggle('hidden', section.id !== `tab-${tab}`));
+
+        const isStat = STAT_TABS.includes(tab);
+        $('period-panel').classList.toggle('hidden', !isStat);
+        // 라이브 공유 통계는 일 단위만 제공한다
+        $('unit-buttons').classList.toggle('hidden', tab === 'sharing-stats');
+        if (tab === 'sharing-stats' && state.unit !== 'DAY') selectUnit('DAY', false);
+        loadCurrentTab();
     }
 
-    function renderChart(key, canvasId, labels, data, color, label) {
-        if (charts[key]) {
-            charts[key].destroy();
-        }
+    function selectUnit(unit, reload = true) {
+        state.unit = unit;
+        document.querySelectorAll('[data-unit]').forEach((button) =>
+            button.classList.toggle('active', button.dataset.unit === unit));
+        const quick = $('quick-buttons');
+        quick.replaceChildren(...QUICK_RANGES[unit].map(([amount, label]) =>
+            el('button', { type: 'button', class: 'secondary', onclick: () => { setRecentRange(unit, amount); loadCurrentTab(); } }, label)));
+        setRecentRange(unit, QUICK_RANGES[unit][1][0]);
+        $('period-hint').textContent = unit === 'DAY' ? ''
+            : `${unit === 'WEEK' ? '주간은 월요일' : '월별은 1일'} 기준으로 시작일·종료일이 걸친 구간 전체를 집계합니다.`;
+        if (reload) loadCurrentTab();
+    }
+
+    function loadCurrentTab() {
+        $('period-error').textContent = '';
+        if (state.tab === 'tables-stats') return loadTableStats();
+        if (state.tab === 'members-stats') return loadMemberStats();
+        if (state.tab === 'sharing-stats') return loadSharingStats();
+        if (state.tab === 'tables') return loadTables();
+        if (state.tab === 'organizations') return loadOrganizations();
+    }
+
+    // ---------- 차트 ----------
+    function renderChart(key, canvasId, config) {
+        if (charts[key]) charts[key].destroy();
+        const axisColor = color('--muted');
+        const gridColor = color('--line');
+        const scales = {
+            x: { ticks: { color: axisColor, maxRotation: 0, autoSkip: true }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: axisColor, precision: 0 }, grid: { color: gridColor } },
+            ...(config.scales || {}),
+        };
         charts[key] = new Chart($(canvasId), {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{ label, data, backgroundColor: color, borderRadius: 4, maxBarThickness: 36 }],
-            },
+            data: { labels: config.labels, datasets: config.datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { ticks: { color: '#94a3b8', maxRotation: 0, autoSkip: true }, grid: { display: false } },
-                    y: { beginAtZero: true, ticks: { color: '#94a3b8', precision: 0 }, grid: { color: '#334155' } },
-                },
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: config.datasets.length > 1, labels: { color: axisColor } } },
+                scales,
             },
         });
     }
 
-    function renderSummary(days) {
-        const totalCount = days.reduce((sum, day) => sum + day.finishedCount, 0);
-        const totalMinutes = days.reduce((sum, day) => sum + day.averageMinutes * day.finishedCount, 0);
-        $('total-count').textContent = `${totalCount}회`;
-        $('total-average').textContent = totalCount === 0 ? '-' : `${(totalMinutes / totalCount).toFixed(1)}분`;
-        $('daily-average').textContent = days.length === 0 ? '-' : `${(totalCount / days.length).toFixed(1)}회`;
+    function bar(label, data, barColor, extra = {}) {
+        return { type: 'bar', label, data, backgroundColor: barColor, borderRadius: 4, maxBarThickness: 36, ...extra };
     }
 
-    async function load() {
-        $('period-error').textContent = '';
+    function statsQuery() {
+        return new URLSearchParams({ unit: state.unit, from: $('from').value, to: $('to').value });
+    }
+
+    // ---------- 타이머 통계 ----------
+    async function loadTableStats() {
         try {
-            const stats = await fetchStats();
-            if (!stats) {
-                return;
-            }
-            showDashboard();
-            const labels = stats.days.map((day) => day.date.slice(5));
-            renderChart('count', 'count-chart', labels, stats.days.map((day) => day.finishedCount),
-                getComputedStyle(document.documentElement).getPropertyValue('--count').trim(), '공유 횟수');
-            renderChart('minutes', 'minutes-chart', labels, stats.days.map((day) => day.averageMinutes),
-                getComputedStyle(document.documentElement).getPropertyValue('--minutes').trim(), '평균 시간(분)');
-            renderSummary(stats.days);
+            const stats = await api(`/api/admin/tables/stats?${statsQuery()}`);
+            const periods = stats.periods;
+            const created = periods.reduce((sum, p) => sum + p.createdCount, 0);
+            const used = periods.reduce((sum, p) => sum + p.usedCount, 0);
+            const unit = UNIT_LABELS[stats.unit];
+            $('ts-created').textContent = `${created}개`;
+            $('ts-used').textContent = `${used}개`;
+            $('ts-created-avg').textContent = periods.length ? `${(created / periods.length).toFixed(1)}개/${unit}` : '-';
+            $('ts-used-avg').textContent = periods.length ? `${(used / periods.length).toFixed(1)}개/${unit}` : '-';
+            renderChart('tables', 'tables-chart', {
+                labels: periods.map((p) => periodLabel(p.periodStart)),
+                datasets: [
+                    bar('생성', periods.map((p) => p.createdCount), color('--created')),
+                    bar('사용', periods.map((p) => p.usedCount), color('--used')),
+                ],
+            });
         } catch (error) {
-            $('period-error').textContent = error.message;
+            handleError(error, 'period-error');
         }
     }
 
-    $('login-form').addEventListener('submit', (event) => {
+    // ---------- 회원 통계 ----------
+    async function loadMemberStats() {
+        try {
+            const stats = await api(`/api/admin/members/stats?${statsQuery()}`);
+            const periods = stats.periods;
+            const newMembers = periods.reduce((sum, p) => sum + p.newMemberCount, 0);
+            const total = periods.length ? periods[periods.length - 1].totalMemberCount : 0;
+            const before = total - newMembers;
+            const rates = periods.map((p) => p.growthRate).filter((rate) => rate !== null);
+            $('ms-new').textContent = `${newMembers}명`;
+            $('ms-total').textContent = `${total}명`;
+            $('ms-rate').textContent = before > 0 ? `${(newMembers / before * 100).toFixed(1)}%` : '-';
+            $('ms-rate-avg').textContent = rates.length ? `${(rates.reduce((a, b) => a + b, 0) / rates.length).toFixed(1)}%` : '-';
+            renderChart('members', 'members-chart', {
+                labels: periods.map((p) => periodLabel(p.periodStart)),
+                datasets: [
+                    bar('신규 회원', periods.map((p) => p.newMemberCount), color('--members'), { yAxisID: 'y', order: 2 }),
+                    {
+                        type: 'line', label: '증가율(%)', data: periods.map((p) => p.growthRate),
+                        borderColor: color('--rate'), backgroundColor: color('--rate'),
+                        yAxisID: 'rate', tension: 0, spanGaps: true, pointRadius: 3, order: 1,
+                    },
+                ],
+                scales: {
+                    rate: {
+                        position: 'right', beginAtZero: true,
+                        ticks: { color: color('--rate'), callback: (value) => `${value}%` },
+                        grid: { display: false },
+                    },
+                },
+            });
+        } catch (error) {
+            handleError(error, 'period-error');
+        }
+    }
+
+    // ---------- 라이브 공유 통계 ----------
+    async function loadSharingStats() {
+        try {
+            const params = new URLSearchParams({ from: $('from').value, to: $('to').value });
+            const stats = await api(`/api/admin/sharing/stats?${params}`);
+            const days = stats.days;
+            const labels = days.map((day) => day.date.slice(5));
+            renderChart('count', 'count-chart', {
+                labels,
+                datasets: [
+                    bar('FINISHED', days.map((day) => day.finishedCount), color('--count'), { stack: 'count' }),
+                    bar('ABANDONED', days.map((day) => day.abandonedCount), color('--abandoned'), { stack: 'count' }),
+                ],
+                scales: { x: { stacked: true, ticks: { color: color('--muted'), maxRotation: 0, autoSkip: true }, grid: { display: false } } },
+            });
+            renderChart('minutes', 'minutes-chart', {
+                labels,
+                datasets: [
+                    bar('FINISHED 평균(분)', days.map((day) => day.averageMinutes), color('--minutes')),
+                    bar('ABANDONED 평균(분)', days.map((day) => day.abandonedAverageMinutes), color('--abandoned')),
+                ],
+            });
+            const sum = (pick) => days.reduce((total, day) => total + pick(day), 0);
+            const finishedCount = sum((day) => day.finishedCount);
+            const abandonedCount = sum((day) => day.abandonedCount);
+            const finishedMinutes = sum((day) => day.averageMinutes * day.finishedCount);
+            const abandonedMinutes = sum((day) => day.abandonedAverageMinutes * day.abandonedCount);
+            const endedCount = finishedCount + abandonedCount;
+            $('total-count').textContent = `${finishedCount}회`;
+            $('abandoned-count').textContent = `${abandonedCount}회`;
+            $('abandoned-rate').textContent = endedCount === 0 ? '-' : `${(abandonedCount / endedCount * 100).toFixed(1)}%`;
+            $('total-average').textContent = finishedCount === 0 ? '-' : `${(finishedMinutes / finishedCount).toFixed(1)}분`;
+            $('abandoned-average').textContent = abandonedCount === 0 ? '-' : `${(abandonedMinutes / abandonedCount).toFixed(1)}분`;
+            $('daily-average').textContent = days.length === 0 ? '-' : `${(endedCount / days.length).toFixed(1)}회`;
+        } catch (error) {
+            handleError(error, 'period-error');
+        }
+    }
+
+    // ---------- 테이블 목록 ----------
+    async function loadTables() {
+        $('tables-error').textContent = '';
+        try {
+            renderSortState();
+            const params = new URLSearchParams({ sort: state.sort, page: state.page, size: $('page-size').value });
+            const result = await api(`/api/admin/tables?${params}`);
+            if (result.totalPages > 0 && state.page >= result.totalPages) {
+                state.page = result.totalPages - 1;
+                return loadTables();
+            }
+            $('tables-total').textContent = `총 ${result.totalElements}개`;
+            const rows = result.tables.map((table) => el('tr', {
+                class: 'clickable', tabindex: 0,
+                onclick: () => openTable(table.id),
+                onkeydown: (event) => { if (event.key === 'Enter') openTable(table.id); },
+            },
+                el('td', { class: 'num' }, table.id),
+                el('td', { class: 'wrap' }, table.name),
+                el('td', { class: 'wrap' }, table.agenda || '-'),
+                el('td', {}, table.memberEmail),
+                el('td', { class: 'num' }, formatDateTime(table.createdAt)),
+                el('td', { class: 'num' }, formatDateTime(table.usedAt)),
+            ));
+            $('tables-body').replaceChildren(...(rows.length ? rows
+                : [el('tr', {}, el('td', { colspan: 6, class: 'empty' }, '테이블이 없습니다.'))]));
+            renderPagination(result.page, result.totalPages);
+        } catch (error) {
+            handleError(error, 'tables-error');
+        }
+    }
+
+    function renderSortState() {
+        document.querySelectorAll('[data-sort]').forEach((button) =>
+            button.classList.toggle('active', button.dataset.sort === state.sort));
+        document.querySelectorAll('[data-sort-column]').forEach((header) =>
+            header.classList.toggle('sorted', header.dataset.sortColumn === state.sort));
+    }
+
+    function renderPagination(page, totalPages) {
+        const go = (target) => { state.page = target; loadTables(); };
+        const buttons = [el('button', { type: 'button', class: 'secondary small', onclick: () => go(page - 1) }, '이전')];
+        buttons[0].disabled = page <= 0;
+        const start = Math.max(0, Math.min(page - 4, totalPages - 9));
+        const end = Math.min(totalPages, start + 9);
+        for (let i = start; i < end; i += 1) {
+            buttons.push(el('button', { type: 'button', class: `secondary small${i === page ? ' active' : ''}`, onclick: () => go(i) }, i + 1));
+        }
+        const next = el('button', { type: 'button', class: 'secondary small', onclick: () => go(page + 1) }, '다음');
+        next.disabled = page >= totalPages - 1;
+        buttons.push(next);
+        $('pagination').replaceChildren(...buttons);
+    }
+
+    async function openTable(tableId) {
+        try {
+            const table = await api(`/api/admin/tables/${tableId}`);
+            openTimeboxModal(table, [
+                ['테이블 ID', table.id],
+                ['회원', table.memberEmail],
+                ['생성', formatDateTime(table.createdAt)],
+                ['마지막 사용', formatDateTime(table.usedAt)],
+            ]);
+        } catch (error) {
+            handleError(error, 'tables-error');
+        }
+    }
+
+    // ---------- 타임박스 모달 (읽기 전용) ----------
+    function openTimeboxModal(table, extraMeta = []) {
+        const info = table.info;
+        $('modal-title').textContent = info.name;
+        $('modal-agenda').textContent = info.agenda ? `주제: ${info.agenda}` : '주제 없음';
+        $('modal-pros').textContent = info.prosTeamName;
+        $('modal-cons').textContent = info.consTeamName;
+        const totalSeconds = table.table.reduce((sum, box) =>
+            sum + (box.boxType === 'TIME_BASED' ? (box.timePerTeam || 0) * 2 : (box.time || 0)), 0);
+        $('modal-meta').replaceChildren(...[
+            ...extraMeta,
+            ['타임박스', `${table.table.length}개 · 총 ${formatTime(totalSeconds)}`],
+            ['경고 종소리', el('span', { class: `chip${info.warningBell ? ' on' : ''}` }, info.warningBell ? 'ON' : 'OFF')],
+            ['종료 종소리', el('span', { class: `chip${info.finishBell ? ' on' : ''}` }, info.finishBell ? 'ON' : 'OFF')],
+        ].map(([label, value]) => el('div', {}, el('span', {}, label), value)));
+
+        const boxes = table.table.map((box, index) => {
+            const bells = box.bell || [];
+            const node = el('div', { class: `timebox ${box.stance}`, tabindex: 0 },
+                el('div', {},
+                    el('div', { class: 'speech' }, `${index + 1}. ${box.speechType}`),
+                    box.speaker ? el('div', { class: 'speaker' }, box.speaker) : null,
+                    bells.length ? el('div', { class: 'bell-badge' }, `🔔 ${bells.length}`) : null),
+                box.boxType === 'TIME_BASED'
+                    ? el('div', { class: 'time' }, formatTime(box.timePerTeam),
+                        el('small', {}, `팀당 · 1회 ${box.timePerSpeaking ? formatTime(box.timePerSpeaking) : '제한 없음'}`))
+                    : el('div', { class: 'time' }, formatTime(box.time)));
+            const select = () => {
+                document.querySelectorAll('.timebox.selected').forEach((selected) => selected.classList.remove('selected'));
+                node.classList.add('selected');
+                renderTimeboxDetail(box, index, info);
+            };
+            node.addEventListener('click', select);
+            node.addEventListener('keydown', (event) => { if (event.key === 'Enter') select(); });
+            return el('div', { class: 'timebox-row' }, node);
+        });
+        $('modal-timeboxes').replaceChildren(...(boxes.length ? boxes : [el('div', { class: 'empty' }, '타임박스가 없습니다.')]));
+        $('modal-detail').classList.add('hidden');
+        // 모달 안에서 다시 열 때는 처음 모달을 연 요소를 유지한다
+        if ($('modal').classList.contains('hidden')) state.modalOpener = document.activeElement;
+        $('modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        $('modal-close').focus();
+    }
+
+    function renderTimeboxDetail(box, index, info) {
+        const team = { PROS: info.prosTeamName, CONS: info.consTeamName, NEUTRAL: '공통' }[box.stance];
+        const rows = [
+            ['순서', index + 1],
+            ['발언 유형', box.speechType],
+            ['입장', `${STANCE_LABELS[box.stance]} (${team})`],
+            ['타이머 종류', BOX_LABELS[box.boxType]],
+            ['발언자', box.speaker || '-'],
+        ];
+        if (box.boxType === 'TIME_BASED') {
+            rows.push(['팀당 시간', formatTime(box.timePerTeam)]);
+            rows.push(['1회 발언 시간', box.timePerSpeaking ? formatTime(box.timePerSpeaking) : '제한 없음']);
+            rows.push(['전체 시간', formatTime((box.timePerTeam || 0) * 2)]);
+        } else {
+            rows.push(['발언 시간', formatTime(box.time)]);
+        }
+        const bells = box.bell || [];
+        const bellTable = bells.length
+            ? el('table', { class: 'data' },
+                el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, '기준'), el('th', {}, '시간'), el('th', {}, '횟수'))),
+                el('tbody', {}, bells.map((bell, i) => el('tr', {},
+                    el('td', {}, i + 1),
+                    el('td', {}, BELL_LABELS[bell.type] || bell.type),
+                    el('td', { class: 'num' }, formatTime(bell.time)),
+                    el('td', { class: 'num' }, `${bell.count}회`)))))
+            : el('div', { class: 'hint' }, box.boxType === 'TIME_BASED' ? '자유토론 타이머는 개별 종소리 설정이 없습니다.' : '설정된 종소리가 없습니다.');
+        $('modal-detail').replaceChildren(
+            el('h3', {}, '타임박스 세부 설정'),
+            el('dl', {}, rows.flatMap(([label, value]) => [el('dt', {}, label), el('dd', {}, value)])),
+            el('h3', {}, '종소리 설정'),
+            bellTable,
+        );
+        $('modal-detail').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        if ($('modal').classList.contains('hidden')) return;
+        $('modal').classList.add('hidden');
+        document.body.style.overflow = '';
+        if (state.modalOpener && document.contains(state.modalOpener)) state.modalOpener.focus();
+        state.modalOpener = null;
+    }
+
+    // 요청이 끝날 때까지 버튼을 막아 같은 POST가 여러 번 나가지 않게 한다
+    async function whilePending(button, task) {
+        if (button.disabled) return;
+        button.disabled = true;
+        try {
+            await task();
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    // ---------- 템플릿 데이터 (zlib → base64 → URI 인코딩) ----------
+    function decodeTemplate(data) {
+        const binary = atob(decodeURIComponent(data.trim()));
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        return JSON.parse(pako.inflate(bytes, { to: 'string' }));
+    }
+
+    function encodeTemplate(table) {
+        const bytes = pako.deflate(new TextEncoder().encode(JSON.stringify(table)));
+        let binary = '';
+        bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+        return encodeURIComponent(btoa(binary));
+    }
+
+    function previewTemplate(data, extraMeta) {
+        const table = decodeTemplate(data);
+        if (!table.info || !Array.isArray(table.table)) throw new Error('테이블 형식의 템플릿이 아닙니다.');
+        openTimeboxModal(table, extraMeta);
+    }
+
+    // ---------- 단체 · 템플릿 ----------
+    async function loadIcons(selectedPath) {
+        const result = await api('/api/admin/icons');
+        const select = $('org-icon');
+        const previous = selectedPath || select.value;
+        const group = (label, uploaded) => el('optgroup', { label },
+            result.icons.filter((icon) => icon.uploaded === uploaded)
+                .map((icon) => el('option', { value: icon.path }, icon.path.replace('/icon/', ''))));
+        select.replaceChildren(group('업로드한 아이콘', true), group('기본 아이콘', false));
+        if (previous && result.icons.some((icon) => icon.path === previous)) select.value = previous;
+        updateIconPreview();
+    }
+
+    function updateIconPreview() {
+        const preview = $('org-icon-preview');
+        preview.classList.toggle('hidden', !$('org-icon').value);
+        if ($('org-icon').value) preview.src = $('org-icon').value;
+    }
+
+    function toIconName(fileName) {
+        return fileName.replace(/\.[^.]+$/, '').trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+    }
+
+    async function uploadIcon() {
+        setMessage('icon-upload-message', '');
+        const file = $('icon-file').files[0];
+        if (!file) {
+            setMessage('icon-upload-message', '업로드할 이미지를 선택하세요.');
+            return;
+        }
+        const form = new FormData();
+        form.append('file', file);
+        form.append('name', $('icon-name').value.trim());
+        try {
+            const response = await fetch('/api/admin/icons', {
+                method: 'POST', headers: { 'X-Admin-Password': currentPassword }, body: form,
+            });
+            if (response.status === 401) {
+                logout('비밀번호가 올바르지 않습니다.');
+                return;
+            }
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(body.message || `업로드에 실패했습니다 (${response.status})`);
+            $('icon-file').value = '';
+            $('icon-name').value = '';
+            await loadIcons(body.path);
+            setMessage('icon-upload-message', `${body.path} 로 저장했습니다. 아이콘으로 선택했습니다.`, true);
+        } catch (error) {
+            setMessage('icon-upload-message', error.message);
+        }
+    }
+
+    async function loadOrganizations() {
+        $('organizations-error').textContent = '';
+        try {
+            const [result] = await Promise.all([api('/api/admin/organizations'), loadIcons()]);
+            state.organizations = result.organizations;
+            renderOrganizations();
+        } catch (error) {
+            handleError(error, 'organizations-error');
+        }
+    }
+
+    function renderOrganizations() {
+        const rows = state.organizations.flatMap((organization) => {
+            const expanded = state.expanded.has(organization.id);
+            const icon = el('img', { class: 'icon', src: organization.iconPath, alt: '', loading: 'lazy' });
+            icon.addEventListener('error', () => icon.classList.add('hidden'));
+            const row = el('tr', {
+                class: 'clickable', onclick: () => {
+                    if (expanded) state.expanded.delete(organization.id); else state.expanded.add(organization.id);
+                    renderOrganizations();
+                },
+            },
+                el('td', {}, el('span', { class: `toggle${expanded ? ' open' : ''}` }, '▸')),
+                el('td', { class: 'num' }, organization.id),
+                el('td', {}, icon),
+                el('td', { class: 'wrap' }, organization.name),
+                el('td', { class: 'wrap' }, organization.affiliation || '-'),
+                el('td', {}, organization.language),
+                el('td', {}, organization.iconPath),
+                el('td', { class: 'num' }, `${organization.templates.length}개`));
+            if (!expanded) return [row];
+            const templateRows = organization.templates.length
+                ? organization.templates.map((template) => el('tr', { class: 'templates-row' },
+                    el('td', {}), el('td', { class: 'num' }, template.id),
+                    el('td', { colspan: 4, class: 'wrap' }, template.name),
+                    el('td', { colspan: 2 }, el('button', {
+                        type: 'button', class: 'secondary small', onclick: () => {
+                            try {
+                                previewTemplate(template.data, [['단체', organization.name], ['템플릿 ID', template.id]]);
+                            } catch (error) {
+                                $('organizations-error').textContent = `미리보기 실패: ${error.message}`;
+                            }
+                        },
+                    }, '미리보기'))))
+                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 8, class: 'empty' }, '템플릿이 없습니다.'))];
+            return [row, ...templateRows];
+        });
+        $('organizations-body').replaceChildren(...(rows.length ? rows
+            : [el('tr', {}, el('td', { colspan: 8, class: 'empty' }, '단체가 없습니다.'))]));
+
+        const select = $('tpl-organization');
+        const previous = select.value;
+        select.replaceChildren(...state.organizations.map((organization) =>
+            el('option', { value: organization.id }, `${organization.name} (${organization.language})`)));
+        if (previous) select.value = previous;
+    }
+
+    function setMessage(id, message, success = false) {
+        $(id).textContent = message;
+        $(id).classList.toggle('success', success);
+    }
+
+    async function createOrganization(event) {
+        event.preventDefault();
+        setMessage('organization-form-message', '');
+        try {
+            const created = await api('/api/admin/organizations', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: $('org-name').value.trim(),
+                    affiliation: $('org-affiliation').value.trim(),
+                    iconPath: $('org-icon').value,
+                    language: $('org-language').value,
+                }),
+            });
+            const iconPath = $('org-icon').value;
+            $('organization-form').reset();
+            $('org-icon').value = iconPath;
+            setMessage('organization-form-message', `'${created.name}' 단체를 추가했습니다 (ID ${created.id}).`, true);
+            await loadOrganizations();
+            $('tpl-organization').value = created.id;
+        } catch (error) {
+            handleError(error, 'organization-form-message');
+        }
+    }
+
+    async function loadTemplateFromTable() {
+        setMessage('template-form-message', '');
+        const tableId = $('tpl-table-id').value;
+        if (!tableId) {
+            setMessage('template-form-message', '테이블 ID를 입력하세요.');
+            return;
+        }
+        try {
+            const table = await api(`/api/admin/tables/${tableId}`);
+            $('tpl-data').value = encodeTemplate({ id: table.id, info: table.info, table: table.table });
+            if (!$('tpl-name').value) $('tpl-name').value = table.info.name;
+            setMessage('template-form-message', `테이블 '${table.info.name}'을 불러왔습니다. 미리보기로 확인하세요.`, true);
+        } catch (error) {
+            handleError(error, 'template-form-message');
+        }
+    }
+
+    async function createTemplate(event) {
+        event.preventDefault();
+        setMessage('template-form-message', '');
+        const organizationId = $('tpl-organization').value;
+        if (!organizationId) {
+            setMessage('template-form-message', '먼저 단체를 추가하세요.');
+            return;
+        }
+        try {
+            decodeTemplate($('tpl-data').value);
+        } catch (error) {
+            setMessage('template-form-message', '데이터를 해석할 수 없습니다. 압축 문자열을 확인하세요.');
+            return;
+        }
+        try {
+            const created = await api(`/api/admin/organizations/${organizationId}/templates`, {
+                method: 'POST',
+                body: JSON.stringify({ name: $('tpl-name').value.trim(), data: $('tpl-data').value.trim() }),
+            });
+            $('tpl-name').value = '';
+            $('tpl-data').value = '';
+            $('tpl-table-id').value = '';
+            setMessage('template-form-message', `'${created.name}' 템플릿을 추가했습니다 (ID ${created.id}).`, true);
+            state.expanded.add(Number(organizationId));
+            await loadOrganizations();
+        } catch (error) {
+            handleError(error, 'template-form-message');
+        }
+    }
+
+    // ---------- 이벤트 ----------
+    $('login-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         currentPassword = $('password').value;
-        savePassword(currentPassword);
         $('password').value = '';
-        load();
+        try {
+            await api('/api/admin/organizations');
+            storage('set', PASSWORD_KEY, currentPassword);
+            start();
+        } catch (error) {
+            if (!(error instanceof UnauthorizedError)) $('login-error').textContent = error.message;
+        }
     });
 
-    $('period-form').addEventListener('submit', (event) => {
+    $('logout').addEventListener('click', () => logout());
+    $('period-form').addEventListener('submit', (event) => { event.preventDefault(); loadCurrentTab(); });
+    document.querySelectorAll('[data-unit]').forEach((button) =>
+        button.addEventListener('click', () => selectUnit(button.dataset.unit)));
+    document.querySelectorAll('#tabs button').forEach((button) =>
+        button.addEventListener('click', () => selectTab(button.dataset.tab)));
+    $('page-size').addEventListener('change', () => { state.page = 0; loadTables(); });
+    document.querySelectorAll('[data-sort]').forEach((button) => button.addEventListener('click', () => {
+        state.sort = button.dataset.sort;
+        state.page = 0;
+        loadTables();
+    }));
+    $('modal-close').addEventListener('click', closeModal);
+    $('modal').addEventListener('click', (event) => { if (event.target === $('modal')) closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
+    $('organization-form').addEventListener('submit', (event) => {
         event.preventDefault();
-        load();
+        whilePending($('organization-form').querySelector('button[type=submit]'), () => createOrganization(event));
+    });
+    $('template-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        whilePending($('template-form').querySelector('button[type=submit]'), () => createTemplate(event));
+    });
+    $('tpl-load').addEventListener('click', loadTemplateFromTable);
+    $('org-icon').addEventListener('change', updateIconPreview);
+    $('icon-upload').addEventListener('click', () => whilePending($('icon-upload'), uploadIcon));
+    $('icon-file').addEventListener('change', () => {
+        const file = $('icon-file').files[0];
+        if (file && !$('icon-name').value) $('icon-name').value = toIconName(file.name);
+    });
+    $('tpl-preview').addEventListener('click', () => {
+        setMessage('template-form-message', '');
+        try {
+            previewTemplate($('tpl-data').value, [['미리보기', $('tpl-name').value || '이름 없음']]);
+        } catch (error) {
+            setMessage('template-form-message', '데이터를 해석할 수 없습니다. 압축 문자열을 확인하세요.');
+        }
     });
 
-    document.querySelectorAll('[data-days]').forEach((button) => {
-        button.addEventListener('click', () => {
-            setRecentDays(Number(button.dataset.days));
-            load();
-        });
-    });
+    function start() {
+        $('login').classList.add('hidden');
+        $('app').classList.remove('hidden');
+        selectUnit('DAY', false);
+        const savedTab = storage('get', TAB_KEY);
+        selectTab(document.querySelector(`#tabs [data-tab="${savedTab}"]`) ? savedTab : 'tables-stats');
+    }
 
-    $('logout').addEventListener('click', () => {
-        clearPassword();
-        currentPassword = null;
-        showLogin();
-    });
-
-    setRecentDays(30);
     if (currentPassword) {
-        load();
+        start();
     } else {
         showLogin();
     }

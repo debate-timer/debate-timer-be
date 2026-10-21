@@ -55,7 +55,7 @@ class SharingStatsServiceTest extends BaseServiceTest {
     class GetDailyStats {
 
         @Test
-        void 종료된_공유만_시작일별로_횟수와_평균_시간을_계산한다() {
+        void 종료된_공유와_중단된_공유를_나눠_시작일별로_횟수와_평균_시간을_계산한다() {
             saveFinished(DAY.atTime(10, 0), 30);
             saveFinished(DAY.atTime(23, 59), 61);
             saveAbandoned(DAY.atTime(12, 0));
@@ -64,9 +64,9 @@ class SharingStatsServiceTest extends BaseServiceTest {
             SharingStatsResponse response = sharingStatsService.getDailyStats(DAY, DAY.plusDays(2));
 
             assertThat(response.days()).containsExactly(
-                    new SharingDailyStatResponse(DAY, 2, 45.5),
-                    new SharingDailyStatResponse(DAY.plusDays(1), 0, 0),
-                    new SharingDailyStatResponse(DAY.plusDays(2), 1, 15)
+                    new SharingDailyStatResponse(DAY, 2, 45.5, 1, 5),
+                    new SharingDailyStatResponse(DAY.plusDays(1), 0, 0, 0, 0),
+                    new SharingDailyStatResponse(DAY.plusDays(2), 1, 15, 0, 0)
             );
         }
 

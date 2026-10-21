@@ -4,7 +4,10 @@ import com.debatetimer.domain.customize.Agenda;
 import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.domain.organization.OrganizationIcon;
+import com.debatetimer.domain.stats.StatPeriod;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
+import com.debatetimer.service.admin.AdminTableService;
 import com.debatetimer.service.admin.SharingStatsService;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -65,6 +68,12 @@ public enum ClientErrorCode implements ResponseErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
+    ORGANIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 단체가 존재하지 않습니다"),
+    INVALID_ICON_FILE(HttpStatus.BAD_REQUEST, "아이콘은 PNG, JPEG, WEBP 이미지만 %dMB 이하로 업로드할 수 있습니다"
+            .formatted(OrganizationIcon.MAX_SIZE_BYTES / 1024 / 1024)),
+    INVALID_ICON_NAME(HttpStatus.BAD_REQUEST, "아이콘 이름은 영문 소문자, 숫자, '_', '-'로 %d자 이하여야 합니다"
+            .formatted(OrganizationIcon.MAX_NAME_LENGTH)),
+    ICON_ALREADY_EXISTS(HttpStatus.CONFLICT, "같은 이름의 아이콘이 이미 있습니다"),
 
     INVALID_OAUTH_REQUEST(HttpStatus.BAD_REQUEST, "구글 OAuth 요청 파라미터 값이 잘못되었습니다."),
 
@@ -89,6 +98,10 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_ADMIN_PASSWORD(HttpStatus.UNAUTHORIZED, "어드민 비밀번호가 올바르지 않습니다"),
     INVALID_STATS_PERIOD(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d일까지 조회할 수 있습니다"
             .formatted(SharingStatsService.MAX_PERIOD_DAYS)),
+    INVALID_STATS_RANGE(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d개 구간까지 조회할 수 있습니다"
+            .formatted(StatPeriod.MAX_PERIOD_COUNT)),
+    INVALID_PAGE_REQUEST(HttpStatus.BAD_REQUEST, "페이지는 0 이상, 페이지 크기는 1 이상 %d 이하여야 합니다"
+            .formatted(AdminTableService.MAX_PAGE_SIZE)),
     ;
 
     private final HttpStatus status;
