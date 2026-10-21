@@ -11,6 +11,10 @@ spring:
 server:
   shutdown: graceful
 
+# 어드민 아이콘 업로드 위치. dev/prod는 도커 볼륨 경로로 덮어쓴다
+icon:
+  upload-dir: ${ICON_UPLOAD_DIR:./uploads/icon}
+
 springdoc:
   swagger-ui:
     path: /docs/swagger
