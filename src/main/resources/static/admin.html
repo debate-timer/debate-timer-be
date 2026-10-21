@@ -16,6 +16,7 @@
             --muted: #94a3b8;
             --count: #3b82f6;
             --minutes: #10b981;
+            --abandoned: #f87171;
             --created: #3b82f6;
             --used: #f59e0b;
             --members: #8b5cf6;
@@ -225,12 +226,16 @@
         <section id="tab-sharing-stats" class="tab hidden">
             <div class="panel summary">
                 <div class="stat"><div class="label">기간 내 FINISHED 공유</div><div class="value" id="total-count">-</div></div>
-                <div class="stat"><div class="label">기간 평균 공유 시간</div><div class="value" id="total-average">-</div></div>
+                <div class="stat"><div class="label">기간 내 ABANDONED 공유</div><div class="value" id="abandoned-count">-</div></div>
+                <div class="stat"><div class="label">중단 비율</div><div class="value" id="abandoned-rate">-</div></div>
+                <div class="stat"><div class="label">FINISHED 평균 공유 시간</div><div class="value" id="total-average">-</div></div>
+                <div class="stat"><div class="label">ABANDONED 평균 공유 시간</div><div class="value" id="abandoned-average">-</div></div>
                 <div class="stat"><div class="label">일 평균 공유 횟수</div><div class="value" id="daily-average">-</div></div>
             </div>
             <div class="panel">
-                <h2>일별 FINISHED 공유 횟수</h2>
+                <h2>일별 공유 횟수 (FINISHED · ABANDONED)</h2>
                 <div class="chart-box"><canvas id="count-chart"></canvas></div>
+                <div class="hint">ABANDONED는 사회자 연결이 끊긴 채 정리된 공유입니다. 서버 재시작 등으로 추적이 끊긴 경우 마지막 수정 시각을 종료 시각으로 봅니다.</div>
             </div>
             <div class="panel">
                 <h2>일별 평균 공유 시간 (분)</h2>
@@ -593,16 +598,32 @@
             const days = stats.days;
             const labels = days.map((day) => day.date.slice(5));
             renderChart('count', 'count-chart', {
-                labels, datasets: [bar('공유 횟수', days.map((day) => day.finishedCount), color('--count'))],
+                labels,
+                datasets: [
+                    bar('FINISHED', days.map((day) => day.finishedCount), color('--count'), { stack: 'count' }),
+                    bar('ABANDONED', days.map((day) => day.abandonedCount), color('--abandoned'), { stack: 'count' }),
+                ],
+                scales: { x: { stacked: true, ticks: { color: color('--muted'), maxRotation: 0, autoSkip: true }, grid: { display: false } } },
             });
             renderChart('minutes', 'minutes-chart', {
-                labels, datasets: [bar('평균 시간(분)', days.map((day) => day.averageMinutes), color('--minutes'))],
+                labels,
+                datasets: [
+                    bar('FINISHED 평균(분)', days.map((day) => day.averageMinutes), color('--minutes')),
+                    bar('ABANDONED 평균(분)', days.map((day) => day.abandonedAverageMinutes), color('--abandoned')),
+                ],
             });
-            const totalCount = days.reduce((sum, day) => sum + day.finishedCount, 0);
-            const totalMinutes = days.reduce((sum, day) => sum + day.averageMinutes * day.finishedCount, 0);
-            $('total-count').textContent = `${totalCount}회`;
-            $('total-average').textContent = totalCount === 0 ? '-' : `${(totalMinutes / totalCount).toFixed(1)}분`;
-            $('daily-average').textContent = days.length === 0 ? '-' : `${(totalCount / days.length).toFixed(1)}회`;
+            const sum = (pick) => days.reduce((total, day) => total + pick(day), 0);
+            const finishedCount = sum((day) => day.finishedCount);
+            const abandonedCount = sum((day) => day.abandonedCount);
+            const finishedMinutes = sum((day) => day.averageMinutes * day.finishedCount);
+            const abandonedMinutes = sum((day) => day.abandonedAverageMinutes * day.abandonedCount);
+            const endedCount = finishedCount + abandonedCount;
+            $('total-count').textContent = `${finishedCount}회`;
+            $('abandoned-count').textContent = `${abandonedCount}회`;
+            $('abandoned-rate').textContent = endedCount === 0 ? '-' : `${(abandonedCount / endedCount * 100).toFixed(1)}%`;
+            $('total-average').textContent = finishedCount === 0 ? '-' : `${(finishedMinutes / finishedCount).toFixed(1)}분`;
+            $('abandoned-average').textContent = abandonedCount === 0 ? '-' : `${(abandonedMinutes / abandonedCount).toFixed(1)}분`;
+            $('daily-average').textContent = days.length === 0 ? '-' : `${(endedCount / days.length).toFixed(1)}회`;
         } catch (error) {
             handleError(error, 'period-error');
         }
