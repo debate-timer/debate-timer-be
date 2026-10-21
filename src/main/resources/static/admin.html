@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="robots" content="noindex, nofollow"/>
     <title>Debate Timer · 어드민</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
+            integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"
+            integrity="sha384-rNlaE5fs9dGIjmxWDALQh/RBAaGRYT5ChrzHo6tRfgrZ36iRFAiquP5g41Jsv+0j"
+            crossorigin="anonymous"></script>
     <style>
         :root {
             --bg: #0f172a;
@@ -374,8 +378,8 @@
     </div>
 </main>
 
-<div id="modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal">
+<div id="modal" class="modal-backdrop hidden" role="presentation">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-head">
             <div>
                 <div class="title" id="modal-title"></div>
@@ -406,7 +410,7 @@
     const BOX_LABELS = { NORMAL: '일반 타이머', TIME_BASED: '자유토론 (시간 총량제)' };
 
     const charts = {};
-    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set() };
+    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), modalOpener: null };
 
     const $ = (id) => document.getElementById(id);
     const color = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -685,7 +689,11 @@
                 return loadTables();
             }
             $('tables-total').textContent = `총 ${result.totalElements}개`;
-            const rows = result.tables.map((table) => el('tr', { class: 'clickable', onclick: () => openTable(table.id) },
+            const rows = result.tables.map((table) => el('tr', {
+                class: 'clickable', tabindex: 0,
+                onclick: () => openTable(table.id),
+                onkeydown: (event) => { if (event.key === 'Enter') openTable(table.id); },
+            },
                 el('td', { class: 'num' }, table.id),
                 el('td', { class: 'wrap' }, table.name),
                 el('td', { class: 'wrap' }, table.agenda || '-'),
@@ -775,8 +783,11 @@
         });
         $('modal-timeboxes').replaceChildren(...(boxes.length ? boxes : [el('div', { class: 'empty' }, '타임박스가 없습니다.')]));
         $('modal-detail').classList.add('hidden');
+        // 모달 안에서 다시 열 때는 처음 모달을 연 요소를 유지한다
+        if ($('modal').classList.contains('hidden')) state.modalOpener = document.activeElement;
         $('modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        $('modal-close').focus();
     }
 
     function renderTimeboxDetail(box, index, info) {
@@ -815,8 +826,22 @@
     }
 
     function closeModal() {
+        if ($('modal').classList.contains('hidden')) return;
         $('modal').classList.add('hidden');
         document.body.style.overflow = '';
+        if (state.modalOpener && document.contains(state.modalOpener)) state.modalOpener.focus();
+        state.modalOpener = null;
+    }
+
+    // 요청이 끝날 때까지 버튼을 막아 같은 POST가 여러 번 나가지 않게 한다
+    async function whilePending(button, task) {
+        if (button.disabled) return;
+        button.disabled = true;
+        try {
+            await task();
+        } finally {
+            button.disabled = false;
+        }
     }
 
     // ---------- 템플릿 데이터 (zlib → base64 → URI 인코딩) ----------
@@ -1053,11 +1078,17 @@
     $('modal-close').addEventListener('click', closeModal);
     $('modal').addEventListener('click', (event) => { if (event.target === $('modal')) closeModal(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
-    $('organization-form').addEventListener('submit', createOrganization);
-    $('template-form').addEventListener('submit', createTemplate);
+    $('organization-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        whilePending($('organization-form').querySelector('button[type=submit]'), () => createOrganization(event));
+    });
+    $('template-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        whilePending($('template-form').querySelector('button[type=submit]'), () => createTemplate(event));
+    });
     $('tpl-load').addEventListener('click', loadTemplateFromTable);
     $('org-icon').addEventListener('change', updateIconPreview);
-    $('icon-upload').addEventListener('click', uploadIcon);
+    $('icon-upload').addEventListener('click', () => whilePending($('icon-upload'), uploadIcon));
     $('icon-file').addEventListener('change', () => {
         const file = $('icon-file').files[0];
         if (file && !$('icon-name').value) $('icon-name').value = toIconName(file.name);
