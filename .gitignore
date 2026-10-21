@@ -45,3 +45,6 @@ out/
 ### application-local.yml
 /src/main/resources/application-local.yml
 .serena
+
+### Uploaded icons (local) ###
+uploads/

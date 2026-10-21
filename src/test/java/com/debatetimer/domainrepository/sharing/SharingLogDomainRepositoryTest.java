@@ -132,10 +132,10 @@ class SharingLogDomainRepositoryTest extends BaseDomainRepositoryTest {
     }
 
     @Nested
-    class FindAllFinishedStartedBetween {
+    class FindAllEndedStartedBetween {
 
         @Test
-        void 기간_안에_시작해_종료된_기록만_찾는다() {
+        void 기간_안에_시작해_종료되거나_중단된_기록만_찾는다() {
             SharingLog finished = createSharing();
             sharingLogDomainRepository.finish(finished.getId(), STARTED_AT.plusMinutes(30));
             SharingLog abandoned = createSharing();
@@ -143,11 +143,11 @@ class SharingLogDomainRepositoryTest extends BaseDomainRepositoryTest {
             createSharing();
 
             assertAll(
-                    () -> assertThat(sharingLogDomainRepository.findAllFinishedStartedBetween(
+                    () -> assertThat(sharingLogDomainRepository.findAllEndedStartedBetween(
                             STARTED_AT, STARTED_AT.plusDays(1)))
                             .extracting(SharingLog::getId)
-                            .containsExactly(finished.getId()),
-                    () -> assertThat(sharingLogDomainRepository.findAllFinishedStartedBetween(
+                            .containsExactlyInAnyOrder(finished.getId(), abandoned.getId()),
+                    () -> assertThat(sharingLogDomainRepository.findAllEndedStartedBetween(
                             STARTED_AT.plusSeconds(1), STARTED_AT.plusDays(1)))
                             .isEmpty()
             );

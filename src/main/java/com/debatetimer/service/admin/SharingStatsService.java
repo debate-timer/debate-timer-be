@@ -1,6 +1,7 @@
 package com.debatetimer.service.admin;
 
 import com.debatetimer.domain.sharing.SharingLog;
+import com.debatetimer.domain.sharing.SharingLogStatus;
 import com.debatetimer.domainrepository.sharing.SharingLogDomainRepository;
 import com.debatetimer.dto.admin.SharingDailyStatResponse;
 import com.debatetimer.dto.admin.SharingStatsResponse;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * 종료(FINISHED)된 공유를 시작일 기준으로 모아 일별 횟수와 평균 공유 시간을 계산한다.
+ * 종료(FINISHED)되거나 중단(ABANDONED)된 공유를 시작일 기준으로 모아 상태별 일별 횟수와 평균 공유 시간을 계산한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class SharingStatsService {
     public SharingStatsResponse getDailyStats(LocalDate from, LocalDate to) {
         validatePeriod(from, to);
         Map<LocalDate, List<SharingLog>> logsByDate = sharingLogDomainRepository
-                .findAllFinishedStartedBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
+                .findAllEndedStartedBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay())
                 .stream()
                 .collect(Collectors.groupingBy(sharingLog -> sharingLog.getStartedAt().toLocalDate()));
 
@@ -46,10 +47,28 @@ public class SharingStatsService {
     }
 
     private SharingDailyStatResponse toDailyStat(LocalDate date, List<SharingLog> logs) {
+        List<SharingLog> finished = filterByStatus(logs, SharingLogStatus.FINISHED);
+        List<SharingLog> abandoned = filterByStatus(logs, SharingLogStatus.ABANDONED);
+        return new SharingDailyStatResponse(
+                date,
+                finished.size(),
+                calculateAverageMinutes(finished),
+                abandoned.size(),
+                calculateAverageMinutes(abandoned)
+        );
+    }
+
+    private List<SharingLog> filterByStatus(List<SharingLog> logs, SharingLogStatus status) {
+        return logs.stream()
+                .filter(sharingLog -> sharingLog.getStatus() == status)
+                .toList();
+    }
+
+    private double calculateAverageMinutes(List<SharingLog> logs) {
         double averageMinutes = logs.stream()
                 .mapToLong(SharingLog::getDurationSeconds)
                 .average()
                 .orElse(0) / SECONDS_PER_MINUTE;
-        return new SharingDailyStatResponse(date, logs.size(), Math.round(averageMinutes * 10) / 10.0);
+        return Math.round(averageMinutes * 10) / 10.0;
     }
 }

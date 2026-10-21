@@ -43,5 +43,8 @@ discord:
 admin:
   password: ${secret.admin.password}
 
+icon:
+  upload-dir: /workspace/icon-upload
+
 logging:
   config: classpath:logging/log4j2-dev.yml

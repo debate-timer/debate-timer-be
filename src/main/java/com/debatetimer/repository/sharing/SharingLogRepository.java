@@ -5,6 +5,7 @@ import com.debatetimer.entity.sharing.SharingLogEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,8 +21,8 @@ public interface SharingLogRepository extends Repository<SharingLogEntity, Long>
 
     List<SharingLogEntity> findAll();
 
-    List<SharingLogEntity> findAllByStatusAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-            SharingLogStatus status,
+    List<SharingLogEntity> findAllByStatusInAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+            Collection<SharingLogStatus> statuses,
             LocalDateTime from,
             LocalDateTime to
     );

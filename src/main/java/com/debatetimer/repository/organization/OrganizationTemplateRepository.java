@@ -9,5 +9,7 @@ public interface OrganizationTemplateRepository extends Repository<OrganizationT
 
     List<OrganizationTemplateEntity> findAllByLanguage(Language language);
 
+    List<OrganizationTemplateEntity> findAllByOrderByIdAsc();
+
     OrganizationTemplateEntity save(OrganizationTemplateEntity entity);
 }

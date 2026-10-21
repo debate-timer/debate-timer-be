@@ -30,9 +30,9 @@ public class SharingLogDomainRepository {
     }
 
     @Transactional(readOnly = true)
-    public List<SharingLog> findAllFinishedStartedBetween(LocalDateTime from, LocalDateTime to) {
-        return sharingLogRepository.findAllByStatusAndStartedAtGreaterThanEqualAndStartedAtLessThan(
-                        SharingLogStatus.FINISHED, from, to)
+    public List<SharingLog> findAllEndedStartedBetween(LocalDateTime from, LocalDateTime to) {
+        return sharingLogRepository.findAllByStatusInAndStartedAtGreaterThanEqualAndStartedAtLessThan(
+                        List.of(SharingLogStatus.FINISHED, SharingLogStatus.ABANDONED), from, to)
                 .stream()
                 .map(SharingLogEntity::toDomain)
                 .toList();
