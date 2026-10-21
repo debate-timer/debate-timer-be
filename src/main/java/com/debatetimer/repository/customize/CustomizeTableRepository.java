@@ -7,6 +7,8 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -39,6 +41,9 @@ public interface CustomizeTableRepository extends Repository<CustomizeTableEntit
         return findWithMemberById(tableId)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TABLE_NOT_FOUND));
     }
+
+    @EntityGraph(attributePaths = "member")
+    Page<CustomizeTableEntity> findAllBy(Pageable pageable);
 
     @Query("SELECT t.createdAt FROM CustomizeTableEntity t WHERE t.createdAt >= :from AND t.createdAt < :to")
     List<LocalDateTime> findCreatedAtBetween(LocalDateTime from, LocalDateTime to);

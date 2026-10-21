@@ -1,6 +1,7 @@
 package com.debatetimer.domainrepository.customize;
 
 import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.customize.CustomizeTableOverview;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.entity.customize.BellEntity;
@@ -17,6 +18,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +69,19 @@ public class CustomizeTableDomainRepository {
     public CustomizeTable getWithMemberById(long tableId) {
         return tableRepository.getWithMemberById(tableId)
                 .toDomain();
+    }
+
+    @Transactional(readOnly = true)
+    public CustomizeTableOverview getOverviewById(long tableId) {
+        return tableRepository.getWithMemberById(tableId)
+                .toOverview();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CustomizeTableOverview> findOverviewsOrderByCreatedAtDesc(int page, int size) {
+        Sort latestFirst = Sort.by(Direction.DESC, "createdAt", "id");
+        return tableRepository.findAllBy(PageRequest.of(page, size, latestFirst))
+                .map(CustomizeTableEntity::toOverview);
     }
 
     @Transactional(readOnly = true)

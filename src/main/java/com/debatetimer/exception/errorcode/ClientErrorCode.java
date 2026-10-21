@@ -6,6 +6,7 @@ import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
 import com.debatetimer.domain.stats.StatPeriod;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
+import com.debatetimer.service.admin.AdminTableService;
 import com.debatetimer.service.admin.SharingStatsService;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,8 @@ public enum ClientErrorCode implements ResponseErrorCode {
             .formatted(SharingStatsService.MAX_PERIOD_DAYS)),
     INVALID_STATS_RANGE(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d개 구간까지 조회할 수 있습니다"
             .formatted(StatPeriod.MAX_PERIOD_COUNT)),
+    INVALID_PAGE_REQUEST(HttpStatus.BAD_REQUEST, "페이지는 0 이상, 페이지 크기는 1 이상 %d 이하여야 합니다"
+            .formatted(AdminTableService.MAX_PAGE_SIZE)),
     ;
 
     private final HttpStatus status;
