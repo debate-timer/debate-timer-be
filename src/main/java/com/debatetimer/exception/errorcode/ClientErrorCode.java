@@ -67,6 +67,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
+    ORGANIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 단체가 존재하지 않습니다"),
 
     INVALID_OAUTH_REQUEST(HttpStatus.BAD_REQUEST, "구글 OAuth 요청 파라미터 값이 잘못되었습니다."),
 

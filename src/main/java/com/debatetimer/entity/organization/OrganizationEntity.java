@@ -48,7 +48,12 @@ public class OrganizationEntity extends BaseTimeEntity {
         this.language = language;
     }
 
+    public OrganizationEntity(Organization organization) {
+        this(organization.getName(), organization.getAffiliation(), organization.getIconPath(),
+                organization.getLanguage());
+    }
+
     public Organization toDomain(List<OrganizationTemplate> templates) {
-        return new Organization(this.id, this.name, this.affiliation, this.iconPath, templates);
+        return new Organization(this.id, this.name, this.affiliation, this.iconPath, this.language, templates);
     }
 }
