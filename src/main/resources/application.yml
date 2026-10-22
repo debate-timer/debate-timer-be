@@ -29,3 +29,8 @@ springdoc:
 openai:
   api-key: ${OPENAI_API_KEY:}
   model: ${OPENAI_MODEL:gpt-5-mini}
+
+# 토론 기록 Soniox 모드의 발언 구간 배치 전사. 키가 비어 있으면 Soniox 전사 요청만 실패한다
+soniox:
+  api-key: ${SONIOX_API_KEY:}
+  model: ${SONIOX_MODEL:stt-async-v5}
