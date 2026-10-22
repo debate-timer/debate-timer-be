@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ public class SonioxClient {
     private final RestClient restClient;
     private final SonioxProperties properties;
 
+    @Autowired
     public SonioxClient(RestClient.Builder restClientBuilder, SonioxProperties properties) {
         this(createRestClient(restClientBuilder, properties), properties);
     }
