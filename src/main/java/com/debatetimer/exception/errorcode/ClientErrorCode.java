@@ -65,6 +65,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     POLL_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다."),
     SHARING_LOG_NOT_FOUND(HttpStatus.NOT_FOUND, "공유 기록을 찾을 수 없습니다."),
     TRANSCRIPT_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 기록을 찾을 수 없습니다."),
+    EMPTY_TRANSCRIPT(HttpStatus.BAD_REQUEST, "기록된 발언이 없습니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
