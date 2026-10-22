@@ -1,6 +1,7 @@
 package com.debatetimer.dto.transcript.response;
 
 import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptStatus;
@@ -16,6 +17,7 @@ public record TranscriptResponse(
         String prosTeamName,
         String consTeamName,
         TranscriptStatus status,
+        SttMode sttMode,
         List<TranscriptLine> lines,
         @Nullable JsonNode report,
         @Nullable String errorMessage
@@ -23,6 +25,7 @@ public record TranscriptResponse(
 
     public TranscriptResponse(Transcript transcript, CustomizeTable table, @Nullable JsonNode report) {
         this(transcript.id(), transcript.tableId(), table.getName(), table.getAgenda(), table.getProsTeamName(),
-                table.getConsTeamName(), transcript.status(), transcript.lines(), report, transcript.errorMessage());
+                table.getConsTeamName(), transcript.status(), transcript.sttMode(), transcript.lines(), report,
+                transcript.errorMessage());
     }
 }

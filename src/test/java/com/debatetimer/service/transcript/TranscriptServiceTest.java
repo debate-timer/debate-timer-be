@@ -8,6 +8,7 @@ import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentRequest;
@@ -58,6 +59,30 @@ class TranscriptServiceTest extends BaseServiceTest {
                     () -> assertThat(found.lines().get(0).speaker()).isEqualTo("콜리"),
                     () -> assertThat(found.agenda()).isEqualTo(table.getAgenda())
             );
+        }
+
+        @Test
+        void 요청한_STT_모드를_함께_저장한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            List<SegmentRequest> segments = requestOf(0, "발언").segments();
+
+            TranscriptCreateResponse created = transcriptService.create(table.getId(), member,
+                    new TranscriptCreateRequest(segments, SttMode.SONIOX));
+
+            assertThat(transcriptService.get(created.id(), member).sttMode()).isEqualTo(SttMode.SONIOX);
+        }
+
+        @Test
+        void STT_모드가_없으면_RPC_모드로_저장한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+
+            TranscriptCreateResponse created = transcriptService.create(table.getId(), member, requestOf(0, "발언"));
+
+            assertThat(transcriptService.get(created.id(), member).sttMode()).isEqualTo(SttMode.RPC);
         }
 
         @Test

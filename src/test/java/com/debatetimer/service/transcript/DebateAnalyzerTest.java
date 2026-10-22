@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptStatus;
@@ -41,7 +42,7 @@ class DebateAnalyzerTest extends BaseServiceTest {
                 new TranscriptLine(0, 0, "입론", Stance.PROS, "콜리", 1_000, "정규직 과보호가 채용을 막습니다"),
                 new TranscriptLine(1, 1, "입론", Stance.CONS, "비토", 65_000, "채용은 경기가 결정합니다")
         );
-        return transcriptDomainRepository.create(table.getId(), member.getId(), lines);
+        return transcriptDomainRepository.create(table.getId(), member.getId(), SttMode.RPC, lines);
     }
 
     @Test

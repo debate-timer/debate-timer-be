@@ -45,7 +45,8 @@ public class TranscriptService {
             throw new DTClientErrorException(ClientErrorCode.EMPTY_TRANSCRIPT);
         }
 
-        Transcript transcript = transcriptDomainRepository.create(table.getId(), member.getId(), lines);
+        Transcript transcript = transcriptDomainRepository.create(table.getId(), member.getId(),
+                request.resolveSttMode(), lines);
         eventPublisher.publishEvent(new TranscriptCreatedEvent(transcript.id()));
         return new TranscriptCreateResponse(transcript.id());
     }

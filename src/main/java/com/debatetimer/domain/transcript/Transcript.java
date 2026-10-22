@@ -8,6 +8,7 @@ public record Transcript(
         long tableId,
         long memberId,
         TranscriptStatus status,
+        SttMode sttMode,
         List<TranscriptLine> lines,
         @Nullable String reportJson,
         @Nullable String errorMessage

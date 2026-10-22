@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptStatus;
@@ -32,13 +33,14 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
 
         @Test
         void 속기록을_분석_중_상태로_저장한다() {
-            Transcript created = transcriptDomainRepository.create(1L, 2L, LINES);
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
 
             Transcript found = transcriptDomainRepository.getById(created.id());
             assertAll(
                     () -> assertThat(found.tableId()).isEqualTo(1L),
                     () -> assertThat(found.memberId()).isEqualTo(2L),
                     () -> assertThat(found.status()).isEqualTo(TranscriptStatus.PROCESSING),
+                    () -> assertThat(found.sttMode()).isEqualTo(SttMode.RPC),
                     () -> assertThat(found.lines()).isEqualTo(LINES),
                     () -> assertThat(found.reportJson()).isNull()
             );
@@ -50,7 +52,7 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
 
         @Test
         void 다른_회원의_속기록이면_예외를_던진다() {
-            Transcript created = transcriptDomainRepository.create(1L, 2L, LINES);
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
 
             assertThatThrownBy(() -> transcriptDomainRepository.getByIdAndMemberId(created.id(), 3L))
                     .isInstanceOf(DTClientErrorException.class)
@@ -63,7 +65,7 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
 
         @Test
         void 분석_보고서를_저장하고_완료_상태로_바꾼다() {
-            Transcript created = transcriptDomainRepository.create(1L, 2L, LINES);
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
 
             transcriptDomainRepository.complete(created.id(), "{\"clashes\":[]}");
 
@@ -80,7 +82,7 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
 
         @Test
         void 오류_메시지를_최대_길이로_잘라_실패_상태로_바꾼다() {
-            Transcript created = transcriptDomainRepository.create(1L, 2L, LINES);
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
 
             transcriptDomainRepository.fail(created.id(), "가".repeat(TranscriptEntity.ERROR_MESSAGE_MAX_LENGTH + 10));
 

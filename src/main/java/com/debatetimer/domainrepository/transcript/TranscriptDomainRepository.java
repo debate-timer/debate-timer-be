@@ -1,5 +1,6 @@
 package com.debatetimer.domainrepository.transcript;
 
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.entity.transcript.TranscriptEntity;
@@ -23,8 +24,8 @@ public class TranscriptDomainRepository {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Transcript create(long tableId, long memberId, List<TranscriptLine> lines) {
-        TranscriptEntity entity = new TranscriptEntity(tableId, memberId, writeLines(lines));
+    public Transcript create(long tableId, long memberId, SttMode sttMode, List<TranscriptLine> lines) {
+        TranscriptEntity entity = new TranscriptEntity(tableId, memberId, sttMode, writeLines(lines));
         return toDomain(transcriptRepository.save(entity));
     }
 
@@ -50,7 +51,8 @@ public class TranscriptDomainRepository {
 
     private Transcript toDomain(TranscriptEntity entity) {
         return new Transcript(entity.getId(), entity.getTableId(), entity.getMemberId(), entity.getStatus(),
-                readLines(entity.getLinesJson()), entity.getReportJson(), entity.getErrorMessage());
+                entity.getSttMode(), readLines(entity.getLinesJson()), entity.getReportJson(),
+                entity.getErrorMessage());
     }
 
     private String writeLines(List<TranscriptLine> lines) {

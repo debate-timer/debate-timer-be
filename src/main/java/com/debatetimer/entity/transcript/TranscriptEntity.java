@@ -1,5 +1,6 @@
 package com.debatetimer.entity.transcript;
 
+import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -38,6 +39,11 @@ public class TranscriptEntity extends BaseTimeEntity {
     private TranscriptStatus status;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stt_mode")
+    private SttMode sttMode;
+
+    @NotNull
     @Column(name = "lines_json", columnDefinition = "LONGTEXT")
     private String linesJson;
 
@@ -47,9 +53,10 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "error_message", length = ERROR_MESSAGE_MAX_LENGTH)
     private String errorMessage;
 
-    public TranscriptEntity(long tableId, long memberId, String linesJson) {
+    public TranscriptEntity(long tableId, long memberId, SttMode sttMode, String linesJson) {
         this.tableId = tableId;
         this.memberId = memberId;
+        this.sttMode = sttMode;
         this.linesJson = linesJson;
         this.status = TranscriptStatus.PROCESSING;
     }
