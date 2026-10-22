@@ -24,3 +24,8 @@ springdoc:
     persist-authorization: true
     display-request-duration: true
     default-model-expand-depth: 10
+
+# 토론 분석 보고서 생성. 키가 비어 있으면 앱은 뜨고 분석만 실패로 기록한다
+openai:
+  api-key: ${OPENAI_API_KEY:}
+  model: ${OPENAI_MODEL:gpt-5-mini}
