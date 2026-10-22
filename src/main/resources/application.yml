@@ -5,8 +5,9 @@ spring:
     timeout-per-shutdown-phase: 60s
   servlet:
     multipart:
-      max-file-size: 2MB
-      max-request-size: 3MB
+      # 토론 기록 Soniox 모드가 발언 구간 오디오(자유토론 등 수 분 분량)를 올린다
+      max-file-size: 30MB
+      max-request-size: 31MB
 
 server:
   shutdown: graceful

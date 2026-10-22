@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.client.storage.IconStorageProperties;
 import com.debatetimer.controller.BaseControllerTest;
+import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.dto.admin.IconResponse;
 import com.debatetimer.dto.admin.IconResponses;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
@@ -82,6 +84,18 @@ class AdminIconControllerTest extends BaseControllerTest {
                     .multiPart("name", "ceda")
                     .when().post("/api/admin/icons")
                     .then().statusCode(HttpStatus.CONFLICT.value());
+        }
+
+        @Test
+        void 전체_업로드_한도와_별개로_아이콘이_2MB를_넘으면_업로드할_수_없다() {
+            byte[] largePng = Arrays.copyOf(PNG, OrganizationIcon.MAX_SIZE_BYTES + 1);
+
+            given()
+                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .multiPart("file", "large.png", largePng, "image/png")
+                    .multiPart("name", "large")
+                    .when().post("/api/admin/icons")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
         }
 
         @Test
