@@ -40,6 +40,16 @@ public class TranscriptDomainRepository {
     }
 
     @Transactional
+    public void refine(long id, List<TranscriptLine> refinedLines) {
+        transcriptRepository.getById(id).refine(writeLines(refinedLines));
+    }
+
+    @Transactional
+    public void skipRefinement(long id) {
+        transcriptRepository.getById(id).skipRefinement();
+    }
+
+    @Transactional
     public void complete(long id, String reportJson) {
         transcriptRepository.getById(id).complete(reportJson);
     }
@@ -51,7 +61,8 @@ public class TranscriptDomainRepository {
 
     private Transcript toDomain(TranscriptEntity entity) {
         return new Transcript(entity.getId(), entity.getTableId(), entity.getMemberId(), entity.getStatus(),
-                entity.getSttMode(), readLines(entity.getLinesJson()), entity.getReportJson(),
+                entity.getSttMode(), entity.isRefining(), readLines(entity.getLinesJson()),
+                readRawLines(entity.getRawLinesJson()), entity.getReportJson(),
                 entity.getErrorMessage());
     }
 
@@ -61,6 +72,11 @@ public class TranscriptDomainRepository {
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("속기록을 저장 형식으로 변환하지 못했습니다.", exception);
         }
+    }
+
+    // 다듬기 도입 전 속기록은 원문을 따로 보관하지 않았다.
+    private List<TranscriptLine> readRawLines(String rawLinesJson) {
+        return rawLinesJson == null ? List.of() : readLines(rawLinesJson);
     }
 
     private List<TranscriptLine> readLines(String linesJson) {

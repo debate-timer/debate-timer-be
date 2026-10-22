@@ -18,6 +18,7 @@ public record TranscriptResponse(
         String consTeamName,
         TranscriptStatus status,
         SttMode sttMode,
+        boolean refining,
         List<TranscriptLine> lines,
         @Nullable JsonNode report,
         @Nullable String errorMessage
@@ -25,7 +26,7 @@ public record TranscriptResponse(
 
     public TranscriptResponse(Transcript transcript, CustomizeTable table, @Nullable JsonNode report) {
         this(transcript.id(), transcript.tableId(), table.getName(), table.getAgenda(), table.getProsTeamName(),
-                table.getConsTeamName(), transcript.status(), transcript.sttMode(), transcript.lines(), report,
-                transcript.errorMessage());
+                table.getConsTeamName(), transcript.status(), transcript.sttMode(), transcript.refining(),
+                transcript.lines(), report, transcript.errorMessage());
     }
 }

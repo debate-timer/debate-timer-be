@@ -41,6 +41,8 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
                     () -> assertThat(found.memberId()).isEqualTo(2L),
                     () -> assertThat(found.status()).isEqualTo(TranscriptStatus.PROCESSING),
                     () -> assertThat(found.sttMode()).isEqualTo(SttMode.RPC),
+                    () -> assertThat(found.refining()).isTrue(),
+                    () -> assertThat(found.rawLines()).isEqualTo(LINES),
                     () -> assertThat(found.lines()).isEqualTo(LINES),
                     () -> assertThat(found.reportJson()).isNull()
             );
@@ -57,6 +59,40 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
             assertThatThrownBy(() -> transcriptDomainRepository.getByIdAndMemberId(created.id(), 3L))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.TRANSCRIPT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class Refine {
+
+        @Test
+        void 다듬은_속기록을_저장하고_원문은_보관한다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
+            List<TranscriptLine> refined = List.of(
+                    new TranscriptLine(0, 0, "입론", Stance.PROS, "1번", 1_000L, "찬성 입론입니다."));
+
+            transcriptDomainRepository.refine(created.id(), refined);
+
+            Transcript found = transcriptDomainRepository.getById(created.id());
+            assertAll(
+                    () -> assertThat(found.refining()).isFalse(),
+                    () -> assertThat(found.lines()).isEqualTo(refined),
+                    () -> assertThat(found.rawLines()).isEqualTo(LINES),
+                    () -> assertThat(found.status()).isEqualTo(TranscriptStatus.PROCESSING)
+            );
+        }
+
+        @Test
+        void 다듬기를_건너뛰면_원문을_속기록으로_쓴다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SttMode.RPC, LINES);
+
+            transcriptDomainRepository.skipRefinement(created.id());
+
+            Transcript found = transcriptDomainRepository.getById(created.id());
+            assertAll(
+                    () -> assertThat(found.refining()).isFalse(),
+                    () -> assertThat(found.lines()).isEqualTo(LINES)
+            );
         }
     }
 

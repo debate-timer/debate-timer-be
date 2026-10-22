@@ -47,6 +47,12 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "lines_json", columnDefinition = "LONGTEXT")
     private String linesJson;
 
+    @Column(name = "raw_lines_json", columnDefinition = "LONGTEXT")
+    private String rawLinesJson;
+
+    @Column(name = "refining")
+    private boolean refining;
+
     @Column(name = "report_json", columnDefinition = "LONGTEXT")
     private String reportJson;
 
@@ -58,7 +64,19 @@ public class TranscriptEntity extends BaseTimeEntity {
         this.memberId = memberId;
         this.sttMode = sttMode;
         this.linesJson = linesJson;
+        this.rawLinesJson = linesJson;
+        this.refining = true;
         this.status = TranscriptStatus.PROCESSING;
+    }
+
+    public void refine(String refinedLinesJson) {
+        this.linesJson = refinedLinesJson;
+        this.refining = false;
+    }
+
+    // 다듬기에 실패하면 원문을 그대로 속기록으로 쓴다.
+    public void skipRefinement() {
+        this.refining = false;
     }
 
     public void complete(String reportJson) {
