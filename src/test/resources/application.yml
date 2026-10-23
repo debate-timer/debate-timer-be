@@ -1,6 +1,11 @@
 spring:
   profiles:
     active: test
+  # 메인 설정과 같은 업로드 한도. 테스트 설정이 메인 application.yml을 대신하므로 따로 둔다
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 31MB
 
 cors:
   origin:

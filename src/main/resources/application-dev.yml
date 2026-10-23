@@ -40,6 +40,13 @@ discord:
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
 
+# 토론 기록 분석·Soniox 배치 전사 키. dev-secret.yml에 값이 없어도 앱은 뜨고 해당 기능만 실패한다
+openai:
+  api-key: ${secret.openai.api_key:}
+
+soniox:
+  api-key: ${secret.soniox.api_key:}
+
 admin:
   password: ${secret.admin.password}
 

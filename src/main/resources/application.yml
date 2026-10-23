@@ -5,8 +5,9 @@ spring:
     timeout-per-shutdown-phase: 60s
   servlet:
     multipart:
-      max-file-size: 2MB
-      max-request-size: 3MB
+      # 토론 기록 Soniox 모드가 발언 구간 오디오(자유토론 등 수 분 분량)를 올린다
+      max-file-size: 30MB
+      max-request-size: 31MB
 
 server:
   shutdown: graceful
@@ -24,3 +25,13 @@ springdoc:
     persist-authorization: true
     display-request-duration: true
     default-model-expand-depth: 10
+
+# 토론 분석 보고서 생성. 키가 비어 있으면 앱은 뜨고 분석만 실패로 기록한다
+openai:
+  api-key: ${OPENAI_API_KEY:}
+  model: ${OPENAI_MODEL:gpt-5-mini}
+
+# 토론 기록 Soniox 모드의 발언 구간 배치 전사. 키가 비어 있으면 Soniox 전사 요청만 실패한다
+soniox:
+  api-key: ${SONIOX_API_KEY:}
+  model: ${SONIOX_MODEL:stt-async-v5}
