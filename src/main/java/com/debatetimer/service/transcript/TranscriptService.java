@@ -11,6 +11,13 @@ import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
+import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
+import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.repository.customize.CustomizeTableRepository;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import com.debatetimer.event.transcript.TranscriptCreatedEvent;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -31,6 +38,7 @@ public class TranscriptService {
 
     private final CustomizeTableDomainRepository customizeTableDomainRepository;
     private final TranscriptDomainRepository transcriptDomainRepository;
+    private final CustomizeTableRepository customizeTableRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
     private final SpeakerSeparator speakerSeparator = new SpeakerSeparator();
@@ -56,6 +64,18 @@ public class TranscriptService {
         Transcript transcript = transcriptDomainRepository.getByIdAndMemberId(transcriptId, member.getId());
         CustomizeTable table = customizeTableDomainRepository.getById(transcript.tableId());
         return new TranscriptResponse(transcript, table, readReport(transcript));
+    }
+
+    @Transactional(readOnly = true)
+    public TranscriptSummaryResponses findAll(Member member) {
+        Map<Long, CustomizeTable> tables = customizeTableRepository.findAllByMember(member).stream()
+                .map(CustomizeTableEntity::toDomain)
+                .collect(Collectors.toMap(CustomizeTable::getId, Function.identity()));
+        List<TranscriptSummaryResponse> transcripts = transcriptDomainRepository.findSummariesByMemberId(member.getId())
+                .stream()
+                .map(summary -> new TranscriptSummaryResponse(summary, tables.get(summary.tableId())))
+                .toList();
+        return new TranscriptSummaryResponses(transcripts);
     }
 
     private JsonNode readReport(Transcript transcript) {

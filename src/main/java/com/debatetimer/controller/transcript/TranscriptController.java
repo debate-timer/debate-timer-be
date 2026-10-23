@@ -5,6 +5,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.service.transcript.TranscriptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,12 @@ public class TranscriptController {
             @RequestBody @Valid TranscriptCreateRequest request
     ) {
         return transcriptService.create(tableId, member, request);
+    }
+
+    @GetMapping("/api/transcripts")
+    @ResponseStatus(HttpStatus.OK)
+    public TranscriptSummaryResponses getTranscripts(@AuthMember Member member) {
+        return transcriptService.findAll(member);
     }
 
     @GetMapping("/api/transcripts/{transcriptId}")

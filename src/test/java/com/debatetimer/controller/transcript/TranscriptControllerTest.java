@@ -12,6 +12,7 @@ import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentReq
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.UtteranceRequest;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
@@ -107,6 +108,37 @@ class TranscriptControllerTest extends BaseControllerTest {
                     .pathParam("transcriptId", transcriptId)
                     .when().get("/api/transcripts/{transcriptId}")
                     .then().statusCode(404);
+        }
+    }
+
+    @Nested
+    class GetTranscripts {
+
+        @Test
+        void 자신의_토론_기록_목록을_조회한다() {
+            Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = createTranscript(bito, table).id();
+
+            TranscriptSummaryResponses response = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/transcripts")
+                    .then().statusCode(200)
+                    .extract().as(TranscriptSummaryResponses.class);
+
+            assertAll(
+                    () -> assertThat(response.transcripts()).hasSize(1),
+                    () -> assertThat(response.transcripts().get(0).id()).isEqualTo(transcriptId),
+                    () -> assertThat(response.transcripts().get(0).tableName()).isEqualTo(table.getName())
+            );
+        }
+
+        @Test
+        void 로그인하지_않으면_조회할_수_없다() {
+            given()
+                    .when().get("/api/transcripts")
+                    .then().statusCode(401);
         }
     }
 }

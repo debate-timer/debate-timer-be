@@ -15,6 +15,7 @@ import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentReq
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.UtteranceRequest;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -124,6 +125,42 @@ class TranscriptServiceTest extends BaseServiceTest {
 
             assertThat(found.status()).isIn(TranscriptStatus.PROCESSING, TranscriptStatus.DONE,
                     TranscriptStatus.FAILED);
+        }
+    }
+
+    @Nested
+    class FindAll {
+
+        @Test
+        void 자신의_토론_기록을_최근_생성순으로_시간표_정보와_함께_조회한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            Member other = memberGenerator.generate("other@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            CustomizeTableEntity otherTable = customizeTableEntityGenerator.generate(other);
+            customizeTimeBoxEntityGenerator.generate(otherTable, CustomizeBoxType.NORMAL, 1);
+            long first = transcriptService.create(table.getId(), member, requestOf(0, "첫 기록")).id();
+            long second = transcriptService.create(table.getId(), member,
+                    new TranscriptCreateRequest(requestOf(0, "둘째 기록").segments(), SttMode.SONIOX)).id();
+            transcriptService.create(otherTable.getId(), other, requestOf(0, "다른 회원 기록"));
+
+            List<TranscriptSummaryResponse> transcripts = transcriptService.findAll(member).transcripts();
+
+            assertAll(
+                    () -> assertThat(transcripts).extracting(TranscriptSummaryResponse::id)
+                            .containsExactly(second, first),
+                    () -> assertThat(transcripts.get(0).sttMode()).isEqualTo(SttMode.SONIOX),
+                    () -> assertThat(transcripts.get(0).tableName()).isEqualTo(table.getName()),
+                    () -> assertThat(transcripts.get(0).agenda()).isEqualTo(table.getAgenda()),
+                    () -> assertThat(transcripts.get(0).createdAt()).isNotNull()
+            );
+        }
+
+        @Test
+        void 기록이_없으면_빈_목록을_돌려준다() {
+            Member member = memberGenerator.generate("email@email.com");
+
+            assertThat(transcriptService.findAll(member).transcripts()).isEmpty();
         }
     }
 }

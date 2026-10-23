@@ -3,6 +3,7 @@ package com.debatetimer.domainrepository.transcript;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
+import com.debatetimer.domain.transcript.TranscriptSummary;
 import com.debatetimer.entity.transcript.TranscriptEntity;
 import com.debatetimer.repository.transcript.TranscriptRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,6 +38,11 @@ public class TranscriptDomainRepository {
     @Transactional(readOnly = true)
     public Transcript getByIdAndMemberId(long id, long memberId) {
         return toDomain(transcriptRepository.getByIdAndMemberId(id, memberId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<TranscriptSummary> findSummariesByMemberId(long memberId) {
+        return transcriptRepository.findSummariesByMemberId(memberId);
     }
 
     @Transactional
