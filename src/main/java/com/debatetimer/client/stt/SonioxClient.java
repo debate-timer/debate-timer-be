@@ -1,12 +1,15 @@
 package com.debatetimer.client.stt;
 
 import com.debatetimer.domain.transcript.SpeechToken;
+import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,6 +38,8 @@ public class SonioxClient {
 
     private final RestClient restClient;
     private final SonioxProperties properties;
+    // 전사는 요청 스레드에서 끝날 때까지 기다리므로, 동시에 진행하는 수를 제한해 다른 API의 스레드를 지킨다.
+    private final Semaphore permits;
 
     @Autowired
     public SonioxClient(RestClient.Builder restClientBuilder, SonioxProperties properties) {
@@ -44,10 +49,12 @@ public class SonioxClient {
     SonioxClient(RestClient restClient, SonioxProperties properties) {
         this.restClient = restClient;
         this.properties = properties;
+        this.permits = new Semaphore(properties.maxConcurrent());
     }
 
     private static RestClient createRestClient(RestClient.Builder restClientBuilder, SonioxProperties properties) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(properties.connectTimeout());
         requestFactory.setReadTimeout(properties.timeout());
         return restClientBuilder
                 .baseUrl(properties.baseUrl())
@@ -59,7 +66,18 @@ public class SonioxClient {
         if (!properties.hasApiKey()) {
             throw new DTServerErrorException(ServerErrorCode.STT_NOT_CONFIGURED);
         }
+        // 한도를 넘으면 기다리지 않고 바로 알린다. 프론트는 이 구간을 전사 실패로 표시한다.
+        if (!permits.tryAcquire()) {
+            throw new DTClientErrorException(ClientErrorCode.STT_TOO_MANY_REQUESTS);
+        }
+        try {
+            return transcribeWithPermit(audio, languageHints);
+        } finally {
+            permits.release();
+        }
+    }
 
+    private List<SpeechToken> transcribeWithPermit(Resource audio, List<String> languageHints) {
         String fileId = null;
         String transcriptionId = null;
         try {

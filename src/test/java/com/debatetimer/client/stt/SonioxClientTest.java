@@ -11,7 +11,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.debatetimer.domain.transcript.SpeechToken;
+import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.time.Duration;
 import java.util.List;
@@ -46,7 +48,20 @@ class SonioxClientTest {
     }
 
     private SonioxProperties propertiesWithKey(String apiKey) {
-        return new SonioxProperties(apiKey, "stt-async-v5", BASE_URL, null, Duration.ZERO, Duration.ofSeconds(5));
+        return propertiesWith(apiKey, 4);
+    }
+
+    private SonioxProperties propertiesWith(String apiKey, int maxConcurrent) {
+        return new SonioxProperties(apiKey, "stt-async-v5", BASE_URL, null, Duration.ZERO, Duration.ofSeconds(5),
+                null, maxConcurrent);
+    }
+
+    private void expectCompletedTranscription() {
+        expectUploadAndCreate();
+        expectStatus("completed");
+        server.expect(requestTo(BASE_URL + "/transcriptions/tr-1/transcript"))
+                .andRespond(withSuccess("{\"tokens\":[]}", MediaType.APPLICATION_JSON));
+        expectCleanUp();
     }
 
     private void expectUploadAndCreate() {
@@ -137,6 +152,36 @@ class SonioxClientTest {
             assertThatThrownBy(() -> noKeyClient.transcribe(AUDIO, List.of("ko")))
                     .isInstanceOf(DTServerErrorException.class)
                     .hasMessage(ServerErrorCode.STT_NOT_CONFIGURED.getMessage());
+        }
+    }
+
+    @Nested
+    class ConcurrencyLimit {
+
+        @Test
+        void 동시_전사_한도를_넘으면_Soniox에_요청하지_않고_예외를_던진다() {
+            RestClient.Builder builder = RestClient.builder().baseUrl(BASE_URL);
+            MockRestServiceServer noCallServer = MockRestServiceServer.bindTo(builder).build();
+            SonioxClient fullClient = new SonioxClient(builder.build(), propertiesWith("test-key", 0));
+
+            assertThatThrownBy(() -> fullClient.transcribe(AUDIO, List.of("ko")))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.STT_TOO_MANY_REQUESTS.getMessage());
+            noCallServer.verify();
+        }
+
+        @Test
+        void 전사가_끝나거나_실패하면_동시_실행_자리를_돌려준다() {
+            RestClient.Builder builder = RestClient.builder().baseUrl(BASE_URL);
+            server = MockRestServiceServer.bindTo(builder).build();
+            SonioxClient singleClient = new SonioxClient(builder.build(), propertiesWith("test-key", 1));
+            server.expect(requestTo(BASE_URL + "/files")).andRespond(withServerError());
+            expectCompletedTranscription();
+
+            assertThatThrownBy(() -> singleClient.transcribe(AUDIO, List.of("ko")))
+                    .isInstanceOf(DTServerErrorException.class);
+            assertThat(singleClient.transcribe(AUDIO, List.of("ko"))).isEmpty();
+            server.verify();
         }
     }
 }

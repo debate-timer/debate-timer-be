@@ -13,7 +13,10 @@ public record SonioxProperties(
         String baseUrl,
         Duration timeout,
         Duration pollInterval,
-        Duration maxWait
+        Duration maxWait,
+        Duration connectTimeout,
+        // 동시에 진행할 수 있는 전사 수. 전사 한 건이 요청 스레드를 최대 maxWait 동안 잡으므로 제한한다.
+        Integer maxConcurrent
 ) {
 
     private static final String DEFAULT_MODEL = "stt-async-v5";
@@ -21,6 +24,8 @@ public record SonioxProperties(
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
     private static final Duration DEFAULT_POLL_INTERVAL = Duration.ofSeconds(1);
     private static final Duration DEFAULT_MAX_WAIT = Duration.ofSeconds(180);
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    private static final int DEFAULT_MAX_CONCURRENT = 4;
 
     public SonioxProperties {
         model = isBlank(model) ? DEFAULT_MODEL : model;
@@ -28,6 +33,8 @@ public record SonioxProperties(
         timeout = timeout == null ? DEFAULT_TIMEOUT : timeout;
         pollInterval = pollInterval == null ? DEFAULT_POLL_INTERVAL : pollInterval;
         maxWait = maxWait == null ? DEFAULT_MAX_WAIT : maxWait;
+        connectTimeout = connectTimeout == null ? DEFAULT_CONNECT_TIMEOUT : connectTimeout;
+        maxConcurrent = maxConcurrent == null ? DEFAULT_MAX_CONCURRENT : maxConcurrent;
     }
 
     public boolean hasApiKey() {
