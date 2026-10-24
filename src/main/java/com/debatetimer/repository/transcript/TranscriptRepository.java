@@ -20,7 +20,7 @@ public interface TranscriptRepository extends Repository<TranscriptEntity, Long>
     // 속기록·보고서 본문(LONGTEXT)은 읽지 않고 목록에 필요한 값만 가져온다.
     @Query("""
             SELECT new com.debatetimer.domain.transcript.TranscriptSummary(
-                t.id, t.tableId, t.sttMode, t.status, t.refining, t.createdAt)
+                t.id, t.tableId, t.tableName, t.agenda, t.sttMode, t.status, t.refining, t.createdAt)
             FROM TranscriptEntity t
             WHERE t.memberId = :memberId
             ORDER BY t.createdAt DESC, t.id DESC

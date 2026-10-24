@@ -2,6 +2,7 @@ package com.debatetimer.entity.transcript;
 
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.TranscriptStatus;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +35,19 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "member_id")
     private long memberId;
 
+    // 속기록을 만들 때의 시간표 정보. 이후 시간표를 수정·삭제해도 바꾸지 않는다.
+    @Column(name = "table_name")
+    private String tableName;
+
+    @Column(name = "agenda")
+    private String agenda;
+
+    @Column(name = "pros_team_name")
+    private String prosTeamName;
+
+    @Column(name = "cons_team_name")
+    private String consTeamName;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private TranscriptStatus status;
@@ -59,14 +73,23 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "error_message", length = ERROR_MESSAGE_MAX_LENGTH)
     private String errorMessage;
 
-    public TranscriptEntity(long tableId, long memberId, SttMode sttMode, String linesJson) {
+    public TranscriptEntity(long tableId, long memberId, TranscriptTableSnapshot table, SttMode sttMode,
+                            String linesJson) {
         this.tableId = tableId;
         this.memberId = memberId;
+        this.tableName = table.tableName();
+        this.agenda = table.agenda();
+        this.prosTeamName = table.prosTeamName();
+        this.consTeamName = table.consTeamName();
         this.sttMode = sttMode;
         this.linesJson = linesJson;
         this.rawLinesJson = linesJson;
         this.refining = true;
         this.status = TranscriptStatus.PROCESSING;
+    }
+
+    public TranscriptTableSnapshot getTableSnapshot() {
+        return new TranscriptTableSnapshot(tableName, agenda, prosTeamName, consTeamName);
     }
 
     public void refine(String refinedLinesJson) {

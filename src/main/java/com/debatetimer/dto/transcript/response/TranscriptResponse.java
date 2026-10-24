@@ -1,6 +1,5 @@
 package com.debatetimer.dto.transcript.response;
 
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
@@ -24,9 +23,10 @@ public record TranscriptResponse(
         @Nullable String errorMessage
 ) {
 
-    public TranscriptResponse(Transcript transcript, CustomizeTable table, @Nullable JsonNode report) {
-        this(transcript.id(), transcript.tableId(), table.getName(), table.getAgenda(), table.getProsTeamName(),
-                table.getConsTeamName(), transcript.status(), transcript.sttMode(), transcript.refining(),
+    // 시간표 정보는 속기록을 만들 때 저장한 스냅샷을 쓴다.
+    public TranscriptResponse(Transcript transcript, @Nullable JsonNode report) {
+        this(transcript.id(), transcript.tableId(), transcript.table().tableName(), transcript.table().agenda(),
+                transcript.table().prosTeamName(), transcript.table().consTeamName(), transcript.status(), transcript.sttMode(), transcript.refining(),
                 transcript.lines(), report, transcript.errorMessage());
     }
 }

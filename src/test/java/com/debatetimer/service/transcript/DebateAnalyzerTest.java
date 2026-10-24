@@ -15,6 +15,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
@@ -42,7 +43,8 @@ class DebateAnalyzerTest extends BaseServiceTest {
                 new TranscriptLine(0, 0, "입론", Stance.PROS, "콜리", 1_000, "정규직 과보호가 채용을 막습니다"),
                 new TranscriptLine(1, 1, "입론", Stance.CONS, "비토", 65_000, "채용은 경기가 결정합니다")
         );
-        return transcriptDomainRepository.create(table.getId(), member.getId(), SttMode.RPC, lines);
+        return transcriptDomainRepository.create(table.getId(), member.getId(),
+                TranscriptTableSnapshot.from(table.toDomain()), SttMode.RPC, lines);
     }
 
     @Test

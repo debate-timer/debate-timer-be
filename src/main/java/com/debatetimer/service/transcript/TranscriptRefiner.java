@@ -1,12 +1,11 @@
 package com.debatetimer.service.transcript;
 
 import com.debatetimer.client.llm.OpenAiClient;
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.transcript.RefinedTextMerger;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
-import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,6 +16,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -31,12 +31,13 @@ import org.springframework.stereotype.Service;
 public class TranscriptRefiner {
 
     private static final String SCHEMA_NAME = "transcript_refinement";
+    private static final Pattern ECHOED_PREFIX = Pattern.compile(
+            "^\\s*(\\[\\d+]\\s*)?[^|\\n]{1,30}?\\s*\\|\\s*(찬성|반대|중립)[^:\\n]{0,30}:\\s*");
     private static final TypeReference<Map<String, Object>> SCHEMA_TYPE = new TypeReference<>() {
     };
 
     private final OpenAiClient openAiClient;
     private final TranscriptDomainRepository transcriptDomainRepository;
-    private final CustomizeTableDomainRepository customizeTableDomainRepository;
     private final ObjectMapper objectMapper;
     private final RefinedTextMerger refinedTextMerger = new RefinedTextMerger();
     private final String systemPrompt;
@@ -45,12 +46,10 @@ public class TranscriptRefiner {
     public TranscriptRefiner(
             OpenAiClient openAiClient,
             TranscriptDomainRepository transcriptDomainRepository,
-            CustomizeTableDomainRepository customizeTableDomainRepository,
             ObjectMapper objectMapper
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
-        this.customizeTableDomainRepository = customizeTableDomainRepository;
         this.objectMapper = objectMapper;
         this.systemPrompt = readResource("prompt/transcript-refinement-system.txt");
         this.schema = readSchema();
@@ -59,8 +58,7 @@ public class TranscriptRefiner {
     public void refine(long transcriptId) {
         try {
             Transcript transcript = transcriptDomainRepository.getById(transcriptId);
-            CustomizeTable table = customizeTableDomainRepository.getById(transcript.tableId());
-            String response = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(table, transcript),
+            String response = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(transcript),
                     SCHEMA_NAME, schema);
             List<TranscriptLine> refined = refinedTextMerger.merge(transcript.lines(), readRefinedTexts(response));
             transcriptDomainRepository.refine(transcriptId, refined);
@@ -70,24 +68,28 @@ public class TranscriptRefiner {
         }
     }
 
-    private String buildUserPrompt(CustomizeTable table, Transcript transcript) {
-        String lines = transcript.lines().stream()
-                .map(this::formatLine)
-                .collect(Collectors.joining("\n"));
+    // 문장(text)과 맥락(발언 유형·진영·화자)을 필드로 나눠 보내, AI가 맥락을 문장에 붙여 돌려주지 않게 한다.
+    private String buildUserPrompt(Transcript transcript) throws JsonProcessingException {
+        TranscriptTableSnapshot table = transcript.table();
+        List<LinePayload> payload = transcript.lines().stream()
+                .map(line -> new LinePayload(line.index(), line.speechType(), stanceLabel(line.stance()),
+                        line.speaker(), line.text()))
+                .toList();
+        String lines = objectMapper.writeValueAsString(payload);
         return """
                 토론 주제: %s
                 찬성 팀: %s
                 반대 팀: %s
                 
-                속기록:
+                속기록(JSON 배열):
                 %s
-                """.formatted(table.getAgenda(), table.getProsTeamName(), table.getConsTeamName(), lines);
+                """.formatted(orEmpty(table.agenda()), orEmpty(table.prosTeamName()), orEmpty(table.consTeamName()),
+                lines);
     }
 
-    private String formatLine(TranscriptLine line) {
-        String speaker = line.speaker() == null || line.speaker().isBlank() ? "" : " " + line.speaker();
-        return "[%d] %s | %s%s: %s".formatted(line.index(), line.speechType(), stanceLabel(line.stance()), speaker,
-                line.text());
+    // 속기록을 만들 때 저장한 시간표 정보를 쓰고, 비어 있으면 빈 값으로 둔다.
+    private String orEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private String stanceLabel(Stance stance) {
@@ -105,7 +107,16 @@ public class TranscriptRefiner {
             return Map.of();
         }
         return refinement.lines().stream()
-                .collect(Collectors.toMap(RefinedLine::index, RefinedLine::text, (first, second) -> first));
+                .collect(Collectors.toMap(RefinedLine::index, line -> stripEchoedPrefix(line.text()),
+                        (first, second) -> first));
+    }
+
+    // AI가 "[2] 입론 | 반대 비토: "처럼 번호·발언 유형·진영·화자 머리말을 문장 앞에 붙여 돌려주면 지운다.
+    private String stripEchoedPrefix(String text) {
+        if (text == null) {
+            return null;
+        }
+        return ECHOED_PREFIX.matcher(text).replaceFirst("");
     }
 
     private Map<String, Object> readSchema() {
@@ -122,6 +133,9 @@ public class TranscriptRefiner {
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    record LinePayload(int index, String speechType, String team, String speaker, String text) {
     }
 
     record RefinementResponse(List<RefinedLine> lines) {

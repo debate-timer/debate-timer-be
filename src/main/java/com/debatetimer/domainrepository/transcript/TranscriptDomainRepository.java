@@ -4,6 +4,7 @@ import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptSummary;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.entity.transcript.TranscriptEntity;
 import com.debatetimer.repository.transcript.TranscriptRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,8 +26,9 @@ public class TranscriptDomainRepository {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Transcript create(long tableId, long memberId, SttMode sttMode, List<TranscriptLine> lines) {
-        TranscriptEntity entity = new TranscriptEntity(tableId, memberId, sttMode, writeLines(lines));
+    public Transcript create(long tableId, long memberId, TranscriptTableSnapshot table, SttMode sttMode,
+                             List<TranscriptLine> lines) {
+        TranscriptEntity entity = new TranscriptEntity(tableId, memberId, table, sttMode, writeLines(lines));
         return toDomain(transcriptRepository.save(entity));
     }
 
@@ -66,7 +68,8 @@ public class TranscriptDomainRepository {
     }
 
     private Transcript toDomain(TranscriptEntity entity) {
-        return new Transcript(entity.getId(), entity.getTableId(), entity.getMemberId(), entity.getStatus(),
+        return new Transcript(entity.getId(), entity.getTableId(), entity.getMemberId(),
+                entity.getTableSnapshot(), entity.getStatus(),
                 entity.getSttMode(), entity.isRefining(), readLines(entity.getLinesJson()),
                 readRawLines(entity.getRawLinesJson()), entity.getReportJson(),
                 entity.getErrorMessage());

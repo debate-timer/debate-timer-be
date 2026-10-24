@@ -6,6 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.customize.BellType;
+import com.debatetimer.dto.customize.request.BellRequest;
+import com.debatetimer.dto.customize.request.CustomizeTableCreateRequest;
+import com.debatetimer.dto.customize.request.CustomizeTableInfoCreateRequest;
+import com.debatetimer.dto.customize.request.CustomizeTimeBoxCreateRequest;
+import com.debatetimer.service.customize.CustomizeService;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.transcript.SttMode;
@@ -30,6 +36,9 @@ class TranscriptServiceTest extends BaseServiceTest {
 
     @Autowired
     private TranscriptService transcriptService;
+
+    @Autowired
+    private CustomizeService customizeService;
 
     @MockitoBean
     private OpenAiClient openAiClient;
@@ -161,6 +170,56 @@ class TranscriptServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("email@email.com");
 
             assertThat(transcriptService.findAll(member).transcripts()).isEmpty();
+        }
+    }
+
+    @Nested
+    class TableSnapshot {
+
+        private CustomizeTableCreateRequest renewedTable() {
+            return new CustomizeTableCreateRequest(
+                    new CustomizeTableInfoCreateRequest("바뀐 시간표", "바뀐 주제", "바뀐 찬성", "바뀐 반대", true, true),
+                    List.of(new CustomizeTimeBoxCreateRequest(Stance.PROS, "입론", CustomizeBoxType.NORMAL,
+                            120, List.of(new BellRequest(BellType.AFTER_START, 90, 1)), null, null, "콜리"))
+            );
+        }
+
+        @Test
+        void 시간표를_수정해도_속기록은_생성_시점의_시간표_이름_주제_팀_이름을_유지한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = transcriptService.create(table.getId(), member, requestOf(0, "발언")).id();
+
+            customizeService.updateTable(renewedTable(), table.getId(), member);
+
+            TranscriptResponse found = transcriptService.get(transcriptId, member);
+            TranscriptSummaryResponse summary = transcriptService.findAll(member).transcripts().get(0);
+            assertAll(
+                    () -> assertThat(found.tableName()).isEqualTo(table.getName()),
+                    () -> assertThat(found.agenda()).isEqualTo(table.getAgenda()),
+                    () -> assertThat(found.prosTeamName()).isEqualTo(table.getProsTeamName()),
+                    () -> assertThat(found.consTeamName()).isEqualTo(table.getConsTeamName()),
+                    () -> assertThat(summary.tableName()).isEqualTo(table.getName()),
+                    () -> assertThat(summary.agenda()).isEqualTo(table.getAgenda())
+            );
+        }
+
+        @Test
+        void 시간표를_지워도_속기록과_목록에_생성_시점의_시간표_정보가_남는다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = transcriptService.create(table.getId(), member, requestOf(0, "발언")).id();
+
+            customizeService.deleteTable(table.getId(), member);
+
+            TranscriptResponse found = transcriptService.get(transcriptId, member);
+            TranscriptSummaryResponse summary = transcriptService.findAll(member).transcripts().get(0);
+            assertAll(
+                    () -> assertThat(found.agenda()).isEqualTo(table.getAgenda()),
+                    () -> assertThat(summary.tableName()).isEqualTo(table.getName())
+            );
         }
     }
 }
