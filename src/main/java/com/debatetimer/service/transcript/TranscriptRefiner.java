@@ -1,12 +1,11 @@
 package com.debatetimer.service.transcript;
 
 import com.debatetimer.client.llm.OpenAiClient;
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.transcript.RefinedTextMerger;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
-import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,7 +35,6 @@ public class TranscriptRefiner {
 
     private final OpenAiClient openAiClient;
     private final TranscriptDomainRepository transcriptDomainRepository;
-    private final CustomizeTableDomainRepository customizeTableDomainRepository;
     private final ObjectMapper objectMapper;
     private final RefinedTextMerger refinedTextMerger = new RefinedTextMerger();
     private final String systemPrompt;
@@ -45,12 +43,10 @@ public class TranscriptRefiner {
     public TranscriptRefiner(
             OpenAiClient openAiClient,
             TranscriptDomainRepository transcriptDomainRepository,
-            CustomizeTableDomainRepository customizeTableDomainRepository,
             ObjectMapper objectMapper
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
-        this.customizeTableDomainRepository = customizeTableDomainRepository;
         this.objectMapper = objectMapper;
         this.systemPrompt = readResource("prompt/transcript-refinement-system.txt");
         this.schema = readSchema();
@@ -59,8 +55,7 @@ public class TranscriptRefiner {
     public void refine(long transcriptId) {
         try {
             Transcript transcript = transcriptDomainRepository.getById(transcriptId);
-            CustomizeTable table = customizeTableDomainRepository.getById(transcript.tableId());
-            String response = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(table, transcript),
+            String response = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(transcript),
                     SCHEMA_NAME, schema);
             List<TranscriptLine> refined = refinedTextMerger.merge(transcript.lines(), readRefinedTexts(response));
             transcriptDomainRepository.refine(transcriptId, refined);
@@ -70,7 +65,8 @@ public class TranscriptRefiner {
         }
     }
 
-    private String buildUserPrompt(CustomizeTable table, Transcript transcript) {
+    private String buildUserPrompt(Transcript transcript) {
+        TranscriptTableSnapshot table = transcript.table();
         String lines = transcript.lines().stream()
                 .map(this::formatLine)
                 .collect(Collectors.joining("\n"));
@@ -81,7 +77,13 @@ public class TranscriptRefiner {
                 
                 속기록:
                 %s
-                """.formatted(table.getAgenda(), table.getProsTeamName(), table.getConsTeamName(), lines);
+                """.formatted(orEmpty(table.agenda()), orEmpty(table.prosTeamName()), orEmpty(table.consTeamName()),
+                lines);
+    }
+
+    // 속기록을 만들 때 저장한 시간표 정보를 쓰고, 비어 있으면 빈 값으로 둔다.
+    private String orEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private String formatLine(TranscriptLine line) {

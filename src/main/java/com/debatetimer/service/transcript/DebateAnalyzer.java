@@ -1,11 +1,10 @@
 package com.debatetimer.service.transcript;
 
 import com.debatetimer.client.llm.OpenAiClient;
-import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
-import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,19 +31,16 @@ public class DebateAnalyzer {
 
     private final OpenAiClient openAiClient;
     private final TranscriptDomainRepository transcriptDomainRepository;
-    private final CustomizeTableDomainRepository customizeTableDomainRepository;
     private final String systemPrompt;
     private final Map<String, Object> schema;
 
     public DebateAnalyzer(
             OpenAiClient openAiClient,
             TranscriptDomainRepository transcriptDomainRepository,
-            CustomizeTableDomainRepository customizeTableDomainRepository,
             ObjectMapper objectMapper
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
-        this.customizeTableDomainRepository = customizeTableDomainRepository;
         this.systemPrompt = readResource("prompt/debate-analysis-system.txt");
         this.schema = readSchema(objectMapper);
     }
@@ -52,8 +48,7 @@ public class DebateAnalyzer {
     public void analyze(long transcriptId) {
         try {
             Transcript transcript = transcriptDomainRepository.getById(transcriptId);
-            CustomizeTable table = customizeTableDomainRepository.getById(transcript.tableId());
-            String report = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(table, transcript),
+            String report = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(transcript),
                     SCHEMA_NAME, schema);
             transcriptDomainRepository.complete(transcriptId, report);
         } catch (RuntimeException exception) {
@@ -62,7 +57,8 @@ public class DebateAnalyzer {
         }
     }
 
-    private String buildUserPrompt(CustomizeTable table, Transcript transcript) {
+    private String buildUserPrompt(Transcript transcript) {
+        TranscriptTableSnapshot table = transcript.table();
         String lines = transcript.lines().stream()
                 .map(this::formatLine)
                 .collect(Collectors.joining("\n"));
@@ -73,7 +69,13 @@ public class DebateAnalyzer {
                 
                 속기록:
                 %s
-                """.formatted(table.getAgenda(), table.getProsTeamName(), table.getConsTeamName(), lines);
+                """.formatted(orEmpty(table.agenda()), orEmpty(table.prosTeamName()), orEmpty(table.consTeamName()),
+                lines);
+    }
+
+    // 속기록을 만들 때 저장한 시간표 정보를 쓰고, 비어 있으면 빈 값으로 둔다.
+    private String orEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private String formatLine(TranscriptLine line) {

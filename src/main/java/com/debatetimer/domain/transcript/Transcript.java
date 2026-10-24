@@ -7,6 +7,7 @@ public record Transcript(
         Long id,
         long tableId,
         long memberId,
+        TranscriptTableSnapshot table,
         TranscriptStatus status,
         SttMode sttMode,
         // AI가 STT 원문을 다듬는 중이면 true. 다듬기가 끝나거나 실패하면 false가 된다.

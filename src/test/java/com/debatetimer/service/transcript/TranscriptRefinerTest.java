@@ -15,6 +15,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.service.BaseServiceTest;
@@ -43,7 +44,8 @@ class TranscriptRefinerTest extends BaseServiceTest {
     private Transcript savedTranscript() {
         Member member = memberGenerator.generate("email@email.com");
         CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
-        return transcriptDomainRepository.create(table.getId(), member.getId(), SttMode.RPC, RAW_LINES);
+        return transcriptDomainRepository.create(table.getId(), member.getId(),
+                TranscriptTableSnapshot.from(table.toDomain()), SttMode.RPC, RAW_LINES);
     }
 
     @Test

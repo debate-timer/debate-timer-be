@@ -6,6 +6,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.transcript.SpeakerSeparator;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
+import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
@@ -13,11 +14,6 @@ import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
-import com.debatetimer.entity.customize.CustomizeTableEntity;
-import com.debatetimer.repository.customize.CustomizeTableRepository;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import com.debatetimer.event.transcript.TranscriptCreatedEvent;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -38,7 +34,6 @@ public class TranscriptService {
 
     private final CustomizeTableDomainRepository customizeTableDomainRepository;
     private final TranscriptDomainRepository transcriptDomainRepository;
-    private final CustomizeTableRepository customizeTableRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
     private final SpeakerSeparator speakerSeparator = new SpeakerSeparator();
@@ -54,7 +49,7 @@ public class TranscriptService {
         }
 
         Transcript transcript = transcriptDomainRepository.create(table.getId(), member.getId(),
-                request.resolveSttMode(), lines);
+                TranscriptTableSnapshot.from(table), request.resolveSttMode(), lines);
         eventPublisher.publishEvent(new TranscriptCreatedEvent(transcript.id()));
         return new TranscriptCreateResponse(transcript.id());
     }
@@ -62,18 +57,14 @@ public class TranscriptService {
     @Transactional(readOnly = true)
     public TranscriptResponse get(long transcriptId, Member member) {
         Transcript transcript = transcriptDomainRepository.getByIdAndMemberId(transcriptId, member.getId());
-        CustomizeTable table = customizeTableDomainRepository.getById(transcript.tableId());
-        return new TranscriptResponse(transcript, table, readReport(transcript));
+        return new TranscriptResponse(transcript, readReport(transcript));
     }
 
     @Transactional(readOnly = true)
     public TranscriptSummaryResponses findAll(Member member) {
-        Map<Long, CustomizeTable> tables = customizeTableRepository.findAllByMember(member).stream()
-                .map(CustomizeTableEntity::toDomain)
-                .collect(Collectors.toMap(CustomizeTable::getId, Function.identity()));
         List<TranscriptSummaryResponse> transcripts = transcriptDomainRepository.findSummariesByMemberId(member.getId())
                 .stream()
-                .map(summary -> new TranscriptSummaryResponse(summary, tables.get(summary.tableId())))
+                .map(TranscriptSummaryResponse::new)
                 .toList();
         return new TranscriptSummaryResponses(transcripts);
     }
