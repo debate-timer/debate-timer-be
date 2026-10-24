@@ -13,15 +13,21 @@ import com.debatetimer.domain.transcript.SpeechToken;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.dto.transcript.response.SpeechTranscribeResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+@ExtendWith(OutputCaptureExtension.class)
 class SpeechTranscribeServiceTest extends BaseServiceTest {
 
     private static final MockMultipartFile AUDIO = new MockMultipartFile("audio", "segment.webm", "audio/webm",
@@ -69,6 +75,20 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.EMPTY_AUDIO.getMessage());
             verifyNoInteractions(sonioxClient);
+        }
+
+        @Test
+        void 전사에_실패하면_오디오_이름_형식_크기를_로그에_남기고_예외를_그대로_던진다(CapturedOutput output) {
+            when(sonioxClient.transcribe(any(), any()))
+                    .thenThrow(new DTServerErrorException(ServerErrorCode.STT_REQUEST_FAILED));
+
+            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(AUDIO, "ko-KR"))
+                    .isInstanceOf(DTServerErrorException.class)
+                    .hasMessage(ServerErrorCode.STT_REQUEST_FAILED.getMessage());
+            assertThat(output.getAll())
+                    .contains("segment.webm")
+                    .contains("audio/webm")
+                    .contains("size=3");
         }
     }
 }
