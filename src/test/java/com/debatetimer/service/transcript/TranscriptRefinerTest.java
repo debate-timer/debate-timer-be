@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,15 +73,36 @@ class TranscriptRefinerTest extends BaseServiceTest {
     }
 
     @Test
-    void 주제와_번호_화자를_붙여_원문을_전달한다() {
+    void 문장과_발언_맥락을_나눈_JSON으로_원문을_전달한다() {
         Transcript transcript = savedTranscript();
         when(openAiClient.requestStructuredOutput(anyString(), anyString(), anyString(), anyMap()))
                 .thenReturn("{\"lines\":[]}");
 
         transcriptRefiner.refine(transcript.id());
 
-        verify(openAiClient).requestStructuredOutput(anyString(),
-                contains("[2] 입론 | 반대 비토: 채찍 pt는 위험합니다"), anyString(), any());
+        verify(openAiClient).requestStructuredOutput(anyString(), argThat(prompt -> prompt.contains(
+                        "{\"index\":2,\"speechType\":\"입론\",\"team\":\"반대\",\"speaker\":\"비토\",\"text\":\"채찍 pt는 위험합니다\"}")
+                        && !prompt.contains("입론 | 반대")),
+                anyString(), any());
+    }
+
+    @Test
+    void AI가_발언_유형과_진영_머리말을_붙여_돌려줘도_문장만_저장한다() {
+        Transcript transcript = savedTranscript();
+        when(openAiClient.requestStructuredOutput(anyString(), anyString(), anyString(), anyMap()))
+                .thenReturn("""
+                        {"lines":[
+                          {"index":0,"text":"입론 | 찬성 콜리: 안녕하십니까, 찬성 측 콜리입니다."},
+                          {"index":1,"text":"입론 | 찬성: 어..."},
+                          {"index":2,"text":"[2] 입론 | 반대 비토: ChatGPT는 위험합니다."}
+                        ]}
+                        """);
+
+        transcriptRefiner.refine(transcript.id());
+
+        Transcript refined = transcriptDomainRepository.getById(transcript.id());
+        assertThat(refined.lines()).extracting(TranscriptLine::text)
+                .containsExactly("안녕하십니까, 찬성 측 콜리입니다.", "어...", "ChatGPT는 위험합니다.");
     }
 
     @Test
