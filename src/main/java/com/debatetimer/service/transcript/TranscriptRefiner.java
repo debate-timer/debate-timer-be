@@ -16,6 +16,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Service;
 public class TranscriptRefiner {
 
     private static final String SCHEMA_NAME = "transcript_refinement";
+    private static final Pattern ECHOED_PREFIX = Pattern.compile(
+            "^\\s*(\\[\\d+]\\s*)?[^|\\n]{1,30}?\\s*\\|\\s*(찬성|반대|중립)[^:\\n]{0,30}:\\s*");
     private static final TypeReference<Map<String, Object>> SCHEMA_TYPE = new TypeReference<>() {
     };
 
@@ -65,17 +68,20 @@ public class TranscriptRefiner {
         }
     }
 
-    private String buildUserPrompt(Transcript transcript) {
+    // 문장(text)과 맥락(발언 유형·진영·화자)을 필드로 나눠 보내, AI가 맥락을 문장에 붙여 돌려주지 않게 한다.
+    private String buildUserPrompt(Transcript transcript) throws JsonProcessingException {
         TranscriptTableSnapshot table = transcript.table();
-        String lines = transcript.lines().stream()
-                .map(this::formatLine)
-                .collect(Collectors.joining("\n"));
+        List<LinePayload> payload = transcript.lines().stream()
+                .map(line -> new LinePayload(line.index(), line.speechType(), stanceLabel(line.stance()),
+                        line.speaker(), line.text()))
+                .toList();
+        String lines = objectMapper.writeValueAsString(payload);
         return """
                 토론 주제: %s
                 찬성 팀: %s
                 반대 팀: %s
                 
-                속기록:
+                속기록(JSON 배열):
                 %s
                 """.formatted(orEmpty(table.agenda()), orEmpty(table.prosTeamName()), orEmpty(table.consTeamName()),
                 lines);
@@ -84,12 +90,6 @@ public class TranscriptRefiner {
     // 속기록을 만들 때 저장한 시간표 정보를 쓰고, 비어 있으면 빈 값으로 둔다.
     private String orEmpty(String value) {
         return value == null ? "" : value;
-    }
-
-    private String formatLine(TranscriptLine line) {
-        String speaker = line.speaker() == null || line.speaker().isBlank() ? "" : " " + line.speaker();
-        return "[%d] %s | %s%s: %s".formatted(line.index(), line.speechType(), stanceLabel(line.stance()), speaker,
-                line.text());
     }
 
     private String stanceLabel(Stance stance) {
@@ -107,7 +107,16 @@ public class TranscriptRefiner {
             return Map.of();
         }
         return refinement.lines().stream()
-                .collect(Collectors.toMap(RefinedLine::index, RefinedLine::text, (first, second) -> first));
+                .collect(Collectors.toMap(RefinedLine::index, line -> stripEchoedPrefix(line.text()),
+                        (first, second) -> first));
+    }
+
+    // AI가 "[2] 입론 | 반대 비토: "처럼 번호·발언 유형·진영·화자 머리말을 문장 앞에 붙여 돌려주면 지운다.
+    private String stripEchoedPrefix(String text) {
+        if (text == null) {
+            return null;
+        }
+        return ECHOED_PREFIX.matcher(text).replaceFirst("");
     }
 
     private Map<String, Object> readSchema() {
@@ -124,6 +133,9 @@ public class TranscriptRefiner {
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    record LinePayload(int index, String speechType, String team, String speaker, String text) {
     }
 
     record RefinementResponse(List<RefinedLine> lines) {
