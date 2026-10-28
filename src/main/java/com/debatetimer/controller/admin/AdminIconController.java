@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,12 +36,12 @@ public class AdminIconController {
     }
 
     @GetMapping("/api/admin/icons/download")
-    public ResponseEntity<byte[]> downloadIcons() {
+    public ResponseEntity<StreamingResponseBody> downloadIcons() {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/zip"))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment().filename(ICON_ZIP_FILE_NAME).build().toString())
-                .body(adminIconService.zipAll());
+                .body(adminIconService::writeZip);
     }
 
     @PostMapping(value = "/api/admin/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

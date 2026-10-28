@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -90,29 +91,14 @@ public class IconFileStorage {
     }
 
     /**
-     * 기본 아이콘과 업로드한 아이콘을 원본 그대로 모두 읽는다.
+     * 기본 아이콘과 업로드한 아이콘을 모두 찾는다. 내용은 읽지 않는다.
      */
     public List<IconFile> findAll() {
         return Stream.concat(
-                bundledFileNames.stream().map(this::readBundled),
-                findUploadedFileNames().stream().map(this::readUploaded)
+                bundledFileNames.stream()
+                        .map(fileName -> new IconFile(fileName, new ClassPathResource(BUNDLED_ICON_LOCATION + fileName))),
+                findUploadedFileNames().stream()
+                        .map(fileName -> new IconFile(fileName, new FileSystemResource(uploadDir.resolve(fileName))))
         ).toList();
-    }
-
-    private IconFile readBundled(String fileName) {
-        try {
-            byte[] content = new ClassPathResource(BUNDLED_ICON_LOCATION + fileName).getContentAsByteArray();
-            return new IconFile(fileName, content);
-        } catch (IOException exception) {
-            throw new DTServerErrorException(ServerErrorCode.ICON_STORAGE_ERROR);
-        }
-    }
-
-    private IconFile readUploaded(String fileName) {
-        try {
-            return new IconFile(fileName, Files.readAllBytes(uploadDir.resolve(fileName)));
-        } catch (IOException exception) {
-            throw new DTServerErrorException(ServerErrorCode.ICON_STORAGE_ERROR);
-        }
     }
 }

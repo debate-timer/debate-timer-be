@@ -28,6 +28,12 @@ class AdminIconControllerTest extends BaseControllerTest {
 
     private static final String PASSWORD = "test-admin-password";
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n', 0, 0};
+    private static final byte[] TRUNCATED_MULTIPART = ("""
+            --broken\r
+            Content-Disposition: form-data; name="file"; filename="icon.png"\r
+            Content-Type: image/png\r
+            \r
+            not closed""").getBytes();
 
     @Autowired
     private IconStorageProperties iconStorageProperties;
@@ -109,6 +115,25 @@ class AdminIconControllerTest extends BaseControllerTest {
                     .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .multiPart("file", "evil.svg", "<svg></svg>".getBytes(), "image/svg+xml")
                     .multiPart("name", "evil")
+                    .when().post("/api/admin/icons")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 어드민_비밀번호가_없으면_잘못된_multipart_요청도_인증_실패로_응답한다() {
+            given()
+                    .contentType("multipart/form-data; boundary=broken")
+                    .body(TRUNCATED_MULTIPART)
+                    .when().post("/api/admin/icons")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
+        }
+
+        @Test
+        void 잘못된_multipart_요청은_업로드할_수_없다() {
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType("multipart/form-data; boundary=broken")
+                    .body(TRUNCATED_MULTIPART)
                     .when().post("/api/admin/icons")
                     .then().statusCode(HttpStatus.BAD_REQUEST.value());
         }

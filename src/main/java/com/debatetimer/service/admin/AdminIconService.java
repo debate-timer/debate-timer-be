@@ -5,10 +5,9 @@ import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.domainrepository.organization.OrganizationIconDomainRepository;
 import com.debatetimer.dto.admin.IconResponse;
 import com.debatetimer.dto.admin.IconResponses;
-import com.debatetimer.exception.custom.DTServerErrorException;
-import com.debatetimer.exception.errorcode.ServerErrorCode;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -36,19 +35,19 @@ public class AdminIconService {
     }
 
     /**
-     * 모든 아이콘을 원본 그대로 하나의 ZIP 으로 묶는다.
+     * 모든 아이콘을 원본 그대로 하나의 ZIP 으로 묶어 출력 스트림에 쓴다.
+     * 아이콘을 하나씩 읽어 바로 쓰므로 전체 아이콘을 메모리에 올리지 않는다.
      */
-    public byte[] zipAll() {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try (ZipOutputStream zip = new ZipOutputStream(bytes)) {
-            for (IconFile file : organizationIconDomainRepository.findAllFiles()) {
-                zip.putNextEntry(new ZipEntry(file.fileName()));
-                zip.write(file.content());
-                zip.closeEntry();
+    public void writeZip(OutputStream output) throws IOException {
+        // 응답 스트림은 서블릿 컨테이너가 닫으므로 ZIP 은 마무리만 한다
+        ZipOutputStream zip = new ZipOutputStream(output);
+        for (IconFile file : organizationIconDomainRepository.findAllFiles()) {
+            zip.putNextEntry(new ZipEntry(file.fileName()));
+            try (InputStream content = file.open()) {
+                content.transferTo(zip);
             }
-        } catch (IOException exception) {
-            throw new DTServerErrorException(ServerErrorCode.ICON_STORAGE_ERROR);
+            zip.closeEntry();
         }
-        return bytes.toByteArray();
+        zip.finish();
     }
 }
