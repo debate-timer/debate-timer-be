@@ -19,7 +19,7 @@ class AdminStatsControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_맞으면_단위별_테이블_통계를_조회한다() {
             TableUsageStatsResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("unit", "WEEK")
                     .queryParam("from", "2026-10-01")
                     .queryParam("to", "2026-10-14")
@@ -33,7 +33,7 @@ class AdminStatsControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_틀리면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, "wrong-password")
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, "wrong-password")
                     .queryParam("unit", "DAY")
                     .queryParam("from", "2026-10-01")
                     .queryParam("to", "2026-10-07")
@@ -42,9 +42,38 @@ class AdminStatsControllerTest extends BaseControllerTest {
         }
 
         @Test
+        void 어드민_비밀번호가_없으면_필수_파라미터가_빠져도_인증_실패로_응답한다() {
+            given()
+                    .queryParam("unit", "DAY")
+                    .queryParam("from", "")
+                    .when().get("/api/admin/tables/stats")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
+        }
+
+        @Test
+        void 필수_파라미터가_비어_있으면_조회할_수_없다() {
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .queryParam("unit", "DAY")
+                    .queryParam("from", "")
+                    .queryParam("to", "2026-10-07")
+                    .when().get("/api/admin/tables/stats")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 필수_파라미터가_없으면_조회할_수_없다() {
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .queryParam("unit", "DAY")
+                    .when().get("/api/admin/tables/stats")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
         void 집계_단위가_잘못되면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("unit", "YEAR")
                     .queryParam("from", "2026-10-01")
                     .queryParam("to", "2026-10-07")
@@ -59,7 +88,7 @@ class AdminStatsControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_맞으면_단위별_회원_통계를_조회한다() {
             MemberSignupStatsResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("unit", "MONTH")
                     .queryParam("from", "2026-01-01")
                     .queryParam("to", "2026-12-31")

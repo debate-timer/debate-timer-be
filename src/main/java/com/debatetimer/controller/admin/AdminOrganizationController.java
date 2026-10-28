@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,36 +20,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminOrganizationController {
 
-    private final AdminAuthorizer adminAuthorizer;
     private final AdminOrganizationService adminOrganizationService;
 
     @GetMapping("/api/admin/organizations")
     @ResponseStatus(HttpStatus.OK)
-    public AdminOrganizationsResponse getOrganizations(
-            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password
-    ) {
-        adminAuthorizer.authorize(password);
+    public AdminOrganizationsResponse getOrganizations() {
         return adminOrganizationService.findAll();
     }
 
     @PostMapping("/api/admin/organizations")
     @ResponseStatus(HttpStatus.CREATED)
     public AdminOrganizationResponse createOrganization(
-            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password,
             @Valid @RequestBody OrganizationCreateRequest request
     ) {
-        adminAuthorizer.authorize(password);
         return adminOrganizationService.create(request);
     }
 
     @PostMapping("/api/admin/organizations/{organizationId}/templates")
     @ResponseStatus(HttpStatus.CREATED)
     public AdminOrganizationTemplateResponse createTemplate(
-            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password,
             @PathVariable long organizationId,
             @Valid @RequestBody OrganizationTemplateCreateRequest request
     ) {
-        adminAuthorizer.authorize(password);
         return adminOrganizationService.createTemplate(organizationId, request);
     }
 }

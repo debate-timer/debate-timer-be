@@ -8,11 +8,16 @@ import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.dto.admin.IconResponse;
 import com.debatetimer.dto.admin.IconResponses;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,7 +43,7 @@ class AdminIconControllerTest extends BaseControllerTest {
 
     private IconResponse upload(String name) {
         return given()
-                .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                 .multiPart("file", "original.png", PNG, "image/png")
                 .multiPart("name", name)
                 .when().post("/api/admin/icons")
@@ -69,7 +74,7 @@ class AdminIconControllerTest extends BaseControllerTest {
             upload("duplicated");
 
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .multiPart("file", "original.png", PNG, "image/png")
                     .multiPart("name", "duplicated")
                     .when().post("/api/admin/icons")
@@ -79,7 +84,7 @@ class AdminIconControllerTest extends BaseControllerTest {
         @Test
         void 기본_아이콘과_같은_이름이면_업로드할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .multiPart("file", "original.png", PNG, "image/png")
                     .multiPart("name", "ceda")
                     .when().post("/api/admin/icons")
@@ -91,7 +96,7 @@ class AdminIconControllerTest extends BaseControllerTest {
             byte[] largePng = Arrays.copyOf(PNG, OrganizationIcon.MAX_SIZE_BYTES + 1);
 
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .multiPart("file", "large.png", largePng, "image/png")
                     .multiPart("name", "large")
                     .when().post("/api/admin/icons")
@@ -101,7 +106,7 @@ class AdminIconControllerTest extends BaseControllerTest {
         @Test
         void 이미지가_아니면_업로드할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .multiPart("file", "evil.svg", "<svg></svg>".getBytes(), "image/svg+xml")
                     .multiPart("name", "evil")
                     .when().post("/api/admin/icons")
@@ -125,7 +130,7 @@ class AdminIconControllerTest extends BaseControllerTest {
             upload("uploaded_icon");
 
             IconResponses response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .when().get("/api/admin/icons")
                     .then().statusCode(HttpStatus.OK.value())
                     .extract().as(IconResponses.class);
@@ -134,6 +139,47 @@ class AdminIconControllerTest extends BaseControllerTest {
                     new IconResponse("/icon/ceda.png", false),
                     new IconResponse("/icon/uploaded_icon.png", true)
             );
+        }
+    }
+
+    @Nested
+    class DownloadIcons {
+
+        @Test
+        void 기본_아이콘과_업로드한_아이콘을_원본_그대로_ZIP으로_내려받는다() throws IOException {
+            upload("zipped_icon");
+
+            byte[] zip = given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .when().get("/api/admin/icons/download")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .contentType("application/zip")
+                    .header("Content-Disposition", "attachment; filename=\"organization-icons.zip\"")
+                    .extract().asByteArray();
+
+            Map<String, byte[]> entries = unzip(zip);
+            assertAll(
+                    () -> assertThat(entries).containsKey("ceda.png"),
+                    () -> assertThat(entries.get("zipped_icon.png")).isEqualTo(PNG)
+            );
+        }
+
+        @Test
+        void 어드민_비밀번호가_없으면_내려받을_수_없다() {
+            given()
+                    .when().get("/api/admin/icons/download")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
+        }
+
+        private Map<String, byte[]> unzip(byte[] zip) throws IOException {
+            Map<String, byte[]> entries = new HashMap<>();
+            try (ZipInputStream input = new ZipInputStream(new ByteArrayInputStream(zip))) {
+                ZipEntry entry;
+                while ((entry = input.getNextEntry()) != null) {
+                    entries.put(entry.getName(), input.readAllBytes());
+                }
+            }
+            return entries;
         }
     }
 }

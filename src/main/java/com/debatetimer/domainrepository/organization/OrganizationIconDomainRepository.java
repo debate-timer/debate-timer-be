@@ -1,5 +1,6 @@
 package com.debatetimer.domainrepository.organization;
 
+import com.debatetimer.client.storage.IconFile;
 import com.debatetimer.client.storage.IconFileStorage;
 import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -20,6 +21,10 @@ public class OrganizationIconDomainRepository {
 
     public List<String> findUploadedPaths() {
         return toPaths(iconFileStorage.findUploadedFileNames());
+    }
+
+    public List<IconFile> findAllFiles() {
+        return iconFileStorage.findAll();
     }
 
     private List<String> toPaths(List<String> fileNames) {

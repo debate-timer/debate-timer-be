@@ -18,7 +18,7 @@ class AdminSharingControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_맞으면_기간별_통계를_조회한다() {
             SharingStatsResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("from", "2026-10-01")
                     .queryParam("to", "2026-10-07")
                     .when().get("/api/admin/sharing/stats")
@@ -31,7 +31,7 @@ class AdminSharingControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_틀리면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, "wrong-password")
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, "wrong-password")
                     .queryParam("from", "2026-10-01")
                     .queryParam("to", "2026-10-07")
                     .when().get("/api/admin/sharing/stats")
@@ -50,7 +50,7 @@ class AdminSharingControllerTest extends BaseControllerTest {
         @Test
         void 조회_기간이_잘못되면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("from", "2026-10-07")
                     .queryParam("to", "2026-10-01")
                     .when().get("/api/admin/sharing/stats")
