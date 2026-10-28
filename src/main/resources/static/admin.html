@@ -101,6 +101,8 @@
         .error { color: var(--error); font-size: 13px; min-height: 18px; margin-top: 8px; }
         .success { color: var(--success); }
         .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+        .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+        .panel-head h2 { margin: 0; }
         .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
         .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
         .stat .label { font-size: 12px; color: var(--muted); }
@@ -307,11 +309,14 @@
         <!-- 단체 · 템플릿 -->
         <section id="tab-organizations" class="tab hidden">
             <div class="panel">
-                <h2>단체 목록</h2>
+                <div class="panel-head">
+                    <h2>단체 목록</h2>
+                    <button type="button" class="secondary small" id="icons-download">아이콘 전체 ZIP 다운로드</button>
+                </div>
                 <div class="table-wrap">
                     <table class="data">
                         <thead>
-                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>아이콘 경로</th><th>템플릿</th></tr>
+                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>아이콘 경로</th><th>템플릿</th><th>원본</th></tr>
                         </thead>
                         <tbody id="organizations-body"></tbody>
                     </table>
@@ -945,13 +950,19 @@
                 el('td', { class: 'wrap' }, organization.affiliation || '-'),
                 el('td', {}, organization.language),
                 el('td', {}, organization.iconPath),
-                el('td', { class: 'num' }, `${organization.templates.length}개`));
+                el('td', { class: 'num' }, `${organization.templates.length}개`),
+                el('td', {}, el('button', {
+                    type: 'button', class: 'secondary small', onclick: (event) => {
+                        event.stopPropagation();
+                        whilePending(event.currentTarget, () => downloadIcon(organization.iconPath));
+                    },
+                }, '다운로드')));
             if (!expanded) return [row];
             const templateRows = organization.templates.length
                 ? organization.templates.map((template) => el('tr', { class: 'templates-row' },
                     el('td', {}), el('td', { class: 'num' }, template.id),
                     el('td', { colspan: 4, class: 'wrap' }, template.name),
-                    el('td', { colspan: 2 }, el('button', {
+                    el('td', { colspan: 3 }, el('button', {
                         type: 'button', class: 'secondary small', onclick: () => {
                             try {
                                 previewTemplate(template.data, [['단체', organization.name], ['템플릿 ID', template.id]]);
@@ -960,17 +971,57 @@
                             }
                         },
                     }, '미리보기'))))
-                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 8, class: 'empty' }, '템플릿이 없습니다.'))];
+                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 9, class: 'empty' }, '템플릿이 없습니다.'))];
             return [row, ...templateRows];
         });
         $('organizations-body').replaceChildren(...(rows.length ? rows
-            : [el('tr', {}, el('td', { colspan: 8, class: 'empty' }, '단체가 없습니다.'))]));
+            : [el('tr', {}, el('td', { colspan: 9, class: 'empty' }, '단체가 없습니다.'))]));
 
         const select = $('tpl-organization');
         const previous = select.value;
         select.replaceChildren(...state.organizations.map((organization) =>
             el('option', { value: organization.id }, `${organization.name} (${organization.language})`)));
         if (previous) select.value = previous;
+    }
+
+    // ---------- 아이콘 다운로드 ----------
+    function saveBlob(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const link = el('a', { href: url, download: fileName });
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    // 화면에 축소돼 보이는 아이콘을 원본 파일 그대로 저장한다
+    async function downloadIcon(iconPath) {
+        $('organizations-error').textContent = '';
+        try {
+            const response = await fetch(iconPath);
+            if (!response.ok) throw new Error(`아이콘을 내려받지 못했습니다 (${response.status})`);
+            saveBlob(await response.blob(), iconPath.split('/').pop() || 'icon');
+        } catch (error) {
+            $('organizations-error').textContent = error.message;
+        }
+    }
+
+    async function downloadAllIcons() {
+        $('organizations-error').textContent = '';
+        try {
+            const response = await fetch('/api/admin/icons/download', { headers: { 'X-Admin-Password': currentPassword } });
+            if (response.status === 401) {
+                logout('비밀번호가 올바르지 않습니다.');
+                return;
+            }
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({}));
+                throw new Error(body.message || `ZIP 다운로드에 실패했습니다 (${response.status})`);
+            }
+            saveBlob(await response.blob(), 'organization-icons.zip');
+        } catch (error) {
+            $('organizations-error').textContent = error.message;
+        }
     }
 
     function setMessage(id, message, success = false) {
@@ -1089,6 +1140,7 @@
     $('tpl-load').addEventListener('click', loadTemplateFromTable);
     $('org-icon').addEventListener('change', updateIconPreview);
     $('icon-upload').addEventListener('click', () => whilePending($('icon-upload'), uploadIcon));
+    $('icons-download').addEventListener('click', () => whilePending($('icons-download'), downloadAllIcons));
     $('icon-file').addEventListener('change', () => {
         const file = $('icon-file').files[0];
         if (file && !$('icon-name').value) $('icon-name').value = toIconName(file.name);

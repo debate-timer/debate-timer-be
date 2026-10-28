@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -22,7 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class IconFileStorage {
 
-    private static final String BUNDLED_ICON_PATTERN = "classpath:/static/icon/*";
+    private static final String BUNDLED_ICON_LOCATION = "static/icon/";
+    private static final String BUNDLED_ICON_PATTERN = "classpath:/" + BUNDLED_ICON_LOCATION + "*";
 
     private final Path uploadDir;
     private final List<String> bundledFileNames;
@@ -85,5 +88,17 @@ public class IconFileStorage {
         } catch (IOException exception) {
             throw new DTServerErrorException(ServerErrorCode.ICON_STORAGE_ERROR);
         }
+    }
+
+    /**
+     * 기본 아이콘과 업로드한 아이콘을 모두 찾는다. 내용은 읽지 않는다.
+     */
+    public List<IconFile> findAll() {
+        return Stream.concat(
+                bundledFileNames.stream()
+                        .map(fileName -> new IconFile(fileName, new ClassPathResource(BUNDLED_ICON_LOCATION + fileName))),
+                findUploadedFileNames().stream()
+                        .map(fileName -> new IconFile(fileName, new FileSystemResource(uploadDir.resolve(fileName))))
+        ).toList();
     }
 }

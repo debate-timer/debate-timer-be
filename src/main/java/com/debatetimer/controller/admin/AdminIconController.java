@@ -7,41 +7,49 @@ import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.debatetimer.service.admin.AdminIconService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequiredArgsConstructor
 public class AdminIconController {
 
-    private final AdminAuthorizer adminAuthorizer;
+    private static final String ICON_ZIP_FILE_NAME = "organization-icons.zip";
+
     private final AdminIconService adminIconService;
 
     @GetMapping("/api/admin/icons")
     @ResponseStatus(HttpStatus.OK)
-    public IconResponses getIcons(
-            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password
-    ) {
-        adminAuthorizer.authorize(password);
+    public IconResponses getIcons() {
         return adminIconService.findAll();
+    }
+
+    @GetMapping("/api/admin/icons/download")
+    public ResponseEntity<StreamingResponseBody> downloadIcons() {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(ICON_ZIP_FILE_NAME).build().toString())
+                .body(adminIconService::writeZip);
     }
 
     @PostMapping(value = "/api/admin/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public IconResponse uploadIcon(
-            @RequestHeader(name = AdminSharingController.ADMIN_PASSWORD_HEADER, required = false) String password,
             @RequestPart("file") MultipartFile file,
             @RequestParam(name = "name", required = false) String name
     ) {
-        adminAuthorizer.authorize(password);
         String fileName = (name == null || name.isBlank()) ? file.getOriginalFilename() : name;
         return adminIconService.upload(fileName, readBytes(file));
     }

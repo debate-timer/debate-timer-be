@@ -26,7 +26,7 @@ class AdminTableControllerTest extends BaseControllerTest {
             customizeTableEntityGenerator.generate(member);
 
             AdminTablePageResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("sort", "USED_AT")
                     .queryParam("page", 0)
                     .queryParam("size", 1)
@@ -40,7 +40,7 @@ class AdminTableControllerTest extends BaseControllerTest {
         @Test
         void 정렬_기준이_잘못되면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .queryParam("sort", "NAME")
                     .when().get("/api/admin/tables")
                     .then().statusCode(HttpStatus.BAD_REQUEST.value());
@@ -49,7 +49,7 @@ class AdminTableControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_틀리면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, "wrong-password")
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, "wrong-password")
                     .when().get("/api/admin/tables")
                     .then().statusCode(HttpStatus.UNAUTHORIZED.value());
         }
@@ -65,7 +65,7 @@ class AdminTableControllerTest extends BaseControllerTest {
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
 
             AdminTableDetailResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .pathParam("tableId", table.getId())
                     .when().get("/api/admin/tables/{tableId}")
                     .then().statusCode(HttpStatus.OK.value())
