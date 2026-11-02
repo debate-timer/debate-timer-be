@@ -89,9 +89,10 @@ class SonioxClientTest {
         server.expect(requestTo(BASE_URL + "/transcriptions/tr-1"))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
-        server.expect(requestTo(BASE_URL + "/files/file-1"))
-                .andExpect(method(HttpMethod.DELETE))
-                .andRespond(withSuccess());
+        // TODO(#294): 유저 테스트 동안 업로드 파일은 지우지 않는다. 기대하지 않은 DELETE /files 요청이 오면 테스트가 실패한다.
+        // server.expect(requestTo(BASE_URL + "/files/file-1"))
+        //         .andExpect(method(HttpMethod.DELETE))
+        //         .andRespond(withSuccess());
     }
 
     @Nested

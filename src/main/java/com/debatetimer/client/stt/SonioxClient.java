@@ -176,9 +176,10 @@ public class SonioxClient {
         if (transcriptionId != null) {
             delete("/transcriptions/{id}", transcriptionId);
         }
-        if (fileId != null) {
-            delete("/files/{id}", fileId);
-        }
+        // TODO(#294): 유저 테스트 동안 업로드한 오디오를 Soniox 콘솔에서 확인하려고 파일 삭제를 멈춘다. 테스트가 끝나면 되돌린다.
+        // if (fileId != null) {
+        //     delete("/files/{id}", fileId);
+        // }
     }
 
     private void delete(String uri, String id) {
