@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -24,6 +25,7 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -155,6 +157,30 @@ class SttAudioStorageTest {
             storage.save(MEMBER_ID, "a".repeat(65), AUDIO);
 
             verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        }
+
+        @Test
+        void 오디오를_읽다가_예상하지_못한_예외가_나도_던지지_않고_대기_용량을_돌려받는다() throws IOException {
+            MultipartFile broken = mock(MultipartFile.class);
+            when(broken.getSize()).thenReturn(3L);
+            when(broken.getBytes()).thenThrow(new IllegalStateException("broken"));
+
+            assertThatCode(() -> storage.save(MEMBER_ID, SESSION_ID, broken)).doesNotThrowAnyException();
+            storage.save(MEMBER_ID, SESSION_ID, AUDIO);
+
+            verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        }
+
+        @Test
+        void 업로드_중_SDK_외의_예외가_나도_던지지_않고_대기_용량을_돌려받는다() {
+            when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+                    .thenThrow(new IllegalStateException("unexpected"))
+                    .thenReturn(null);
+
+            assertThatCode(() -> storage.save(MEMBER_ID, SESSION_ID, AUDIO)).doesNotThrowAnyException();
+            storage.save(MEMBER_ID, SESSION_ID, AUDIO);
+
+            verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
         }
     }
 }

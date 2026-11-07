@@ -16,7 +16,6 @@ import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -55,10 +54,21 @@ public class SttAudioStorage {
      * 업로드는 요청이 끝난 뒤에 이뤄지므로 multipart 임시 파일 대신 읽어 둔 bytes를 넘긴다.
      */
     public void save(long memberId, @Nullable String sessionId, MultipartFile audio) {
+        // 보관은 부가 기능이라 예상하지 못한 예외도 전사 요청으로 넘기지 않는다.
+        try {
+            saveIfPossible(memberId, sessionId, audio);
+        } catch (RuntimeException exception) {
+            log.warn("STT 오디오 보관 중 예상하지 못한 오류가 나 보관하지 않습니다. memberId={}, sessionId={}",
+                    memberId, sessionId, exception);
+        }
+    }
+
+    private void saveIfPossible(long memberId, @Nullable String sessionId, MultipartFile audio) {
         if (s3Client == null || !isValidSessionId(memberId, sessionId)) {
             return;
         }
         long size = audio.getSize();
+        // 요청 스레드에서 bytes를 읽기 전에 대기 용량부터 잡아, 밀려 있을 때는 큰 오디오를 힙에 올리지 않는다.
         if (pendingBytes.addAndGet(size) > maxPendingBytes) {
             pendingBytes.addAndGet(-size);
             log.warn("업로드를 기다리는 STT 오디오가 많아 보관하지 않습니다. memberId={}, sessionId={}, size={}",
@@ -72,6 +82,9 @@ public class SttAudioStorage {
         } catch (IOException exception) {
             pendingBytes.addAndGet(-size);
             log.warn("STT 오디오를 읽지 못해 보관하지 않습니다. memberId={}, sessionId={}", memberId, sessionId, exception);
+        } catch (RuntimeException exception) {
+            pendingBytes.addAndGet(-size);
+            throw exception;
         }
     }
 
@@ -111,9 +124,10 @@ public class SttAudioStorage {
                 .key(key)
                 .contentType(audio.contentType())
                 .build();
+        // 업로드 스레드에서 난 예외는 기록만 남긴다. SDK 예외 외의 오류로 스레드가 죽지 않게 함께 잡는다.
         try {
             s3Client.putObject(request, RequestBody.fromBytes(audio.content()));
-        } catch (SdkException exception) {
+        } catch (RuntimeException exception) {
             log.warn("STT 오디오를 S3에 저장하지 못했습니다. key={}, size={}", key, audio.content().length, exception);
         }
     }
