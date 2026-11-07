@@ -18,6 +18,7 @@ import com.debatetimer.service.poll.PollService;
 import com.debatetimer.service.poll.VoteService;
 import com.debatetimer.service.sharing.SharingService;
 import com.debatetimer.service.transcript.SpeechTranscribeService;
+import com.debatetimer.service.transcript.TranscriptService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -82,6 +83,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected SpeechTranscribeService speechTranscribeService;
+
+    @MockitoBean
+    protected TranscriptService transcriptService;
 
     @MockitoBean
     protected AuthManager authManager;
