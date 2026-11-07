@@ -16,6 +16,7 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.dto.transcript.response.SpeechTranscribeResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -111,6 +112,23 @@ public class SpeechTranscribeDocumentTest extends BaseDocumentTest {
                     .multiPart("language", "ko-KR")
                     .when().post("/api/stt/soniox")
                     .then().statusCode(errorCode.getStatus().value());
+        }
+
+        @Test
+        void 발언_구간_오디오_전사_권한_없음() {
+            doThrow(new DTClientErrorException(ClientErrorCode.FEATURE_NOT_ALLOWED)).when(authService)
+                    .authorizeFeatureFlag(any(), eq(FeatureFlag.TRANSCRIPT));
+
+            var document = document("stt/soniox", ClientErrorCode.FEATURE_NOT_ALLOWED)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .multiPart("audio", "segment.webm", AUDIO, "audio/webm")
+                    .when().post("/api/stt/soniox")
+                    .then().statusCode(403);
         }
     }
 }

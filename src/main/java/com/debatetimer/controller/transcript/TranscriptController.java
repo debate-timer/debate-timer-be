@@ -1,6 +1,7 @@
 package com.debatetimer.controller.transcript;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
@@ -26,7 +27,7 @@ public class TranscriptController {
     @PostMapping("/api/transcripts/{tableId}")
     @ResponseStatus(HttpStatus.CREATED)
     public TranscriptCreateResponse createTranscript(
-            @AuthMember Member member,
+            @AuthMember(requires = FeatureFlag.TRANSCRIPT) Member member,
             @PathVariable(name = "tableId") long tableId,
             @RequestBody @Valid TranscriptCreateRequest request
     ) {
@@ -35,14 +36,14 @@ public class TranscriptController {
 
     @GetMapping("/api/transcripts")
     @ResponseStatus(HttpStatus.OK)
-    public TranscriptSummaryResponses getTranscripts(@AuthMember Member member) {
+    public TranscriptSummaryResponses getTranscripts(@AuthMember(requires = FeatureFlag.TRANSCRIPT) Member member) {
         return transcriptService.findAll(member);
     }
 
     @GetMapping("/api/transcripts/{transcriptId}")
     @ResponseStatus(HttpStatus.OK)
     public TranscriptResponse getTranscript(
-            @AuthMember Member member,
+            @AuthMember(requires = FeatureFlag.TRANSCRIPT) Member member,
             @PathVariable(name = "transcriptId") long transcriptId
     ) {
         return transcriptService.get(transcriptId, member);

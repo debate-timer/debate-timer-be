@@ -1,6 +1,7 @@
 package com.debatetimer.controller.transcript;
 
 import com.debatetimer.controller.auth.AuthMember;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.transcript.response.SpeechTranscribeResponse;
 import com.debatetimer.service.transcript.SpeechTranscribeService;
@@ -24,7 +25,7 @@ public class SpeechTranscribeController {
     @PostMapping(value = "/api/stt/soniox", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public SpeechTranscribeResponse transcribeWithSoniox(
-            @AuthMember Member member,
+            @AuthMember(requires = FeatureFlag.TRANSCRIPT) Member member,
             @RequestPart("audio") MultipartFile audio,
             @RequestParam(name = "sessionId", required = false) String sessionId,
             @RequestParam(name = "language", required = false) String language

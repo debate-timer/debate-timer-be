@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.customize.CustomizeBoxType;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentRequest;
@@ -26,6 +27,12 @@ class TranscriptControllerTest extends BaseControllerTest {
     @MockitoBean
     private OpenAiClient openAiClient;
 
+    private Member generateTranscriptMember(String email) {
+        Member member = memberGenerator.generate(email);
+        memberFeatureFlagEntityGenerator.generate(member, FeatureFlag.TRANSCRIPT);
+        return member;
+    }
+
     private TranscriptCreateResponse createTranscript(Member member, CustomizeTableEntity table) {
         TranscriptCreateRequest request = new TranscriptCreateRequest(List.of(
                 new SegmentRequest(0, null, List.of(new UtteranceRequest(1_000L, "찬성 입론입니다.")))
@@ -45,7 +52,7 @@ class TranscriptControllerTest extends BaseControllerTest {
 
         @Test
         void 속기록을_저장한다() {
-            Member bito = memberGenerator.generate("default@gmail.com");
+            Member bito = generateTranscriptMember("default@gmail.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
 
@@ -55,8 +62,26 @@ class TranscriptControllerTest extends BaseControllerTest {
         }
 
         @Test
-        void 기록된_발언이_없으면_예외가_발생한다() {
+        void 속기록_플래그가_없으면_저장할_수_없다() {
             Member bito = memberGenerator.generate("default@gmail.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            TranscriptCreateRequest request = new TranscriptCreateRequest(List.of(
+                    new SegmentRequest(0, null, List.of(new UtteranceRequest(1_000L, "찬성 입론입니다.")))
+            ));
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .pathParam("tableId", table.getId())
+                    .body(request)
+                    .when().post("/api/transcripts/{tableId}")
+                    .then().statusCode(403);
+        }
+
+        @Test
+        void 기록된_발언이_없으면_예외가_발생한다() {
+            Member bito = generateTranscriptMember("default@gmail.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
             TranscriptCreateRequest request = new TranscriptCreateRequest(List.of());
@@ -76,7 +101,7 @@ class TranscriptControllerTest extends BaseControllerTest {
 
         @Test
         void 자신의_속기록을_조회한다() {
-            Member bito = memberGenerator.generate("default@gmail.com");
+            Member bito = generateTranscriptMember("default@gmail.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
             long transcriptId = createTranscript(bito, table).id();
@@ -96,8 +121,8 @@ class TranscriptControllerTest extends BaseControllerTest {
 
         @Test
         void 다른_회원의_속기록은_조회할_수_없다() {
-            Member bito = memberGenerator.generate("default@gmail.com");
-            Member other = memberGenerator.generate("other@gmail.com");
+            Member bito = generateTranscriptMember("default@gmail.com");
+            Member other = generateTranscriptMember("other@gmail.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
             long transcriptId = createTranscript(bito, table).id();
@@ -116,7 +141,7 @@ class TranscriptControllerTest extends BaseControllerTest {
 
         @Test
         void 자신의_토론_기록_목록을_조회한다() {
-            Member bito = memberGenerator.generate("default@gmail.com");
+            Member bito = generateTranscriptMember("default@gmail.com");
             CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
             customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
             long transcriptId = createTranscript(bito, table).id();
@@ -132,6 +157,16 @@ class TranscriptControllerTest extends BaseControllerTest {
                     () -> assertThat(response.transcripts().get(0).id()).isEqualTo(transcriptId),
                     () -> assertThat(response.transcripts().get(0).tableName()).isEqualTo(table.getName())
             );
+        }
+
+        @Test
+        void 속기록_플래그가_없으면_조회할_수_없다() {
+            Member bito = memberGenerator.generate("default@gmail.com");
+
+            given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/transcripts")
+                    .then().statusCode(403);
         }
 
         @Test
