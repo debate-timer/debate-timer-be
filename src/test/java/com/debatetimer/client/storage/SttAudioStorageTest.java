@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.mock.web.MockMultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -27,8 +26,8 @@ class SttAudioStorageTest {
             true, "debate-bucket", "ap-northeast-2", "access", "secret", null);
     // 2026-11-03 13:04:05 KST
     private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-11-03T04:04:05Z"), ZoneId.of("Asia/Seoul"));
-    private static final MockMultipartFile AUDIO = new MockMultipartFile("audio", "segment.webm", "audio/webm",
-            new byte[]{1, 2, 3});
+    private static final SttAudio AUDIO = new SttAudio(7L, "session-1", new byte[]{1, 2, 3}, "audio/webm",
+            "segment.webm");
 
     private S3Client s3Client;
     private SttAudioStorage storage;
@@ -44,7 +43,7 @@ class SttAudioStorageTest {
 
         @Test
         void 회원_날짜_토론_세션별_경로로_오디오를_저장한다() {
-            storage.save(7L, "session-1", AUDIO);
+            storage.save(AUDIO);
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
             ArgumentCaptor<RequestBody> body = ArgumentCaptor.forClass(RequestBody.class);
@@ -60,9 +59,7 @@ class SttAudioStorageTest {
 
         @Test
         void 파일_이름에_확장자가_없으면_확장자_없이_저장한다() {
-            MockMultipartFile blob = new MockMultipartFile("audio", "blob", "audio/webm", new byte[]{1});
-
-            storage.save(7L, "session-1", blob);
+            storage.save(new SttAudio(7L, "session-1", new byte[]{1}, "audio/webm", "blob"));
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(request.capture(), any(RequestBody.class));
@@ -74,7 +71,7 @@ class SttAudioStorageTest {
             when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
                     .thenThrow(S3Exception.builder().message("denied").build());
 
-            assertThatCode(() -> storage.save(7L, "session-1", AUDIO)).doesNotThrowAnyException();
+            assertThatCode(() -> storage.save(AUDIO)).doesNotThrowAnyException();
         }
 
         @Test
@@ -83,7 +80,7 @@ class SttAudioStorageTest {
 
             assertAll(
                     () -> assertThat(disabled.isEnabled()).isFalse(),
-                    () -> assertThatCode(() -> disabled.save(7L, "session-1", AUDIO)).doesNotThrowAnyException()
+                    () -> assertThatCode(() -> disabled.save(AUDIO)).doesNotThrowAnyException()
             );
         }
     }

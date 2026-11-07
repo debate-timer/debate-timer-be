@@ -1,5 +1,6 @@
 package com.debatetimer.service.transcript;
 
+import com.debatetimer.client.storage.SttAudio;
 import com.debatetimer.client.storage.SttAudioStorage;
 import com.debatetimer.client.stt.SonioxClient;
 import com.debatetimer.domain.transcript.SpeechToken;
@@ -8,6 +9,7 @@ import com.debatetimer.dto.transcript.response.SpeechTranscribeResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 토론 기록 Soniox 모드에서 타이머가 끝난 발언 구간의 오디오를 받아 문장 단위로 전사한다.
- * 받은 오디오는 토론 세션별로 S3에 보관하고, Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
+ * 받은 오디오는 토론 세션별로 S3에 비동기로 보관하고, Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
  */
 @Slf4j
 @Service
@@ -40,7 +42,7 @@ public class SpeechTranscribeService {
         if (sessionId != null && !SESSION_ID_PATTERN.matcher(sessionId).matches()) {
             throw new DTClientErrorException(ClientErrorCode.INVALID_STT_SESSION_ID);
         }
-        // 전사에 실패한 오디오도 다시 들어볼 수 있도록 전사 전에 보관한다.
+        // 전사에 실패한 오디오도 다시 들어볼 수 있도록 전사 전에 보관을 맡긴다.
         store(memberId, sessionId, audio);
         List<SpeechToken> tokens = transcribe(audio, language);
         return new SpeechTranscribeResponse(utteranceAssembler.assemble(tokens));
@@ -48,10 +50,15 @@ public class SpeechTranscribeService {
 
     // 세션 식별자를 아직 보내지 않는 프론트 요청은 보관 없이 전사만 한다.
     private void store(long memberId, @Nullable String sessionId, MultipartFile audio) {
-        if (sessionId == null) {
+        if (sessionId == null || !sttAudioStorage.isEnabled()) {
             return;
         }
-        sttAudioStorage.save(memberId, sessionId, audio);
+        try {
+            sttAudioStorage.save(new SttAudio(memberId, sessionId, audio.getBytes(), audio.getContentType(),
+                    audio.getOriginalFilename()));
+        } catch (IOException exception) {
+            log.warn("STT 오디오를 읽지 못해 보관하지 않습니다. memberId={}, sessionId={}", memberId, sessionId, exception);
+        }
     }
 
     // Soniox가 오디오를 거절하면 어떤 파일이었는지 알 수 있도록 업로드한 오디오 정보를 함께 남긴다.

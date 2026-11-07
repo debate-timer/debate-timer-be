@@ -2,14 +2,15 @@ package com.debatetimer.service.transcript;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.debatetimer.client.storage.SttAudio;
 import com.debatetimer.client.storage.SttAudioStorage;
 import com.debatetimer.client.stt.SonioxClient;
 import com.debatetimer.domain.transcript.SpeechToken;
@@ -21,9 +22,11 @@ import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,11 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
 
     @MockitoBean
     private SttAudioStorage sttAudioStorage;
+
+    @BeforeEach
+    void setUp() {
+        when(sttAudioStorage.isEnabled()).thenReturn(true);
+    }
 
     @Nested
     class TranscribeWithSoniox {
@@ -83,16 +91,24 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.EMPTY_AUDIO.getMessage());
             verifyNoInteractions(sonioxClient);
-            verify(sttAudioStorage, never()).save(anyLong(), any(), any());
+            verify(sttAudioStorage, never()).save(any());
         }
 
         @Test
-        void 회원과_토론_세션별로_오디오를_보관한다() {
+        void 회원과_토론_세션_정보와_함께_오디오_보관을_맡긴다() {
             when(sonioxClient.transcribe(any(), any())).thenReturn(List.of());
 
             speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR");
 
-            verify(sttAudioStorage).save(MEMBER_ID, SESSION_ID, AUDIO);
+            ArgumentCaptor<SttAudio> stored = ArgumentCaptor.forClass(SttAudio.class);
+            verify(sttAudioStorage).save(stored.capture());
+            assertAll(
+                    () -> assertThat(stored.getValue().memberId()).isEqualTo(MEMBER_ID),
+                    () -> assertThat(stored.getValue().sessionId()).isEqualTo(SESSION_ID),
+                    () -> assertThat(stored.getValue().content()).containsExactly(1, 2, 3),
+                    () -> assertThat(stored.getValue().contentType()).isEqualTo("audio/webm"),
+                    () -> assertThat(stored.getValue().originalFilename()).isEqualTo("segment.webm")
+            );
         }
 
         @Test
@@ -101,8 +117,18 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
 
             speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, null, "ko-KR");
 
-            verify(sttAudioStorage, never()).save(anyLong(), any(), any());
+            verify(sttAudioStorage, never()).save(any());
             verify(sonioxClient).transcribe(any(), any());
+        }
+
+        @Test
+        void 보관이_꺼져_있으면_오디오를_넘기지_않는다() {
+            when(sttAudioStorage.isEnabled()).thenReturn(false);
+            when(sonioxClient.transcribe(any(), any())).thenReturn(List.of());
+
+            speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR");
+
+            verify(sttAudioStorage, never()).save(any());
         }
 
         @Test
@@ -112,7 +138,7 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.INVALID_STT_SESSION_ID.getMessage());
             verifyNoInteractions(sonioxClient);
-            verify(sttAudioStorage, never()).save(anyLong(), any(), any());
+            verify(sttAudioStorage, never()).save(any());
         }
 
         @Test
@@ -122,7 +148,7 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
 
             assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR"))
                     .isInstanceOf(DTServerErrorException.class);
-            verify(sttAudioStorage).save(MEMBER_ID, SESSION_ID, AUDIO);
+            verify(sttAudioStorage).save(any());
         }
 
         @Test
