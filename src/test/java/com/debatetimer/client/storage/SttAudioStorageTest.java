@@ -43,8 +43,8 @@ class SttAudioStorageTest {
     class Save {
 
         @Test
-        void 날짜와_회원별_경로로_오디오를_저장한다() {
-            storage.save(7L, AUDIO);
+        void 회원_날짜_토론_세션별_경로로_오디오를_저장한다() {
+            storage.save(7L, "session-1", AUDIO);
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
             ArgumentCaptor<RequestBody> body = ArgumentCaptor.forClass(RequestBody.class);
@@ -52,7 +52,7 @@ class SttAudioStorageTest {
             assertAll(
                     () -> assertThat(request.getValue().bucket()).isEqualTo("debate-bucket"),
                     () -> assertThat(request.getValue().key())
-                            .matches("stt-audio/2026/11/03/member-7/130405-[0-9a-f-]{36}\\.webm"),
+                            .matches("stt-audio/7/2026-11-03/session-1/130405-[0-9a-f-]{36}\\.webm"),
                     () -> assertThat(request.getValue().contentType()).isEqualTo("audio/webm"),
                     () -> assertThat(body.getValue().optionalContentLength()).hasValue(3L)
             );
@@ -62,11 +62,11 @@ class SttAudioStorageTest {
         void 파일_이름에_확장자가_없으면_확장자_없이_저장한다() {
             MockMultipartFile blob = new MockMultipartFile("audio", "blob", "audio/webm", new byte[]{1});
 
-            storage.save(7L, blob);
+            storage.save(7L, "session-1", blob);
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(request.capture(), any(RequestBody.class));
-            assertThat(request.getValue().key()).matches("stt-audio/2026/11/03/member-7/130405-[0-9a-f-]{36}");
+            assertThat(request.getValue().key()).matches("stt-audio/7/2026-11-03/session-1/130405-[0-9a-f-]{36}");
         }
 
         @Test
@@ -74,7 +74,7 @@ class SttAudioStorageTest {
             when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
                     .thenThrow(S3Exception.builder().message("denied").build());
 
-            assertThatCode(() -> storage.save(7L, AUDIO)).doesNotThrowAnyException();
+            assertThatCode(() -> storage.save(7L, "session-1", AUDIO)).doesNotThrowAnyException();
         }
 
         @Test
@@ -83,7 +83,7 @@ class SttAudioStorageTest {
 
             assertAll(
                     () -> assertThat(disabled.isEnabled()).isFalse(),
-                    () -> assertThatCode(() -> disabled.save(7L, AUDIO)).doesNotThrowAnyException()
+                    () -> assertThatCode(() -> disabled.save(7L, "session-1", AUDIO)).doesNotThrowAnyException()
             );
         }
     }

@@ -9,6 +9,7 @@ import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -17,26 +18,40 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 토론 기록 Soniox 모드에서 타이머가 끝난 발언 구간의 오디오를 받아 문장 단위로 전사한다.
- * 받은 오디오는 S3에 보관하고, Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
+ * 받은 오디오는 토론 세션별로 S3에 보관하고, Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SpeechTranscribeService {
 
+    // 세션 식별자는 S3 경로에 그대로 들어가므로 경로 문자를 막는다. 프론트는 토론 시작 시 UUID로 만든다.
+    private static final Pattern SESSION_ID_PATTERN = Pattern.compile("[A-Za-z0-9_-]{1,64}");
+
     private final SonioxClient sonioxClient;
     private final SttAudioStorage sttAudioStorage;
     private final UtteranceAssembler utteranceAssembler = new UtteranceAssembler();
 
     public SpeechTranscribeResponse transcribeWithSoniox(long memberId, MultipartFile audio,
-                                                        @Nullable String language) {
+                                                        @Nullable String sessionId, @Nullable String language) {
         if (audio == null || audio.isEmpty()) {
             throw new DTClientErrorException(ClientErrorCode.EMPTY_AUDIO);
         }
+        if (sessionId != null && !SESSION_ID_PATTERN.matcher(sessionId).matches()) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_STT_SESSION_ID);
+        }
         // 전사에 실패한 오디오도 다시 들어볼 수 있도록 전사 전에 보관한다.
-        sttAudioStorage.save(memberId, audio);
+        store(memberId, sessionId, audio);
         List<SpeechToken> tokens = transcribe(audio, language);
         return new SpeechTranscribeResponse(utteranceAssembler.assemble(tokens));
+    }
+
+    // 세션 식별자를 아직 보내지 않는 프론트 요청은 보관 없이 전사만 한다.
+    private void store(long memberId, @Nullable String sessionId, MultipartFile audio) {
+        if (sessionId == null) {
+            return;
+        }
+        sttAudioStorage.save(memberId, sessionId, audio);
     }
 
     // Soniox가 오디오를 거절하면 어떤 파일이었는지 알 수 있도록 업로드한 오디오 정보를 함께 남긴다.
