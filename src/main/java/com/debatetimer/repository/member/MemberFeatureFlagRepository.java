@@ -12,4 +12,12 @@ public interface MemberFeatureFlagRepository extends Repository<MemberFeatureFla
 
     @Query("SELECT f.featureFlag FROM MemberFeatureFlagEntity f WHERE f.memberId = :memberId")
     List<FeatureFlag> findFeatureFlagsByMemberId(long memberId);
+
+    List<MemberFeatureFlagEntity> findAllByMemberIdOrderByIdAsc(long memberId);
+
+    List<MemberFeatureFlagEntity> findAllByOrderByMemberIdAscIdAsc();
+
+    boolean existsByMemberIdAndFeatureFlag(long memberId, FeatureFlag featureFlag);
+
+    void deleteByMemberIdAndFeatureFlag(long memberId, FeatureFlag featureFlag);
 }

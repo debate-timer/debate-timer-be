@@ -1,7 +1,7 @@
 package com.debatetimer.controller.admin;
 
-import com.debatetimer.dto.admin.IconResponse;
-import com.debatetimer.dto.admin.IconResponses;
+import com.debatetimer.dto.admin.response.IconResponse;
+import com.debatetimer.dto.admin.response.IconResponses;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.debatetimer.service.admin.AdminIconService;

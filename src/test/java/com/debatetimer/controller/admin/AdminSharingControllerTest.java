@@ -3,7 +3,7 @@ package com.debatetimer.controller.admin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.debatetimer.controller.BaseControllerTest;
-import com.debatetimer.dto.admin.SharingStatsResponse;
+import com.debatetimer.dto.admin.response.SharingStatsResponse;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

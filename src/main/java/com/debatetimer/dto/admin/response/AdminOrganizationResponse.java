@@ -1,4 +1,4 @@
-package com.debatetimer.dto.admin;
+package com.debatetimer.dto.admin.response;
 
 import com.debatetimer.domain.organization.Language;
 import com.debatetimer.domain.organization.Organization;

@@ -15,6 +15,7 @@ import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.event.transcript.TranscriptAnalysisListener;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
 import java.util.List;
@@ -26,6 +27,10 @@ class TranscriptControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private OpenAiClient openAiClient;
+
+    // 속기록 저장 뒤 비동기로 도는 보정·분석이 다음 테스트의 같은 ID 속기록 행을 덮어쓰지 않도록 막는다
+    @MockitoBean
+    private TranscriptAnalysisListener transcriptAnalysisListener;
 
     private Member generateTranscriptMember(String email) {
         Member member = memberGenerator.generate(email);

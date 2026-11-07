@@ -1,8 +1,8 @@
 package com.debatetimer.controller.admin;
 
 import com.debatetimer.domain.stats.StatUnit;
-import com.debatetimer.dto.admin.MemberSignupStatsResponse;
-import com.debatetimer.dto.admin.TableUsageStatsResponse;
+import com.debatetimer.dto.admin.response.MemberSignupStatsResponse;
+import com.debatetimer.dto.admin.response.TableUsageStatsResponse;
 import com.debatetimer.service.admin.MemberSignupStatsService;
 import com.debatetimer.service.admin.TableUsageStatsService;
 import java.time.LocalDate;

@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.stats.StatUnit;
-import com.debatetimer.dto.admin.MemberSignupStatResponse;
-import com.debatetimer.dto.admin.MemberSignupStatsResponse;
+import com.debatetimer.dto.admin.response.MemberSignupStatResponse;
+import com.debatetimer.dto.admin.response.MemberSignupStatsResponse;
 import com.debatetimer.service.BaseServiceTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

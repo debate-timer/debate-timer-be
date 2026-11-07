@@ -1,6 +1,6 @@
 package com.debatetimer.controller.admin;
 
-import com.debatetimer.dto.admin.SharingStatsResponse;
+import com.debatetimer.dto.admin.response.SharingStatsResponse;
 import com.debatetimer.service.admin.SharingStatsService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.debatetimer.dto.admin;
+package com.debatetimer.dto.admin.response;
 
 import jakarta.annotation.Nullable;
 import java.time.LocalDate;

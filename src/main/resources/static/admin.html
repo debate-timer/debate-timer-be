@@ -202,6 +202,7 @@
             <button type="button" data-tab="sharing-stats">라이브 공유</button>
             <button type="button" data-tab="tables">테이블 목록</button>
             <button type="button" data-tab="organizations">단체 · 템플릿</button>
+            <button type="button" data-tab="feature-flags">피쳐 플래그</button>
         </nav>
 
         <!-- 통계 공통 기간 선택 -->
@@ -380,6 +381,34 @@
                 </div>
             </div>
         </section>
+
+        <!-- 피쳐 플래그 -->
+        <section id="tab-feature-flags" class="tab hidden">
+            <div class="panel">
+                <h2>플래그 부여 · 조회</h2>
+                <form id="feature-flag-form" class="row">
+                    <input id="ff-email" type="email" required maxlength="255" placeholder="회원 이메일" style="flex:1; min-width:220px"/>
+                    <select id="ff-flag" aria-label="피쳐 플래그" required></select>
+                    <button type="submit">부여</button>
+                    <button type="button" class="secondary" id="ff-search">조회</button>
+                </form>
+                <div class="hint" id="ff-flag-hint"></div>
+                <div id="feature-flag-message" class="error"></div>
+            </div>
+
+            <div class="panel">
+                <h2>플래그 보유 회원</h2>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr><th>회원 ID</th><th>이메일</th><th>플래그</th><th>부여</th><th></th></tr>
+                        </thead>
+                        <tbody id="feature-flag-members-body"></tbody>
+                    </table>
+                </div>
+                <div id="feature-flag-members-error" class="error"></div>
+            </div>
+        </section>
     </div>
 </main>
 
@@ -461,6 +490,7 @@
             const body = await response.json().catch(() => ({}));
             throw new Error(body.message || `요청에 실패했습니다 (${response.status})`);
         }
+        if (response.status === 204) return null;
         return response.json();
     }
 
@@ -551,6 +581,7 @@
         if (state.tab === 'sharing-stats') return loadSharingStats();
         if (state.tab === 'tables') return loadTables();
         if (state.tab === 'organizations') return loadOrganizations();
+        if (state.tab === 'feature-flags') return loadFeatureFlags();
     }
 
     // ---------- 차트 ----------
@@ -1100,6 +1131,91 @@
         }
     }
 
+    // ---------- 피쳐 플래그 ----------
+    async function loadFeatureFlags() {
+        $('feature-flag-members-error').textContent = '';
+        try {
+            const [flags, result] = await Promise.all([
+                api('/api/admin/feature-flags'),
+                api('/api/admin/feature-flags/members'),
+            ]);
+            renderFeatureFlagOptions(flags.featureFlags);
+            renderFeatureFlagMembers(result.members);
+        } catch (error) {
+            handleError(error, 'feature-flag-members-error');
+        }
+    }
+
+    function renderFeatureFlagOptions(featureFlags) {
+        const select = $('ff-flag');
+        const previous = select.value;
+        select.replaceChildren(...featureFlags.map((flag) =>
+            el('option', { value: flag.featureFlag }, `${flag.featureFlag} (${flag.description})`)));
+        if (previous) select.value = previous;
+        $('ff-flag-hint').textContent = '플래그가 있는 회원만 해당 기능 API를 호출할 수 있고, 프론트에서도 해당 화면이 보입니다.';
+    }
+
+    function renderFeatureFlagMembers(members) {
+        const rows = members.flatMap((member) => member.featureFlags.map((flag, index) => el('tr', {},
+            el('td', { class: 'num' }, index === 0 ? member.memberId : ''),
+            el('td', {}, index === 0 ? member.email : ''),
+            el('td', {}, el('span', { class: 'chip on' }, flag.featureFlag)),
+            el('td', { class: 'num' }, formatDateTime(flag.grantedAt)),
+            el('td', {}, el('button', {
+                type: 'button', class: 'secondary small',
+                onclick: (event) => whilePending(event.currentTarget, () => revokeFeatureFlag(member, flag.featureFlag)),
+            }, '회수')))));
+        $('feature-flag-members-body').replaceChildren(...(rows.length ? rows
+            : [el('tr', {}, el('td', { colspan: 5, class: 'empty' }, '플래그를 가진 회원이 없습니다.'))]));
+    }
+
+    function describeMemberFlags(member) {
+        const flags = member.featureFlags.map((flag) => flag.featureFlag);
+        return `${member.email} (ID ${member.memberId}): ${flags.length ? flags.join(', ') : '플래그 없음'}`;
+    }
+
+    async function grantFeatureFlag(event) {
+        event.preventDefault();
+        setMessage('feature-flag-message', '');
+        try {
+            const member = await api('/api/admin/feature-flags/members', {
+                method: 'POST',
+                body: JSON.stringify({ email: $('ff-email').value.trim(), featureFlag: $('ff-flag').value }),
+            });
+            setMessage('feature-flag-message', `부여했습니다. ${describeMemberFlags(member)}`, true);
+            await loadFeatureFlags();
+        } catch (error) {
+            handleError(error, 'feature-flag-message');
+        }
+    }
+
+    async function searchMemberFeatureFlags() {
+        setMessage('feature-flag-message', '');
+        const email = $('ff-email').value.trim();
+        if (!email) {
+            setMessage('feature-flag-message', '회원 이메일을 입력하세요.');
+            return;
+        }
+        try {
+            const member = await api(`/api/admin/feature-flags/members/search?${new URLSearchParams({ email })}`);
+            setMessage('feature-flag-message', describeMemberFlags(member), true);
+        } catch (error) {
+            handleError(error, 'feature-flag-message');
+        }
+    }
+
+    async function revokeFeatureFlag(member, featureFlag) {
+        if (!confirm(`${member.email} 회원의 ${featureFlag} 플래그를 회수할까요?`)) return;
+        setMessage('feature-flag-message', '');
+        try {
+            await api(`/api/admin/feature-flags/members/${member.memberId}/${featureFlag}`, { method: 'DELETE' });
+            setMessage('feature-flag-message', `${member.email} 회원의 ${featureFlag} 플래그를 회수했습니다.`, true);
+            await loadFeatureFlags();
+        } catch (error) {
+            handleError(error, 'feature-flag-members-error');
+        }
+    }
+
     // ---------- 이벤트 ----------
     $('login-form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -1138,6 +1254,11 @@
         whilePending($('template-form').querySelector('button[type=submit]'), () => createTemplate(event));
     });
     $('tpl-load').addEventListener('click', loadTemplateFromTable);
+    $('feature-flag-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        whilePending($('feature-flag-form').querySelector('button[type=submit]'), () => grantFeatureFlag(event));
+    });
+    $('ff-search').addEventListener('click', () => whilePending($('ff-search'), searchMemberFeatureFlags));
     $('org-icon').addEventListener('change', updateIconPreview);
     $('icon-upload').addEventListener('click', () => whilePending($('icon-upload'), uploadIcon));
     $('icons-download').addEventListener('click', () => whilePending($('icons-download'), downloadAllIcons));

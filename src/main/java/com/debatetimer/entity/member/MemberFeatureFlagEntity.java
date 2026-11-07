@@ -1,6 +1,7 @@
 package com.debatetimer.entity.member;
 
 import com.debatetimer.domain.member.FeatureFlag;
+import com.debatetimer.domain.member.FeatureFlagGrant;
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,5 +39,9 @@ public class MemberFeatureFlagEntity extends BaseTimeEntity {
     public MemberFeatureFlagEntity(long memberId, FeatureFlag featureFlag) {
         this.memberId = memberId;
         this.featureFlag = featureFlag;
+    }
+
+    public FeatureFlagGrant toDomain() {
+        return new FeatureFlagGrant(memberId, featureFlag, getCreatedAt());
     }
 }
