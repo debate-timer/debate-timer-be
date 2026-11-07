@@ -38,8 +38,8 @@ public class SpeechTranscribeDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.STT_API)
-                .summary("발언 구간 오디오 Soniox 전사")
-                .description("""
+                .summary(featureFlagSummary(FeatureFlag.TRANSCRIPT, "발언 구간 오디오 Soniox 전사"))
+                .description(featureFlagDescription(FeatureFlag.TRANSCRIPT) + """
                         토론 기록 Soniox 모드에서 타이머가 끝난 발언 구간 오디오를 받아 문장 단위로 전사합니다.
                         Soniox 전사가 끝날 때까지 기다린 뒤 응답하므로 최대 3분 정도 걸릴 수 있습니다.
 
