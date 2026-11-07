@@ -47,6 +47,13 @@ openai:
 soniox:
   api-key: ${secret.soniox.api_key:}
 
+stt-audio:
+  enabled: ${secret.stt_audio.enabled:false}
+  bucket: ${secret.stt_audio.bucket:}
+  region: ${secret.stt_audio.region:ap-northeast-2}
+  access-key: ${secret.stt_audio.access_key:}
+  secret-key: ${secret.stt_audio.secret_key:}
+
 admin:
   password: ${secret.admin.password}
 
