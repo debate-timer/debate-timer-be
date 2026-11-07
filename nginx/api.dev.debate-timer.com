@@ -10,6 +10,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # 클라이언트가 보낸 값을 그대로 넘기지 않도록 nginx 가 아는 값으로 덮어쓴다
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
     }
 
     location /ws/ {
@@ -21,6 +24,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # 클라이언트가 보낸 값을 그대로 넘기지 않도록 nginx 가 아는 값으로 덮어쓴다
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
         proxy_read_timeout 3600s;
     }
 
