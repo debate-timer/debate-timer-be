@@ -1,4 +1,4 @@
-package com.debatetimer.dto.admin;
+package com.debatetimer.dto.admin.response;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTableOverview;

@@ -1,8 +1,8 @@
 package com.debatetimer.controller.admin;
 
 import com.debatetimer.domain.customize.CustomizeTableSortType;
-import com.debatetimer.dto.admin.AdminTableDetailResponse;
-import com.debatetimer.dto.admin.AdminTablePageResponse;
+import com.debatetimer.dto.admin.response.AdminTableDetailResponse;
+import com.debatetimer.dto.admin.response.AdminTablePageResponse;
 import com.debatetimer.service.admin.AdminTableService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

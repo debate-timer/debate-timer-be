@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.organization.Language;
-import com.debatetimer.dto.admin.AdminOrganizationResponse;
-import com.debatetimer.dto.admin.AdminOrganizationTemplateResponse;
-import com.debatetimer.dto.admin.AdminOrganizationsResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
 import com.debatetimer.entity.organization.OrganizationEntity;

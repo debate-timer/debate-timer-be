@@ -1,9 +1,9 @@
 package com.debatetimer.controller.admin;
 
 import com.debatetimer.domain.member.FeatureFlag;
-import com.debatetimer.dto.admin.AdminFeatureFlagsResponse;
-import com.debatetimer.dto.admin.AdminMemberFeatureFlagResponse;
-import com.debatetimer.dto.admin.AdminMemberFeatureFlagsResponse;
+import com.debatetimer.dto.admin.response.AdminFeatureFlagsResponse;
+import com.debatetimer.dto.admin.response.AdminMemberFeatureFlagResponse;
+import com.debatetimer.dto.admin.response.AdminMemberFeatureFlagsResponse;
 import com.debatetimer.dto.admin.request.FeatureFlagGrantRequest;
 import com.debatetimer.service.admin.AdminFeatureFlagService;
 import jakarta.validation.Valid;

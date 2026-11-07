@@ -1,9 +1,9 @@
 package com.debatetimer.service.admin;
 
 import com.debatetimer.domainrepository.organization.OrganizationDomainRepository;
-import com.debatetimer.dto.admin.AdminOrganizationResponse;
-import com.debatetimer.dto.admin.AdminOrganizationTemplateResponse;
-import com.debatetimer.dto.admin.AdminOrganizationsResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
 import lombok.RequiredArgsConstructor;
