@@ -42,7 +42,7 @@ class SttAudioStorageTest {
     class Save {
 
         @Test
-        void 회원_날짜_토론_세션별_경로로_오디오를_저장한다() {
+        void 회원_토론_세션별_경로로_오디오를_저장한다() {
             storage.save(AUDIO);
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
@@ -51,7 +51,7 @@ class SttAudioStorageTest {
             assertAll(
                     () -> assertThat(request.getValue().bucket()).isEqualTo("debate-bucket"),
                     () -> assertThat(request.getValue().key())
-                            .matches("stt-audio/7/2026-11-03/session-1/130405-[0-9a-f-]{36}\\.webm"),
+                            .matches("stt-audio/7/session-1/20261103-130405-[0-9a-f-]{36}\\.webm"),
                     () -> assertThat(request.getValue().contentType()).isEqualTo("audio/webm"),
                     () -> assertThat(body.getValue().optionalContentLength()).hasValue(3L)
             );
@@ -63,7 +63,7 @@ class SttAudioStorageTest {
 
             ArgumentCaptor<PutObjectRequest> request = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(request.capture(), any(RequestBody.class));
-            assertThat(request.getValue().key()).matches("stt-audio/7/2026-11-03/session-1/130405-[0-9a-f-]{36}");
+            assertThat(request.getValue().key()).matches("stt-audio/7/session-1/20261103-130405-[0-9a-f-]{36}");
         }
 
         @Test

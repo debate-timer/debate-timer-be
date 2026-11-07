@@ -25,8 +25,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RequiredArgsConstructor
 public class SttAudioStorage {
 
-    private static final DateTimeFormatter DATE_PATH = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter TIME_PREFIX = DateTimeFormatter.ofPattern("HHmmss");
+    // 자정을 넘기는 토론도 세션 안에서 녹음 순서대로 정렬되도록 날짜까지 붙인다.
+    private static final DateTimeFormatter TIME_PREFIX = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     // 꺼져 있거나 설정이 비어 있으면 null이고, 저장하지 않는다.
     @Nullable
@@ -56,14 +56,13 @@ public class SttAudioStorage {
         }
     }
 
-    // 회원·날짜·토론 세션별로 모아 보기 쉽게 {prefix}/{memberId}/{yyyy-MM-dd}/{sessionId}/{HHmmss}-{uuid}.{확장자} 로 저장한다.
+    // 회원·토론 세션별로 모아 보기 쉽게 {prefix}/{memberId}/{sessionId}/{yyyyMMdd-HHmmss}-{uuid}.{확장자} 로 저장한다.
     private String createKey(SttAudio audio) {
         LocalDateTime now = LocalDateTime.now(clock);
         String extension = StringUtils.getFilenameExtension(audio.originalFilename());
         String fileName = now.format(TIME_PREFIX) + "-" + UUID.randomUUID()
                 + (StringUtils.hasText(extension) ? "." + extension : "");
-        return String.join("/", properties.keyPrefix(), String.valueOf(audio.memberId()), now.format(DATE_PATH),
-                audio.sessionId(), fileName);
+        return String.join("/", properties.keyPrefix(), String.valueOf(audio.memberId()), audio.sessionId(), fileName);
     }
 
     @PreDestroy
