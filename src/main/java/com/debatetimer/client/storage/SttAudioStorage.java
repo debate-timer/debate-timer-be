@@ -1,11 +1,13 @@
 package com.debatetimer.client.storage;
 
 import jakarta.annotation.PreDestroy;
+import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -13,6 +15,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -29,6 +32,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class SttAudioStorage {
 
     // 자정을 넘기는 토론도 세션 안에서 녹음 순서대로 정렬되도록 날짜까지 붙인다.
+    // 프론트는 토론 시작 시 UUID로 만든다.
+    private static final Pattern SESSION_ID_PATTERN = Pattern.compile("[A-Za-z0-9_-]{1,64}");
     private static final DateTimeFormatter TIME_PREFIX = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     // 꺼져 있거나 설정이 비어 있으면 null이고, 저장하지 않는다.
@@ -45,17 +50,45 @@ public class SttAudioStorage {
         return s3Client != null;
     }
 
-    public void save(SttAudio audio) {
-        if (s3Client == null) {
+    /**
+     * 발언 구간 오디오를 회원·토론 세션별 경로로 보관하도록 맡긴다. 보관할 수 없으면 기록만 남기고 넘어가므로 전사에는 영향이 없다.
+     * 업로드는 요청이 끝난 뒤에 이뤄지므로 multipart 임시 파일 대신 읽어 둔 bytes를 넘긴다.
+     */
+    public void save(long memberId, @Nullable String sessionId, MultipartFile audio) {
+        if (s3Client == null || !isValidSessionId(memberId, sessionId)) {
             return;
         }
-        long size = audio.content().length;
+        long size = audio.getSize();
         if (pendingBytes.addAndGet(size) > maxPendingBytes) {
             pendingBytes.addAndGet(-size);
             log.warn("업로드를 기다리는 STT 오디오가 많아 보관하지 않습니다. memberId={}, sessionId={}, size={}",
-                    audio.memberId(), audio.sessionId(), size);
+                    memberId, sessionId, size);
             return;
         }
+        try {
+            SttAudio sttAudio = new SttAudio(memberId, sessionId, audio.getBytes(), audio.getContentType(),
+                    audio.getOriginalFilename());
+            submit(sttAudio, size);
+        } catch (IOException exception) {
+            pendingBytes.addAndGet(-size);
+            log.warn("STT 오디오를 읽지 못해 보관하지 않습니다. memberId={}, sessionId={}", memberId, sessionId, exception);
+        }
+    }
+
+    // 세션 식별자는 S3 경로에 그대로 들어가므로 경로 문자가 섞인 값은 보관하지 않는다.
+    // 세션 식별자를 아직 보내지 않는 프론트 요청은 조용히 건너뛴다.
+    private boolean isValidSessionId(long memberId, @Nullable String sessionId) {
+        if (sessionId == null) {
+            return false;
+        }
+        if (!SESSION_ID_PATTERN.matcher(sessionId).matches()) {
+            log.warn("토론 세션 식별자 형식이 올바르지 않아 STT 오디오를 보관하지 않습니다. memberId={}", memberId);
+            return false;
+        }
+        return true;
+    }
+
+    private void submit(SttAudio audio, long size) {
         // 녹음 순서대로 정렬되도록 경로는 업로드 시점이 아니라 요청 시점으로 정한다.
         String key = createKey(audio);
         try {
