@@ -78,19 +78,13 @@ class SttAudioStorageTest {
         }
 
         @Test
-        void 꺼져_있으면_저장하지_않는다() {
-            SttAudioStorage disabled = new SttAudioStorage(new SttAudioStorageProperties(
-                    false, "debate-bucket", "ap-northeast-2", "access", "secret", null));
+        void S3_클라이언트가_없으면_꺼진_것으로_보고_저장하지_않는다() {
+            SttAudioStorage disabled = new SttAudioStorage(null, PROPERTIES, CLOCK);
 
-            assertThatCode(() -> disabled.save(7L, AUDIO)).doesNotThrowAnyException();
-        }
-
-        @Test
-        void 켜져_있어도_설정이_비어_있으면_저장하지_않는다() {
-            SttAudioStorage incomplete = new SttAudioStorage(new SttAudioStorageProperties(
-                    true, "", "ap-northeast-2", "access", "secret", null));
-
-            assertThatCode(() -> incomplete.save(7L, AUDIO)).doesNotThrowAnyException();
+            assertAll(
+                    () -> assertThat(disabled.isEnabled()).isFalse(),
+                    () -> assertThatCode(() -> disabled.save(7L, AUDIO)).doesNotThrowAnyException()
+            );
         }
     }
 }
