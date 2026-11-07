@@ -1,3 +1,8 @@
+# nginx 가 HTTPS 를 받아 HTTP 로 넘기므로, 프록시가 붙인 X-Forwarded-Proto 를 반영해 원래 요청 주소를 알게 한다.
+# 반영하지 않으면 같은 도메인의 어드민 페이지 요청(Origin: https://...)을 다른 출처로 보고 CORS 403 으로 거절한다.
+server:
+  forward-headers-strategy: native
+
 spring:
   config:
     import: prod-secret.yml
