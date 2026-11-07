@@ -9,7 +9,8 @@ public enum Tag {
     SHARING_API("Sharing API"),
     POLL_API("Poll API"),
     ORGANIZATION_API("Organization API"),
-    STT_API("STT API");
+    STT_API("STT API"),
+    TRANSCRIPT_API("Transcript API");
 
     private final String displayName;
 
