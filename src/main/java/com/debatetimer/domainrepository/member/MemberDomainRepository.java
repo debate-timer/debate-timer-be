@@ -1,7 +1,9 @@
 package com.debatetimer.domainrepository.member;
 
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.repository.member.MemberRepository;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,5 +23,15 @@ public class MemberDomainRepository {
     @Transactional(readOnly = true)
     public long countCreatedBefore(LocalDateTime createdAt) {
         return memberRepository.countByCreatedAtBefore(createdAt);
+    }
+
+    @Transactional(readOnly = true)
+    public Member getByEmail(String email) {
+        return memberRepository.getByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> findAllByIds(Collection<Long> ids) {
+        return memberRepository.findAllByIdIn(ids);
     }
 }

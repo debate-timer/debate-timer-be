@@ -4,6 +4,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +27,8 @@ public interface MemberRepository extends Repository<Member, Long> {
         return findByEmail(email)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.MEMBER_NOT_FOUND));
     }
+
+    List<Member> findAllByIdIn(Collection<Long> ids);
 
     @Query("SELECT m.createdAt FROM Member m WHERE m.createdAt >= :from AND m.createdAt < :to")
     List<LocalDateTime> findCreatedAtBetween(LocalDateTime from, LocalDateTime to);
