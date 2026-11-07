@@ -16,6 +16,7 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.dto.transcript.response.SpeechTranscribeResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -37,8 +38,8 @@ public class SpeechTranscribeDocumentTest extends BaseDocumentTest {
 
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.STT_API)
-                .summary("발언 구간 오디오 Soniox 전사")
-                .description("""
+                .summary(featureFlagSummary(FeatureFlag.TRANSCRIPT, "발언 구간 오디오 Soniox 전사"))
+                .description(featureFlagDescription(FeatureFlag.TRANSCRIPT) + """
                         토론 기록 Soniox 모드에서 타이머가 끝난 발언 구간 오디오를 받아 문장 단위로 전사합니다.
                         Soniox 전사가 끝날 때까지 기다린 뒤 응답하므로 최대 3분 정도 걸릴 수 있습니다.
 
@@ -111,6 +112,23 @@ public class SpeechTranscribeDocumentTest extends BaseDocumentTest {
                     .multiPart("language", "ko-KR")
                     .when().post("/api/stt/soniox")
                     .then().statusCode(errorCode.getStatus().value());
+        }
+
+        @Test
+        void 발언_구간_오디오_전사_권한_없음() {
+            doThrow(new DTClientErrorException(ClientErrorCode.FEATURE_NOT_ALLOWED)).when(authService)
+                    .authorizeFeatureFlag(any(), eq(FeatureFlag.TRANSCRIPT));
+
+            var document = document("stt/soniox", ClientErrorCode.FEATURE_NOT_ALLOWED)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .multiPart("audio", "segment.webm", AUDIO, "audio/webm")
+                    .when().post("/api/stt/soniox")
+                    .then().statusCode(403);
         }
     }
 }
