@@ -23,6 +23,7 @@ import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
+import com.debatetimer.event.transcript.TranscriptAnalysisListener;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.BaseServiceTest;
@@ -42,6 +43,10 @@ class TranscriptServiceTest extends BaseServiceTest {
 
     @MockitoBean
     private OpenAiClient openAiClient;
+
+    // 속기록 저장 뒤 비동기로 도는 보정·분석이 다음 테스트의 같은 ID 속기록 행을 덮어쓰지 않도록 막는다
+    @MockitoBean
+    private TranscriptAnalysisListener transcriptAnalysisListener;
 
     private TranscriptCreateRequest requestOf(int timeBoxIndex, String... texts) {
         List<UtteranceRequest> utterances = java.util.stream.IntStream.range(0, texts.length)
