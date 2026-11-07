@@ -2,6 +2,7 @@ package com.debatetimer.config;
 
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.controller.tool.jwt.AuthManager;
+import com.debatetimer.domain.member.Member;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
@@ -38,6 +39,9 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
         }
         String email = authManager.resolveAccessToken(accessToken);
-        return authService.getMember(email);
+        Member member = authService.getMember(email);
+        AuthMember authMember = parameter.getParameterAnnotation(AuthMember.class);
+        authService.authorizeFeatureFlag(member, authMember.requires());
+        return member;
     }
 }

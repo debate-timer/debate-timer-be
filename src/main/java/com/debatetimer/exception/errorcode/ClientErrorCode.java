@@ -69,6 +69,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     EMPTY_AUDIO(HttpStatus.BAD_REQUEST, "전사할 오디오가 비어 있습니다."),
     STT_TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "음성 인식 요청이 많습니다. 잠시 후 다시 시도해 주세요."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
+    FEATURE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "사용 권한이 없는 기능입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
