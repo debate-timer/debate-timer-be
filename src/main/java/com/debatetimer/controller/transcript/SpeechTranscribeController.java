@@ -28,6 +28,6 @@ public class SpeechTranscribeController {
             @RequestPart("audio") MultipartFile audio,
             @RequestParam(name = "language", required = false) String language
     ) {
-        return speechTranscribeService.transcribeWithSoniox(audio, language);
+        return speechTranscribeService.transcribeWithSoniox(member.getId(), audio, language);
     }
 }
