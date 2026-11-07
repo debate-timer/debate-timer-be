@@ -14,8 +14,10 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponse;
 import com.debatetimer.dto.member.TableResponses;
@@ -85,6 +87,48 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .body(request)
                     .when().post("/api/member")
                     .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
+    class GetFeatureFlags {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("회원의 피쳐 플래그 조회")
+                .description("""
+                        로그인한 회원에게 부여된 피쳐 플래그 목록을 조회합니다. 플래그가 없으면 빈 배열입니다.
+                        프론트는 이 목록으로 플래그가 필요한 기능의 화면 노출 여부를 정합니다.
+
+                        ### 피쳐 플래그
+                        | 플래그 | 설명 | 필요한 API |
+                        | :---: | --- | --- |
+                        | TRANSCRIPT | 속기록 · 토론 분석 | `POST /api/stt/soniox`, `POST /api/transcripts/{tableId}`, `GET /api/transcripts`, `GET /api/transcripts/{transcriptId}` |
+
+                        플래그는 어드민에서 회원별로 부여 · 회수하므로, 앱 진입이나 로그인 직후처럼 화면을 그리기 전에 다시 조회하는 것을 권장합니다.
+                        플래그가 필요한 API 는 Swagger 요약 앞에 `[플래그 이름]` 이 붙어 있고, 플래그 없이 호출하면 `403 FEATURE_NOT_ALLOWED` 를 응답합니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
+
+        private final RestDocumentationResponse responseDocument = response().responseBodyField(
+                fieldWithPath("featureFlags").type(ARRAY).description("회원에게 부여된 피쳐 플래그 (TRANSCRIPT)"));
+
+        @Test
+        void 피쳐_플래그_조회_성공() {
+            MemberFeatureFlagsResponse response = new MemberFeatureFlagsResponse(List.of(FeatureFlag.TRANSCRIPT));
+            doReturn(response).when(memberService).getFeatureFlags(EXIST_MEMBER_ID);
+
+            var document = document("member/feature-flags", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .when().get("/api/member/feature-flags")
+                    .then().statusCode(200);
         }
     }
 

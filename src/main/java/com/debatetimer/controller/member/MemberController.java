@@ -7,6 +7,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
+import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.auth.AuthService;
@@ -37,6 +38,11 @@ public class MemberController {
     @GetMapping("/api/table")
     public TableResponses getTables(@AuthMember Member member) {
         return memberService.getTables(member.getId());
+    }
+
+    @GetMapping("/api/member/feature-flags")
+    public MemberFeatureFlagsResponse getFeatureFlags(@AuthMember Member member) {
+        return memberService.getFeatureFlags(member.getId());
     }
 
     @PostMapping("/api/member")

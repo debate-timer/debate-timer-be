@@ -9,6 +9,17 @@ import org.junit.jupiter.api.Test;
 class MemberFeatureFlagsTest {
 
     @Nested
+    class Values {
+
+        @Test
+        void 중복_없이_선언_순서로_돌려준다() {
+            MemberFeatureFlags flags = new MemberFeatureFlags(List.of(FeatureFlag.TRANSCRIPT, FeatureFlag.TRANSCRIPT));
+
+            assertThat(flags.values()).containsExactly(FeatureFlag.TRANSCRIPT);
+        }
+    }
+
+    @Nested
     class HasAll {
 
         @Test
