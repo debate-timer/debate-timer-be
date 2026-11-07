@@ -8,7 +8,8 @@ public enum Tag {
     CUSTOMIZE_API("Customize Table API"),
     SHARING_API("Sharing API"),
     POLL_API("Poll API"),
-    ORGANIZATION_API("Organization API");
+    ORGANIZATION_API("Organization API"),
+    STT_API("STT API");
 
     private final String displayName;
 
