@@ -37,3 +37,11 @@ openai:
 soniox:
   api-key: ${SONIOX_API_KEY:}
   model: ${SONIOX_MODEL:stt-async-v5}
+
+# 토론 기록 Soniox 모드 발언 구간 오디오의 S3 보관. 꺼져 있거나 설정이 비어 있으면 저장하지 않고 전사만 한다
+stt-audio:
+  enabled: ${STT_AUDIO_ENABLED:false}
+  bucket: ${STT_AUDIO_BUCKET:}
+  region: ${STT_AUDIO_REGION:ap-northeast-2}
+  access-key: ${STT_AUDIO_ACCESS_KEY:}
+  secret-key: ${STT_AUDIO_SECRET_KEY:}

@@ -3,11 +3,14 @@ package com.debatetimer.service.transcript;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.debatetimer.client.storage.SttAudioStorage;
 import com.debatetimer.client.stt.SonioxClient;
 import com.debatetimer.domain.transcript.SpeechToken;
 import com.debatetimer.domain.transcript.Utterance;
@@ -30,6 +33,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ExtendWith(OutputCaptureExtension.class)
 class SpeechTranscribeServiceTest extends BaseServiceTest {
 
+    private static final long MEMBER_ID = 1L;
+    private static final String SESSION_ID = "3f2b8c1e-5d4a-4e7b-9c0d-1a2b3c4d5e6f";
     private static final MockMultipartFile AUDIO = new MockMultipartFile("audio", "segment.webm", "audio/webm",
             new byte[]{1, 2, 3});
 
@@ -38,6 +43,9 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
 
     @MockitoBean
     private SonioxClient sonioxClient;
+
+    @MockitoBean
+    private SttAudioStorage sttAudioStorage;
 
     @Nested
     class TranscribeWithSoniox {
@@ -50,7 +58,7 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
                     new SpeechToken(" 감사합니다.", 1_200, 1_600)
             ));
 
-            SpeechTranscribeResponse response = speechTranscribeService.transcribeWithSoniox(AUDIO, "ko-KR");
+            SpeechTranscribeResponse response = speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR");
 
             assertThat(response.utterances()).containsExactly(
                     new Utterance(100, "찬성 입론입니다."),
@@ -62,7 +70,7 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
         void 영어_화면이면_영어_언어_힌트로_요청한다() {
             when(sonioxClient.transcribe(any(), any())).thenReturn(List.of());
 
-            speechTranscribeService.transcribeWithSoniox(AUDIO, "en-US");
+            speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "en-US");
 
             verify(sonioxClient).transcribe(any(), eq(List.of("en")));
         }
@@ -71,10 +79,30 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
         void 오디오가_비어_있으면_전사하지_않고_예외를_던진다() {
             MockMultipartFile empty = new MockMultipartFile("audio", "segment.webm", "audio/webm", new byte[0]);
 
-            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(empty, "ko-KR"))
+            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(MEMBER_ID, empty, SESSION_ID, "ko-KR"))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.EMPTY_AUDIO.getMessage());
             verifyNoInteractions(sonioxClient);
+            verify(sttAudioStorage, never()).save(anyLong(), any(), any());
+        }
+
+        @Test
+        void 회원과_토론_세션_정보와_함께_오디오_보관을_맡긴다() {
+            when(sonioxClient.transcribe(any(), any())).thenReturn(List.of());
+
+            speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR");
+
+            verify(sttAudioStorage).save(MEMBER_ID, SESSION_ID, AUDIO);
+        }
+
+        @Test
+        void 전사에_실패해도_오디오는_S3에_보관한다() {
+            when(sonioxClient.transcribe(any(), any()))
+                    .thenThrow(new DTServerErrorException(ServerErrorCode.STT_REQUEST_FAILED));
+
+            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR"))
+                    .isInstanceOf(DTServerErrorException.class);
+            verify(sttAudioStorage).save(MEMBER_ID, SESSION_ID, AUDIO);
         }
 
         @Test
@@ -82,7 +110,7 @@ class SpeechTranscribeServiceTest extends BaseServiceTest {
             when(sonioxClient.transcribe(any(), any()))
                     .thenThrow(new DTServerErrorException(ServerErrorCode.STT_REQUEST_FAILED));
 
-            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(AUDIO, "ko-KR"))
+            assertThatThrownBy(() -> speechTranscribeService.transcribeWithSoniox(MEMBER_ID, AUDIO, SESSION_ID, "ko-KR"))
                     .isInstanceOf(DTServerErrorException.class)
                     .hasMessage(ServerErrorCode.STT_REQUEST_FAILED.getMessage());
             assertThat(output.getAll())

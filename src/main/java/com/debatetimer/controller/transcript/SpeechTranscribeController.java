@@ -26,8 +26,9 @@ public class SpeechTranscribeController {
     public SpeechTranscribeResponse transcribeWithSoniox(
             @AuthMember Member member,
             @RequestPart("audio") MultipartFile audio,
+            @RequestParam(name = "sessionId", required = false) String sessionId,
             @RequestParam(name = "language", required = false) String language
     ) {
-        return speechTranscribeService.transcribeWithSoniox(audio, language);
+        return speechTranscribeService.transcribeWithSoniox(member.getId(), audio, sessionId, language);
     }
 }

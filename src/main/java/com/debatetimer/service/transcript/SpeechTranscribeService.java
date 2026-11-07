@@ -1,5 +1,6 @@
 package com.debatetimer.service.transcript;
 
+import com.debatetimer.client.storage.SttAudioStorage;
 import com.debatetimer.client.stt.SonioxClient;
 import com.debatetimer.domain.transcript.SpeechToken;
 import com.debatetimer.domain.transcript.UtteranceAssembler;
@@ -16,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 토론 기록 Soniox 모드에서 타이머가 끝난 발언 구간의 오디오를 받아 문장 단위로 전사한다.
- * Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
+ * 받은 오디오는 토론 세션별로 S3에 비동기로 보관하고, Soniox 전사가 끝날 때까지 요청 스레드에서 기다린다.
  */
 @Slf4j
 @Service
@@ -24,12 +25,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class SpeechTranscribeService {
 
     private final SonioxClient sonioxClient;
+    private final SttAudioStorage sttAudioStorage;
     private final UtteranceAssembler utteranceAssembler = new UtteranceAssembler();
 
-    public SpeechTranscribeResponse transcribeWithSoniox(MultipartFile audio, @Nullable String language) {
+    public SpeechTranscribeResponse transcribeWithSoniox(long memberId, MultipartFile audio,
+                                                        @Nullable String sessionId, @Nullable String language) {
         if (audio == null || audio.isEmpty()) {
             throw new DTClientErrorException(ClientErrorCode.EMPTY_AUDIO);
         }
+        // 전사에 실패한 오디오도 다시 들어볼 수 있도록 전사 전에 보관을 맡긴다.
+        sttAudioStorage.save(memberId, sessionId, audio);
         List<SpeechToken> tokens = transcribe(audio, language);
         return new SpeechTranscribeResponse(utteranceAssembler.assemble(tokens));
     }

@@ -39,6 +39,14 @@ discord:
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
 
+# 토론 기록 Soniox 모드 발언 구간 오디오의 S3 보관. prod-secret.yml에 값이 없으면 저장하지 않는다
+stt-audio:
+  enabled: ${secret.stt_audio.enabled:false}
+  bucket: ${secret.stt_audio.bucket:}
+  region: ${secret.stt_audio.region:ap-northeast-2}
+  access-key: ${secret.stt_audio.access_key:}
+  secret-key: ${secret.stt_audio.secret_key:}
+
 admin:
   password: ${secret.admin.password}
 

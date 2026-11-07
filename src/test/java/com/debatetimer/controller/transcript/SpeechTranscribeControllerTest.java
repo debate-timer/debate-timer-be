@@ -31,6 +31,7 @@ class SpeechTranscribeControllerTest extends BaseControllerTest {
             SpeechTranscribeResponse response = given()
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .multiPart("audio", "segment.webm", new byte[]{1, 2, 3}, "audio/webm")
+                    .formParam("sessionId", "3f2b8c1e-5d4a-4e7b-9c0d-1a2b3c4d5e6f")
                     .formParam("language", "ko-KR")
                     .when().post("/api/stt/soniox")
                     .then().statusCode(200)
