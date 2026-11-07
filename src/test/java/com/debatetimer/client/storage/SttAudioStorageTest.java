@@ -5,16 +5,22 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.TaskRejectedException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -29,13 +35,15 @@ class SttAudioStorageTest {
     private static final SttAudio AUDIO = new SttAudio(7L, "session-1", new byte[]{1, 2, 3}, "audio/webm",
             "segment.webm");
 
+    private static final long MAX_PENDING_BYTES = 3;
+
     private S3Client s3Client;
     private SttAudioStorage storage;
 
     @BeforeEach
     void setUp() {
         s3Client = mock(S3Client.class);
-        storage = new SttAudioStorage(s3Client, PROPERTIES, CLOCK);
+        storage = new SttAudioStorage(s3Client, PROPERTIES, CLOCK, new SyncTaskExecutor(), MAX_PENDING_BYTES);
     }
 
     @Nested
@@ -76,12 +84,47 @@ class SttAudioStorageTest {
 
         @Test
         void S3_클라이언트가_없으면_꺼진_것으로_보고_저장하지_않는다() {
-            SttAudioStorage disabled = new SttAudioStorage(null, PROPERTIES, CLOCK);
+            SttAudioStorage disabled = new SttAudioStorage(null, PROPERTIES, CLOCK, new SyncTaskExecutor(),
+                    MAX_PENDING_BYTES);
 
             assertAll(
                     () -> assertThat(disabled.isEnabled()).isFalse(),
                     () -> assertThatCode(() -> disabled.save(AUDIO)).doesNotThrowAnyException()
             );
+        }
+
+        @Test
+        void 업로드를_기다리는_오디오가_상한을_넘으면_보관하지_않는다() {
+            SttAudio large = new SttAudio(7L, "session-1", new byte[]{1, 2, 3, 4}, "audio/webm", "segment.webm");
+
+            storage.save(large);
+
+            verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        }
+
+        @Test
+        void 업로드가_끝나면_대기_용량을_돌려받아_다음_오디오를_보관한다() {
+            storage.save(AUDIO);
+            storage.save(AUDIO);
+
+            verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+        }
+
+        @Test
+        void 업로드_대기열이_가득_차도_예외를_던지지_않고_대기_용량을_돌려받는다() {
+            AtomicBoolean full = new AtomicBoolean(true);
+            TaskExecutor fullOnce = task -> {
+                if (full.getAndSet(false)) {
+                    throw new TaskRejectedException("full");
+                }
+                task.run();
+            };
+            SttAudioStorage storage = new SttAudioStorage(s3Client, PROPERTIES, CLOCK, fullOnce, MAX_PENDING_BYTES);
+
+            assertThatCode(() -> storage.save(AUDIO)).doesNotThrowAnyException();
+            storage.save(AUDIO);
+
+            verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
         }
     }
 }
