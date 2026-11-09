@@ -16,6 +16,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: validate
     defer-datasource-initialization: false
@@ -43,6 +44,13 @@ discord:
   token: ${secret.discord.token}
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
+
+# 토론 기록 분석·Soniox 배치 전사 키. prod-secret.yml에 값이 없어도 앱은 뜨고 해당 기능만 실패한다
+openai:
+  api-key: ${secret.openai.api_key:}
+
+soniox:
+  api-key: ${secret.soniox.api_key:}
 
 # 토론 기록 Soniox 모드 발언 구간 오디오의 S3 보관. prod-secret.yml에 값이 없으면 저장하지 않는다
 stt-audio:
