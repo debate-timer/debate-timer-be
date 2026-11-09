@@ -32,6 +32,14 @@ public class TranscriptDomainRepository {
         return toDomain(transcriptRepository.save(entity));
     }
 
+    // 기존 속기록의 시간표 스냅샷·STT 모드·회원을 그대로 두고, STT 원문으로 새 기록을 만든다.
+    @Transactional
+    public Transcript createRerun(Transcript source) {
+        TranscriptEntity entity = new TranscriptEntity(source.tableId(), source.memberId(), source.table(),
+                source.sttMode(), writeLines(source.originalLines()), source.id());
+        return toDomain(transcriptRepository.save(entity));
+    }
+
     @Transactional(readOnly = true)
     public Transcript getById(long id) {
         return toDomain(transcriptRepository.getById(id));
@@ -72,7 +80,7 @@ public class TranscriptDomainRepository {
                 entity.getTableSnapshot(), entity.getStatus(),
                 entity.getSttMode(), entity.isRefining(), readLines(entity.getLinesJson()),
                 readRawLines(entity.getRawLinesJson()), entity.getReportJson(),
-                entity.getErrorMessage());
+                entity.getErrorMessage(), entity.getSourceTranscriptId());
     }
 
     private String writeLines(List<TranscriptLine> lines) {
