@@ -1,0 +1,176 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "prosArguments",
+    "consArguments",
+    "clashes",
+    "keyMoments",
+    "teamFeedback"
+  ],
+  "properties": {
+    "prosArguments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/argument"
+      }
+    },
+    "consArguments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/argument"
+      }
+    },
+    "clashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "prosPosition",
+          "consPosition",
+          "advantage",
+          "reason",
+          "lineIndices"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "쟁점을 질문 형태로 짧게"
+          },
+          "prosPosition": {
+            "type": "string"
+          },
+          "consPosition": {
+            "type": "string"
+          },
+          "advantage": {
+            "type": "string",
+            "enum": [
+              "PROS",
+              "CONS",
+              "EVEN"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "우세를 판단한 이유 한 문장"
+          },
+          "lineIndices": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "keyMoments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lineIndex",
+          "label",
+          "reason"
+        ],
+        "properties": {
+          "lineIndex": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string",
+            "description": "흐름 전환, 효과적 질문, 결정적 정리처럼 2~6자"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "teamFeedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pros",
+        "cons"
+      ],
+      "properties": {
+        "pros": {
+          "$ref": "#/$defs/feedback"
+        },
+        "cons": {
+          "$ref": "#/$defs/feedback"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "argument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "evidences"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string"
+        },
+        "evidences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "content",
+              "lineIndex"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SOURCED",
+                  "LOGICAL",
+                  "VAGUE",
+                  "NONE"
+                ]
+              },
+              "content": {
+                "type": "string"
+              },
+              "lineIndex": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strengths",
+        "weaknesses"
+      ],
+      "properties": {
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

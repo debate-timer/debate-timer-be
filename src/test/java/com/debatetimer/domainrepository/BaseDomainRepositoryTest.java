@@ -7,6 +7,7 @@ import com.debatetimer.fixture.domain.CustomizeTimeBoxGenerator;
 import com.debatetimer.fixture.entity.BellEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTableEntityGenerator;
 import com.debatetimer.fixture.entity.CustomizeTimeBoxEntityGenerator;
+import com.debatetimer.fixture.entity.MemberFeatureFlagEntityGenerator;
 import com.debatetimer.fixture.entity.MemberGenerator;
 import com.debatetimer.fixture.entity.OrganizationEntityGenerator;
 import com.debatetimer.fixture.entity.OrganizationTemplateEntityGenerator;
@@ -35,6 +36,9 @@ public abstract class BaseDomainRepositoryTest {
 
     @Autowired
     protected MemberGenerator memberGenerator;
+
+    @Autowired
+    protected MemberFeatureFlagEntityGenerator memberFeatureFlagEntityGenerator;
 
     @Autowired
     protected CustomizeTableEntityGenerator tableEntityGenerator;

@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.organization.Language;
-import com.debatetimer.dto.admin.AdminOrganizationResponse;
-import com.debatetimer.dto.admin.AdminOrganizationTemplateResponse;
-import com.debatetimer.dto.admin.AdminOrganizationsResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
+import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
 import com.debatetimer.entity.organization.OrganizationEntity;
@@ -30,7 +30,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
             organizationTemplateEntityGenerator.generate(korean, "템플릿");
 
             AdminOrganizationsResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .when().get("/api/admin/organizations")
                     .then().statusCode(HttpStatus.OK.value())
                     .extract().as(AdminOrganizationsResponse.class);
@@ -44,7 +44,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_틀리면_조회할_수_없다() {
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, "wrong-password")
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, "wrong-password")
                     .when().get("/api/admin/organizations")
                     .then().statusCode(HttpStatus.UNAUTHORIZED.value());
         }
@@ -59,7 +59,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
                     "한앎", "한양대", "/icon.png", Language.KO_KR);
 
             AdminOrganizationResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/admin/organizations")
@@ -78,7 +78,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
                     " ", "한양대", "/icon.png", Language.KO_KR);
 
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/admin/organizations")
@@ -107,7 +107,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
             OrganizationTemplateCreateRequest request = new OrganizationTemplateCreateRequest("템플릿", "data");
 
             AdminOrganizationTemplateResponse response = given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .contentType(ContentType.JSON)
                     .pathParam("organizationId", organization.getId())
                     .body(request)
@@ -123,7 +123,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
             OrganizationTemplateCreateRequest request = new OrganizationTemplateCreateRequest("템플릿", "data");
 
             given()
-                    .header(AdminSharingController.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
                     .contentType(ContentType.JSON)
                     .pathParam("organizationId", 999)
                     .body(request)

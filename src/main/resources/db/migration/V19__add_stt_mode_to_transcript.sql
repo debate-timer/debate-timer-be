@@ -1,0 +1,2 @@
+ALTER TABLE transcript
+    ADD COLUMN stt_mode ENUM ('RPC','SONIOX') NOT NULL DEFAULT 'RPC';

@@ -1,3 +1,8 @@
+# nginx 가 HTTPS 를 받아 HTTP 로 넘기므로, 프록시가 붙인 X-Forwarded-Proto 를 반영해 원래 요청 주소를 알게 한다.
+# 반영하지 않으면 같은 도메인의 어드민 페이지 요청(Origin: https://...)을 다른 출처로 보고 CORS 403 으로 거절한다.
+server:
+  forward-headers-strategy: native
+
 spring:
   config:
     import: prod-secret.yml
@@ -38,6 +43,14 @@ discord:
   token: ${secret.discord.token}
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
+
+# 토론 기록 Soniox 모드 발언 구간 오디오의 S3 보관. prod-secret.yml에 값이 없으면 저장하지 않는다
+stt-audio:
+  enabled: ${secret.stt_audio.enabled:false}
+  bucket: ${secret.stt_audio.bucket:}
+  region: ${secret.stt_audio.region:ap-northeast-2}
+  access-key: ${secret.stt_audio.access_key:}
+  secret-key: ${secret.stt_audio.secret_key:}
 
 admin:
   password: ${secret.admin.password}

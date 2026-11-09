@@ -5,10 +5,12 @@ import static org.mockito.Mockito.doReturn;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.customize.CustomizeTable;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.OAuthToken;
+import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.ErrorResponse;
@@ -44,6 +46,44 @@ class MemberControllerTest extends BaseControllerTest {
                     .extract().as(TableResponses.class);
 
             assertThat(response.tables()).hasSize(1);
+        }
+    }
+
+    @Nested
+    class GetFeatureFlags {
+
+        @Test
+        void 회원의_피쳐_플래그를_조회한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+            memberFeatureFlagEntityGenerator.generate(bito, FeatureFlag.TRANSCRIPT);
+
+            MemberFeatureFlagsResponse response = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/member/feature-flags")
+                    .then().statusCode(200)
+                    .extract().as(MemberFeatureFlagsResponse.class);
+
+            assertThat(response.featureFlags()).containsExactly(FeatureFlag.TRANSCRIPT);
+        }
+
+        @Test
+        void 플래그가_없으면_빈_목록을_조회한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            MemberFeatureFlagsResponse response = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/member/feature-flags")
+                    .then().statusCode(200)
+                    .extract().as(MemberFeatureFlagsResponse.class);
+
+            assertThat(response.featureFlags()).isEmpty();
+        }
+
+        @Test
+        void 로그인하지_않으면_조회할_수_없다() {
+            given()
+                    .when().get("/api/member/feature-flags")
+                    .then().statusCode(401);
         }
     }
 

@@ -65,6 +65,10 @@ dependencies {
     // DB schema manager
     implementation 'org.flywaydb:flyway-mysql'
 
+    // AWS S3 (토론 기록 Soniox 모드 오디오 보관)
+    implementation platform('software.amazon.awssdk:bom:2.46.7')
+    implementation 'software.amazon.awssdk:s3'
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

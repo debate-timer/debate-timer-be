@@ -1,0 +1,5 @@
+ALTER TABLE transcript
+    ADD COLUMN raw_lines_json LONGTEXT NULL;
+
+ALTER TABLE transcript
+    ADD COLUMN refining BOOLEAN NOT NULL DEFAULT FALSE;

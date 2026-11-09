@@ -1,3 +1,8 @@
+# nginx 가 HTTPS 를 받아 HTTP 로 넘기므로, 프록시가 붙인 X-Forwarded-Proto 를 반영해 원래 요청 주소를 알게 한다.
+# 반영하지 않으면 같은 도메인의 어드민 페이지 요청(Origin: https://...)을 다른 출처로 보고 CORS 403 으로 거절한다.
+server:
+  forward-headers-strategy: native
+
 spring:
   config:
     import: dev-secret.yml
@@ -39,6 +44,20 @@ discord:
   token: ${secret.discord.token}
   channelId: ${secret.discord.channelId}
   sharingChannelId: ${secret.discord.sharingChannelId}
+
+# 토론 기록 분석·Soniox 배치 전사 키. dev-secret.yml에 값이 없어도 앱은 뜨고 해당 기능만 실패한다
+openai:
+  api-key: ${secret.openai.api_key:}
+
+soniox:
+  api-key: ${secret.soniox.api_key:}
+
+stt-audio:
+  enabled: ${secret.stt_audio.enabled:false}
+  bucket: ${secret.stt_audio.bucket:}
+  region: ${secret.stt_audio.region:ap-northeast-2}
+  access-key: ${secret.stt_audio.access_key:}
+  secret-key: ${secret.stt_audio.secret_key:}
 
 admin:
   password: ${secret.admin.password}

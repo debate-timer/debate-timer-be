@@ -6,6 +6,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 
 import com.debatetimer.controller.tool.cookie.CookieManager;
 import com.debatetimer.controller.tool.jwt.AuthManager;
+import com.debatetimer.domain.member.FeatureFlag;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
@@ -16,6 +17,8 @@ import com.debatetimer.service.organization.OrganizationService;
 import com.debatetimer.service.poll.PollService;
 import com.debatetimer.service.poll.VoteService;
 import com.debatetimer.service.sharing.SharingService;
+import com.debatetimer.service.transcript.SpeechTranscribeService;
+import com.debatetimer.service.transcript.TranscriptService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -79,6 +82,12 @@ public abstract class BaseDocumentTest {
     protected OrganizationService organizationService;
 
     @MockitoBean
+    protected SpeechTranscribeService speechTranscribeService;
+
+    @MockitoBean
+    protected TranscriptService transcriptService;
+
+    @MockitoBean
     protected AuthManager authManager;
 
     @MockitoBean
@@ -118,6 +127,22 @@ public abstract class BaseDocumentTest {
                 .sameSite("None")
                 .secure(true)
                 .build();
+    }
+
+    // 피쳐 플래그가 필요한 API 의 summary 앞에 붙여 API 목록에서 바로 보이게 한다.
+    protected static String featureFlagSummary(FeatureFlag flag, String summary) {
+        return "[%s] %s".formatted(flag.name(), summary);
+    }
+
+    // 피쳐 플래그가 필요한 API 의 description 맨 앞에 붙여 프론트가 노출 조건을 알 수 있게 한다.
+    protected static String featureFlagDescription(FeatureFlag flag) {
+        return """
+                > **피쳐 플래그 필요: `%s` (%s)**
+                >
+                > `%s` 플래그를 부여받은 회원만 호출할 수 있습니다. 플래그가 없는 회원이 호출하면 `403 FEATURE_NOT_ALLOWED` 를 응답합니다.
+                > 플래그는 어드민에서 회원별로 부여합니다. 플래그가 없는 회원에게는 이 기능의 화면을 노출하지 않아야 합니다.
+
+                """.formatted(flag.name(), flag.getDescription(), flag.name());
     }
 
     protected RestDocumentationRequest request() {
