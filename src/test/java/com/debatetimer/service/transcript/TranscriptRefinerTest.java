@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,10 +13,12 @@ import static org.mockito.Mockito.when;
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.member.Member;
+import com.debatetimer.domain.prompt.PromptType;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
+import com.debatetimer.domainrepository.prompt.LlmPromptDomainRepository;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.service.BaseServiceTest;
@@ -37,6 +40,9 @@ class TranscriptRefinerTest extends BaseServiceTest {
 
     @Autowired
     private TranscriptDomainRepository transcriptDomainRepository;
+
+    @Autowired
+    private LlmPromptDomainRepository llmPromptDomainRepository;
 
     @MockitoBean
     private OpenAiClient openAiClient;
@@ -133,5 +139,17 @@ class TranscriptRefinerTest extends BaseServiceTest {
                 () -> assertThat(skipped.refining()).isFalse(),
                 () -> assertThat(skipped.lines()).isEqualTo(RAW_LINES)
         );
+    }
+
+    @Test
+    void 어드민에서_수정한_시스템_프롬프트로_요청한다() {
+        Transcript transcript = savedTranscript();
+        llmPromptDomainRepository.save(PromptType.TRANSCRIPT_REFINEMENT, "수정한 프롬프트");
+        when(openAiClient.requestStructuredOutput(anyString(), anyString(), anyString(), anyMap()))
+                .thenReturn("{}");
+
+        transcriptRefiner.refine(transcript.id());
+
+        verify(openAiClient).requestStructuredOutput(eq("수정한 프롬프트"), anyString(), anyString(), any());
     }
 }

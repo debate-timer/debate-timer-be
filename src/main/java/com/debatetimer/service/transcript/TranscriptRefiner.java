@@ -2,11 +2,13 @@ package com.debatetimer.service.transcript;
 
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.prompt.PromptType;
 import com.debatetimer.domain.transcript.RefinedTextMerger;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
+import com.debatetimer.service.prompt.PromptProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,25 +42,27 @@ public class TranscriptRefiner {
     private final TranscriptDomainRepository transcriptDomainRepository;
     private final ObjectMapper objectMapper;
     private final RefinedTextMerger refinedTextMerger = new RefinedTextMerger();
-    private final String systemPrompt;
+    private final PromptProvider promptProvider;
     private final Map<String, Object> schema;
 
     public TranscriptRefiner(
             OpenAiClient openAiClient,
             TranscriptDomainRepository transcriptDomainRepository,
+            PromptProvider promptProvider,
             ObjectMapper objectMapper
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
         this.objectMapper = objectMapper;
-        this.systemPrompt = readResource("prompt/transcript-refinement-system.md");
+        this.promptProvider = promptProvider;
         this.schema = readSchema();
     }
 
     public void refine(long transcriptId) {
         try {
             Transcript transcript = transcriptDomainRepository.getById(transcriptId);
-            String response = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(transcript),
+            String response = openAiClient.requestStructuredOutput(
+                    promptProvider.getSystemPrompt(PromptType.TRANSCRIPT_REFINEMENT), buildUserPrompt(transcript),
                     SCHEMA_NAME, schema);
             List<TranscriptLine> refined = refinedTextMerger.merge(transcript.lines(), readRefinedTexts(response));
             transcriptDomainRepository.refine(transcriptId, refined);

@@ -2,10 +2,12 @@ package com.debatetimer.service.transcript;
 
 import com.debatetimer.client.llm.OpenAiClient;
 import com.debatetimer.domain.customize.Stance;
+import com.debatetimer.domain.prompt.PromptType;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
 import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
+import com.debatetimer.service.prompt.PromptProvider;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -31,24 +33,26 @@ public class DebateAnalyzer {
 
     private final OpenAiClient openAiClient;
     private final TranscriptDomainRepository transcriptDomainRepository;
-    private final String systemPrompt;
+    private final PromptProvider promptProvider;
     private final Map<String, Object> schema;
 
     public DebateAnalyzer(
             OpenAiClient openAiClient,
             TranscriptDomainRepository transcriptDomainRepository,
+            PromptProvider promptProvider,
             ObjectMapper objectMapper
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
-        this.systemPrompt = readResource("prompt/debate-analysis-system.md");
+        this.promptProvider = promptProvider;
         this.schema = readSchema(objectMapper);
     }
 
     public void analyze(long transcriptId) {
         try {
             Transcript transcript = transcriptDomainRepository.getById(transcriptId);
-            String report = openAiClient.requestStructuredOutput(systemPrompt, buildUserPrompt(transcript),
+            String report = openAiClient.requestStructuredOutput(
+                    promptProvider.getSystemPrompt(PromptType.DEBATE_ANALYSIS), buildUserPrompt(transcript),
                     SCHEMA_NAME, schema);
             transcriptDomainRepository.complete(transcriptId, report);
         } catch (RuntimeException exception) {
