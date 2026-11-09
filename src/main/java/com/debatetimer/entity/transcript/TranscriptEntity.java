@@ -73,8 +73,28 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "error_message", length = ERROR_MESSAGE_MAX_LENGTH)
     private String errorMessage;
 
-    public TranscriptEntity(long tableId, long memberId, TranscriptTableSnapshot table, SttMode sttMode,
-                            String linesJson) {
+    // 어드민이 기존 속기록 원문으로 보정·분석을 다시 돌려 만든 기록이면 원본 속기록 ID
+    @Column(name = "source_transcript_id")
+    private Long sourceTranscriptId;
+
+    public TranscriptEntity(
+            long tableId,
+            long memberId,
+            TranscriptTableSnapshot table,
+            SttMode sttMode,
+            String linesJson
+    ) {
+        this(tableId, memberId, table, sttMode, linesJson, null);
+    }
+
+    public TranscriptEntity(
+            long tableId,
+            long memberId,
+            TranscriptTableSnapshot table,
+            SttMode sttMode,
+            String linesJson,
+            Long sourceTranscriptId
+    ) {
         this.tableId = tableId;
         this.memberId = memberId;
         this.tableName = table.tableName();
@@ -86,6 +106,7 @@ public class TranscriptEntity extends BaseTimeEntity {
         this.rawLinesJson = linesJson;
         this.refining = true;
         this.status = TranscriptStatus.PROCESSING;
+        this.sourceTranscriptId = sourceTranscriptId;
     }
 
     public TranscriptTableSnapshot getTableSnapshot() {

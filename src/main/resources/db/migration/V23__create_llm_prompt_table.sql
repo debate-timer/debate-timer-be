@@ -1,0 +1,9 @@
+CREATE TABLE llm_prompt
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    prompt_type VARCHAR(50) NOT NULL,
+    content     LONGTEXT    NOT NULL,
+    created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uk_llm_prompt_type UNIQUE (prompt_type)
+);

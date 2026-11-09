@@ -3,6 +3,7 @@ package com.debatetimer.domainrepository.transcript;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
 import com.debatetimer.domain.transcript.TranscriptLine;
+import com.debatetimer.domain.transcript.TranscriptOverview;
 import com.debatetimer.domain.transcript.TranscriptSummary;
 import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.entity.transcript.TranscriptEntity;
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,19 @@ public class TranscriptDomainRepository {
                              List<TranscriptLine> lines) {
         TranscriptEntity entity = new TranscriptEntity(tableId, memberId, table, sttMode, writeLines(lines));
         return toDomain(transcriptRepository.save(entity));
+    }
+
+    // 기존 속기록의 시간표 스냅샷·STT 모드·회원을 그대로 두고, STT 원문으로 새 기록을 만든다.
+    @Transactional
+    public Transcript createRerun(Transcript source) {
+        TranscriptEntity entity = new TranscriptEntity(source.tableId(), source.memberId(), source.table(),
+                source.sttMode(), writeLines(source.originalLines()), source.id());
+        return toDomain(transcriptRepository.save(entity));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TranscriptOverview> findOverviews(int page, int size) {
+        return transcriptRepository.findOverviews(PageRequest.of(page, size));
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +88,7 @@ public class TranscriptDomainRepository {
                 entity.getTableSnapshot(), entity.getStatus(),
                 entity.getSttMode(), entity.isRefining(), readLines(entity.getLinesJson()),
                 readRawLines(entity.getRawLinesJson()), entity.getReportJson(),
-                entity.getErrorMessage());
+                entity.getErrorMessage(), entity.getSourceTranscriptId());
     }
 
     private String writeLines(List<TranscriptLine> lines) {
