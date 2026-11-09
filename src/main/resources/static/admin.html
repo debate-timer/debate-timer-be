@@ -85,6 +85,11 @@
         .icon-preview { width: 38px; height: 38px; flex: none; }
         .upload-box { border: 1px dashed var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
         textarea { width: 100%; min-height: 90px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+        textarea.prompt-editor { min-height: 360px; resize: vertical; line-height: 1.5; }
+        .prompt-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        details.prompt-default { margin-top: 10px; }
+        details.prompt-default summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+        details.prompt-default pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
         button {
             background: var(--count);
             color: #fff;
@@ -203,6 +208,7 @@
             <button type="button" data-tab="tables">테이블 목록</button>
             <button type="button" data-tab="organizations">단체 · 템플릿</button>
             <button type="button" data-tab="feature-flags">피쳐 플래그</button>
+            <button type="button" data-tab="prompts">LLM 프롬프트</button>
         </nav>
 
         <!-- 통계 공통 기간 선택 -->
@@ -409,6 +415,16 @@
                 <div id="feature-flag-members-error" class="error"></div>
             </div>
         </section>
+
+        <!-- LLM 프롬프트 -->
+        <section id="tab-prompts" class="tab hidden">
+            <div class="panel">
+                <h2>LLM 시스템 프롬프트</h2>
+                <div class="hint">저장하면 바로 운영 중인 모든 속기록 보정 · 분석 보고서 생성에 적용됩니다. 결과는 앱에서 새 속기록을 만들어 확인하세요.</div>
+                <div id="prompts-error" class="error"></div>
+            </div>
+            <div id="prompts-list"></div>
+        </section>
     </div>
 </main>
 
@@ -582,6 +598,7 @@
         if (state.tab === 'tables') return loadTables();
         if (state.tab === 'organizations') return loadOrganizations();
         if (state.tab === 'feature-flags') return loadFeatureFlags();
+        if (state.tab === 'prompts') return loadPrompts();
     }
 
     // ---------- 차트 ----------
@@ -1213,6 +1230,62 @@
             await loadFeatureFlags();
         } catch (error) {
             handleError(error, 'feature-flag-members-error');
+        }
+    }
+
+    // ---------- LLM 프롬프트 ----------
+    async function loadPrompts() {
+        $('prompts-error').textContent = '';
+        try {
+            const result = await api('/api/admin/prompts');
+            $('prompts-list').replaceChildren(...result.prompts.map(renderPrompt));
+        } catch (error) {
+            handleError(error, 'prompts-error');
+        }
+    }
+
+    function renderPrompt(prompt) {
+        const messageId = `prompt-message-${prompt.promptType}`;
+        const editor = el('textarea', { class: 'prompt-editor', spellcheck: 'false', 'aria-label': prompt.description });
+        editor.value = prompt.content;
+        const save = el('button', { type: 'button', disabled: '' }, '저장');
+        const reset = el('button', { type: 'button', class: 'secondary' }, '기본값으로 되돌리기');
+        if (!prompt.customized) reset.disabled = true;
+        editor.addEventListener('input', () => { save.disabled = editor.value === prompt.content || !editor.value.trim(); });
+        save.addEventListener('click', () => whilePending(save, () => savePrompt(prompt, editor.value, messageId)));
+        reset.addEventListener('click', () => whilePending(reset, () => resetPrompt(prompt, messageId)));
+
+        const status = prompt.customized
+            ? el('span', { class: 'chip on' }, `수정됨 · ${formatDateTime(prompt.modifiedAt)}`)
+            : el('span', { class: 'chip' }, '기본값 사용 중');
+        return el('div', { class: 'panel' },
+            el('div', { class: 'panel-head' }, el('h2', {}, `${prompt.description} (${prompt.promptType})`), status),
+            editor,
+            el('div', { class: 'prompt-actions' }, save, reset),
+            el('div', { id: messageId, class: 'error' }),
+            el('details', { class: 'prompt-default' }, el('summary', {}, '기본값(md 파일) 보기'), el('pre', {}, prompt.defaultContent)));
+    }
+
+    async function savePrompt(prompt, content, messageId) {
+        setMessage(messageId, '');
+        try {
+            await api(`/api/admin/prompts/${prompt.promptType}`, { method: 'PUT', body: JSON.stringify({ content }) });
+            await loadPrompts();
+            setMessage(`prompt-message-${prompt.promptType}`, '저장했습니다. 이제부터 이 프롬프트를 씁니다.', true);
+        } catch (error) {
+            handleError(error, messageId);
+        }
+    }
+
+    async function resetPrompt(prompt, messageId) {
+        if (!confirm(`${prompt.description} 프롬프트를 기본값으로 되돌릴까요? 수정한 내용은 사라집니다.`)) return;
+        setMessage(messageId, '');
+        try {
+            await api(`/api/admin/prompts/${prompt.promptType}`, { method: 'DELETE' });
+            await loadPrompts();
+            setMessage(`prompt-message-${prompt.promptType}`, '기본값으로 되돌렸습니다.', true);
+        } catch (error) {
+            handleError(error, messageId);
         }
     }
 
