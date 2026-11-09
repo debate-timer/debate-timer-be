@@ -88,6 +88,14 @@
         textarea.prompt-editor { min-height: 360px; resize: vertical; line-height: 1.5; }
         .prompt-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         details.prompt-default { margin-top: 10px; }
+        .modal.wide { max-width: 1000px; }
+        .json-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+        pre.json-view {
+            margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; word-break: break-word;
+            font-family: ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5;
+            background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px;
+        }
+        .chip.warn { border-color: var(--error); color: var(--error); }
         details.prompt-default summary { cursor: pointer; color: var(--muted); font-size: 12px; }
         details.prompt-default pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
         button {
@@ -208,6 +216,7 @@
             <button type="button" data-tab="tables">테이블 목록</button>
             <button type="button" data-tab="organizations">단체 · 템플릿</button>
             <button type="button" data-tab="feature-flags">피쳐 플래그</button>
+            <button type="button" data-tab="transcripts">토론 기록</button>
             <button type="button" data-tab="prompts">LLM 프롬프트</button>
         </nav>
 
@@ -416,6 +425,30 @@
             </div>
         </section>
 
+        <!-- 토론 기록 -->
+        <section id="tab-transcripts" class="tab hidden">
+            <div class="panel">
+                <div class="row spread">
+                    <h2 style="margin:0">전체 토론 기록</h2>
+                    <div class="row">
+                        <span class="hint" id="transcripts-total" style="margin:0"></span>
+                        <button type="button" class="secondary small" id="transcripts-refresh">새로고침</button>
+                    </div>
+                </div>
+                <div class="hint">행을 누르면 STT 원문 · 보정본 · 분석 보고서 JSON을 볼 수 있고, 원문으로 보정 · 분석을 다시 돌릴 수 있습니다.</div>
+                <div class="table-wrap" style="margin-top:12px">
+                    <table class="data">
+                        <thead>
+                        <tr><th>ID</th><th>회원</th><th>테이블</th><th>주제</th><th>STT</th><th>상태</th><th>원본</th><th>생성</th></tr>
+                        </thead>
+                        <tbody id="transcripts-body"></tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="transcripts-pagination"></div>
+                <div id="transcripts-error" class="error"></div>
+            </div>
+        </section>
+
         <!-- LLM 프롬프트 -->
         <section id="tab-prompts" class="tab hidden">
             <div class="panel">
@@ -445,6 +478,26 @@
     </div>
 </div>
 
+<div id="transcript-modal" class="modal-backdrop hidden" role="presentation">
+    <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="transcript-modal-title">
+        <div class="modal-head">
+            <div>
+                <div class="title" id="transcript-modal-title"></div>
+                <div class="agenda" id="transcript-modal-agenda"></div>
+            </div>
+            <div class="row">
+                <button type="button" class="small" id="transcript-rerun">현재 속기록으로 다시 실행</button>
+                <button type="button" class="secondary small" id="transcript-modal-close">닫기</button>
+            </div>
+        </div>
+        <div class="meta" id="transcript-modal-meta"></div>
+        <div class="json-tabs" id="transcript-json-tabs" role="group" aria-label="JSON 종류"></div>
+        <pre class="json-view" id="transcript-json"></pre>
+        <div id="transcript-modal-message" class="error"></div>
+        <div class="hint">다시 실행하면 같은 회원 · 시간표 정보 · STT 원문으로 새 토론 기록을 만들고, 지금 저장된 프롬프트로 보정 · 분석을 돌립니다. 회원의 앱 기록 목록에도 보입니다.</div>
+    </div>
+</div>
+
 <script>
     const PASSWORD_KEY = 'debate-timer-admin-password';
     const TAB_KEY = 'debate-timer-admin-tab';
@@ -458,9 +511,12 @@
     const BELL_LABELS = { AFTER_START: '시작 후', BEFORE_END: '종료 전', AFTER_END: '종료 후' };
     const STANCE_LABELS = { PROS: '찬성', CONS: '반대', NEUTRAL: '중립' };
     const BOX_LABELS = { NORMAL: '일반 타이머', TIME_BASED: '자유토론 (시간 총량제)' };
+    const TRANSCRIPT_STATUS_LABELS = { PROCESSING: '분석 중', DONE: '완료', FAILED: '실패' };
+    const TRANSCRIPT_JSON_TABS = [['rawLines', 'STT 원문'], ['lines', '보정본'], ['report', '분석 보고서']];
 
     const charts = {};
-    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), modalOpener: null };
+    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), modalOpener: null,
+        transcriptPage: 0, transcript: null, transcriptJson: 'lines', transcriptOpener: null };
 
     const $ = (id) => document.getElementById(id);
     const color = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -599,6 +655,7 @@
         if (state.tab === 'organizations') return loadOrganizations();
         if (state.tab === 'feature-flags') return loadFeatureFlags();
         if (state.tab === 'prompts') return loadPrompts();
+        if (state.tab === 'transcripts') return loadTranscripts();
     }
 
     // ---------- 차트 ----------
@@ -1233,6 +1290,124 @@
         }
     }
 
+    // ---------- 토론 기록 ----------
+    function transcriptStatus(transcript) {
+        if (transcript.status === 'FAILED') return el('span', { class: 'chip warn' }, '실패');
+        if (transcript.status === 'DONE') return el('span', { class: 'chip on' }, '완료');
+        return el('span', { class: 'chip' }, transcript.refining ? '보정 중' : '분석 중');
+    }
+
+    async function loadTranscripts() {
+        $('transcripts-error').textContent = '';
+        try {
+            const params = new URLSearchParams({ page: state.transcriptPage, size: 20 });
+            const result = await api(`/api/admin/transcripts?${params}`);
+            if (result.totalPages > 0 && state.transcriptPage >= result.totalPages) {
+                state.transcriptPage = result.totalPages - 1;
+                return loadTranscripts();
+            }
+            $('transcripts-total').textContent = `총 ${result.totalElements}개`;
+            const rows = result.transcripts.map((transcript) => el('tr', {
+                class: 'clickable', tabindex: 0,
+                onclick: (event) => openTranscript(transcript.id, event.currentTarget),
+                onkeydown: (event) => { if (event.key === 'Enter') openTranscript(transcript.id, event.currentTarget); },
+            },
+                el('td', { class: 'num' }, transcript.id),
+                el('td', {}, transcript.memberEmail || `#${transcript.memberId}`),
+                el('td', { class: 'wrap' }, transcript.tableName || '-'),
+                el('td', { class: 'wrap' }, transcript.agenda || '-'),
+                el('td', {}, transcript.sttMode),
+                el('td', {}, transcriptStatus(transcript)),
+                el('td', { class: 'num' }, transcript.sourceTranscriptId ? `#${transcript.sourceTranscriptId} 재실행` : '-'),
+                el('td', { class: 'num' }, formatDateTime(transcript.createdAt)),
+            ));
+            $('transcripts-body').replaceChildren(...(rows.length ? rows
+                : [el('tr', {}, el('td', { colspan: 8, class: 'empty' }, '토론 기록이 없습니다.'))]));
+            renderTranscriptPagination(result.page, result.totalPages);
+        } catch (error) {
+            handleError(error, 'transcripts-error');
+        }
+    }
+
+    function renderTranscriptPagination(page, totalPages) {
+        const go = (target) => { state.transcriptPage = target; loadTranscripts(); };
+        const prev = el('button', { type: 'button', class: 'secondary small', onclick: () => go(page - 1) }, '이전');
+        prev.disabled = page <= 0;
+        const next = el('button', { type: 'button', class: 'secondary small', onclick: () => go(page + 1) }, '다음');
+        next.disabled = page >= totalPages - 1;
+        $('transcripts-pagination').replaceChildren(prev, el('span', { class: 'hint', style: 'margin:0 8px' },
+            `${totalPages ? page + 1 : 0} / ${totalPages}`), next);
+    }
+
+    async function openTranscript(transcriptId, opener) {
+        $('transcripts-error').textContent = '';
+        try {
+            const transcript = await api(`/api/admin/transcripts/${transcriptId}`);
+            if (opener) state.transcriptOpener = opener;
+            renderTranscriptModal(transcript);
+            $('transcript-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            $('transcript-modal-close').focus();
+        } catch (error) {
+            handleError(error, 'transcripts-error');
+        }
+    }
+
+    function renderTranscriptModal(transcript) {
+        state.transcript = transcript;
+        setMessage('transcript-modal-message', '');
+        $('transcript-modal-title').textContent = `#${transcript.id} ${transcript.tableName || ''}`;
+        $('transcript-modal-agenda').textContent = transcript.agenda || '';
+        const meta = [
+            ['회원 ID', transcript.memberId],
+            ['테이블 ID', transcript.tableId],
+            ['팀', `${transcript.prosTeamName || '-'} vs ${transcript.consTeamName || '-'}`],
+            ['STT', transcript.sttMode],
+            ['상태', `${TRANSCRIPT_STATUS_LABELS[transcript.status]}${transcript.refining ? ' (보정 중)' : ''}`],
+            ['줄 수', `원문 ${transcript.rawLines.length} · 보정 ${transcript.lines.length}`],
+        ];
+        const metaNodes = meta.map(([label, value]) => el('div', {}, el('span', {}, label), el('span', {}, value)));
+        if (transcript.sourceTranscriptId) {
+            metaNodes.push(el('div', {}, el('span', {}, '원본'), el('a', { href: '#',
+                onclick: (event) => { event.preventDefault(); openTranscript(transcript.sourceTranscriptId); } },
+                `#${transcript.sourceTranscriptId}`)));
+        }
+        if (transcript.errorMessage) metaNodes.push(el('div', {}, el('span', {}, '실패 사유'), el('span', {}, transcript.errorMessage)));
+        $('transcript-modal-meta').replaceChildren(...metaNodes);
+        renderTranscriptJson();
+    }
+
+    function renderTranscriptJson() {
+        $('transcript-json-tabs').replaceChildren(...TRANSCRIPT_JSON_TABS.map(([key, label]) => el('button', {
+            type: 'button', class: `secondary small${key === state.transcriptJson ? ' active' : ''}`,
+            onclick: () => { state.transcriptJson = key; renderTranscriptJson(); },
+        }, label)));
+        const value = state.transcript[state.transcriptJson];
+        $('transcript-json').textContent = value === null || value === undefined ? '(아직 없음)' : JSON.stringify(value, null, 2);
+    }
+
+    function closeTranscriptModal() {
+        if ($('transcript-modal').classList.contains('hidden')) return;
+        $('transcript-modal').classList.add('hidden');
+        document.body.style.overflow = '';
+        if (state.transcriptOpener && document.contains(state.transcriptOpener)) state.transcriptOpener.focus();
+        state.transcriptOpener = null;
+    }
+
+    async function rerunTranscript() {
+        const source = state.transcript;
+        if (!confirm(`#${source.id} 토론 기록의 STT 원문으로 보정 · 분석을 다시 돌려 새 기록을 만들까요?`)) return;
+        setMessage('transcript-modal-message', '');
+        try {
+            const created = await api(`/api/admin/transcripts/${source.id}/rerun`, { method: 'POST' });
+            state.transcriptPage = 0;
+            await loadTranscripts();
+            setMessage('transcript-modal-message', `#${created.id} 기록을 만들었습니다. 보정 · 분석은 수십 초 걸리니 목록에서 새로고침해 확인하세요.`, true);
+        } catch (error) {
+            handleError(error, 'transcript-modal-message');
+        }
+    }
+
     // ---------- LLM 프롬프트 ----------
     async function loadPrompts() {
         $('prompts-error').textContent = '';
@@ -1317,7 +1492,11 @@
     }));
     $('modal-close').addEventListener('click', closeModal);
     $('modal').addEventListener('click', (event) => { if (event.target === $('modal')) closeModal(); });
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeModal(); closeTranscriptModal(); } });
+    $('transcript-modal-close').addEventListener('click', closeTranscriptModal);
+    $('transcript-modal').addEventListener('click', (event) => { if (event.target === $('transcript-modal')) closeTranscriptModal(); });
+    $('transcript-rerun').addEventListener('click', () => whilePending($('transcript-rerun'), rerunTranscript));
+    $('transcripts-refresh').addEventListener('click', () => whilePending($('transcripts-refresh'), loadTranscripts));
     $('organization-form').addEventListener('submit', (event) => {
         event.preventDefault();
         whilePending($('organization-form').querySelector('button[type=submit]'), () => createOrganization(event));
