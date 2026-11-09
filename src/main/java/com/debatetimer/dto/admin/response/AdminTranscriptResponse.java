@@ -21,8 +21,18 @@ public record AdminTranscriptResponse(
 ) {
 
     public AdminTranscriptResponse(TranscriptOverview overview) {
-        this(overview.id(), overview.memberId(), overview.memberEmail(), overview.tableId(), overview.tableName(),
-                overview.agenda(), overview.sttMode(), overview.status(), overview.refining(),
-                overview.sourceTranscriptId(), overview.createdAt());
+        this(
+                overview.id(),
+                overview.memberId(),
+                overview.memberEmail(),
+                overview.tableId(),
+                overview.tableName(),
+                overview.agenda(),
+                overview.sttMode(),
+                overview.status(),
+                overview.refining(),
+                overview.sourceTranscriptId(),
+                overview.createdAt()
+        );
     }
 }

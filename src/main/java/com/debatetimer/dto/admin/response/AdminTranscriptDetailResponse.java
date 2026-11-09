@@ -30,9 +30,22 @@ public record AdminTranscriptDetailResponse(
 ) {
 
     public AdminTranscriptDetailResponse(Transcript transcript, @Nullable JsonNode report) {
-        this(transcript.id(), transcript.memberId(), transcript.tableId(), transcript.table().tableName(),
-                transcript.table().agenda(), transcript.table().prosTeamName(), transcript.table().consTeamName(),
-                transcript.status(), transcript.sttMode(), transcript.refining(), transcript.sourceTranscriptId(),
-                transcript.errorMessage(), transcript.originalLines(), transcript.lines(), report);
+        this(
+                transcript.id(),
+                transcript.memberId(),
+                transcript.tableId(),
+                transcript.table().tableName(),
+                transcript.table().agenda(),
+                transcript.table().prosTeamName(),
+                transcript.table().consTeamName(),
+                transcript.status(),
+                transcript.sttMode(),
+                transcript.refining(),
+                transcript.sourceTranscriptId(),
+                transcript.errorMessage(),
+                transcript.originalLines(),
+                transcript.lines(),
+                report
+        );
     }
 }

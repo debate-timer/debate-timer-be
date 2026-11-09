@@ -77,13 +77,24 @@ public class TranscriptEntity extends BaseTimeEntity {
     @Column(name = "source_transcript_id")
     private Long sourceTranscriptId;
 
-    public TranscriptEntity(long tableId, long memberId, TranscriptTableSnapshot table, SttMode sttMode,
-                            String linesJson) {
+    public TranscriptEntity(
+            long tableId,
+            long memberId,
+            TranscriptTableSnapshot table,
+            SttMode sttMode,
+            String linesJson
+    ) {
         this(tableId, memberId, table, sttMode, linesJson, null);
     }
 
-    public TranscriptEntity(long tableId, long memberId, TranscriptTableSnapshot table, SttMode sttMode,
-                            String linesJson, Long sourceTranscriptId) {
+    public TranscriptEntity(
+            long tableId,
+            long memberId,
+            TranscriptTableSnapshot table,
+            SttMode sttMode,
+            String linesJson,
+            Long sourceTranscriptId
+    ) {
         this.tableId = tableId;
         this.memberId = memberId;
         this.tableName = table.tableName();
