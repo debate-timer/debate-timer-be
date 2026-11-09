@@ -41,7 +41,7 @@ public class DebateAnalyzer {
     ) {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
-        this.systemPrompt = readResource("prompt/debate-analysis-system.txt");
+        this.systemPrompt = readResource("prompt/debate-analysis-system.md");
         this.schema = readSchema(objectMapper);
     }
 

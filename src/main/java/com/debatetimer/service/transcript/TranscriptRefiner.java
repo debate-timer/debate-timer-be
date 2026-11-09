@@ -51,7 +51,7 @@ public class TranscriptRefiner {
         this.openAiClient = openAiClient;
         this.transcriptDomainRepository = transcriptDomainRepository;
         this.objectMapper = objectMapper;
-        this.systemPrompt = readResource("prompt/transcript-refinement-system.txt");
+        this.systemPrompt = readResource("prompt/transcript-refinement-system.md");
         this.schema = readSchema();
     }
 
