@@ -11,8 +11,10 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.UtteranceRequest;
+import com.debatetimer.dto.transcript.response.SharedTranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptShareResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.event.transcript.TranscriptAnalysisListener;
@@ -179,6 +181,83 @@ class TranscriptControllerTest extends BaseControllerTest {
             given()
                     .when().get("/api/transcripts")
                     .then().statusCode(401);
+        }
+    }
+
+    @Nested
+    class ShareTranscript {
+
+        private String share(Member member, long transcriptId) {
+            return given()
+                    .headers(headerGenerator.generateAccessTokenHeader(member))
+                    .pathParam("transcriptId", transcriptId)
+                    .when().post("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(200)
+                    .extract().as(TranscriptShareResponse.class)
+                    .shareToken();
+        }
+
+        @Test
+        void 공유한_속기록은_로그인하지_않아도_조회할_수_있다() {
+            Member bito = generateTranscriptMember("default@gmail.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = createTranscript(bito, table).id();
+            String shareToken = share(bito, transcriptId);
+
+            SharedTranscriptResponse response = given()
+                    .pathParam("shareToken", shareToken)
+                    .when().get("/api/shared-transcripts/{shareToken}")
+                    .then().statusCode(200)
+                    .extract().as(SharedTranscriptResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.tableName()).isEqualTo(table.getName()),
+                    () -> assertThat(response.lines()).extracting("text").containsExactly("찬성 입론입니다.")
+            );
+        }
+
+        @Test
+        void 다른_회원의_속기록은_공유할_수_없다() {
+            Member bito = generateTranscriptMember("default@gmail.com");
+            Member other = generateTranscriptMember("other@gmail.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = createTranscript(bito, table).id();
+
+            given()
+                    .headers(headerGenerator.generateAccessTokenHeader(other))
+                    .pathParam("transcriptId", transcriptId)
+                    .when().post("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(404);
+        }
+
+        @Test
+        void 공유를_해제하면_공유_링크로_조회할_수_없다() {
+            Member bito = generateTranscriptMember("default@gmail.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(bito);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            long transcriptId = createTranscript(bito, table).id();
+            String shareToken = share(bito, transcriptId);
+
+            given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .pathParam("transcriptId", transcriptId)
+                    .when().delete("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(204);
+
+            given()
+                    .pathParam("shareToken", shareToken)
+                    .when().get("/api/shared-transcripts/{shareToken}")
+                    .then().statusCode(404);
+        }
+
+        @Test
+        void 없는_공유_토큰이면_조회할_수_없다() {
+            given()
+                    .pathParam("shareToken", "not-exist-token")
+                    .when().get("/api/shared-transcripts/{shareToken}")
+                    .then().statusCode(404);
         }
     }
 }

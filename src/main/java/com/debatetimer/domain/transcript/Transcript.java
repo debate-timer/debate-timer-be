@@ -18,7 +18,9 @@ public record Transcript(
         @Nullable String reportJson,
         @Nullable String errorMessage,
         // 어드민 재실행으로 만든 기록이면 원본 속기록 ID
-        @Nullable Long sourceTranscriptId
+        @Nullable Long sourceTranscriptId,
+        // 공유 링크 토큰. 공유하지 않으면 null 이다.
+        @Nullable String shareToken
 ) {
 
     // 다듬기 도입 전 속기록은 원문을 따로 보관하지 않았지만, 그때는 lines 가 곧 STT 원문이다.

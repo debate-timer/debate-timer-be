@@ -3,6 +3,7 @@ package com.debatetimer.controller.transcript;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -27,8 +28,10 @@ import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.UtteranceRequest;
+import com.debatetimer.dto.transcript.response.SharedTranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptShareResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -301,7 +304,8 @@ public class TranscriptDocumentTest extends BaseDocumentTest {
                         fieldWithPath("lines[].offsetMs").type(NUMBER).description("타임박스 시작부터의 경과 시간(ms)"),
                         fieldWithPath("lines[].text").type(STRING).description("문장"),
                         subsectionWithPath("report").type(OBJECT).description("분석 보고서. status 가 DONE 일 때만 있음 (구조는 설명 참고)").optional(),
-                        fieldWithPath("errorMessage").type(STRING).description("분석 실패 사유. status 가 FAILED 일 때만 있음").optional()
+                        fieldWithPath("errorMessage").type(STRING).description("분석 실패 사유. status 가 FAILED 일 때만 있음").optional(),
+                        fieldWithPath("shareToken").type(STRING).description("공유 링크 토큰. 공유하지 않으면 null").optional()
                 );
 
         @Test
@@ -314,7 +318,7 @@ public class TranscriptDocumentTest extends BaseDocumentTest {
                             new TranscriptLine(1, 1, "입론", Stance.CONS, "비토", 1_000L,
                                     "인식 오류가 판정을 왜곡할 수 있습니다.")
                     ),
-                    report(), null);
+                    report(), null, "3f2b8c1e-7d4a-4e9b-a6c5-0d1e2f3a4b5c");
             doReturn(response).when(transcriptService).get(7L, EXIST_MEMBER);
 
             var document = document("transcript/get", 200)
@@ -364,6 +368,201 @@ public class TranscriptDocumentTest extends BaseDocumentTest {
                     .pathParam("transcriptId", 7L)
                     .when().get("/api/transcripts/{transcriptId}")
                     .then().statusCode(403);
+        }
+    }
+
+    @Nested
+    class ShareTranscript {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.TRANSCRIPT_API)
+                .summary(featureFlagSummary(FeatureFlag.TRANSCRIPT, "속기록 공유 링크 생성"))
+                .description(featureFlagDescription(FeatureFlag.TRANSCRIPT) + """
+                        로그인 없이 속기록과 분석 보고서를 볼 수 있는 공유 토큰을 발급합니다. 본인의 속기록만 공유할 수 있습니다.
+
+                        - 이미 공유 중이면 기존 토큰을 그대로 돌려줍니다.
+                        - 공유를 해제한 뒤 다시 공유하면 새 토큰을 발급하므로, 예전 링크로는 볼 수 없습니다.
+                        - 공유 링크로는 `GET /api/shared-transcripts/{shareToken}` 를 호출해 조회합니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .pathParameter(
+                        parameterWithName("transcriptId").description("속기록 ID")
+                );
+
+        private final RestDocumentationResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("shareToken").type(STRING).description("공유 링크 토큰")
+                );
+
+        @Test
+        void 속기록_공유_링크_생성_성공() {
+            doReturn(new TranscriptShareResponse("3f2b8c1e-7d4a-4e9b-a6c5-0d1e2f3a4b5c")).when(transcriptService)
+                    .share(7L, EXIST_MEMBER);
+
+            var document = document("transcript/share", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("transcriptId", 7L)
+                    .when().post("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(
+                value = ClientErrorCode.class,
+                names = {"TRANSCRIPT_NOT_FOUND"}
+        )
+        @ParameterizedTest
+        void 속기록_공유_링크_생성_실패(ClientErrorCode errorCode) {
+            doThrow(new DTClientErrorException(errorCode)).when(transcriptService).share(anyLong(), any());
+
+            var document = document("transcript/share", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("transcriptId", 7L)
+                    .when().post("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
+    class UnshareTranscript {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.TRANSCRIPT_API)
+                .summary(featureFlagSummary(FeatureFlag.TRANSCRIPT, "속기록 공유 해제"))
+                .description(featureFlagDescription(FeatureFlag.TRANSCRIPT) + """
+                        공유 토큰을 없애 기존 공유 링크로 속기록을 볼 수 없게 합니다. 공유 중이 아니어도 성공합니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .pathParameter(
+                        parameterWithName("transcriptId").description("속기록 ID")
+                );
+
+        @Test
+        void 속기록_공유_해제_성공() {
+            doNothing().when(transcriptService).unshare(7L, EXIST_MEMBER);
+
+            var document = document("transcript/unshare", 204)
+                    .request(requestDocument)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("transcriptId", 7L)
+                    .when().delete("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(204);
+        }
+
+        @EnumSource(
+                value = ClientErrorCode.class,
+                names = {"TRANSCRIPT_NOT_FOUND"}
+        )
+        @ParameterizedTest
+        void 속기록_공유_해제_실패(ClientErrorCode errorCode) {
+            doThrow(new DTClientErrorException(errorCode)).when(transcriptService).unshare(anyLong(), any());
+
+            var document = document("transcript/unshare", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .pathParam("transcriptId", 7L)
+                    .when().delete("/api/transcripts/{transcriptId}/share")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
+    class GetSharedTranscript {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.TRANSCRIPT_API)
+                .summary("공유 링크로 속기록 조회")
+                .description("""
+                        공유 토큰으로 속기록 본문과 분석 보고서를 조회합니다. 로그인하지 않아도 됩니다.
+
+                        - 진행 상태(`status`, `refining`)와 `report` 구조는 속기록 상세 조회와 같습니다.
+                        - 시간표 ID, STT 모드, 분석 실패 사유는 포함하지 않습니다.
+                        - 없는 토큰이거나 공유를 해제했으면 `TRANSCRIPT_NOT_FOUND` 로 거절합니다.
+                        """)
+                .pathParameter(
+                        parameterWithName("shareToken").description("공유 링크 토큰")
+                );
+
+        private final RestDocumentationResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("tableName").type(STRING).description("저장 시점 시간표 이름").optional(),
+                        fieldWithPath("agenda").type(STRING).description("저장 시점 토론 주제").optional(),
+                        fieldWithPath("prosTeamName").type(STRING).description("저장 시점 찬성팀 이름").optional(),
+                        fieldWithPath("consTeamName").type(STRING).description("저장 시점 반대팀 이름").optional(),
+                        fieldWithPath("status").type(STRING).description("분석 상태 (PROCESSING, DONE, FAILED)"),
+                        fieldWithPath("refining").type(BOOLEAN).description("AI 문장 보정 진행 중 여부"),
+                        fieldWithPath("lines").type(ARRAY).description("속기록 문장 목록 (발언 순)"),
+                        fieldWithPath("lines[].index").type(NUMBER).description("문장 순서 (0부터)"),
+                        fieldWithPath("lines[].timeBoxIndex").type(NUMBER).description("타임박스 순서"),
+                        fieldWithPath("lines[].speechType").type(STRING).description("발언 유형"),
+                        fieldWithPath("lines[].stance").type(STRING).description("발언 진영 (PROS, CONS, NEUTRAL)"),
+                        fieldWithPath("lines[].speaker").type(STRING).description("발언자 이름").optional(),
+                        fieldWithPath("lines[].offsetMs").type(NUMBER).description("타임박스 시작부터의 경과 시간(ms)"),
+                        fieldWithPath("lines[].text").type(STRING).description("문장"),
+                        subsectionWithPath("report").type(OBJECT).description("분석 보고서. status 가 DONE 일 때만 있음 (구조는 속기록 상세 조회 참고)").optional()
+                );
+
+        @Test
+        void 공유_링크로_속기록_조회_성공() {
+            SharedTranscriptResponse response = new SharedTranscriptResponse("교내 토론 대회 결승",
+                    "AI 음성 기록을 도입해야 한다", "찬성", "반대", TranscriptStatus.DONE, false,
+                    List.of(
+                            new TranscriptLine(0, 0, "입론", Stance.PROS, "콜리", 300L,
+                                    "AI 음성 기록은 토론 대회의 공정성을 높입니다."),
+                            new TranscriptLine(1, 1, "입론", Stance.CONS, "비토", 1_000L,
+                                    "인식 오류가 판정을 왜곡할 수 있습니다.")
+                    ),
+                    report());
+            doReturn(response).when(transcriptService).getShared("3f2b8c1e-7d4a-4e9b-a6c5-0d1e2f3a4b5c");
+
+            var document = document("transcript/get-shared", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .pathParam("shareToken", "3f2b8c1e-7d4a-4e9b-a6c5-0d1e2f3a4b5c")
+                    .when().get("/api/shared-transcripts/{shareToken}")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(
+                value = ClientErrorCode.class,
+                names = {"TRANSCRIPT_NOT_FOUND"}
+        )
+        @ParameterizedTest
+        void 공유_링크로_속기록_조회_실패(ClientErrorCode errorCode) {
+            doThrow(new DTClientErrorException(errorCode)).when(transcriptService).getShared(any());
+
+            var document = document("transcript/get-shared", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .pathParam("shareToken", "not-exist-token")
+                    .when().get("/api/shared-transcripts/{shareToken}")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }

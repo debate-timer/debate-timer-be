@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 public class TranscriptEntity extends BaseTimeEntity {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 255;
+    private static final int SHARE_TOKEN_LENGTH = 36;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,6 +77,10 @@ public class TranscriptEntity extends BaseTimeEntity {
     // 어드민이 기존 속기록 원문으로 보정·분석을 다시 돌려 만든 기록이면 원본 속기록 ID
     @Column(name = "source_transcript_id")
     private Long sourceTranscriptId;
+
+    // 로그인 없이 속기록을 볼 수 있는 공유 링크 토큰. 공유하지 않으면 null 이다.
+    @Column(name = "share_token", length = SHARE_TOKEN_LENGTH, unique = true)
+    private String shareToken;
 
     public TranscriptEntity(
             long tableId,
@@ -132,6 +137,10 @@ public class TranscriptEntity extends BaseTimeEntity {
     public void fail(String errorMessage) {
         this.errorMessage = truncate(errorMessage);
         this.status = TranscriptStatus.FAILED;
+    }
+
+    public void unshare() {
+        this.shareToken = null;
     }
 
     private String truncate(String message) {

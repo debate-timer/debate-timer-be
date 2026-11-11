@@ -10,8 +10,10 @@ import com.debatetimer.domain.transcript.TranscriptTableSnapshot;
 import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
+import com.debatetimer.dto.transcript.response.SharedTranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptShareResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponses;
 import com.debatetimer.event.transcript.TranscriptCreatedEvent;
@@ -58,6 +60,23 @@ public class TranscriptService {
     public TranscriptResponse get(long transcriptId, Member member) {
         Transcript transcript = transcriptDomainRepository.getByIdAndMemberId(transcriptId, member.getId());
         return new TranscriptResponse(transcript, readReport(transcript));
+    }
+
+    @Transactional(readOnly = true)
+    public SharedTranscriptResponse getShared(String shareToken) {
+        Transcript transcript = transcriptDomainRepository.getByShareToken(shareToken);
+        return new SharedTranscriptResponse(transcript, readReport(transcript));
+    }
+
+    @Transactional
+    public TranscriptShareResponse share(long transcriptId, Member member) {
+        Transcript transcript = transcriptDomainRepository.share(transcriptId, member.getId());
+        return new TranscriptShareResponse(transcript.shareToken());
+    }
+
+    @Transactional
+    public void unshare(long transcriptId, Member member) {
+        transcriptDomainRepository.unshare(transcriptId, member.getId());
     }
 
     @Transactional(readOnly = true)
