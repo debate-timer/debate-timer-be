@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 public enum FeatureFlag {
 
     TRANSCRIPT("속기록 · 토론 분석"),
+    MULTI_DEVICE_RECORDING("다기기 녹음 (V2)"),
     ;
 
     private final String description;

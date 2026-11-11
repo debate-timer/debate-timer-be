@@ -213,6 +213,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                         | 플래그 | 설명 | 필요한 API |
                         | :---: | --- | --- |
                         | TRANSCRIPT | 속기록 · 토론 분석 | `POST /api/stt/soniox`, `POST /api/transcripts/{tableId}`, `GET /api/transcripts`, `GET /api/transcripts/{transcriptId}` |
+                        | MULTI_DEVICE_RECORDING | 다기기 녹음 (V2) | `POST /api/v2/recordings`, `GET /api/v2/recordings/{sessionKey}`, `POST /api/v2/recordings/{sessionKey}/host-device`, `POST /api/v2/recordings/{sessionKey}/finish` |
 
                         플래그는 어드민에서 회원별로 부여 · 회수하므로, 앱 진입이나 로그인 직후처럼 화면을 그리기 전에 다시 조회하는 것을 권장합니다.
                         플래그가 필요한 API 는 Swagger 요약 앞에 `[플래그 이름]` 이 붙어 있고, 플래그 없이 호출하면 `403 FEATURE_NOT_ALLOWED` 를 응답합니다.
