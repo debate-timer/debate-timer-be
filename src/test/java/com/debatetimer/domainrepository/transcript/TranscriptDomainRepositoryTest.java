@@ -14,7 +14,15 @@ import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
 import com.debatetimer.entity.transcript.TranscriptEntity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +166,33 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
             String secondToken = transcriptDomainRepository.share(created.id(), 2L).shareToken();
 
             assertThat(secondToken).isEqualTo(firstToken);
+        }
+
+        @Test
+        void 동시에_공유해도_저장된_토큰_하나만_돌려준다() throws Exception {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+            int requestCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(requestCount);
+            CountDownLatch ready = new CountDownLatch(1);
+            List<Future<String>> results = new ArrayList<>();
+            try {
+                for (int i = 0; i < requestCount; i++) {
+                    results.add(executor.submit(() -> {
+                        ready.await();
+                        return transcriptDomainRepository.share(created.id(), 2L).shareToken();
+                    }));
+                }
+                ready.countDown();
+
+                Set<String> tokens = new HashSet<>();
+                for (Future<String> result : results) {
+                    tokens.add(result.get(10, TimeUnit.SECONDS));
+                }
+                String storedToken = transcriptDomainRepository.getById(created.id()).shareToken();
+                assertThat(tokens).containsExactly(storedToken);
+            } finally {
+                executor.shutdownNow();
+            }
         }
 
         @Test

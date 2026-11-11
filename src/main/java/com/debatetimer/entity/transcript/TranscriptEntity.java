@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -138,13 +137,6 @@ public class TranscriptEntity extends BaseTimeEntity {
     public void fail(String errorMessage) {
         this.errorMessage = truncate(errorMessage);
         this.status = TranscriptStatus.FAILED;
-    }
-
-    // 이미 공유 중이면 기존 링크를 그대로 쓴다.
-    public void share() {
-        if (shareToken == null) {
-            this.shareToken = UUID.randomUUID().toString();
-        }
     }
 
     public void unshare() {

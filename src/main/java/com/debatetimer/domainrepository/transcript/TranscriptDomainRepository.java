@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -88,11 +89,11 @@ public class TranscriptDomainRepository {
         transcriptRepository.getById(id).fail(errorMessage);
     }
 
+    // 이미 공유 중이면 기존 토큰을 그대로 쓴다. 동시에 요청해도 저장된 토큰 하나만 돌려주도록 저장 뒤 다시 읽는다.
     @Transactional
     public Transcript share(long id, long memberId) {
-        TranscriptEntity entity = transcriptRepository.getByIdAndMemberId(id, memberId);
-        entity.share();
-        return toDomain(entity);
+        transcriptRepository.updateShareTokenIfAbsent(id, memberId, UUID.randomUUID().toString());
+        return toDomain(transcriptRepository.getByIdAndMemberId(id, memberId));
     }
 
     @Transactional

@@ -9,7 +9,9 @@ import com.debatetimer.domain.transcript.TranscriptOverview;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.Repository;
 
 public interface TranscriptRepository extends Repository<TranscriptEntity, Long> {
@@ -21,6 +23,19 @@ public interface TranscriptRepository extends Repository<TranscriptEntity, Long>
     Optional<TranscriptEntity> findByIdAndMemberId(long id, long memberId);
 
     Optional<TranscriptEntity> findByShareToken(String shareToken);
+
+    // 공유 토큰이 없을 때만 저장해, 동시에 공유해도 먼저 저장된 토큰을 덮어쓰지 않는다
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE TranscriptEntity t
+            SET t.shareToken = :shareToken
+            WHERE t.id = :id AND t.memberId = :memberId AND t.shareToken IS NULL
+            """)
+    int updateShareTokenIfAbsent(
+            @Param("id") long id,
+            @Param("memberId") long memberId,
+            @Param("shareToken") String shareToken
+    );
 
     // 속기록·보고서 본문(LONGTEXT)은 읽지 않고 목록에 필요한 값만 가져온다.
     @Query("""
