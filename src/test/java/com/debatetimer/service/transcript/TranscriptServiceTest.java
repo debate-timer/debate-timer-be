@@ -19,8 +19,10 @@ import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.SegmentRequest;
 import com.debatetimer.dto.transcript.request.TranscriptCreateRequest.UtteranceRequest;
+import com.debatetimer.dto.transcript.response.SharedTranscriptResponse;
 import com.debatetimer.dto.transcript.response.TranscriptCreateResponse;
 import com.debatetimer.dto.transcript.response.TranscriptResponse;
+import com.debatetimer.dto.transcript.response.TranscriptShareResponse;
 import com.debatetimer.dto.transcript.response.TranscriptSummaryResponse;
 import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.event.transcript.TranscriptAnalysisListener;
@@ -139,6 +141,56 @@ class TranscriptServiceTest extends BaseServiceTest {
 
             assertThat(found.status()).isIn(TranscriptStatus.PROCESSING, TranscriptStatus.DONE,
                     TranscriptStatus.FAILED);
+        }
+    }
+
+    @Nested
+    class Share {
+
+        @Test
+        void 공유한_속기록을_공유_토큰으로_로그인_없이_조회한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            TranscriptCreateResponse created = transcriptService.create(table.getId(), member, requestOf(0, "발언"));
+
+            TranscriptShareResponse shared = transcriptService.share(created.id(), member);
+
+            SharedTranscriptResponse found = transcriptService.getShared(shared.shareToken());
+            assertAll(
+                    () -> assertThat(found.tableName()).isEqualTo(table.getName()),
+                    () -> assertThat(found.lines()).extracting("text").containsExactly("발언"),
+                    () -> assertThat(transcriptService.get(created.id(), member).shareToken())
+                            .isEqualTo(shared.shareToken())
+            );
+        }
+
+        @Test
+        void 다른_회원의_기록은_공유할_수_없다() {
+            Member owner = memberGenerator.generate("owner@email.com");
+            Member other = memberGenerator.generate("other@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(owner);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            TranscriptCreateResponse created = transcriptService.create(table.getId(), owner, requestOf(0, "발언"));
+
+            assertThatThrownBy(() -> transcriptService.share(created.id(), other))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.TRANSCRIPT_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 공유를_해제하면_공유_토큰으로_조회할_수_없다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            customizeTimeBoxEntityGenerator.generate(table, CustomizeBoxType.NORMAL, 1);
+            TranscriptCreateResponse created = transcriptService.create(table.getId(), member, requestOf(0, "발언"));
+            String shareToken = transcriptService.share(created.id(), member).shareToken();
+
+            transcriptService.unshare(created.id(), member);
+
+            assertThatThrownBy(() -> transcriptService.getShared(shareToken))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.TRANSCRIPT_NOT_FOUND.getMessage());
         }
     }
 

@@ -20,13 +20,14 @@ public record TranscriptResponse(
         boolean refining,
         List<TranscriptLine> lines,
         @Nullable JsonNode report,
-        @Nullable String errorMessage
+        @Nullable String errorMessage,
+        @Nullable String shareToken
 ) {
 
     // 시간표 정보는 속기록을 만들 때 저장한 스냅샷을 쓴다.
     public TranscriptResponse(Transcript transcript, @Nullable JsonNode report) {
         this(transcript.id(), transcript.tableId(), transcript.table().tableName(), transcript.table().agenda(),
                 transcript.table().prosTeamName(), transcript.table().consTeamName(), transcript.status(), transcript.sttMode(), transcript.refining(),
-                transcript.lines(), report, transcript.errorMessage());
+                transcript.lines(), report, transcript.errorMessage(), transcript.shareToken());
     }
 }

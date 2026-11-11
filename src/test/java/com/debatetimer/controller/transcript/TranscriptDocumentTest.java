@@ -301,7 +301,8 @@ public class TranscriptDocumentTest extends BaseDocumentTest {
                         fieldWithPath("lines[].offsetMs").type(NUMBER).description("타임박스 시작부터의 경과 시간(ms)"),
                         fieldWithPath("lines[].text").type(STRING).description("문장"),
                         subsectionWithPath("report").type(OBJECT).description("분석 보고서. status 가 DONE 일 때만 있음 (구조는 설명 참고)").optional(),
-                        fieldWithPath("errorMessage").type(STRING).description("분석 실패 사유. status 가 FAILED 일 때만 있음").optional()
+                        fieldWithPath("errorMessage").type(STRING).description("분석 실패 사유. status 가 FAILED 일 때만 있음").optional(),
+                        fieldWithPath("shareToken").type(STRING).description("공유 링크 토큰. 공유하지 않으면 null").optional()
                 );
 
         @Test
@@ -314,7 +315,7 @@ public class TranscriptDocumentTest extends BaseDocumentTest {
                             new TranscriptLine(1, 1, "입론", Stance.CONS, "비토", 1_000L,
                                     "인식 오류가 판정을 왜곡할 수 있습니다.")
                     ),
-                    report(), null);
+                    report(), null, "3f2b8c1e-7d4a-4e9b-a6c5-0d1e2f3a4b5c");
             doReturn(response).when(transcriptService).get(7L, EXIST_MEMBER);
 
             var document = document("transcript/get", 200)
