@@ -69,6 +69,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     EMPTY_TRANSCRIPT(HttpStatus.BAD_REQUEST, "기록된 발언이 없습니다."),
     EMPTY_AUDIO(HttpStatus.BAD_REQUEST, "전사할 오디오가 비어 있습니다."),
     STT_TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "음성 인식 요청이 많습니다. 잠시 후 다시 시도해 주세요."),
+    RECORDING_V2_DISABLED(HttpStatus.NOT_FOUND, "사용할 수 없는 기능입니다."),
     RECORDING_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "녹음 세션을 찾을 수 없습니다."),
     RECORDING_SESSION_CLOSED(HttpStatus.CONFLICT, "이미 끝난 녹음 세션입니다."),
     INVALID_RECORDING_JOIN_CODE(HttpStatus.FORBIDDEN, "녹음 참가 코드가 올바르지 않습니다."),
