@@ -16,7 +16,7 @@ class TranscriptTest {
 
     private Transcript transcript(List<TranscriptLine> lines, List<TranscriptLine> rawLines) {
         return new Transcript(1L, 1L, 1L, TABLE, TranscriptStatus.DONE, SttMode.RPC, false, lines, rawLines,
-                null, null, null);
+                null, null, null, null);
     }
 
     @Test

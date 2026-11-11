@@ -133,4 +133,70 @@ class TranscriptDomainRepositoryTest extends BaseDomainRepositoryTest {
             );
         }
     }
+
+    @Nested
+    class Share {
+
+        @Test
+        void 공유_토큰을_발급하고_토큰으로_조회할_수_있다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+
+            Transcript shared = transcriptDomainRepository.share(created.id(), 2L);
+
+            Transcript found = transcriptDomainRepository.getByShareToken(shared.shareToken());
+            assertAll(
+                    () -> assertThat(shared.shareToken()).isNotBlank(),
+                    () -> assertThat(found.id()).isEqualTo(created.id())
+            );
+        }
+
+        @Test
+        void 이미_공유_중이면_기존_토큰을_돌려준다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+            String firstToken = transcriptDomainRepository.share(created.id(), 2L).shareToken();
+
+            String secondToken = transcriptDomainRepository.share(created.id(), 2L).shareToken();
+
+            assertThat(secondToken).isEqualTo(firstToken);
+        }
+
+        @Test
+        void 다른_회원의_속기록은_공유할_수_없다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+
+            assertThatThrownBy(() -> transcriptDomainRepository.share(created.id(), 3L))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.TRANSCRIPT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class Unshare {
+
+        @Test
+        void 공유를_해제하면_토큰으로_조회할_수_없다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+            String token = transcriptDomainRepository.share(created.id(), 2L).shareToken();
+
+            transcriptDomainRepository.unshare(created.id(), 2L);
+
+            assertAll(
+                    () -> assertThat(transcriptDomainRepository.getById(created.id()).shareToken()).isNull(),
+                    () -> assertThatThrownBy(() -> transcriptDomainRepository.getByShareToken(token))
+                            .isInstanceOf(DTClientErrorException.class)
+                            .hasMessage(ClientErrorCode.TRANSCRIPT_NOT_FOUND.getMessage())
+            );
+        }
+
+        @Test
+        void 다시_공유하면_새_토큰을_발급한다() {
+            Transcript created = transcriptDomainRepository.create(1L, 2L, SNAPSHOT, SttMode.RPC, LINES);
+            String oldToken = transcriptDomainRepository.share(created.id(), 2L).shareToken();
+            transcriptDomainRepository.unshare(created.id(), 2L);
+
+            String newToken = transcriptDomainRepository.share(created.id(), 2L).shareToken();
+
+            assertThat(newToken).isNotEqualTo(oldToken);
+        }
+    }
 }

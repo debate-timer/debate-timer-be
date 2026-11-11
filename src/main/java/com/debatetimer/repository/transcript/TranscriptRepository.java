@@ -20,6 +20,8 @@ public interface TranscriptRepository extends Repository<TranscriptEntity, Long>
 
     Optional<TranscriptEntity> findByIdAndMemberId(long id, long memberId);
 
+    Optional<TranscriptEntity> findByShareToken(String shareToken);
+
     // 속기록·보고서 본문(LONGTEXT)은 읽지 않고 목록에 필요한 값만 가져온다.
     @Query("""
             SELECT new com.debatetimer.domain.transcript.TranscriptSummary(
@@ -49,6 +51,11 @@ public interface TranscriptRepository extends Repository<TranscriptEntity, Long>
 
     default TranscriptEntity getByIdAndMemberId(long id, long memberId) {
         return findByIdAndMemberId(id, memberId)
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TRANSCRIPT_NOT_FOUND));
+    }
+
+    default TranscriptEntity getByShareToken(String shareToken) {
+        return findByShareToken(shareToken)
                 .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.TRANSCRIPT_NOT_FOUND));
     }
 }

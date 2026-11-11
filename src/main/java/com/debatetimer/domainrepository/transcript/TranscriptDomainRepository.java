@@ -59,6 +59,11 @@ public class TranscriptDomainRepository {
     }
 
     @Transactional(readOnly = true)
+    public Transcript getByShareToken(String shareToken) {
+        return toDomain(transcriptRepository.getByShareToken(shareToken));
+    }
+
+    @Transactional(readOnly = true)
     public List<TranscriptSummary> findSummariesByMemberId(long memberId) {
         return transcriptRepository.findSummariesByMemberId(memberId);
     }
@@ -83,12 +88,24 @@ public class TranscriptDomainRepository {
         transcriptRepository.getById(id).fail(errorMessage);
     }
 
+    @Transactional
+    public Transcript share(long id, long memberId) {
+        TranscriptEntity entity = transcriptRepository.getByIdAndMemberId(id, memberId);
+        entity.share();
+        return toDomain(entity);
+    }
+
+    @Transactional
+    public void unshare(long id, long memberId) {
+        transcriptRepository.getByIdAndMemberId(id, memberId).unshare();
+    }
+
     private Transcript toDomain(TranscriptEntity entity) {
         return new Transcript(entity.getId(), entity.getTableId(), entity.getMemberId(),
                 entity.getTableSnapshot(), entity.getStatus(),
                 entity.getSttMode(), entity.isRefining(), readLines(entity.getLinesJson()),
                 readRawLines(entity.getRawLinesJson()), entity.getReportJson(),
-                entity.getErrorMessage(), entity.getSourceTranscriptId());
+                entity.getErrorMessage(), entity.getSourceTranscriptId(), entity.getShareToken());
     }
 
     private String writeLines(List<TranscriptLine> lines) {
