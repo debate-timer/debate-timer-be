@@ -1,10 +1,12 @@
 package com.debatetimer.service.sharing;
 
+import com.debatetimer.domain.sharing.TimerEventType;
 import jakarta.annotation.Nullable;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.stereotype.Component;
@@ -12,14 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SharingRoomRegistry {
 
-    // 종료 직후 입장한 청중에게만 종료를 알린다. 이후 같은 룸을 다시 공유할 때 먼저 입장한 청중은 대기 화면을 보게 한다.
+    // 종료·중단 직후 입장한 청중에게만 알린다. 이후 같은 룸을 다시 공유할 때 먼저 입장한 청중은 대기 화면을 보게 한다.
     static final Duration FINISHED_TTL = Duration.ofMinutes(5);
     static final Duration VERSION_TTL = Duration.ofDays(1);
     static final Duration SYNC_REQUEST_TTL = Duration.ofDays(1);
     static final Duration SYNC_REQUEST_INTERVAL = Duration.ofMillis(500);
     private static final int ROOM_LOCK_STRIPES = 64;
 
-    private final Map<Long, Instant> finishedRoomExpirations = new ConcurrentHashMap<>();
+    private final Map<Long, EndedRoom> endedRooms = new ConcurrentHashMap<>();
     private final Map<Long, AcceptedVersion> lastAcceptedVersions = new ConcurrentHashMap<>();
     private final Map<Long, Instant> lastSyncRequestedAt = new ConcurrentHashMap<>();
     private final Object[] roomLocks = createRoomLocks();
@@ -34,23 +36,38 @@ public class SharingRoomRegistry {
     }
 
     public void markFinished(long roomId) {
-        finishedRoomExpirations.put(roomId, clock.instant().plus(FINISHED_TTL));
+        markEnded(roomId, TimerEventType.FINISHED);
+    }
+
+    public void markAborted(long roomId) {
+        markEnded(roomId, TimerEventType.ABORT);
     }
 
     public void reopen(long roomId) {
-        finishedRoomExpirations.remove(roomId);
+        endedRooms.remove(roomId);
     }
 
     public boolean isFinished(long roomId) {
-        Instant expiration = finishedRoomExpirations.get(roomId);
-        if (expiration == null) {
-            return false;
+        return findEndEvent(roomId).filter(TimerEventType.FINISHED::equals).isPresent();
+    }
+
+    public boolean isAborted(long roomId) {
+        return findEndEvent(roomId).filter(TimerEventType.ABORT::equals).isPresent();
+    }
+
+    /**
+     * 종료 유지 시간 안의 룸이면 정상 종료(FINISHED)인지 중도 중단(ABORT)인지 알려준다.
+     */
+    public Optional<TimerEventType> findEndEvent(long roomId) {
+        EndedRoom endedRoom = endedRooms.get(roomId);
+        if (endedRoom == null) {
+            return Optional.empty();
         }
-        if (isExpired(expiration)) {
-            finishedRoomExpirations.remove(roomId, expiration);
-            return false;
+        if (isExpired(endedRoom.expiration())) {
+            endedRooms.remove(roomId, endedRoom);
+            return Optional.empty();
         }
-        return true;
+        return Optional.of(endedRoom.endEvent());
     }
 
     /**
@@ -120,11 +137,15 @@ public class SharingRoomRegistry {
     }
 
     public void removeExpired() {
-        finishedRoomExpirations.values().removeIf(this::isExpired);
+        endedRooms.values().removeIf(endedRoom -> isExpired(endedRoom.expiration()));
         lastAcceptedVersions.values()
                 .removeIf(accepted -> isExpired(accepted.acceptedAt().plus(VERSION_TTL)));
         lastSyncRequestedAt.values()
                 .removeIf(requestedAt -> isExpired(requestedAt.plus(SYNC_REQUEST_TTL)));
+    }
+
+    private void markEnded(long roomId, TimerEventType endEvent) {
+        endedRooms.put(roomId, new EndedRoom(endEvent, clock.instant().plus(FINISHED_TTL)));
     }
 
     private boolean isExpired(Instant expiration) {
@@ -140,5 +161,8 @@ public class SharingRoomRegistry {
     }
 
     private record AcceptedVersion(long version, Instant acceptedAt) {
+    }
+
+    private record EndedRoom(TimerEventType endEvent, Instant expiration) {
     }
 }
