@@ -83,6 +83,29 @@ public class VoteDocumentTest extends BaseDocumentTest {
                     .when().get("/api/polls/{pollId}/votes")
                     .then().statusCode(200);
         }
+
+        @EnumSource(
+                value = ClientErrorCode.class,
+                names = {
+                        "POLL_NOT_FOUND",
+                        "TABLE_NOT_FOUND"
+                }
+        )
+        @ParameterizedTest
+        void 투표자_선거_정보_조회_실패(ClientErrorCode clientErrorCode) {
+            doThrow(new DTClientErrorException(clientErrorCode)).when(voteService).getVoterPollInfo(anyLong());
+
+            var document = document("vote/get", clientErrorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("pollId", 1l)
+                    .when().get("/api/polls/{pollId}/votes")
+                    .then().statusCode(clientErrorCode.getStatus().value());
+        }
     }
 
     @Nested
