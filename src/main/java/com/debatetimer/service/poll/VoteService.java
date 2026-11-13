@@ -1,9 +1,11 @@
 package com.debatetimer.service.poll;
 
+import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.poll.ParticipateCode;
 import com.debatetimer.domain.poll.Poll;
 import com.debatetimer.domain.poll.Vote;
 import com.debatetimer.domain.poll.VoteInfo;
+import com.debatetimer.domainrepository.customize.CustomizeTableDomainRepository;
 import com.debatetimer.domainrepository.poll.PollDomainRepository;
 import com.debatetimer.domainrepository.poll.VoteDomainRepository;
 import com.debatetimer.dto.poll.request.VoteRequest;
@@ -22,6 +24,7 @@ public class VoteService {
 
     private final VoteDomainRepository voteDomainRepository;
     private final PollDomainRepository pollDomainRepository;
+    private final CustomizeTableDomainRepository customizeTableDomainRepository;
 
     @Transactional
     public VoteCreateResponse vote(long pollId, VoteRequest voteRequest) {
@@ -49,8 +52,9 @@ public class VoteService {
     @Transactional(readOnly = true)
     public VoterPollInfoResponse getVoterPollInfo(long pollId) {
         Poll poll = pollDomainRepository.getById(pollId);
+        CustomizeTable table = customizeTableDomainRepository.getById(poll.getTableId());
         VoteInfo voteInfo = voteDomainRepository.findVoteInfoByPollId(pollId);
         ParticipateCode code = new ParticipateCode(UUID.randomUUID().toString());
-        return new VoterPollInfoResponse(poll, voteInfo, code);
+        return new VoterPollInfoResponse(poll, table, voteInfo, code);
     }
 }

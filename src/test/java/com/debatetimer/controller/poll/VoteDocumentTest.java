@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -16,6 +17,7 @@ import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.poll.PollStatus;
 import com.debatetimer.domain.poll.VoteTeam;
 import com.debatetimer.dto.poll.request.VoteRequest;
+import com.debatetimer.dto.poll.response.TableInfoResponse;
 import com.debatetimer.dto.poll.response.VoteCreateResponse;
 import com.debatetimer.dto.poll.response.VoterPollInfoResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
@@ -48,7 +50,11 @@ public class VoteDocumentTest extends BaseDocumentTest {
                         fieldWithPath("participateCode").type(STRING).description("참여 코드"),
                         fieldWithPath("totalCount").type(NUMBER).description("전체 투표 수"),
                         fieldWithPath("prosCount").type(NUMBER).description("찬성 투표 수"),
-                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수")
+                        fieldWithPath("consCount").type(NUMBER).description("반대 투표 수"),
+                        fieldWithPath("tableInfo").type(OBJECT).description("시간표 정보"),
+                        fieldWithPath("tableInfo.id").type(NUMBER).description("시간표 ID"),
+                        fieldWithPath("tableInfo.name").type(STRING).description("시간표 이름"),
+                        fieldWithPath("tableInfo.agenda").type(STRING).description("토론 주제 (선거 생성 시점 값)")
                 );
 
         @Test
@@ -61,7 +67,8 @@ public class VoteDocumentTest extends BaseDocumentTest {
                     UUID.randomUUID().toString(),
                     3L,
                     2L,
-                    1L
+                    1L,
+                    new TableInfoResponse(7L, "시간표 이름", "토론 주제")
             );
             doReturn(response).when(voteService).getVoterPollInfo(anyLong());
 
