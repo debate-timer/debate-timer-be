@@ -165,7 +165,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             MemberSettingsResponse response = new MemberSettingsResponse(Language.US_EN, new BigDecimal("0.5"));
             doReturn(response).when(memberService).updateSettings(EXIST_MEMBER_ID, request);
 
-            var document = document("member/settings/put", 200)
+            var document = document("member/settings/patch", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -174,7 +174,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .headers(EXIST_MEMBER_HEADER)
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(200);
         }
 
@@ -185,7 +185,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             doThrow(new DTClientErrorException(errorCode)).when(memberService)
                     .updateSettings(eq(EXIST_MEMBER_ID), any());
 
-            var document = document("member/settings/put", errorCode)
+            var document = document("member/settings/patch", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -194,7 +194,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .headers(EXIST_MEMBER_HEADER)
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }

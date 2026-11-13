@@ -149,7 +149,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(200)
                     .extract().as(MemberSettingsResponse.class);
 
@@ -164,7 +164,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of("language", "en"))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(200)
                     .extract().path("language");
 
@@ -184,7 +184,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of("language", language))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -199,7 +199,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of("language", "EN", "volume", 0.5))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -216,7 +216,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -231,7 +231,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of())
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -243,7 +243,7 @@ class MemberControllerTest extends BaseControllerTest {
             given()
                     .contentType(ContentType.JSON)
                     .body(new MemberSettingsUpdateRequest(Language.US_EN, 0.3))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(401);
         }
     }
