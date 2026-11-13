@@ -1,6 +1,7 @@
 package com.debatetimer.controller.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 
 import com.debatetimer.controller.BaseControllerTest;
@@ -116,6 +117,19 @@ class MemberControllerTest extends BaseControllerTest {
         }
 
         @Test
+        void 언어는_클라이언트_언어_코드로_응답한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            String language = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/member/settings")
+                    .then().statusCode(200)
+                    .extract().path("language");
+
+            assertThat(language).isEqualTo("ko");
+        }
+
+        @Test
         void 로그인하지_않으면_조회할_수_없다() {
             given()
                     .when().get("/api/member/settings")
@@ -135,11 +149,46 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(200)
                     .extract().as(MemberSettingsResponse.class);
 
             assertThat(response).isEqualTo(new MemberSettingsResponse(Language.US_EN, new BigDecimal("0.3")));
+        }
+
+        @Test
+        void 클라이언트_언어_코드로_변경하고_응답한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            String language = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(Map.of("language", "en"))
+                    .when().patch("/api/member/settings")
+                    .then().statusCode(200)
+                    .extract().path("language");
+
+            assertAll(
+                    () -> assertThat(language).isEqualTo("en"),
+                    () -> assertThat(memberRepository.getById(bito.getId()).getSettings().getLanguage())
+                            .isEqualTo(Language.US_EN)
+            );
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"EN", "US_EN", "ja"})
+        void 지원하지_않는_언어_코드면_400_에러를_반환한다(String language) {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            ErrorResponse errorResponse = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(Map.of("language", language))
+                    .when().patch("/api/member/settings")
+                    .then().statusCode(400)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.MESSAGE_NOT_READABLE.getMessage());
         }
 
         @Test
@@ -150,7 +199,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of("language", "EN", "volume", 0.5))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -167,7 +216,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(request)
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -182,7 +231,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .headers(headerGenerator.generateAccessTokenHeader(bito))
                     .body(Map.of())
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(400)
                     .extract().as(ErrorResponse.class);
 
@@ -194,7 +243,7 @@ class MemberControllerTest extends BaseControllerTest {
             given()
                     .contentType(ContentType.JSON)
                     .body(new MemberSettingsUpdateRequest(Language.US_EN, 0.3))
-                    .when().put("/api/member/settings")
+                    .when().patch("/api/member/settings")
                     .then().statusCode(401);
         }
     }
