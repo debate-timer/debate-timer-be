@@ -45,7 +45,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
                 .summary("멤버 생성")
-                .description("신규 회원이면 `Accept-Language` 가 영어(`en`)로 시작할 때 언어 설정을 `US_EN`, 그 외에는 `KO_KR` 로 만듭니다. 기존 회원의 설정은 바꾸지 않습니다.")
+                .description("신규 회원이면 `Accept-Language` 가 영어(`en`)로 시작할 때 언어 설정을 영어(`en`), 그 외에는 한국어(`ko`)로 만듭니다. 기존 회원의 설정은 바꾸지 않습니다.")
                 .requestHeader(
                         headerWithName(HttpHeaders.ACCEPT_LANGUAGE).description("브라우저 언어").optional()
                 )
@@ -108,14 +108,14 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 .summary("회원 설정 조회")
                 .description("""
                         로그인한 회원의 언어 · 음량 설정을 조회합니다. 접속 · 로그인 시 1회 조회합니다.
-                        저장된 설정이 없는 회원은 기본값(`KO_KR` / 0.5)을 응답합니다. 비회원은 브라우저 저장소를 사용하므로 호출하지 않습니다.
+                        저장된 설정이 없는 회원은 기본값(`ko` / 0.5)을 응답합니다. 비회원은 브라우저 저장소를 사용하므로 호출하지 않습니다.
                         """)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 );
 
         private final RestDocumentationResponse responseDocument = response().responseBodyField(
-                fieldWithPath("language").type(STRING).description("언어 (KO_KR : 한국어 / US_EN : 영어)"),
+                fieldWithPath("language").type(STRING).description("언어 (ko : 한국어 / en : 영어)"),
                 fieldWithPath("volume").type(NUMBER).description("음량 (0 ~ 1, 소수점 1자리)"));
 
         @Test
@@ -151,12 +151,12 @@ public class MemberDocumentTest extends BaseDocumentTest {
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 )
                 .requestBodyField(
-                        fieldWithPath("language").type(STRING).description("언어 (KO_KR : 한국어 / US_EN : 영어)").optional(),
+                        fieldWithPath("language").type(STRING).description("언어 (ko : 한국어 / en : 영어)").optional(),
                         fieldWithPath("volume").type(NUMBER).description("음량 (0 ~ 1)").optional()
                 );
 
         private final RestDocumentationResponse responseDocument = response().responseBodyField(
-                fieldWithPath("language").type(STRING).description("변경 후 언어 (KO_KR / US_EN)"),
+                fieldWithPath("language").type(STRING).description("변경 후 언어 (ko / en)"),
                 fieldWithPath("volume").type(NUMBER).description("변경 후 음량 (0 ~ 1, 소수점 1자리)"));
 
         @Test
