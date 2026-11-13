@@ -20,6 +20,7 @@ import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -128,6 +129,18 @@ class SharingServiceTest {
             sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 200L, null));
 
             assertThat(sentResponses(1)).extracting(SharingResponse::version).containsExactly(200L);
+        }
+
+        @Test
+        void 버전이_없는_중단_이벤트는_거절하고_보내지_않는다() {
+            SharingRequest abortWithoutVersion = new SharingRequest(TimerEventType.ABORT, null, null);
+
+            assertAll(
+                    () -> assertThatThrownBy(() -> sharingService.share(ROOM_ID, CHAIRMAN, abortWithoutVersion))
+                            .isInstanceOf(DTClientErrorException.class)
+                            .hasMessage(ClientErrorCode.VERSION_REQUIRED_TIMER_EVENT.getMessage()),
+                    () -> verify(messagingTemplate, never()).convertAndSend(anyString(), any(Object.class))
+            );
         }
     }
 
