@@ -3,12 +3,15 @@ package com.debatetimer.controller.member;
 import com.debatetimer.controller.auth.AuthMember;
 import com.debatetimer.controller.tool.cookie.CookieManager;
 import com.debatetimer.controller.tool.jwt.AuthManager;
+import com.debatetimer.domain.member.Language;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.MemberInfo;
+import com.debatetimer.dto.member.MemberSettingsResponse;
+import com.debatetimer.dto.member.MemberSettingsUpdateRequest;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
@@ -21,7 +24,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,10 +50,25 @@ public class MemberController {
         return memberService.getFeatureFlags(member.getId());
     }
 
+    @GetMapping("/api/member/settings")
+    public MemberSettingsResponse getSettings(@AuthMember Member member) {
+        return memberService.getSettings(member.getId());
+    }
+
+    @PutMapping("/api/member/settings")
+    public MemberSettingsResponse updateSettings(@AuthMember Member member,
+                                                 @RequestBody MemberSettingsUpdateRequest request) {
+        return memberService.updateSettings(member.getId(), request);
+    }
+
     @PostMapping("/api/member")
-    public ResponseEntity<MemberCreateResponse> createMember(@Validated @RequestBody MemberCreateRequest request) {
+    public ResponseEntity<MemberCreateResponse> createMember(
+            @Validated @RequestBody MemberCreateRequest request,
+            @RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE, required = false) String acceptLanguage
+    ) {
         MemberInfo memberInfo = authService.getMemberInfo(request);
-        MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo);
+        Language language = Language.fromAcceptLanguage(acceptLanguage);
+        MemberCreateResponse memberCreateResponse = memberService.createMember(memberInfo, language);
         JwtTokenResponse jwtToken = authManager.issueToken(memberInfo);
         ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
                 jwtToken.refreshToken(), jwtToken.refreshExpiration());
