@@ -371,6 +371,46 @@ class SharingServiceTest {
         }
 
         @Test
+        void 중단된_룸이면_청중에게_공유_중단을_알린다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            sharingRoomRegistry.markAborted(ROOM_ID);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            SharingResponse response = sentResponses(1).get(0);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> verify(messagingTemplate, never()).convertAndSend(eq("/chairman/" + ROOM_ID), any(Object.class))
+            );
+        }
+
+        @Test
+        void 사회자가_중단하고_연결을_끊어도_유지_시간_안에_입장한_청중에게는_공유_중단을_알린다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.ABORT, 1L, null));
+            sharingService.leave(SIMP_SESSION);
+            clock.advance(SharingRoomRegistry.FINISHED_TTL.minusSeconds(1));
+
+            sharingService.joinAudience(ROOM_ID);
+
+            assertThat(sentResponses(2)).extracting(SharingResponse::eventType)
+                    .containsExactly(TimerEventType.ABORT, TimerEventType.ABORT);
+        }
+
+        @Test
+        void 중단_유지_시간이_지난_룸에_사회자보다_먼저_입장하면_청중에게_사회자_부재를_알린다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            sharingRoomRegistry.markAborted(ROOM_ID);
+            sharingService.leave(SIMP_SESSION);
+            clock.advance(SharingRoomRegistry.FINISHED_TTL);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            assertThat(sentResponses(1).get(0).eventType()).isEqualTo(TimerEventType.CHAIRMAN_ABSENT);
+        }
+
+        @Test
         void 종료_유지_시간이_지난_룸에_사회자보다_먼저_입장하면_청중에게_사회자_부재를_알린다() {
             sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
             sharingRoomRegistry.markFinished(ROOM_ID);
@@ -542,6 +582,15 @@ class SharingServiceTest {
         @Test
         void 종료된_룸에_입장한_청중은_기록하지_않는다() {
             sharingRoomRegistry.markFinished(ROOM_ID);
+
+            sharingService.joinAudience(ROOM_ID);
+
+            verify(sharingLogService, never()).joinAudience(ROOM_ID);
+        }
+
+        @Test
+        void 중단된_룸에_입장한_청중은_기록하지_않는다() {
+            sharingRoomRegistry.markAborted(ROOM_ID);
 
             sharingService.joinAudience(ROOM_ID);
 
