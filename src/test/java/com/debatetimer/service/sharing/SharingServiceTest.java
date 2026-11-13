@@ -145,6 +145,109 @@ class SharingServiceTest {
     }
 
     @Nested
+    class ShareAbort {
+
+        @BeforeEach
+        void startChairman() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+        }
+
+        private SharingRequest abort(long version) {
+            return new SharingRequest(TimerEventType.ABORT, version, null);
+        }
+
+        @Test
+        void 중단_이벤트를_룸_채널로_보내고_룸을_중단_상태로_만든다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+
+            SharingResponse response = sentResponses(1).get(0);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.version()).isEqualTo(1L),
+                    () -> assertThat(response.serverTime()).isEqualTo(NOW.toEpochMilli()),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+
+        @Test
+        void 이미_중단된_룸의_중단_이벤트는_다시_보내지_않는다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(2L));
+
+            assertThat(sentResponses(1)).extracting(SharingResponse::version).containsExactly(1L);
+        }
+
+        @Test
+        void 중단된_룸에서는_사회자의_다른_이벤트를_보내지_않고_중단_상태를_유지한다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.SYNC, 2L));
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.NEXT, 3L));
+
+            assertAll(
+                    () -> assertThat(sentResponses(1)).extracting(SharingResponse::eventType)
+                            .containsExactly(TimerEventType.ABORT),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+
+        @Test
+        void 정상_종료된_룸에_늦게_도착한_중단_이벤트는_보내지_않고_종료_상태를_유지한다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
+
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(2L));
+
+            assertAll(
+                    () -> assertThat(sentResponses(1)).extracting(SharingResponse::eventType)
+                            .containsExactly(TimerEventType.FINISHED),
+                    () -> assertThat(sharingRoomRegistry.isFinished(ROOM_ID)).isTrue(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 이미_공유된_버전_이하의_중단_이벤트는_보내지_않는다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, normalEvent(TimerEventType.PLAY, 2L));
+
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+
+            assertAll(
+                    () -> assertThat(sentResponses(1)).extracting(SharingResponse::eventType)
+                            .containsExactly(TimerEventType.PLAY),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 밀려난_사회자의_중단_이벤트는_보내지_않는다() {
+            sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
+
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+
+            assertAll(
+                    () -> verify(messagingTemplate, never()).convertAndSend(eq("/room/" + ROOM_ID), any(Object.class)),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 중단된_룸에서_사회자가_다시_공유를_시작하면_이벤트를_다시_보낸다() {
+            sharingService.share(ROOM_ID, CHAIRMAN, abort(1L));
+            sharingService.startChairman(ROOM_ID, "tab-b", "simp-2");
+
+            sharingService.share(ROOM_ID, "tab-b", normalEvent(TimerEventType.SYNC, 1L));
+
+            assertAll(
+                    () -> assertThat(sentResponses(2)).extracting(SharingResponse::eventType)
+                            .containsExactly(TimerEventType.ABORT, TimerEventType.SYNC),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+    }
+
+    @Nested
     class ShareByChairmanSession {
 
         @Test
@@ -366,6 +469,31 @@ class SharingServiceTest {
             sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.FINISHED, 1L, null));
 
             verify(sharingLogService).finish(ROOM_ID);
+        }
+
+        @Test
+        void 중단_이벤트를_중계하면_공유_기록을_중단한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.ABORT, 1L, null));
+
+            assertAll(
+                    () -> verify(sharingLogService).abort(ROOM_ID),
+                    () -> verify(sharingLogService, never()).finish(ROOM_ID),
+                    () -> verify(sharingLogService, never()).recordEvent(eq(ROOM_ID), any())
+            );
+        }
+
+        @Test
+        void 중단_기록에_실패해도_중단_이벤트를_중계한다() {
+            sharingService.startChairman(ROOM_ID, CHAIRMAN, SIMP_SESSION);
+            doThrow(new IllegalStateException("db down"))
+                    .when(sharingLogService).abort(ROOM_ID);
+
+            sharingService.share(ROOM_ID, CHAIRMAN, new SharingRequest(TimerEventType.ABORT, 1L, null));
+
+            assertThat(sentResponses(1)).extracting(SharingResponse::eventType)
+                    .containsExactly(TimerEventType.ABORT);
         }
 
         @Test
