@@ -186,6 +186,72 @@ class SharingLogServiceTest extends BaseServiceTest {
     }
 
     @Nested
+    class Abort {
+
+        @Test
+        void 중단하면_중단_시각과_함께_중단으로_기록하고_종료_이벤트를_발행하지_않는다() {
+            sharingLogService.start(roomId);
+            clock.advance(Duration.ofMinutes(10));
+
+            sharingLogService.abort(roomId);
+
+            SharingLogEntity log = onlyLog();
+            assertAll(
+                    () -> assertThat(log.getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> assertThat(log.getEndedAt()).isEqualTo(at(NOW.plus(Duration.ofMinutes(10)))),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
+        }
+
+        @Test
+        void 마지막_타임박스에서_중단해도_중단으로_기록한다() {
+            sharingLogService.start(roomId);
+            sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, TIME_BOX_COUNT - 1));
+
+            sharingLogService.abort(roomId);
+
+            assertAll(
+                    () -> assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
+        }
+
+        @Test
+        void 중단한_뒤_연결이_끊겨_유예_시간이_지나도_다시_정리하지_않는다() {
+            sharingLogService.start(roomId);
+            sharingLogService.recordEvent(roomId, event(TimerEventType.PLAY, TIME_BOX_COUNT - 1));
+            sharingLogService.abort(roomId);
+            sharingLogService.disconnect(roomId);
+            clock.advance(ActiveSharing.RECONNECT_GRACE);
+
+            sharingLogService.closeExpired();
+
+            assertAll(
+                    () -> assertThat(onlyLog().getStatus()).isEqualTo(SharingLogStatus.ABANDONED),
+                    () -> verify(eventPublisher, never()).publishEvent(any(Object.class))
+            );
+        }
+
+        @Test
+        void 중단한_뒤_다시_시작하면_새_기록을_만든다() {
+            sharingLogService.start(roomId);
+            sharingLogService.abort(roomId);
+
+            sharingLogService.start(roomId);
+
+            assertThat(sharingLogRepository.findAll()).extracting(SharingLogEntity::getStatus)
+                    .containsExactly(SharingLogStatus.ABANDONED, SharingLogStatus.SHARING);
+        }
+
+        @Test
+        void 진행_중인_공유가_없으면_아무것도_기록하지_않는다() {
+            sharingLogService.abort(roomId);
+
+            assertThat(sharingLogRepository.findAll()).isEmpty();
+        }
+    }
+
+    @Nested
     class JoinAudience {
 
         @Test
