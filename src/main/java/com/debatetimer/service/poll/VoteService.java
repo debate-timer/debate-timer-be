@@ -49,7 +49,6 @@ public class VoteService {
         }
     }
 
-    @Transactional(readOnly = true)
     public VoterPollInfoResponse getVoterPollInfo(long pollId) {
         Poll poll = pollDomainRepository.getById(pollId);
         CustomizeTable table = customizeTableDomainRepository.getById(poll.getTableId());
