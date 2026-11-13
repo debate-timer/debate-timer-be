@@ -6,9 +6,12 @@ import static org.mockito.Mockito.doReturn;
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.member.FeatureFlag;
+import com.debatetimer.domain.member.Language;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberInfo;
+import com.debatetimer.dto.member.MemberSettingsResponse;
+import com.debatetimer.dto.member.MemberSettingsUpdateRequest;
 import com.debatetimer.dto.member.OAuthToken;
 import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.TableResponses;
@@ -16,16 +19,25 @@ import com.debatetimer.entity.customize.CustomizeTableEntity;
 import com.debatetimer.exception.ErrorResponse;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.fixture.NullAndEmptyAndBlankSource;
+import com.debatetimer.repository.member.MemberRepository;
 import io.restassured.http.ContentType;
 import io.restassured.http.Headers;
 import io.restassured.response.ValidatableResponse;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 class MemberControllerTest extends BaseControllerTest {
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Nested
     class GetTables {
@@ -88,7 +100,125 @@ class MemberControllerTest extends BaseControllerTest {
     }
 
     @Nested
+    class GetSettings {
+
+        @Test
+        void 회원의_설정을_조회한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            MemberSettingsResponse response = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .when().get("/api/member/settings")
+                    .then().statusCode(200)
+                    .extract().as(MemberSettingsResponse.class);
+
+            assertThat(response).isEqualTo(new MemberSettingsResponse(Language.KO_KR, new BigDecimal("0.5")));
+        }
+
+        @Test
+        void 로그인하지_않으면_조회할_수_없다() {
+            given()
+                    .when().get("/api/member/settings")
+                    .then().statusCode(401);
+        }
+    }
+
+    @Nested
+    class UpdateSettings {
+
+        @Test
+        void 회원의_설정을_변경한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+            MemberSettingsUpdateRequest request = new MemberSettingsUpdateRequest(Language.US_EN, 0.3);
+
+            MemberSettingsResponse response = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(request)
+                    .when().put("/api/member/settings")
+                    .then().statusCode(200)
+                    .extract().as(MemberSettingsResponse.class);
+
+            assertThat(response).isEqualTo(new MemberSettingsResponse(Language.US_EN, new BigDecimal("0.3")));
+        }
+
+        @Test
+        void 지원하지_않는_언어면_400_에러를_반환한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            ErrorResponse errorResponse = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(Map.of("language", "EN", "volume", 0.5))
+                    .when().put("/api/member/settings")
+                    .then().statusCode(400)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.MESSAGE_NOT_READABLE.getMessage());
+        }
+
+        @ParameterizedTest
+        @ValueSource(doubles = {-0.1, 1.1})
+        void 음량이_범위를_벗어나면_400_에러를_반환한다(double volume) {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+            MemberSettingsUpdateRequest request = new MemberSettingsUpdateRequest(null, volume);
+
+            ErrorResponse errorResponse = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(request)
+                    .when().put("/api/member/settings")
+                    .then().statusCode(400)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.INVALID_MEMBER_VOLUME.getMessage());
+        }
+
+        @Test
+        void 변경할_설정이_없으면_400_에러를_반환한다() {
+            Member bito = memberGenerator.generate("bito@gmail.com");
+
+            ErrorResponse errorResponse = given()
+                    .contentType(ContentType.JSON)
+                    .headers(headerGenerator.generateAccessTokenHeader(bito))
+                    .body(Map.of())
+                    .when().put("/api/member/settings")
+                    .then().statusCode(400)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.EMPTY_MEMBER_SETTINGS.getMessage());
+        }
+
+        @Test
+        void 로그인하지_않으면_변경할_수_없다() {
+            given()
+                    .contentType(ContentType.JSON)
+                    .body(new MemberSettingsUpdateRequest(Language.US_EN, 0.3))
+                    .when().put("/api/member/settings")
+                    .then().statusCode(401);
+        }
+    }
+
+    @Nested
     class CreateMember {
+
+        @Test
+        void 영어_브라우저로_가입하면_언어를_US_EN_으로_설정한다() {
+            MemberCreateRequest request = new MemberCreateRequest("gnkldsnglnksl", "http://redirectUrl");
+            OAuthToken oAuthToken = new OAuthToken("accessToken");
+            doReturn(oAuthToken).when(oAuthClient).requestToken(request);
+            doReturn(new MemberInfo("default@gmail.com")).when(oAuthClient).requestMemberInfo(oAuthToken);
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+                    .body(request)
+                    .when().post("/api/member")
+                    .then().statusCode(201);
+
+            Member member = memberRepository.getByEmail("default@gmail.com");
+            assertThat(member.getSettings().getLanguage()).isEqualTo(Language.US_EN);
+        }
 
         @Test
         void 회원을_생성한다() {

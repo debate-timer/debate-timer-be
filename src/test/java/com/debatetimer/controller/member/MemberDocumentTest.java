@@ -1,6 +1,7 @@
 package com.debatetimer.controller.member;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
@@ -15,16 +16,20 @@ import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
 import com.debatetimer.domain.member.FeatureFlag;
+import com.debatetimer.domain.member.Language;
 import com.debatetimer.dto.member.MemberCreateRequest;
 import com.debatetimer.dto.member.MemberCreateResponse;
 import com.debatetimer.dto.member.MemberFeatureFlagsResponse;
 import com.debatetimer.dto.member.MemberInfo;
+import com.debatetimer.dto.member.MemberSettingsResponse;
+import com.debatetimer.dto.member.MemberSettingsUpdateRequest;
 import com.debatetimer.dto.member.TableResponse;
 import com.debatetimer.dto.member.TableResponses;
 import com.debatetimer.dto.member.TableType;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,6 +45,10 @@ public class MemberDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
                 .summary("멤버 생성")
+                .description("신규 회원이면 `Accept-Language` 가 영어(`en`)로 시작할 때 언어 설정을 `US_EN`, 그 외에는 `KO_KR` 로 만듭니다. 기존 회원의 설정은 바꾸지 않습니다.")
+                .requestHeader(
+                        headerWithName(HttpHeaders.ACCEPT_LANGUAGE).description("브라우저 언어").optional()
+                )
                 .requestBodyField(
                         fieldWithPath("code").type(STRING).description("인가 코드"),
                         fieldWithPath("redirectUrl").type(STRING).description("리다이렉트 URL")
@@ -57,7 +66,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             MemberInfo memberInfo = new MemberInfo(EXIST_MEMBER_EMAIL);
             MemberCreateResponse response = new MemberCreateResponse(EXIST_MEMBER_ID, EXIST_MEMBER_EMAIL);
             doReturn(memberInfo).when(authService).getMemberInfo(request);
-            doReturn(response).when(memberService).createMember(memberInfo);
+            doReturn(response).when(memberService).createMember(memberInfo, Language.US_EN);
             doReturn(EXIST_MEMBER_TOKEN_RESPONSE).when(authManager).issueToken(memberInfo);
             doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager)
                     .createCookie(any(), any(), any());
@@ -66,6 +75,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .header(HttpHeaders.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
                     .body(request)
                     .when().post("/api/member")
                     .then().statusCode(201);
@@ -86,6 +96,105 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/member")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
+    class GetSettings {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("회원 설정 조회")
+                .description("""
+                        로그인한 회원의 언어 · 음량 설정을 조회합니다. 접속 · 로그인 시 1회 조회합니다.
+                        저장된 설정이 없는 회원은 기본값(`KO_KR` / 0.5)을 응답합니다. 비회원은 브라우저 저장소를 사용하므로 호출하지 않습니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
+
+        private final RestDocumentationResponse responseDocument = response().responseBodyField(
+                fieldWithPath("language").type(STRING).description("언어 (KO_KR : 한국어 / US_EN : 영어)"),
+                fieldWithPath("volume").type(NUMBER).description("음량 (0 ~ 1, 소수점 1자리)"));
+
+        @Test
+        void 회원_설정_조회_성공() {
+            MemberSettingsResponse response = new MemberSettingsResponse(Language.KO_KR, new BigDecimal("0.5"));
+            doReturn(response).when(memberService).getSettings(EXIST_MEMBER_ID);
+
+            var document = document("member/settings/get", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .when().get("/api/member/settings")
+                    .then().statusCode(200);
+        }
+    }
+
+    @Nested
+    class UpdateSettings {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("회원 설정 수정")
+                .description("""
+                        로그인한 회원의 언어 · 음량 설정을 수정합니다. 생략(null)한 값은 기존 값을 유지합니다.
+                        - 사용자가 직접 언어를 선택했을 때만 호출합니다. 영어 링크로 접속했다는 이유만으로 호출하지 않습니다.
+                        - 음량은 소수점 1자리로 반올림해 저장합니다. 슬라이더 연속 조작 시 debounce 후 호출을 권장합니다.
+                        - 지원하지 않는 언어 값이면 `400 MESSAGE_NOT_READABLE` 을 응답합니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .requestBodyField(
+                        fieldWithPath("language").type(STRING).description("언어 (KO_KR : 한국어 / US_EN : 영어)").optional(),
+                        fieldWithPath("volume").type(NUMBER).description("음량 (0 ~ 1)").optional()
+                );
+
+        private final RestDocumentationResponse responseDocument = response().responseBodyField(
+                fieldWithPath("language").type(STRING).description("변경 후 언어 (KO_KR / US_EN)"),
+                fieldWithPath("volume").type(NUMBER).description("변경 후 음량 (0 ~ 1, 소수점 1자리)"));
+
+        @Test
+        void 회원_설정_수정_성공() {
+            MemberSettingsUpdateRequest request = new MemberSettingsUpdateRequest(Language.US_EN, 0.5);
+            MemberSettingsResponse response = new MemberSettingsResponse(Language.US_EN, new BigDecimal("0.5"));
+            doReturn(response).when(memberService).updateSettings(EXIST_MEMBER_ID, request);
+
+            var document = document("member/settings/put", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .body(request)
+                    .when().put("/api/member/settings")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = ClientErrorCode.class, names = {"EMPTY_MEMBER_SETTINGS", "INVALID_MEMBER_VOLUME"})
+        @ParameterizedTest
+        void 회원_설정_수정_실패(ClientErrorCode errorCode) {
+            MemberSettingsUpdateRequest request = new MemberSettingsUpdateRequest(Language.US_EN, 1.5);
+            doThrow(new DTClientErrorException(errorCode)).when(memberService)
+                    .updateSettings(eq(EXIST_MEMBER_ID), any());
+
+            var document = document("member/settings/put", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .body(request)
+                    .when().put("/api/member/settings")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }

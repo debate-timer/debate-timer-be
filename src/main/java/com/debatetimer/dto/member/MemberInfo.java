@@ -1,5 +1,6 @@
 package com.debatetimer.dto.member;
 
+import com.debatetimer.domain.member.Language;
 import com.debatetimer.domain.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -10,7 +11,7 @@ public record MemberInfo(String email) {
         this(member.getEmail());
     }
 
-    public Member toMember() {
-        return new Member(email);
+    public Member toMember(Language language) {
+        return new Member(email, language);
     }
 }
