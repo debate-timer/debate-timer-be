@@ -8,7 +8,9 @@ import com.debatetimer.client.recordingv2.SpeechTranscriberV2;
 import com.debatetimer.client.recordingv2.SttAudioStorageV2;
 import com.debatetimer.config.recordingv2.RecordingV2Properties;
 import com.debatetimer.domain.recordingv2.AudioCandidateV2;
+import com.debatetimer.domain.recordingv2.AudioQualityMetricsV2;
 import com.debatetimer.domain.recordingv2.AudioQualityScorerV2;
+import com.debatetimer.domain.recordingv2.AudioQualityScorerV2.RankedCandidate;
 import com.debatetimer.domain.recordingv2.ClosedTurnV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnV2;
@@ -17,6 +19,7 @@ import com.debatetimer.domainrepository.recordingv2.RecordingV2DomainRepository;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -90,7 +93,11 @@ public class TurnProcessorV2 {
     }
 
     public void submit(ClosedTurnV2 closedTurn) {
-        List<AudioCandidateV2> ranked = scorer.rank(closedTurn.candidates());
+        List<RankedCandidate> scored = scorer.rankWithScores(closedTurn.candidates());
+        logRanking(closedTurn, scored);
+        List<AudioCandidateV2> ranked = scored.stream()
+                .map(RankedCandidate::candidate)
+                .toList();
         Optional<RecordingTurnV2> created = callQuietly("턴 기록", label(closedTurn),
                 () -> createTurn(closedTurn, ranked));
         registry.markPersisted(closedTurn.sessionKey());
@@ -150,6 +157,8 @@ public class TurnProcessorV2 {
             List<Utterance> utterances = speechTranscriber.transcribe(candidate.file(), session.language());
             recordingV2DomainRepository.completeTurn(turn.id(), candidate.deviceId(), candidate.startedAtEpochMs(),
                     candidate.team(), s3Key.orElse(null), utterances);
+            log.info("V2 녹음 턴 전사 완료: turnKey={}, deviceId={}, utterances={}, s3Key={}", turn.turnKey(),
+                    candidate.deviceId(), utterances.size(), s3Key.orElse("-"));
         });
     }
 
@@ -161,6 +170,26 @@ public class TurnProcessorV2 {
 
     private void deleteFiles(ClosedTurnV2 closedTurn) {
         closedTurn.candidates().forEach(candidate -> audioSpool.delete(candidate.file()));
+    }
+
+    // 어떤 후보를 왜 골랐는지 확인할 수 있도록 후보마다 점수·지표를 남긴다. 순위에서 빠진 후보는 크기·길이가 맞지 않은 후보다.
+    private void logRanking(ClosedTurnV2 closedTurn, List<RankedCandidate> scored) {
+        String ranking = scored.stream()
+                .map(ranked -> describe(ranked.candidate()) + " score=" + String.format("%.1f", ranked.score()))
+                .collect(Collectors.joining(", "));
+        log.info("V2 녹음 턴 후보 순위: {} candidates={} excluded={} [{}] → 선택 {}", label(closedTurn),
+                closedTurn.candidates().size(), closedTurn.candidates().size() - scored.size(), ranking,
+                scored.isEmpty() ? "없음" : scored.get(0).candidate().deviceId());
+    }
+
+    private String describe(AudioCandidateV2 candidate) {
+        AudioQualityMetricsV2 metrics = candidate.metrics();
+        String metricText = metrics.isPlausible()
+                ? String.format("rms=%.1f peak=%.1f snr=%.1f silence=%.2f clip=%.3f", metrics.rmsDb(),
+                metrics.peakDb(), metrics.snrDb(), metrics.silenceRatio(), metrics.clippingRatio())
+                : "지표없음";
+        return candidate.deviceId() + (candidate.host() ? "(host)" : "") + " " + candidate.durationMs() + "ms "
+                + metricText;
     }
 
     private String label(ClosedTurnV2 closedTurn) {

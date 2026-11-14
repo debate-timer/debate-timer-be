@@ -99,6 +99,17 @@ class AudioQualityScorerV2Test {
         }
     }
 
+    @Test
+    void 순위와_함께_후보별_점수를_돌려준다() {
+        AudioCandidateV2 noisy = candidate("noisy", false, 40_000, 10_000, metrics(-20, -3, 0, 0.2, 10), 0);
+        AudioCandidateV2 clear = candidate("clear", false, 40_000, 10_000, metrics(-20, -3, 0, 0.2, 30), 1);
+
+        List<AudioQualityScorerV2.RankedCandidate> ranked = scorer.rankWithScores(List.of(noisy, clear));
+
+        assertThat(ranked).extracting(AudioQualityScorerV2.RankedCandidate::candidate).containsExactly(clear, noisy);
+        assertThat(ranked.get(0).score()).isGreaterThan(ranked.get(1).score());
+    }
+
     private AudioQualityMetricsV2 goodMetrics() {
         return metrics(-20, -3, 0, 0.2, 30);
     }

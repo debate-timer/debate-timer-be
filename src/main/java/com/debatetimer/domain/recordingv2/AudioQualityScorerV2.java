@@ -23,6 +23,15 @@ public class AudioQualityScorerV2 {
     static final double COMPLETENESS_WEIGHT = 30;
 
     public List<AudioCandidateV2> rank(List<AudioCandidateV2> candidates) {
+        return rankWithScores(candidates).stream()
+                .map(RankedCandidate::candidate)
+                .toList();
+    }
+
+    /**
+     * 순위와 함께 각 후보의 점수를 돌려준다. 고른 이유를 기록할 때 쓴다.
+     */
+    public List<RankedCandidate> rankWithScores(List<AudioCandidateV2> candidates) {
         List<AudioCandidateV2> valid = candidates.stream()
                 .filter(AudioCandidateV2::isValid)
                 .toList();
@@ -31,12 +40,13 @@ public class AudioQualityScorerV2 {
                 .max()
                 .orElse(0);
 
-        Comparator<AudioCandidateV2> order = Comparator
-                .comparing((AudioCandidateV2 candidate) -> !candidate.hasPlausibleMetrics())
-                .thenComparing(candidate -> score(candidate, longestDurationMs), Comparator.reverseOrder())
-                .thenComparing(candidate -> !candidate.host())
-                .thenComparing(AudioCandidateV2::receivedAt);
+        Comparator<RankedCandidate> order = Comparator
+                .comparing((RankedCandidate ranked) -> !ranked.candidate().hasPlausibleMetrics())
+                .thenComparing(RankedCandidate::score, Comparator.reverseOrder())
+                .thenComparing(ranked -> !ranked.candidate().host())
+                .thenComparing(ranked -> ranked.candidate().receivedAt());
         return valid.stream()
+                .map(candidate -> new RankedCandidate(candidate, score(candidate, longestDurationMs)))
                 .sorted(order)
                 .toList();
     }
@@ -68,5 +78,8 @@ public class AudioQualityScorerV2 {
             return Math.max(0, LOUDNESS_WEIGHT - (rmsDb - MAX_GOOD_RMS_DB));
         }
         return LOUDNESS_WEIGHT;
+    }
+
+    public record RankedCandidate(AudioCandidateV2 candidate, double score) {
     }
 }
