@@ -1,10 +1,13 @@
 package com.debatetimer.client.recordingv2;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTInitializationException;
+import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.InitializationErrorCode;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -35,7 +38,8 @@ public class AudioSpoolV2 {
         try {
             Files.createDirectories(directory);
         } catch (IOException exception) {
-            throw new UncheckedIOException("녹음 스풀 디렉터리를 만들지 못했습니다. dir=" + directory, exception);
+            log.error("녹음 스풀 디렉터리를 만들지 못했습니다. dir={}", directory, exception);
+            throw new DTInitializationException(InitializationErrorCode.RECORDING_SPOOL_DIR_UNAVAILABLE, exception);
         }
         // 재시작 전에 남은 파일도 정리할 때 용량을 돌려받으므로 처음부터 사용량에 넣는다.
         usedBytes.set(sizeOfExistingFiles());
@@ -55,7 +59,7 @@ public class AudioSpoolV2 {
         } catch (IOException | RuntimeException exception) {
             usedBytes.addAndGet(-size);
             deleteQuietly(file);
-            throw new IllegalStateException("녹음 오디오를 임시 파일로 받지 못했습니다.", exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_AUDIO_SPOOL_ERROR, exception);
         }
     }
 

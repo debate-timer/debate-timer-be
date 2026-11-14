@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTInitializationException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.InitializationErrorCode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,6 +84,15 @@ class AudioSpoolV2Test {
         assertThat(old).doesNotExist();
         assertThat(recent).exists();
         assertThat(spool.getUsedBytes()).isEqualTo(1);
+    }
+
+    @Test
+    void 스풀_디렉터리를_만들_수_없으면_앱을_띄우지_않는다() throws IOException {
+        Path file = Files.write(directory.resolve("not-a-directory"), new byte[]{1});
+
+        assertThatThrownBy(() -> new AudioSpoolV2(file.resolve("spool"), 10))
+                .isInstanceOf(DTInitializationException.class)
+                .hasMessage(InitializationErrorCode.RECORDING_SPOOL_DIR_UNAVAILABLE.getMessage());
     }
 
     private MockMultipartFile audio(String filename, int size) {

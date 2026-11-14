@@ -1,5 +1,7 @@
 package com.debatetimer.domain.recordingv2;
 
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,7 +41,7 @@ public final class RecordingSecretV2 {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(secret.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(digest);
         } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256을 쓸 수 없습니다.", exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_SECRET_HASH_ERROR, exception);
         }
     }
 

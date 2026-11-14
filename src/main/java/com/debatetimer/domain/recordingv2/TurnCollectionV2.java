@@ -1,5 +1,7 @@
 package com.debatetimer.domain.recordingv2;
 
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class TurnCollectionV2 {
      */
     public Optional<AudioCandidateV2> add(AudioCandidateV2 candidate) {
         if (closed) {
-            throw new IllegalStateException("이미 닫힌 턴입니다. turnKey=" + turnKey);
+            throw new DTClientErrorException(ClientErrorCode.RECORDING_TURN_CLOSED);
         }
         return Optional.ofNullable(candidates.put(candidate.deviceId(), candidate));
     }

@@ -1,6 +1,8 @@
 package com.debatetimer.repository.recordingv2;
 
 import com.debatetimer.entity.recordingv2.RecordingTurnV2Entity;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.Repository;
@@ -17,6 +19,6 @@ public interface RecordingTurnV2Repository extends Repository<RecordingTurnV2Ent
 
     default RecordingTurnV2Entity getById(long id) {
         return findById(id)
-                .orElseThrow(() -> new IllegalStateException("녹음 턴을 찾을 수 없습니다. id=" + id));
+                .orElseThrow(() -> new DTServerErrorException(ServerErrorCode.RECORDING_TURN_NOT_FOUND));
     }
 }

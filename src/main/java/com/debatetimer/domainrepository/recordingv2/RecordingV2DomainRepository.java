@@ -8,6 +8,8 @@ import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.entity.recordingv2.RecordingSessionV2Entity;
 import com.debatetimer.entity.recordingv2.RecordingTurnV2Entity;
 import com.debatetimer.repository.recordingv2.RecordingSessionV2Repository;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import com.debatetimer.repository.recordingv2.RecordingTurnV2Repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -119,7 +121,7 @@ public class RecordingV2DomainRepository {
         try {
             return objectMapper.writeValueAsString(utterances);
         } catch (JsonProcessingException exception) {
-            throw new IllegalStateException("전사 결과를 저장 형식으로 변환하지 못했습니다.", exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_CONVERSION_ERROR, exception);
         }
     }
 
@@ -130,7 +132,7 @@ public class RecordingV2DomainRepository {
         try {
             return objectMapper.readValue(utterancesJson, UTTERANCES_TYPE);
         } catch (JsonProcessingException exception) {
-            throw new IllegalStateException("저장된 전사 결과를 읽지 못했습니다.", exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_CONVERSION_ERROR, exception);
         }
     }
 }

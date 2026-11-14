@@ -3,6 +3,8 @@ package com.debatetimer.domain.recordingv2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -52,7 +54,8 @@ class TurnCollectionV2Test {
         assertThat(collection.isClosed()).isTrue();
         assertThat(collection.shouldClose(Set.of(), OPENED_AT.plusSeconds(60), WINDOW)).isFalse();
         assertThatThrownBy(() -> collection.add(candidate("audience")))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(DTClientErrorException.class)
+                .hasMessage(ClientErrorCode.RECORDING_TURN_CLOSED.getMessage());
     }
 
     private AudioCandidateV2 candidate(String deviceId) {
