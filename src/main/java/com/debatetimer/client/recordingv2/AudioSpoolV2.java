@@ -59,6 +59,8 @@ public class AudioSpoolV2 {
         } catch (IOException | RuntimeException exception) {
             usedBytes.addAndGet(-size);
             deleteQuietly(file);
+            // 전역 예외 핸들러는 메시지만 남기므로 원인(디스크 부족 등)은 여기서 남긴다.
+            log.error("녹음 오디오를 임시 파일로 받지 못했습니다. file={}, size={}", file, size, exception);
             throw new DTServerErrorException(ServerErrorCode.RECORDING_AUDIO_SPOOL_ERROR, exception);
         }
     }
