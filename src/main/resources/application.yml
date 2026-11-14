@@ -45,3 +45,7 @@ stt-audio:
   region: ${STT_AUDIO_REGION:ap-northeast-2}
   access-key: ${STT_AUDIO_ACCESS_KEY:}
   secret-key: ${STT_AUDIO_SECRET_KEY:}
+
+# 다기기 녹음 V2(청중 기기 녹음 중 턴별 최고 품질 선택 후 백그라운드 전사). 꺼져 있으면 V2 API는 404로 응답한다
+recording-v2:
+  enabled: ${RECORDING_V2_ENABLED:false}

@@ -10,7 +10,8 @@ public enum Tag {
     POLL_API("Poll API"),
     ORGANIZATION_API("Organization API"),
     STT_API("STT API"),
-    TRANSCRIPT_API("Transcript API");
+    TRANSCRIPT_API("Transcript API"),
+    RECORDING_V2_API("Recording V2 API");
 
     private final String displayName;
 
