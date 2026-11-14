@@ -1,5 +1,8 @@
 package com.debatetimer.service.recordingv2;
 
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.callQuietly;
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.runQuietly;
+
 import com.debatetimer.client.recordingv2.AudioSpoolV2;
 import com.debatetimer.client.recordingv2.SpeechTranscriberV2;
 import com.debatetimer.client.recordingv2.SttAudioStorageV2;
@@ -33,6 +36,9 @@ import org.springframework.stereotype.Service;
 public class TurnProcessorV2 {
 
     private static final int SHUTDOWN_SECONDS = 30;
+    static final String NO_CANDIDATE = "고를 수 있는 녹음 후보가 없습니다.";
+    static final String QUEUE_FULL = "처리 대기열이 가득 찼습니다.";
+    static final String ALL_FAILED = "모든 녹음 후보의 전사에 실패했습니다.";
 
     private final RecordingV2DomainRepository recordingV2DomainRepository;
     private final RecordingSessionRegistryV2 registry;
@@ -85,30 +91,20 @@ public class TurnProcessorV2 {
 
     public void submit(ClosedTurnV2 closedTurn) {
         List<AudioCandidateV2> ranked = scorer.rank(closedTurn.candidates());
-        RecordingTurnV2 turn;
-        try {
-            turn = createTurn(closedTurn, ranked);
-        } catch (RuntimeException exception) {
-            log.warn("V2 녹음 턴을 기록하지 못해 버립니다. sessionKey={}, turnKey={}", closedTurn.sessionKey(),
-                    closedTurn.turnKey(), exception);
-            deleteFiles(closedTurn.candidates());
+        Optional<RecordingTurnV2> created = callQuietly("턴 기록", label(closedTurn),
+                () -> createTurn(closedTurn, ranked));
+        registry.markPersisted(closedTurn.sessionKey());
+        if (created.isEmpty()) {
+            deleteFiles(closedTurn);
             return;
-        } finally {
-            registry.markPersisted(closedTurn.sessionKey());
         }
-
+        RecordingTurnV2 turn = created.get();
         if (ranked.isEmpty()) {
-            recordingV2DomainRepository.failTurn(turn.id(), "고를 수 있는 녹음 후보가 없습니다.");
-            deleteFiles(closedTurn.candidates());
+            fail(turn, closedTurn, NO_CANDIDATE);
             return;
         }
-        try {
-            executor.execute(() -> process(closedTurn, turn, ranked));
-        } catch (TaskRejectedException exception) {
-            log.warn("V2 녹음 처리 대기열이 가득 찼습니다. sessionKey={}, turnKey={}", closedTurn.sessionKey(),
-                    closedTurn.turnKey());
-            recordingV2DomainRepository.failTurn(turn.id(), "처리 대기열이 가득 찼습니다.");
-            deleteFiles(closedTurn.candidates());
+        if (!dispatch(closedTurn, turn, ranked)) {
+            fail(turn, closedTurn, QUEUE_FULL);
         }
     }
 
@@ -123,49 +119,52 @@ public class TurnProcessorV2 {
                 closedTurn.candidates().size());
     }
 
-    private void process(ClosedTurnV2 closedTurn, RecordingTurnV2 turn, List<AudioCandidateV2> ranked) {
+    private boolean dispatch(ClosedTurnV2 closedTurn, RecordingTurnV2 turn, List<AudioCandidateV2> ranked) {
         try {
-            RecordingSessionV2 session = recordingV2DomainRepository.getSession(closedTurn.sessionId());
-            for (AudioCandidateV2 candidate : ranked) {
-                if (transcribe(session, turn, candidate)) {
-                    return;
-                }
-            }
-            recordingV2DomainRepository.failTurn(turn.id(), "모든 녹음 후보의 전사에 실패했습니다.");
-        } catch (RuntimeException exception) {
-            log.warn("V2 녹음 턴 처리 중 오류가 났습니다. turnId={}", turn.id(), exception);
-            failQuietly(turn.id(), exception);
-        } finally {
-            deleteFiles(closedTurn.candidates());
+            executor.execute(() -> process(closedTurn, turn, ranked));
+            return true;
+        } catch (TaskRejectedException exception) {
+            log.warn("V2 녹음 처리 대기열이 가득 찼습니다: {}", label(closedTurn));
+            return false;
         }
+    }
+
+    // 순위대로 전사해 처음 성공한 후보를 쓴다.
+    private void process(ClosedTurnV2 closedTurn, RecordingTurnV2 turn, List<AudioCandidateV2> ranked) {
+        boolean done = callQuietly("턴 처리", label(closedTurn), () -> {
+            RecordingSessionV2 session = recordingV2DomainRepository.getSession(closedTurn.sessionId());
+            return ranked.stream().anyMatch(candidate -> transcribe(session, turn, candidate));
+        }).orElse(false);
+        if (done) {
+            deleteFiles(closedTurn);
+            return;
+        }
+        fail(turn, closedTurn, ALL_FAILED);
     }
 
     // 전사에 실패한 오디오도 다시 들어볼 수 있도록 전사 전에 보관한다.
     private boolean transcribe(RecordingSessionV2 session, RecordingTurnV2 turn, AudioCandidateV2 candidate) {
         Optional<String> s3Key = sttAudioStorage.upload(session.memberId(), session.sessionKey(), turn.turnKey(),
                 candidate);
-        try {
+        return runQuietly("후보 전사", turn.id() + "/" + candidate.deviceId(), () -> {
             List<Utterance> utterances = speechTranscriber.transcribe(candidate.file(), session.language());
             recordingV2DomainRepository.completeTurn(turn.id(), candidate.deviceId(), candidate.startedAtEpochMs(),
                     candidate.team(), s3Key.orElse(null), utterances);
-            return true;
-        } catch (RuntimeException exception) {
-            log.warn("V2 녹음 후보 전사에 실패해 다음 후보로 넘어갑니다. turnId={}, deviceId={}, size={}", turn.id(),
-                    candidate.deviceId(), candidate.sizeBytes(), exception);
-            return false;
-        }
+        });
     }
 
-    private void failQuietly(long turnId, RuntimeException cause) {
-        try {
-            recordingV2DomainRepository.failTurn(turnId, cause.getMessage());
-        } catch (RuntimeException exception) {
-            log.warn("V2 녹음 턴을 실패로 기록하지 못했습니다. turnId={}", turnId, exception);
-        }
+    // 실패 기록이 실패해도 임시 파일은 지운다.
+    private void fail(RecordingTurnV2 turn, ClosedTurnV2 closedTurn, String reason) {
+        runQuietly("턴 실패 기록", label(closedTurn), () -> recordingV2DomainRepository.failTurn(turn.id(), reason));
+        deleteFiles(closedTurn);
     }
 
-    private void deleteFiles(List<AudioCandidateV2> candidates) {
-        candidates.forEach(candidate -> audioSpool.delete(candidate.file()));
+    private void deleteFiles(ClosedTurnV2 closedTurn) {
+        closedTurn.candidates().forEach(candidate -> audioSpool.delete(candidate.file()));
+    }
+
+    private String label(ClosedTurnV2 closedTurn) {
+        return closedTurn.sessionKey() + "/" + closedTurn.turnKey();
     }
 
     @PreDestroy

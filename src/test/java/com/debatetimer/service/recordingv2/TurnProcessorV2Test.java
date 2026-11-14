@@ -1,11 +1,13 @@
 package com.debatetimer.service.recordingv2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -147,6 +149,32 @@ class TurnProcessorV2Test {
         processor(rejecting).submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only)));
 
         verify(repository).failTurn(eq(TURN_ID), anyString());
+        assertThat(only.file()).doesNotExist();
+    }
+
+    @Test
+    void 실패_기록이_실패해도_예외를_던지지_않고_후보_파일을_지운다() throws IOException {
+        AudioCandidateV2 only = candidate("only", true, 35, null, 1_000L);
+        when(transcriber.transcribe(any(), any()))
+                .thenThrow(new DTServerErrorException(ServerErrorCode.STT_REQUEST_FAILED));
+        doThrow(new RuntimeException("db down")).when(repository).failTurn(anyLong(), anyString());
+
+        assertThatCode(() -> processor(new SyncTaskExecutor())
+                .submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only))))
+                .doesNotThrowAnyException();
+        assertThat(only.file()).doesNotExist();
+    }
+
+    @Test
+    void 턴_기록에_실패하면_처리하지_않고_후보_파일을_지운다() throws IOException {
+        AudioCandidateV2 only = candidate("only", true, 35, null, 1_000L);
+        when(repository.createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt()))
+                .thenThrow(new RuntimeException("db down"));
+
+        processor(new SyncTaskExecutor()).submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only)));
+
+        verify(registry).markPersisted("session");
+        verify(transcriber, never()).transcribe(any(), any());
         assertThat(only.file()).doesNotExist();
     }
 
