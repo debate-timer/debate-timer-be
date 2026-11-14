@@ -1,5 +1,7 @@
 package com.debatetimer.scheduler.recordingv2;
 
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.runQuietly;
+
 import com.debatetimer.client.recordingv2.AudioSpoolV2;
 import com.debatetimer.config.recordingv2.RecordingV2Properties;
 import com.debatetimer.service.recordingv2.RecordingFinalizerV2;
@@ -30,8 +32,10 @@ public class RecordingV2Scheduler {
     @Scheduled(fixedDelay = CLOSE_TURNS_INTERVAL_MILLIS)
     public void closeTurns() {
         if (properties.enabled()) {
+            // 처리기에 예상하지 못한 오류가 있어도 같은 주기에 닫힌 다른 턴은 처리한다.
             registry.drainClosable(properties.collectWindow(), properties.deviceIdleTimeout())
-                    .forEach(turnProcessor::submit);
+                    .forEach(turn -> runQuietly("턴 넘기기", turn.sessionKey() + "/" + turn.turnKey(),
+                            () -> turnProcessor.submit(turn)));
         }
     }
 

@@ -1,5 +1,7 @@
 package com.debatetimer.service.recordingv2;
 
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.runQuietly;
+
 import com.debatetimer.client.recordingv2.AudioSpoolV2;
 import com.debatetimer.config.recordingv2.RecordingV2Properties;
 import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
@@ -10,7 +12,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
  * - 끝낸 뒤 최대 대기 시간이 지나면 처리가 끝난 턴만으로 만든다.
  * - 전사된 발언이 없거나 만들다 실패하면 세션을 실패로 기록한다.
  */
-@Slf4j
 @Service
 public class RecordingFinalizerV2 {
 
@@ -61,11 +61,9 @@ public class RecordingFinalizerV2 {
 
     public void finalizeReadySessions() {
         for (RecordingSessionV2 session : recordingV2DomainRepository.findSessions(RecordingSessionStatusV2.FINISHING)) {
-            try {
-                finalizeIfReady(session);
-            } catch (RuntimeException exception) {
-                log.warn("V2 녹음 세션을 마무리하지 못했습니다. sessionKey={}", session.sessionKey(), exception);
-                recordingV2DomainRepository.failSession(session.id(), "속기록을 만들지 못했습니다.");
+            if (!runQuietly("세션 마무리", session.sessionKey(), () -> finalizeIfReady(session))) {
+                runQuietly("세션 실패 기록", session.sessionKey(),
+                        () -> recordingV2DomainRepository.failSession(session.id(), "속기록을 만들지 못했습니다."));
                 cleanUp(session);
             }
         }
