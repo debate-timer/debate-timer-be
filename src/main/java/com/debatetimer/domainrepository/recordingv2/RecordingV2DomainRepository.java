@@ -8,9 +8,9 @@ import com.debatetimer.domain.recordingv2.RecordingTurnV2;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.entity.recordingv2.RecordingSessionV2Entity;
 import com.debatetimer.entity.recordingv2.RecordingTurnV2Entity;
-import com.debatetimer.repository.recordingv2.RecordingSessionV2Repository;
 import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
+import com.debatetimer.repository.recordingv2.RecordingSessionV2Repository;
 import com.debatetimer.repository.recordingv2.RecordingTurnV2Repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,10 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class RecordingV2DomainRepository {
@@ -97,13 +99,13 @@ public class RecordingV2DomainRepository {
     @Transactional
     public void completeTurn(long turnId, String selectedDeviceId, long startedAtEpochMs, @Nullable Stance team,
                              @Nullable String s3Key, List<Utterance> utterances) {
-        turnRepository.getById(turnId)
+        getTurn(turnId)
                 .complete(selectedDeviceId, startedAtEpochMs, team, s3Key, writeUtterances(utterances));
     }
 
     @Transactional
     public void failTurn(long turnId, String errorMessage) {
-        turnRepository.getById(turnId).fail(errorMessage);
+        getTurn(turnId).fail(errorMessage);
     }
 
     /**
@@ -126,6 +128,15 @@ public class RecordingV2DomainRepository {
                 .toList();
     }
 
+    // 턴은 서버가 만든 ID로만 찾으므로 없으면 서버 오류다. 응답 메시지에는 ID가 없어 로그로 남긴다.
+    private RecordingTurnV2Entity getTurn(long turnId) {
+        return turnRepository.findById(turnId)
+                .orElseThrow(() -> {
+                    log.error("녹음 턴을 찾을 수 없습니다. turnId={}", turnId);
+                    return new DTServerErrorException(ServerErrorCode.RECORDING_TURN_NOT_FOUND);
+                });
+    }
+
     private RecordingSessionV2 toDomain(RecordingSessionV2Entity entity) {
         return new RecordingSessionV2(entity.getId(), entity.getSessionKey(), entity.getMemberId(),
                 entity.getTableId(), entity.getLanguage(), entity.getJoinCodeHash(), entity.getStatus(),
@@ -143,7 +154,8 @@ public class RecordingV2DomainRepository {
         try {
             return objectMapper.writeValueAsString(utterances);
         } catch (JsonProcessingException exception) {
-            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_CONVERSION_ERROR, exception);
+            log.error("녹음 전사 결과를 저장 형식으로 변환하지 못했습니다. utterances={}", utterances.size(), exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_WRITE_ERROR, exception);
         }
     }
 
@@ -154,7 +166,8 @@ public class RecordingV2DomainRepository {
         try {
             return objectMapper.readValue(utterancesJson, UTTERANCES_TYPE);
         } catch (JsonProcessingException exception) {
-            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_CONVERSION_ERROR, exception);
+            log.error("저장된 녹음 전사 결과를 읽지 못했습니다.", exception);
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_UTTERANCES_READ_ERROR, exception);
         }
     }
 }

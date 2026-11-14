@@ -1,7 +1,7 @@
 package com.debatetimer.domain.recordingv2;
 
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.custom.DTServerErrorException;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,7 +32,8 @@ public class TurnCollectionV2 {
      */
     public Optional<AudioCandidateV2> add(AudioCandidateV2 candidate) {
         if (closed) {
-            throw new DTClientErrorException(ClientErrorCode.RECORDING_TURN_CLOSED);
+            // 레지스트리가 닫힌 턴을 먼저 걸러 정상 흐름에서는 오지 않는다. 오면 레지스트리 버그이므로 서버 오류로 알린다.
+            throw new DTServerErrorException(ServerErrorCode.RECORDING_TURN_COLLECTION_CLOSED);
         }
         return Optional.ofNullable(candidates.put(candidate.deviceId(), candidate));
     }

@@ -12,7 +12,9 @@ import com.debatetimer.domain.recordingv2.RecordingTurnV2;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
 import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.custom.DTServerErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -97,6 +99,14 @@ class RecordingV2DomainRepositoryTest extends BaseDomainRepositoryTest {
                     () -> assertThat(found.utterances()).isEqualTo(utterances),
                     () -> assertThat(recordingV2DomainRepository.existsTurn(session.id(), "0-1")).isTrue()
             );
+        }
+
+        @Test
+        void 없는_턴을_완료하려_하면_서버_오류를_던진다() {
+            assertThatThrownBy(() -> recordingV2DomainRepository.completeTurn(999L, "device", 0L, null, null,
+                    List.of()))
+                    .isInstanceOf(DTServerErrorException.class)
+                    .hasMessage(ServerErrorCode.RECORDING_TURN_NOT_FOUND.getMessage());
         }
 
         @Test
