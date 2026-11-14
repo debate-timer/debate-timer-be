@@ -24,6 +24,8 @@ public record RecordingV2Properties(
         // 고른 후보를 S3에 올리고 전사하는 스레드 수. V2 전용 Soniox 동시 전사 수와 같다.
         Integer workers,
         Integer queueCapacity,
+        // 이보다 오래 처리 중인 턴은 앱이 재시작되며 작업을 잃은 것으로 본다. 전사 최대 대기 시간보다 길어야 한다.
+        Duration processingTimeout,
         // 사회자가 끝낸 뒤 남은 턴 처리를 기다리는 최대 시간. 지나면 끝난 턴만으로 속기록을 만든다.
         Duration finishTimeout,
         // 녹음 중인 세션의 기기·수집 상태를 메모리에 두는 최대 시간
@@ -38,6 +40,7 @@ public record RecordingV2Properties(
     private static final long DEFAULT_MAX_SPOOL_BYTES = 512L * 1024 * 1024;
     private static final int DEFAULT_WORKERS = 2;
     private static final int DEFAULT_QUEUE_CAPACITY = 50;
+    private static final Duration DEFAULT_PROCESSING_TIMEOUT = Duration.ofMinutes(5);
     private static final Duration DEFAULT_FINISH_TIMEOUT = Duration.ofMinutes(10);
     private static final Duration DEFAULT_SESSION_TTL = Duration.ofHours(12);
 
@@ -50,6 +53,7 @@ public record RecordingV2Properties(
         maxSpoolBytes = maxSpoolBytes == null ? DEFAULT_MAX_SPOOL_BYTES : maxSpoolBytes;
         workers = workers == null ? DEFAULT_WORKERS : workers;
         queueCapacity = queueCapacity == null ? DEFAULT_QUEUE_CAPACITY : queueCapacity;
+        processingTimeout = processingTimeout == null ? DEFAULT_PROCESSING_TIMEOUT : processingTimeout;
         finishTimeout = finishTimeout == null ? DEFAULT_FINISH_TIMEOUT : finishTimeout;
         sessionTtl = sessionTtl == null ? DEFAULT_SESSION_TTL : sessionTtl;
     }

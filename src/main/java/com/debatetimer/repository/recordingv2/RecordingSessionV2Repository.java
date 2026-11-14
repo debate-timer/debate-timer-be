@@ -4,6 +4,7 @@ import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
 import com.debatetimer.entity.recordingv2.RecordingSessionV2Entity;
 import com.debatetimer.exception.custom.DTClientErrorException;
 import com.debatetimer.exception.errorcode.ClientErrorCode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.Repository;
@@ -17,6 +18,9 @@ public interface RecordingSessionV2Repository extends Repository<RecordingSessio
     Optional<RecordingSessionV2Entity> findBySessionKey(String sessionKey);
 
     List<RecordingSessionV2Entity> findAllByStatus(RecordingSessionStatusV2 status);
+
+    List<RecordingSessionV2Entity> findAllByStatusAndCreatedAtBefore(RecordingSessionStatusV2 status,
+                                                                     LocalDateTime createdAt);
 
     default RecordingSessionV2Entity getById(long id) {
         return findById(id)

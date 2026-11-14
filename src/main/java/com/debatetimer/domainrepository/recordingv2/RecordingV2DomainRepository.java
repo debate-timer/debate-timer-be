@@ -3,6 +3,7 @@ package com.debatetimer.domainrepository.recordingv2;
 import com.debatetimer.domain.customize.Stance;
 import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionV2;
+import com.debatetimer.domain.recordingv2.RecordingTurnStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnV2;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.entity.recordingv2.RecordingSessionV2Entity;
@@ -57,6 +58,14 @@ public class RecordingV2DomainRepository {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<RecordingSessionV2> findSessionsCreatedBefore(RecordingSessionStatusV2 status,
+                                                              LocalDateTime createdAt) {
+        return sessionRepository.findAllByStatusAndCreatedAtBefore(status, createdAt).stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
     @Transactional
     public void finishSession(long id, LocalDateTime finishedAt) {
         sessionRepository.getById(id).finish(finishedAt);
@@ -95,6 +104,19 @@ public class RecordingV2DomainRepository {
     @Transactional
     public void failTurn(long turnId, String errorMessage) {
         turnRepository.getById(turnId).fail(errorMessage);
+    }
+
+    /**
+     * 처리 중으로 기록된 지 오래된 턴을 실패로 바꾼다.
+     *
+     * @return 실패로 바꾼 턴 수
+     */
+    @Transactional
+    public int failProcessingTurnsCreatedBefore(LocalDateTime createdAt, String errorMessage) {
+        List<RecordingTurnV2Entity> turns = turnRepository.findAllByStatusAndCreatedAtBefore(
+                RecordingTurnStatusV2.PROCESSING, createdAt);
+        turns.forEach(turn -> turn.fail(errorMessage));
+        return turns.size();
     }
 
     @Transactional(readOnly = true)
