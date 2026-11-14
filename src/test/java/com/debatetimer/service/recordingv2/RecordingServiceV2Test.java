@@ -138,7 +138,7 @@ class RecordingServiceV2Test extends BaseServiceTest {
             recordingServiceV2.upload(created.sessionKey(), created.deviceToken(), "0-1", UPLOAD, audio());
             recordingServiceV2.upload(created.sessionKey(), audience.deviceToken(), "0-1", UPLOAD, audio());
 
-            List<ClosedTurnV2> closed = registry.drainClosable(Duration.ofSeconds(20));
+            List<ClosedTurnV2> closed = registry.drainClosable(Duration.ofSeconds(20), Duration.ofMinutes(10));
             assertThat(closed).singleElement()
                     .satisfies(turn -> assertThat(turn.candidates()).hasSize(2));
             closed.forEach(turn -> registry.markPersisted(turn.sessionKey()));

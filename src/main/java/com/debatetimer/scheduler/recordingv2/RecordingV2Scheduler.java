@@ -30,7 +30,7 @@ public class RecordingV2Scheduler {
     @Scheduled(fixedDelay = CLOSE_TURNS_INTERVAL_MILLIS)
     public void closeTurns() {
         if (properties.enabled()) {
-            registry.drainClosable(properties.collectWindow())
+            registry.drainClosable(properties.collectWindow(), properties.deviceIdleTimeout())
                     .forEach(turnProcessor::submit);
         }
     }

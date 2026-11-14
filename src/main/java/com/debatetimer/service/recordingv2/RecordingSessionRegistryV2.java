@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 /**
  * 녹음 중인 세션의 참가 기기와 턴별 수집 상태를 메모리에 둔다. 공유 기능의 레지스트리처럼 앱 인스턴스 하나를 가정한다.
  * - 기기 토큰은 해시로만 들고 있는다.
+ * - 사회자 기기는 하나만 둔다. 사회자가 다시 참가하면 이전 사회자 기기를 지운다.
+ * - 참가·업로드가 오래 없는 기기는 떠난 것으로 보아 정원과 "모두 올렸는지" 판단에서 빼고, 새 기기가 참가할 때 지운다.
  * - 닫힌 턴은 다시 열지 않도록 턴 키만 기억한다.
  * - 닫혀서 넘긴 턴이 DB에 기록될 때까지는 정리되지 않은 것으로 보아, 그 사이에 속기록을 만들지 않게 한다.
  * 재시작하면 상태를 잃는다. 이미 DB에 기록된 턴은 남고, 기기는 참가 코드로 다시 참가한다.
@@ -42,20 +44,27 @@ public class RecordingSessionRegistryV2 {
     }
 
     public synchronized RecordingDeviceV2 addDevice(long sessionId, String sessionKey, String deviceId,
-                                                    String tokenHash, boolean host, int maxDevices) {
+                                                    String tokenHash, boolean host, int maxDevices,
+                                                    Duration idleTimeout) {
+        Instant now = clock.instant();
         SessionState state = sessions.computeIfAbsent(sessionKey, key -> new SessionState(sessionId));
+        state.removeIdleDevices(now, idleTimeout);
+        if (host) {
+            state.devices.values().removeIf(entry -> entry.device().host());
+        }
         if (state.devices.size() >= maxDevices) {
             throw new DTClientErrorException(ClientErrorCode.RECORDING_DEVICE_LIMIT_EXCEEDED);
         }
         RecordingDeviceV2 device = new RecordingDeviceV2(deviceId, host);
-        state.devices.put(tokenHash, device);
-        state.touch(clock.instant());
+        state.devices.put(tokenHash, new DeviceEntry(device, now));
+        state.touch(now);
         return device;
     }
 
     public synchronized Optional<RecordingDeviceV2> findDevice(String sessionKey, String tokenHash) {
         return Optional.ofNullable(sessions.get(sessionKey))
-                .map(state -> state.devices.get(tokenHash));
+                .map(state -> state.devices.get(tokenHash))
+                .map(DeviceEntry::device);
     }
 
     /**
@@ -73,6 +82,7 @@ public class RecordingSessionRegistryV2 {
             throw new DTClientErrorException(ClientErrorCode.RECORDING_TURN_CLOSED);
         }
         state.touch(clock.instant());
+        state.touchDevice(candidate.deviceId(), clock.instant());
         return state.collections.computeIfAbsent(turnKey, key -> new TurnCollectionV2(key, clock.instant()))
                 .add(candidate);
     }
@@ -80,10 +90,11 @@ public class RecordingSessionRegistryV2 {
     /**
      * 참가 기기가 모두 올렸거나 수집 창 시간이 지난 턴을 닫아 넘긴다.
      */
-    public synchronized List<ClosedTurnV2> drainClosable(Duration window) {
+    public synchronized List<ClosedTurnV2> drainClosable(Duration window, Duration idleTimeout) {
         Instant now = clock.instant();
         List<ClosedTurnV2> closed = new ArrayList<>();
-        sessions.forEach((sessionKey, state) -> closed.addAll(state.drainClosable(sessionKey, now, window)));
+        sessions.forEach((sessionKey, state) ->
+                closed.addAll(state.drainClosable(sessionKey, now, window, idleTimeout)));
         return closed;
     }
 
@@ -133,7 +144,8 @@ public class RecordingSessionRegistryV2 {
     private class SessionState {
 
         private final long sessionId;
-        private final Map<String, RecordingDeviceV2> devices = new HashMap<>();
+        // 기기 토큰 해시별 참가 기기
+        private final Map<String, DeviceEntry> devices = new HashMap<>();
         private final Map<String, TurnCollectionV2> collections = new HashMap<>();
         private final Set<String> closedTurnKeys = new HashSet<>();
         private int inFlightTurns;
@@ -147,9 +159,20 @@ public class RecordingSessionRegistryV2 {
             lastActiveAt = now;
         }
 
-        private List<ClosedTurnV2> drainClosable(String sessionKey, Instant now, Duration window) {
+        private void touchDevice(String deviceId, Instant now) {
+            devices.replaceAll((tokenHash, entry) ->
+                    entry.device().deviceId().equals(deviceId) ? new DeviceEntry(entry.device(), now) : entry);
+        }
+
+        private void removeIdleDevices(Instant now, Duration idleTimeout) {
+            devices.values().removeIf(entry -> entry.isIdle(now, idleTimeout));
+        }
+
+        private List<ClosedTurnV2> drainClosable(String sessionKey, Instant now, Duration window,
+                                                 Duration idleTimeout) {
             Set<String> deviceIds = devices.values().stream()
-                    .map(RecordingDeviceV2::deviceId)
+                    .filter(entry -> !entry.isIdle(now, idleTimeout))
+                    .map(entry -> entry.device().deviceId())
                     .collect(Collectors.toSet());
             List<ClosedTurnV2> closed = new ArrayList<>();
             Iterator<TurnCollectionV2> iterator = collections.values().iterator();
@@ -169,6 +192,13 @@ public class RecordingSessionRegistryV2 {
             return collections.values().stream()
                     .flatMap(collection -> collection.close().stream())
                     .toList();
+        }
+    }
+
+    private record DeviceEntry(RecordingDeviceV2 device, Instant lastSeenAt) {
+
+        private boolean isIdle(Instant now, Duration idleTimeout) {
+            return !now.isBefore(lastSeenAt.plus(idleTimeout));
         }
     }
 }

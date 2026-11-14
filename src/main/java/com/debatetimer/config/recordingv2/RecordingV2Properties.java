@@ -15,6 +15,8 @@ public record RecordingV2Properties(
         Duration collectWindow,
         // 사회자 기기를 포함해 한 세션에 참가할 수 있는 기기 수
         Integer maxDevices,
+        // 참가·업로드가 이 시간 동안 없으면 떠난 기기로 본다
+        Duration deviceIdleTimeout,
         // 후보 오디오를 받아 두는 로컬 디렉터리
         String spoolDir,
         // 스풀 디렉터리에 받아 둘 수 있는 오디오 bytes 합계 상한
@@ -30,6 +32,7 @@ public record RecordingV2Properties(
 
     private static final Duration DEFAULT_COLLECT_WINDOW = Duration.ofSeconds(20);
     private static final int DEFAULT_MAX_DEVICES = 8;
+    private static final Duration DEFAULT_DEVICE_IDLE_TIMEOUT = Duration.ofMinutes(10);
     private static final String DEFAULT_SPOOL_DIR = Path.of(System.getProperty("java.io.tmpdir"), "recording-v2")
             .toString();
     private static final long DEFAULT_MAX_SPOOL_BYTES = 512L * 1024 * 1024;
@@ -42,6 +45,7 @@ public record RecordingV2Properties(
         enabled = enabled != null && enabled;
         collectWindow = collectWindow == null ? DEFAULT_COLLECT_WINDOW : collectWindow;
         maxDevices = maxDevices == null ? DEFAULT_MAX_DEVICES : maxDevices;
+        deviceIdleTimeout = deviceIdleTimeout == null ? DEFAULT_DEVICE_IDLE_TIMEOUT : deviceIdleTimeout;
         spoolDir = spoolDir == null || spoolDir.isBlank() ? DEFAULT_SPOOL_DIR : spoolDir;
         maxSpoolBytes = maxSpoolBytes == null ? DEFAULT_MAX_SPOOL_BYTES : maxSpoolBytes;
         workers = workers == null ? DEFAULT_WORKERS : workers;

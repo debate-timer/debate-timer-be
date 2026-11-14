@@ -96,7 +96,7 @@ public class RecordingServiceV2 {
     }
 
     /**
-     * 사회자 기기가 토큰을 잃었을 때(새로고침, 서버 재시작) 사회자 기기로 다시 참가한다.
+     * 사회자 기기가 토큰을 잃었을 때(새로고침, 서버 재시작) 사회자 기기로 다시 참가한다. 이전 사회자 기기는 지운다.
      */
     public RecordingDeviceResponseV2 rejoinHost(Member member, String sessionKey) {
         validateEnabled();
@@ -157,7 +157,7 @@ public class RecordingServiceV2 {
         String deviceId = RecordingSecretV2.generateDeviceId();
         String deviceToken = RecordingSecretV2.generateDeviceToken();
         registry.addDevice(session.id(), session.sessionKey(), deviceId, RecordingSecretV2.hash(deviceToken), host,
-                properties.maxDevices());
+                properties.maxDevices(), properties.deviceIdleTimeout());
         return new RecordingDeviceResponseV2(deviceId, deviceToken);
     }
 
