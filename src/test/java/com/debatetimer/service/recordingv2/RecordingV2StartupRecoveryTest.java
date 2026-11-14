@@ -11,6 +11,7 @@ import com.debatetimer.domainrepository.recordingv2.RecordingV2DomainRepository;
 import com.debatetimer.scheduler.recordingv2.RecordingV2Scheduler;
 import com.debatetimer.service.BaseServiceTest;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ class RecordingV2StartupRecoveryTest extends BaseServiceTest {
     @Test
     void 세션_유지_시간이_지난_녹음_중_세션을_끝낸_것으로_바꾼다() {
         RecordingSessionV2 old = recordingV2DomainRepository.createSession("old", 1L, 2L, null, "hash");
-        LocalDateTime now = LocalDateTime.now().plusHours(13);
+        LocalDateTime now = LocalDateTime.now().plusHours(13).truncatedTo(ChronoUnit.MICROS);
 
         recovery.recover(now);
 
