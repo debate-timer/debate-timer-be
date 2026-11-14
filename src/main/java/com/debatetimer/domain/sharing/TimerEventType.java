@@ -17,6 +17,8 @@ public enum TimerEventType {
     TEAM_SWITCH(Objects::nonNull),
     SYNC(Objects::nonNull),
     FINISHED(Objects::isNull),
+    // 사회자가 토론 도중 공유를 중단했음을 알린다. 중복·순서 판단에 쓰도록 버전을 반드시 담는다
+    ABORT(Objects::isNull),
     // 활성 사회자가 없음을 청중에게 알리는 서버 전용 이벤트로, 사회자는 발행할 수 없다
     CHAIRMAN_ABSENT(eventData -> false),
     ;
@@ -31,6 +33,10 @@ public enum TimerEventType {
 
     public boolean isSync() {
         return this == SYNC;
+    }
+
+    public boolean requiresVersion() {
+        return this == ABORT;
     }
 
     /**

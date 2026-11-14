@@ -1,14 +1,40 @@
 package com.debatetimer.domain.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class LanguageTest {
+
+    @Nested
+    class Code {
+
+        @ParameterizedTest
+        @CsvSource({"KO_KR, ko", "US_EN, en"})
+        void 클라이언트와_주고받는_언어_코드를_가진다(Language language, String code) {
+            assertThat(language.getCode()).isEqualTo(code);
+        }
+
+        @ParameterizedTest
+        @CsvSource({"ko, KO_KR", "en, US_EN"})
+        void 언어_코드로_언어를_찾는다(String code, Language language) {
+            assertThat(Language.fromCode(code)).isEqualTo(language);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"KO_KR", "US_EN", "EN", "ko-KR", "ja"})
+        void 지원하지_않는_언어_코드면_예외가_발생한다(String code) {
+            assertThatThrownBy(() -> Language.fromCode(code))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
 
     @Nested
     class FromAcceptLanguage {

@@ -119,6 +119,7 @@
                         <option>RESET</option>
                         <option>TEAM_SWITCH</option>
                         <option>FINISHED</option>
+                        <option>ABORT</option>
                     </select>
                 </div>
                 <div class="row">
@@ -148,7 +149,7 @@
                 <div class="row">
                     <button id="chairSend" class="primary" disabled>발행 (Send)</button>
                 </div>
-                <div class="sub" style="margin:0">※ <code>FINISHED</code>는 data=null로 전송됩니다 (서버 검증 규칙).</div>
+                <div class="sub" style="margin:0">※ <code>FINISHED</code>·<code>ABORT</code>는 data=null로 전송되며, <code>ABORT</code>는 version을 함께 보냅니다 (서버 검증 규칙).</div>
             </fieldset>
 
             <div class="preset">
@@ -156,6 +157,7 @@
                 <button data-evt="STOP" class="qsend" disabled>⏸ STOP</button>
                 <button data-evt="NEXT" class="qsend" disabled>⏭ NEXT</button>
                 <button data-evt="FINISHED" class="qsend" disabled>🏁 FINISHED</button>
+                <button data-evt="ABORT" class="qsend" disabled>🛑 ABORT</button>
             </div>
 
             <div id="chairLog" class="log"></div>
@@ -266,6 +268,9 @@
     function buildRequest(evtType) {
         if (evtType === "FINISHED") {
             return { eventType: "FINISHED", data: null };
+        }
+        if (evtType === "ABORT") {
+            return { eventType: "ABORT", data: null, version: Date.now() };
         }
         const team = $("currentTeam").value;
         return {

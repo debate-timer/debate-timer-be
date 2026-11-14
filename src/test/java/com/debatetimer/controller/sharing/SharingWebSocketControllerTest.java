@@ -325,6 +325,61 @@ class SharingWebSocketControllerTest extends BaseStompTest {
     }
 
     @Nested
+    class ShareAbort {
+
+        @Test
+        void 사회자가_발생시킨_공유_중단_이벤트를_청중이_공유받고_룸이_중단_상태가_된다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 1758500001000L, null));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.version()).isEqualTo(1758500001000L),
+                    () -> assertThat(response.serverTime()).isNotNull(),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+
+        @Test
+        void 버전이_없는_공유_중단_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, null, null));
+
+            assertAll(
+                    () -> assertThat(handler.poll(2L)).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 공유가_중단된_뒤_사회자가_보낸_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 100L, null));
+            stompSession.send(headers, normalEvent(TimerEventType.SYNC, 200L));
+
+            assertAll(
+                    () -> assertThat(handler.poll(3L).eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(handler.poll(2L)).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+    }
+
+    @Nested
     class ShareSync {
 
         @Test

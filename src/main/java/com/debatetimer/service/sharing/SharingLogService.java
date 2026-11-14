@@ -18,7 +18,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * 라이브 공유 한 번을 공유 기록 한 행으로 추적한다.
- * - 사회자가 공유를 시작하면 기록을 만들고, 사회자가 종료(FINISHED)를 발행할 때까지 같은 기록을 쓴다.
+ * - 사회자가 공유를 시작하면 기록을 만들고, 사회자가 종료(FINISHED)나 중단(ABORT)을 발행할 때까지 같은 기록을 쓴다.
+ * - 사회자가 중단하면 어느 타임박스까지 진행했는지와 관계없이 중단으로 기록하고, 종료 이벤트를 발행하지 않는다.
  * - 사회자 연결이 끊긴 뒤 재연결 유예 시간 안에 다시 공유를 시작하면 같은 기록을 이어서 쓴다.
  * - 만료된 공유는 끝까지 진행했으면 종료로, 아니면 중단으로 기록한다. 만료 판단은 {@link ActiveSharing}이 한다.
  * - 종료로 기록할 때는 사회자가 직접 종료했는지와 관계없이 종료 이벤트를 발행한다.
@@ -93,6 +94,14 @@ public class SharingLogService {
         }
         sharingLogDomainRepository.finish(active.getLogId(), LocalDateTime.now(clock))
                 .ifPresent(sharingLog -> publishFinished(active, sharingLog));
+    }
+
+    public synchronized void abort(long roomId) {
+        ActiveSharing active = activeSharings.remove(roomId);
+        if (active == null) {
+            return;
+        }
+        sharingLogDomainRepository.abandon(active.getLogId(), LocalDateTime.now(clock));
     }
 
     /**
