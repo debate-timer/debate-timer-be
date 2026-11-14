@@ -105,6 +105,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_TIME_BASED_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다"),
     INVALID_TIMER_EVENT(HttpStatus.BAD_REQUEST, "잘못된 타이머 이벤트 데이터입니다"),
     INVALID_SYNC_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 동기화 타이머 이벤트 데이터입니다"),
+    VERSION_REQUIRED_TIMER_EVENT(HttpStatus.BAD_REQUEST, "버전이 필요한 타이머 이벤트입니다"),
 
     INVALID_ADMIN_PASSWORD(HttpStatus.UNAUTHORIZED, "어드민 비밀번호가 올바르지 않습니다"),
     INVALID_STATS_PERIOD(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d일까지 조회할 수 있습니다"
