@@ -37,7 +37,7 @@ class TimerEventTypeTest {
 
         }
 
-        @EnumSource(value = TimerEventType.class, names = {"FINISHED", "ABORT"})
+        @EnumSource(value = TimerEventType.class, names = {"FINISHED", "ABORT", "RECORDING_OPENED"})
         @ParameterizedTest
         void 타이머_이벤트_데이터가_존재하지_않아야_한다(TimerEventType eventType) {
             TimerEventData timerEventData = new TimerEventData(
@@ -92,14 +92,15 @@ class TimerEventTypeTest {
     @Nested
     class RequiresVersion {
 
-        @Test
-        void 중단_이벤트는_버전이_필요하다() {
-            assertThat(TimerEventType.ABORT.requiresVersion()).isTrue();
+        @EnumSource(value = TimerEventType.class, names = {"ABORT", "RECORDING_OPENED"})
+        @ParameterizedTest
+        void 중단_이벤트와_녹음_참여_이벤트는_버전이_필요하다(TimerEventType eventType) {
+            assertThat(eventType.requiresVersion()).isTrue();
         }
 
-        @EnumSource(value = TimerEventType.class, names = {"ABORT"}, mode = EnumSource.Mode.EXCLUDE)
+        @EnumSource(value = TimerEventType.class, names = {"ABORT", "RECORDING_OPENED"}, mode = EnumSource.Mode.EXCLUDE)
         @ParameterizedTest
-        void 중단_이벤트가_아니면_하위_호환을_위해_버전이_없어도_된다(TimerEventType eventType) {
+        void 그_외_이벤트는_하위_호환을_위해_버전이_없어도_된다(TimerEventType eventType) {
             assertThat(eventType.requiresVersion()).isFalse();
         }
     }

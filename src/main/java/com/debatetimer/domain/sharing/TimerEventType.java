@@ -19,6 +19,8 @@ public enum TimerEventType {
     FINISHED(Objects::isNull),
     // 사회자가 토론 도중 공유를 중단했음을 알린다. 중복·순서 판단에 쓰도록 버전을 반드시 담는다
     ABORT(Objects::isNull),
+    // 사회자가 연 다기기 녹음의 참가 정보를 이미 공유 화면을 보고 있는 청중에게 알린다. 참가 정보는 recording 필드로 보내고, 버전을 반드시 담는다
+    RECORDING_OPENED(Objects::isNull),
     // 활성 사회자가 없음을 청중에게 알리는 서버 전용 이벤트로, 사회자는 발행할 수 없다
     CHAIRMAN_ABSENT(eventData -> false),
     ;
@@ -36,7 +38,11 @@ public enum TimerEventType {
     }
 
     public boolean requiresVersion() {
-        return this == ABORT;
+        return this == ABORT || this == RECORDING_OPENED;
+    }
+
+    public boolean requiresRecording() {
+        return this == RECORDING_OPENED;
     }
 
     /**
