@@ -102,6 +102,20 @@ class RecordingV2DomainRepositoryTest extends BaseDomainRepositoryTest {
         }
 
         @Test
+        void 세션과_턴_키로_기록된_턴을_찾는다() {
+            RecordingSessionV2 session = recordingV2DomainRepository.createSession("session-key", 1L, 2L, null,
+                    "hash");
+            RecordingTurnV2 created = recordingV2DomainRepository.createTurn(session.id(), "0-1", 0, null, 0L, 1);
+
+            assertAll(
+                    () -> assertThat(recordingV2DomainRepository.findTurn(session.id(), "0-1"))
+                            .map(RecordingTurnV2::id)
+                            .contains(created.id()),
+                    () -> assertThat(recordingV2DomainRepository.findTurn(session.id(), "1-2")).isEmpty()
+            );
+        }
+
+        @Test
         void 없는_턴을_완료하려_하면_서버_오류를_던진다() {
             assertThatThrownBy(() -> recordingV2DomainRepository.completeTurn(999L, "device", 0L, null, null,
                     List.of()))

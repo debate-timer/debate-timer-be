@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -94,6 +95,12 @@ public class RecordingV2DomainRepository {
     @Transactional(readOnly = true)
     public boolean existsTurn(long sessionId, String turnKey) {
         return turnRepository.existsBySessionIdAndTurnKey(sessionId, turnKey);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<RecordingTurnV2> findTurn(long sessionId, String turnKey) {
+        return turnRepository.findBySessionIdAndTurnKey(sessionId, turnKey)
+                .map(this::toDomain);
     }
 
     @Transactional

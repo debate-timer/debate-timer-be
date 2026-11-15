@@ -17,6 +17,8 @@ public interface RecordingTurnV2Repository extends Repository<RecordingTurnV2Ent
 
     boolean existsBySessionIdAndTurnKey(long sessionId, String turnKey);
 
+    Optional<RecordingTurnV2Entity> findBySessionIdAndTurnKey(long sessionId, String turnKey);
+
     List<RecordingTurnV2Entity> findAllByStatusAndCreatedAtBefore(RecordingTurnStatusV2 status,
                                                                   LocalDateTime createdAt);
 }
