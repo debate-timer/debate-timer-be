@@ -12,4 +12,9 @@ public abstract class DTErrorResponseException extends RuntimeException {
         super(message);
         this.httpStatus = httpStatus;
     }
+
+    protected DTErrorResponseException(String message, HttpStatus httpStatus, Throwable cause) {
+        super(message, cause);
+        this.httpStatus = httpStatus;
+    }
 }

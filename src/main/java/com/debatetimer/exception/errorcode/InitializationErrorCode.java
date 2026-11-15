@@ -20,6 +20,7 @@ public enum InitializationErrorCode {
 
     ADMIN_PASSWORD_EMPTY("어드민 비밀번호가 입력되지 않았습니다"),
     ICON_UPLOAD_DIR_EMPTY("아이콘 업로드 디렉터리가 입력되지 않았습니다"),
+    RECORDING_SPOOL_DIR_UNAVAILABLE("녹음 스풀 디렉터리를 만들지 못했습니다"),
     ;
 
     private final String message;
