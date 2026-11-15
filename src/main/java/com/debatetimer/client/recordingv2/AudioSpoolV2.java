@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 턴 후보 오디오를 고를 때까지 로컬 임시 파일로 받아 둔다. 기기 수만큼 늘어나는 오디오를 힙에 올리지 않기 위해서다.
  * 받아 둔 bytes 합계가 상한을 넘으면 새 오디오를 받지 않는다.
+ * 사용량은 이 객체가 저장·삭제한 파일로만 집계하므로, 디렉터리를 다른 앱과 함께 쓰면 안 된다.
  */
 @Slf4j
 public class AudioSpoolV2 {
@@ -77,7 +78,7 @@ public class AudioSpoolV2 {
     }
 
     /**
-     * 재시작 등으로 주인을 잃은 임시 파일을 지운다. 무중단 배포 중 다른 앱이 쓰는 파일을 지우지 않도록 오래된 파일만 지운다.
+     * 재시작 등으로 주인을 잃은 임시 파일을 지운다. 지금 처리 중인 파일을 지우지 않도록 오래된 파일만 지운다.
      */
     public void deleteOlderThan(Duration age, Clock clock) {
         Instant threshold = clock.instant().minus(age);

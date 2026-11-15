@@ -17,7 +17,7 @@ public record RecordingV2Properties(
         Integer maxDevices,
         // 참가·업로드가 이 시간 동안 없으면 떠난 기기로 본다
         Duration deviceIdleTimeout,
-        // 후보 오디오를 받아 두는 로컬 디렉터리
+        // 후보 오디오를 받아 두는 로컬 디렉터리. 앱마다 그 아래 포트별 디렉터리를 쓴다(spoolDirectory 참고).
         String spoolDir,
         // 스풀 디렉터리에 받아 둘 수 있는 오디오 bytes 합계 상한
         Long maxSpoolBytes,
@@ -56,5 +56,14 @@ public record RecordingV2Properties(
         processingTimeout = processingTimeout == null ? DEFAULT_PROCESSING_TIMEOUT : processingTimeout;
         finishTimeout = finishTimeout == null ? DEFAULT_FINISH_TIMEOUT : finishTimeout;
         sessionTtl = sessionTtl == null ? DEFAULT_SESSION_TTL : sessionTtl;
+    }
+
+    /**
+     * 앱이 실제로 쓰는 스풀 디렉터리. 무중단 배포 중에는 같은 서버에 두 앱이 떠 있으므로 포트별로 나눈다.
+     * 같은 디렉터리를 쓰면 한 앱이 지운 파일이 다른 앱의 사용량 집계에 남아 업로드를 거부할 수 있다.
+     * 재시작한 앱은 같은 포트 디렉터리에서 이전 실행이 남긴 파일을 정리한다.
+     */
+    public Path spoolDirectory(String serverPort) {
+        return Path.of(spoolDir, "port-" + serverPort);
     }
 }

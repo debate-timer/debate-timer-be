@@ -6,8 +6,8 @@ import com.debatetimer.client.recordingv2.SttAudioStorageV2;
 import com.debatetimer.client.storage.SttAudioStorageProperties;
 import com.debatetimer.client.stt.SonioxClient;
 import com.debatetimer.client.stt.SonioxProperties;
-import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +28,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 public class RecordingV2Config {
 
     @Bean
-    public AudioSpoolV2 audioSpoolV2(RecordingV2Properties properties) {
-        return new AudioSpoolV2(Path.of(properties.spoolDir()), properties.maxSpoolBytes());
+    public AudioSpoolV2 audioSpoolV2(RecordingV2Properties properties,
+                                     @Value("${server.port:8080}") String serverPort) {
+        return new AudioSpoolV2(properties.spoolDirectory(serverPort), properties.maxSpoolBytes());
     }
 
     @Bean(destroyMethod = "close")

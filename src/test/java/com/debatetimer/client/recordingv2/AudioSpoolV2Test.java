@@ -95,6 +95,18 @@ class AudioSpoolV2Test {
                 .hasMessage(InitializationErrorCode.RECORDING_SPOOL_DIR_UNAVAILABLE.getMessage());
     }
 
+    @Test
+    void 무중단_배포로_함께_뜬_앱이_지운_파일이_다른_앱의_사용량에_남지_않는다() {
+        AudioSpoolV2 oldApp = new AudioSpoolV2(directory.resolve("port-8080"), 4);
+        Path oldFile = oldApp.save(audio("old.webm", 3));
+        AudioSpoolV2 newApp = new AudioSpoolV2(directory.resolve("port-8081"), 4);
+
+        oldApp.delete(oldFile);
+
+        assertThat(newApp.getUsedBytes()).isZero();
+        assertThat(newApp.save(audio("new.webm", 4))).exists();
+    }
+
     private MockMultipartFile audio(String filename, int size) {
         return new MockMultipartFile("audio", filename, "audio/webm", new byte[size]);
     }
