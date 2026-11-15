@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,7 @@ import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -166,20 +168,53 @@ class TurnProcessorV2Test {
     }
 
     @Test
-    void 턴_기록에_실패하면_처리하지_않고_후보_파일을_지운다() throws IOException {
+    void 턴_기록이_잠깐_실패해도_다시_시도해_처리한다() throws IOException {
         AudioCandidateV2 only = candidate("only", true, 35, null, 1_000L);
         when(repository.createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt()))
-                .thenThrow(new RuntimeException("db down"));
+                .thenThrow(new RuntimeException("db down"))
+                .thenReturn(TURN);
+        when(repository.findTurn(SESSION_ID, "0-1")).thenReturn(Optional.empty());
+        when(transcriber.transcribe(only.file(), "ko-KR")).thenReturn(List.of());
 
         processor(new SyncTaskExecutor()).submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only)));
 
+        verify(repository, times(2)).createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt());
+        verify(repository).completeTurn(TURN_ID, "only", 1_000L, null, "s3-key", List.of());
+        assertThat(only.file()).doesNotExist();
+    }
+
+    @Test
+    void 이전_시도에서_턴이_저장됐으면_다시_만들지_않고_그_턴으로_처리한다() throws IOException {
+        AudioCandidateV2 only = candidate("only", true, 35, null, 1_000L);
+        when(repository.createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt()))
+                .thenThrow(new RuntimeException("commit 후 연결 끊김"));
+        when(repository.findTurn(SESSION_ID, "0-1")).thenReturn(Optional.of(TURN));
+        when(transcriber.transcribe(only.file(), "ko-KR")).thenReturn(List.of());
+
+        processor(new SyncTaskExecutor()).submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only)));
+
+        verify(repository, times(1)).createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt());
+        verify(repository).completeTurn(TURN_ID, "only", 1_000L, null, "s3-key", List.of());
+    }
+
+    @Test
+    void 턴_기록을_정해진_횟수만큼_모두_실패하면_처리하지_않고_후보_파일을_지운다() throws IOException {
+        AudioCandidateV2 only = candidate("only", true, 35, null, 1_000L);
+        when(repository.createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt()))
+                .thenThrow(new RuntimeException("db down"));
+        when(repository.findTurn(SESSION_ID, "0-1")).thenThrow(new RuntimeException("db down"));
+
+        processor(new SyncTaskExecutor()).submit(new ClosedTurnV2(SESSION_ID, "session", "0-1", List.of(only)));
+
+        verify(repository, times(TurnProcessorV2.CREATE_TURN_ATTEMPTS))
+                .createTurn(anyLong(), anyString(), anyInt(), any(), anyLong(), anyInt());
         verify(registry).markPersisted("session");
         verify(transcriber, never()).transcribe(any(), any());
         assertThat(only.file()).doesNotExist();
     }
 
     private TurnProcessorV2 processor(TaskExecutor executor) {
-        return new TurnProcessorV2(repository, registry, audioSpool, storage, transcriber, executor);
+        return new TurnProcessorV2(repository, registry, audioSpool, storage, transcriber, executor, Duration.ZERO);
     }
 
     private AudioCandidateV2 candidate(String deviceId, boolean host, double snrDb, Stance team, long startedAt)

@@ -17,6 +17,7 @@ import com.debatetimer.domain.recordingv2.RecordingTurnV2;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.domainrepository.recordingv2.RecordingV2DomainRepository;
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 /**
  * 수집이 끝난 턴에서 음성 품질이 가장 좋은 후보를 골라 백그라운드에서 S3에 보관하고 전사한다.
  * - 턴은 넘겨받은 스레드에서 먼저 DB에 처리 중으로 기록해, 속기록을 만들 때 빠뜨리지 않게 한다.
+ *   마감한 턴은 수집 목록에서 빠지므로, DB 오류가 잠깐 나도 음성을 잃지 않도록 기록을 몇 번 다시 시도한다.
  * - 고른 후보의 전사가 실패하면 다음 후보로 넘어간다. 모두 실패하면 턴을 실패로 기록한다.
  * - 처리가 끝나면 후보 임시 파일을 모두 지운다.
  * 작업 스레드는 빈으로 등록하지 않는다(AsyncConfig 참고).
@@ -39,6 +41,8 @@ import org.springframework.stereotype.Service;
 public class TurnProcessorV2 {
 
     private static final int SHUTDOWN_SECONDS = 30;
+    private static final Duration CREATE_TURN_RETRY_DELAY = Duration.ofMillis(200);
+    static final int CREATE_TURN_ATTEMPTS = 3;
     static final String NO_CANDIDATE = "고를 수 있는 녹음 후보가 없습니다.";
     static final String QUEUE_FULL = "처리 대기열이 가득 찼습니다.";
     static final String ALL_FAILED = "모든 녹음 후보의 전사에 실패했습니다.";
@@ -49,6 +53,7 @@ public class TurnProcessorV2 {
     private final SttAudioStorageV2 sttAudioStorage;
     private final SpeechTranscriberV2 speechTranscriber;
     private final TaskExecutor executor;
+    private final Duration createTurnRetryDelay;
     private final AudioQualityScorerV2 scorer = new AudioQualityScorerV2();
 
     @Autowired
@@ -61,7 +66,7 @@ public class TurnProcessorV2 {
             RecordingV2Properties properties
     ) {
         this(recordingV2DomainRepository, registry, audioSpool, sttAudioStorage, speechTranscriber,
-                createExecutor(properties));
+                createExecutor(properties), CREATE_TURN_RETRY_DELAY);
     }
 
     TurnProcessorV2(
@@ -70,7 +75,8 @@ public class TurnProcessorV2 {
             AudioSpoolV2 audioSpool,
             SttAudioStorageV2 sttAudioStorage,
             SpeechTranscriberV2 speechTranscriber,
-            TaskExecutor executor
+            TaskExecutor executor,
+            Duration createTurnRetryDelay
     ) {
         this.recordingV2DomainRepository = recordingV2DomainRepository;
         this.registry = registry;
@@ -78,6 +84,7 @@ public class TurnProcessorV2 {
         this.sttAudioStorage = sttAudioStorage;
         this.speechTranscriber = speechTranscriber;
         this.executor = executor;
+        this.createTurnRetryDelay = createTurnRetryDelay;
     }
 
     private static ThreadPoolTaskExecutor createExecutor(RecordingV2Properties properties) {
@@ -98,8 +105,7 @@ public class TurnProcessorV2 {
         List<AudioCandidateV2> ranked = scored.stream()
                 .map(RankedCandidate::candidate)
                 .toList();
-        Optional<RecordingTurnV2> created = callQuietly("턴 기록", label(closedTurn),
-                () -> createTurn(closedTurn, ranked));
+        Optional<RecordingTurnV2> created = persistTurn(closedTurn, ranked);
         registry.markPersisted(closedTurn.sessionKey());
         if (created.isEmpty()) {
             deleteFiles(closedTurn);
@@ -112,6 +118,37 @@ public class TurnProcessorV2 {
         }
         if (!dispatch(closedTurn, turn, ranked)) {
             fail(turn, closedTurn, QUEUE_FULL);
+        }
+    }
+
+    // 저장은 됐는데 응답만 실패했을 수 있어, 다시 만들기 전에 이미 기록된 턴이 있는지 먼저 찾는다.
+    private Optional<RecordingTurnV2> persistTurn(ClosedTurnV2 closedTurn, List<AudioCandidateV2> ranked) {
+        for (int attempt = 1; attempt <= CREATE_TURN_ATTEMPTS; attempt++) {
+            if (attempt > 1) {
+                waitBeforeRetry();
+                Optional<RecordingTurnV2> existing = callQuietly("기록된 턴 조회", label(closedTurn),
+                        () -> recordingV2DomainRepository.findTurn(closedTurn.sessionId(), closedTurn.turnKey())
+                                .orElse(null));
+                if (existing.isPresent()) {
+                    return existing;
+                }
+            }
+            Optional<RecordingTurnV2> created = callQuietly("턴 기록 " + attempt + "/" + CREATE_TURN_ATTEMPTS,
+                    label(closedTurn), () -> createTurn(closedTurn, ranked));
+            if (created.isPresent()) {
+                return created;
+            }
+        }
+        log.error("V2 녹음 턴을 기록하지 못해 후보를 버립니다: {} candidates={}", label(closedTurn),
+                closedTurn.candidates().size());
+        return Optional.empty();
+    }
+
+    private void waitBeforeRetry() {
+        try {
+            Thread.sleep(createTurnRetryDelay.toMillis());
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
         }
     }
 
