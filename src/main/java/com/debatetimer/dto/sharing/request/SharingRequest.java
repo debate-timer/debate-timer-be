@@ -18,12 +18,24 @@ public record SharingRequest(
 
         @Valid
         @Nullable
-        TimerEventInfoRequest data
+        TimerEventInfoRequest data,
+
+        // 녹음 참여 이벤트(RECORDING_OPENED)의 다기기 녹음 참가 정보
+        @Valid
+        @Nullable
+        RecordingJoinRequest recording
 ) {
+
+    public SharingRequest(TimerEventType eventType, @Nullable Long version, @Nullable TimerEventInfoRequest data) {
+        this(eventType, version, data, null);
+    }
 
     public TimerEvent toTimerEvent() {
         if (eventType.requiresVersion() && version == null) {
             throw new DTClientErrorException(ClientErrorCode.VERSION_REQUIRED_TIMER_EVENT);
+        }
+        if (eventType.requiresRecording() && recording == null) {
+            throw new DTClientErrorException(ClientErrorCode.INVALID_TIMER_EVENT);
         }
         return Optional.ofNullable(data)
                 .map(TimerEventInfoRequest::toTimerEventInfo)

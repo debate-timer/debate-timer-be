@@ -4,6 +4,7 @@ import com.debatetimer.domain.sharing.TimerEvent;
 import com.debatetimer.domain.sharing.TimerEventType;
 import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
 import com.debatetimer.dto.sharing.request.SharingRequest;
+import com.debatetimer.dto.sharing.response.RecordingJoinResponse;
 import com.debatetimer.dto.sharing.response.SharingResponse;
 import com.debatetimer.dto.sharing.response.TimerEventDataResponse;
 import java.time.Clock;
@@ -57,6 +58,7 @@ public class SharingService {
      * - 이미 공유한 버전 이하의 이벤트(중복·순서가 뒤바뀐 이벤트)는 중계하지 않고 룸 상태도 바꾸지 않는다.
      * - 버전 수락부터 중계까지 룸 단위로 하나씩 실행해, 낮은 버전이 높은 버전보다 늦게 반영되지 않게 한다.
      * - 청중이 수신 시점까지 흐른 시간을 보정할 수 있도록, 서버가 이벤트를 중계한 시각(epoch ms)을 함께 담는다.
+     * - 녹음 참여 이벤트는 사회자가 보낸 다기기 녹음 참가 정보를 함께 담아 중계한다.
      * - 중단된 룸은 사회자가 다시 공유를 시작하기 전까지 어떤 이벤트도 중계하지 않아, 늦게 도착한 이벤트가 공유를 되살리지 않게 한다.
      * - 이미 정상 종료된 룸에 늦게 도착한 중단은 종료 사유를 바꾸지 않도록 버린다.
      */
@@ -155,7 +157,12 @@ public class SharingService {
         TimerEventDataResponse data = Optional.ofNullable(timerEvent.getTimerEventData())
                 .map(TimerEventDataResponse::new)
                 .orElse(null);
-        return new SharingResponse(request.eventType(), request.version(), clock.millis(), data);
+        // 참가 정보는 녹음 참여 이벤트에만 싣는다. 다른 이벤트에 함께 보내도 청중에게 전달하지 않는다.
+        RecordingJoinResponse recording = Optional.ofNullable(request.recording())
+                .filter(ignored -> request.eventType().requiresRecording())
+                .map(RecordingJoinResponse::new)
+                .orElse(null);
+        return new SharingResponse(request.eventType(), request.version(), clock.millis(), data, recording);
     }
 
     private void recordSharingLog(long roomId, TimerEvent timerEvent) {
