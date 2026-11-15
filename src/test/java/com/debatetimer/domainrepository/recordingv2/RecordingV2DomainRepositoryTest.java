@@ -17,14 +17,34 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.exception.errorcode.ServerErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 
 class RecordingV2DomainRepositoryTest extends BaseDomainRepositoryTest {
 
     @Autowired
     private RecordingV2DomainRepository recordingV2DomainRepository;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    private static void await(CountDownLatch latch) {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("기다리는 작업이 끝나지 않았습니다.");
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(exception);
+        }
+    }
 
     @Nested
     class Session {
@@ -112,6 +132,42 @@ class RecordingV2DomainRepositoryTest extends BaseDomainRepositoryTest {
                             .map(RecordingTurnV2::id)
                             .contains(created.id()),
                     () -> assertThat(recordingV2DomainRepository.findTurn(session.id(), "1-2")).isEmpty()
+            );
+        }
+
+        @Test
+        void 오래된_처리_중_턴을_실패로_바꾸는_사이_전사가_끝나도_완료_결과를_덮어쓰지_않는다() throws Exception {
+            RecordingSessionV2 session = recordingV2DomainRepository.createSession("session-key", 1L, 2L, null,
+                    "hash");
+            RecordingTurnV2 turn = recordingV2DomainRepository.createTurn(session.id(), "0-1", 0, null, 0L, 1);
+            CountDownLatch recoveryLocked = new CountDownLatch(1);
+            CountDownLatch releaseRecovery = new CountDownLatch(1);
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+
+            try {
+                Future<?> recovery = executor.submit(() -> transactionTemplate.executeWithoutResult(status -> {
+                    recordingV2DomainRepository.failProcessingTurnsCreatedBefore(LocalDateTime.now().plusMinutes(1),
+                            "서버 재시작으로 처리하지 못했습니다.");
+                    recoveryLocked.countDown();
+                    await(releaseRecovery);
+                }));
+                await(recoveryLocked);
+                Future<?> completion = executor.submit(() -> recordingV2DomainRepository.completeTurn(turn.id(),
+                        "device", 0L, null, null, List.of()));
+                // 잠금이 없으면 이 사이에 완료가 먼저 커밋되고, 복구가 커밋하며 실패로 덮어쓴다.
+                Thread.sleep(300);
+                releaseRecovery.countDown();
+                recovery.get(5, TimeUnit.SECONDS);
+                completion.get(5, TimeUnit.SECONDS);
+            } finally {
+                releaseRecovery.countDown();
+                executor.shutdownNow();
+            }
+
+            RecordingTurnV2 found = recordingV2DomainRepository.findTurns(session.id()).get(0);
+            assertAll(
+                    () -> assertThat(found.status()).isEqualTo(RecordingTurnStatusV2.DONE),
+                    () -> assertThat(found.errorMessage()).isNull()
             );
         }
 
