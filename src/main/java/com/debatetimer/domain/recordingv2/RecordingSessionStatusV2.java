@@ -10,6 +10,8 @@ public enum RecordingSessionStatusV2 {
     COMPLETED,
     // 전사된 발언이 없거나 속기록을 만들지 못했다
     FAILED,
+    // 사회자가 녹음을 끄거나 화면을 떠나 속기록 없이 버렸다
+    CANCELED,
     ;
 
     public boolean isRecording() {

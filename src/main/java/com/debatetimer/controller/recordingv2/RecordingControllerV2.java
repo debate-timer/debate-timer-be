@@ -72,6 +72,15 @@ public class RecordingControllerV2 {
         recordingServiceV2.finish(member, sessionKey);
     }
 
+    @PostMapping("/api/v2/recordings/{sessionKey}/cancel")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancel(
+            @AuthMember(requires = FeatureFlag.MULTI_DEVICE_RECORDING) Member member,
+            @PathVariable(name = "sessionKey") String sessionKey
+    ) {
+        recordingServiceV2.cancel(member, sessionKey);
+    }
+
     // 청중 기기는 로그인 없이 참가 코드로 참가한다.
     @PostMapping("/api/v2/recordings/{sessionKey}/devices")
     @ResponseStatus(HttpStatus.CREATED)

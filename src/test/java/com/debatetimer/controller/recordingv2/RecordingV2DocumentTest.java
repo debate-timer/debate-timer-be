@@ -283,6 +283,7 @@ public class RecordingV2DocumentTest extends BaseDocumentTest {
                         | FINISHING | 끝낸 뒤 남은 턴 전사를 기다리는 중 |
                         | COMPLETED | 속기록을 만들었음 |
                         | FAILED | 전사된 발언이 없거나 속기록을 만들지 못했음 |
+                        | CANCELED | 사회자가 녹음을 꺼 속기록 없이 버렸음 |
                         """)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
@@ -357,6 +358,36 @@ public class RecordingV2DocumentTest extends BaseDocumentTest {
                     .headers(EXIST_MEMBER_HEADER)
                     .when().post("/api/v2/recordings/{sessionKey}/finish", SESSION_KEY)
                     .then().statusCode(202);
+        }
+    }
+
+    @Nested
+    class Cancel {
+
+        private final RestDocumentationRequest requestDocument = request()
+                .tag(Tag.RECORDING_V2_API)
+                .summary(featureFlagSummary(FeatureFlag.MULTI_DEVICE_RECORDING, "다기기 녹음 취소"))
+                .description(featureFlagDescription(FeatureFlag.MULTI_DEVICE_RECORDING) + """
+                        사회자가 녹음을 끄거나 타이머 화면을 떠날 때 세션을 버립니다. 속기록을 만들지 않고,
+                        이후 청중 기기의 참가·업로드를 받지 않습니다. 이미 끝냈거나 취소한 세션이면 그대로 204를 응답합니다.
+                        """)
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .pathParameter(
+                        parameterWithName("sessionKey").description("녹음 세션 식별자")
+                );
+
+        @Test
+        void 다기기_녹음_취소_성공() {
+            var document = document("recording-v2/cancel", 204)
+                    .request(requestDocument)
+                    .build();
+
+            given(document)
+                    .headers(EXIST_MEMBER_HEADER)
+                    .when().post("/api/v2/recordings/{sessionKey}/cancel", SESSION_KEY)
+                    .then().statusCode(204);
         }
     }
 

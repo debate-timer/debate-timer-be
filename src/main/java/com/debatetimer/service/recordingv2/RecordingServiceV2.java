@@ -147,6 +147,20 @@ public class RecordingServiceV2 {
         }
     }
 
+    /**
+     * 사회자가 녹음을 끄거나 화면을 떠나 세션을 버린다. 속기록을 만들지 않고, 모아 둔 후보와 기기를 지워
+     * 이후 참가·업로드를 받지 않는다. 이미 끝냈거나 취소한 세션이면 그대로 둔다.
+     */
+    public void cancel(Member member, String sessionKey) {
+        validateEnabled();
+        RecordingSessionV2 session = getOwnedSession(member, sessionKey);
+        if (session.status().isRecording()
+                && recordingV2DomainRepository.cancelSession(session.id(), LocalDateTime.now(clock))) {
+            registry.remove(session.sessionKey())
+                    .forEach(candidate -> audioSpool.delete(candidate.file()));
+        }
+    }
+
     public RecordingSessionResponseV2 get(Member member, String sessionKey) {
         validateEnabled();
         RecordingSessionV2 session = getOwnedSession(member, sessionKey);

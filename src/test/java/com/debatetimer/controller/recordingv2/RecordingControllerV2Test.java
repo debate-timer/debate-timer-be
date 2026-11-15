@@ -131,6 +131,28 @@ class RecordingControllerV2Test extends BaseControllerTest {
         }
     }
 
+    @Nested
+    class Cancel {
+
+        @Test
+        void 사회자가_취소하면_취소_상태가_된다() {
+            memberFeatureFlagEntityGenerator.generate(member, FeatureFlag.MULTI_DEVICE_RECORDING);
+            RecordingSessionCreateResponseV2 session = createSession();
+
+            given()
+                    .headers(headerGenerator.generateAccessTokenHeader(member))
+                    .when().post("/api/v2/recordings/{sessionKey}/cancel", session.sessionKey())
+                    .then().statusCode(204);
+
+            RecordingSessionResponseV2 response = given()
+                    .headers(headerGenerator.generateAccessTokenHeader(member))
+                    .when().get("/api/v2/recordings/{sessionKey}", session.sessionKey())
+                    .then().statusCode(200)
+                    .extract().as(RecordingSessionResponseV2.class);
+            assertThat(response.status()).isEqualTo(RecordingSessionStatusV2.CANCELED);
+        }
+    }
+
     private RecordingSessionCreateResponseV2 createSession() {
         return given()
                 .headers(headerGenerator.generateAccessTokenHeader(member))
