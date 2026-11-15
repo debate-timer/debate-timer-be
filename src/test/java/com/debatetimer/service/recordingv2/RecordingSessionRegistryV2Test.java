@@ -1,6 +1,7 @@
 package com.debatetimer.service.recordingv2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.debatetimer.domain.recordingv2.AudioCandidateV2;
@@ -82,6 +83,21 @@ class RecordingSessionRegistryV2Test {
 
             assertThat(registry.findDevice(SESSION_KEY, "left-hash")).isEmpty();
             assertThat(registry.findDevice(SESSION_KEY, "host-hash")).isPresent();
+        }
+
+        @Test
+        void 녹음_중_업로드가_없어_지워진_기기도_다시_참가하면_같은_턴에_후보를_올린다() {
+            registry.addDevice(1L, SESSION_KEY, "host", "host-hash", true, 8, IDLE);
+            registry.addDevice(1L, SESSION_KEY, "audience", "audience-hash", false, 8, IDLE);
+            clock.advance(Duration.ofMinutes(11));
+            registry.addDevice(1L, SESSION_KEY, "late", "late-hash", false, 8, IDLE);
+            assertThat(registry.findDevice(SESSION_KEY, "audience-hash")).isEmpty();
+
+            registry.addDevice(1L, SESSION_KEY, "audience-again", "audience-again-hash", false, 8, IDLE);
+
+            assertThat(registry.findDevice(SESSION_KEY, "audience-again-hash")).isPresent();
+            assertThatCode(() -> registry.addCandidate(SESSION_KEY, "0-1", candidate("audience-again")))
+                    .doesNotThrowAnyException();
         }
     }
 

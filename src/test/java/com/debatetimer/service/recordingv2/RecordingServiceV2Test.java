@@ -155,6 +155,30 @@ class RecordingServiceV2Test extends BaseServiceTest {
         }
 
         @Test
+        void 서버_재시작으로_기기_목록을_잃으면_기존_토큰은_거절되고_다시_참가하면_올릴_수_있다() {
+            RecordingSessionCreateResponseV2 created = create();
+            RecordingDeviceResponseV2 audience = recordingServiceV2.join(created.sessionKey(),
+                    new RecordingJoinRequestV2(created.joinCode()));
+            registry.remove(created.sessionKey());
+
+            assertThatThrownBy(() -> recordingServiceV2.upload(created.sessionKey(), audience.deviceToken(), "0-1",
+                    UPLOAD, audio()))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_RECORDING_DEVICE.getMessage());
+
+            RecordingDeviceResponseV2 host = recordingServiceV2.rejoinHost(member, created.sessionKey());
+            RecordingDeviceResponseV2 audienceAgain = recordingServiceV2.join(created.sessionKey(),
+                    new RecordingJoinRequestV2(created.joinCode()));
+            recordingServiceV2.upload(created.sessionKey(), host.deviceToken(), "0-1", UPLOAD, audio());
+            recordingServiceV2.upload(created.sessionKey(), audienceAgain.deviceToken(), "0-1", UPLOAD, audio());
+
+            List<ClosedTurnV2> closed = registry.drainClosable(Duration.ofSeconds(20), Duration.ofMinutes(10));
+            assertThat(closed).singleElement()
+                    .satisfies(turn -> assertThat(turn.candidates()).hasSize(2));
+            closed.forEach(turn -> registry.markPersisted(turn.sessionKey()));
+        }
+
+        @Test
         void 경로_문자가_섞인_턴_키는_받지_않는다() {
             RecordingSessionCreateResponseV2 created = create();
 
