@@ -58,16 +58,15 @@ public class TranscriptAssemblerV2 {
 
     /**
      * 턴 전사 결과의 offsetMs는 각 턴 녹음 시작 기준이므로, 가장 먼저 시작한 턴 기준의 토론 경과 시간으로 바꾼다.
+     * 기준은 실패한 턴까지 포함해 정한다. 첫 턴이 실패해도 이후 발언 시각이 앞당겨지지 않게 하기 위해서다.
      */
     List<SpeechSegment> toSegments(List<RecordingTurnV2> turns) {
-        List<RecordingTurnV2> doneTurns = turns.stream()
-                .filter(turn -> turn.status() == RecordingTurnStatusV2.DONE)
-                .toList();
-        long debateStartedAt = doneTurns.stream()
+        long debateStartedAt = turns.stream()
                 .mapToLong(RecordingTurnV2::startedAtEpochMs)
                 .min()
                 .orElse(0);
-        return doneTurns.stream()
+        return turns.stream()
+                .filter(turn -> turn.status() == RecordingTurnStatusV2.DONE)
                 .map(turn -> toSegment(turn, turn.startedAtEpochMs() - debateStartedAt))
                 .toList();
     }
