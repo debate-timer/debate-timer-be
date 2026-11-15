@@ -45,4 +45,28 @@ class SharingRequestTest {
                     .hasMessage(ClientErrorCode.VERSION_REQUIRED_TIMER_EVENT.getMessage());
         }
     }
+
+    @Nested
+    class RecordingClosed {
+
+        @Test
+        void 녹음_참가_정보와_버전이_있으면_데이터_없는_이벤트로_만든다() {
+            SharingRequest request = new SharingRequest(TimerEventType.RECORDING_CLOSED, 100L, null,
+                    new RecordingJoinRequest("session-1", "join-code"));
+
+            TimerEvent timerEvent = request.toTimerEvent();
+
+            assertThat(timerEvent.getEventType()).isEqualTo(TimerEventType.RECORDING_CLOSED);
+            assertThat(timerEvent.getTimerEventData()).isNull();
+        }
+
+        @Test
+        void 녹음_참가_정보가_없으면_예외를_던진다() {
+            SharingRequest request = new SharingRequest(TimerEventType.RECORDING_CLOSED, 100L, null);
+
+            assertThatThrownBy(request::toTimerEvent)
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_TIMER_EVENT.getMessage());
+        }
+    }
 }

@@ -80,6 +80,17 @@ public class RecordingV2DomainRepository {
                 RecordingSessionStatusV2.RECORDING) > 0;
     }
 
+    /**
+     * 녹음 중인 세션을 취소한다. 이미 마무리 중이거나 끝난 세션이면 바꾸지 않는다.
+     *
+     * @return 바꿨으면 true
+     */
+    @Transactional
+    public boolean cancelSession(long id, LocalDateTime canceledAt) {
+        return sessionRepository.updateStatusIfRecording(id, canceledAt, RecordingSessionStatusV2.CANCELED,
+                RecordingSessionStatusV2.RECORDING) > 0;
+    }
+
     @Transactional
     public void completeSession(long id, long transcriptId) {
         sessionRepository.getById(id).complete(transcriptId);

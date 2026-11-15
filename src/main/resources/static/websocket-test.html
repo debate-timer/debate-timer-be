@@ -121,6 +121,7 @@
                         <option>FINISHED</option>
                         <option>ABORT</option>
                         <option>RECORDING_OPENED</option>
+                        <option>RECORDING_CLOSED</option>
                     </select>
                 </div>
                 <div class="row">
@@ -150,7 +151,7 @@
                 <div class="row">
                     <button id="chairSend" class="primary" disabled>발행 (Send)</button>
                 </div>
-                <div class="sub" style="margin:0">※ <code>FINISHED</code>·<code>ABORT</code>는 data=null로 전송되며, <code>ABORT</code>는 version을 함께 보냅니다 (서버 검증 규칙). <code>RECORDING_OPENED</code>는 data=null, version과 함께 예시 다기기 녹음 참가 정보(recording)를 보냅니다.</div>
+                <div class="sub" style="margin:0">※ <code>FINISHED</code>·<code>ABORT</code>는 data=null로 전송되며, <code>ABORT</code>는 version을 함께 보냅니다 (서버 검증 규칙). <code>RECORDING_OPENED</code>·<code>RECORDING_CLOSED</code>는 data=null, version과 함께 예시 다기기 녹음 참가 정보(recording)를 보냅니다.</div>
             </fieldset>
 
             <div class="preset">
@@ -273,9 +274,9 @@
         if (evtType === "ABORT") {
             return { eventType: "ABORT", data: null, version: Date.now() };
         }
-        if (evtType === "RECORDING_OPENED") {
+        if (evtType === "RECORDING_OPENED" || evtType === "RECORDING_CLOSED") {
             return {
-                eventType: "RECORDING_OPENED",
+                eventType: evtType,
                 data: null,
                 version: Date.now(),
                 recording: { sessionKey: "test-session", joinCode: "test-join-code" },

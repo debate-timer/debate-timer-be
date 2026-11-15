@@ -225,6 +225,60 @@ class RecordingServiceV2Test extends BaseServiceTest {
     }
 
     @Nested
+    class Cancel {
+
+        @Test
+        void 취소하면_취소_상태가_되고_참가할_수_없다() {
+            RecordingSessionCreateResponseV2 created = create();
+
+            recordingServiceV2.cancel(member, created.sessionKey());
+
+            assertAll(
+                    () -> assertThat(recordingV2DomainRepository.getSession(created.sessionKey()).status())
+                            .isEqualTo(RecordingSessionStatusV2.CANCELED),
+                    () -> assertThatThrownBy(() -> recordingServiceV2.join(created.sessionKey(),
+                            new RecordingJoinRequestV2(created.joinCode())))
+                            .isInstanceOf(DTClientErrorException.class)
+                            .hasMessage(ClientErrorCode.RECORDING_SESSION_CLOSED.getMessage())
+            );
+        }
+
+        @Test
+        void 취소하면_기기를_지워_업로드를_받지_않는다() {
+            RecordingSessionCreateResponseV2 created = create();
+
+            recordingServiceV2.cancel(member, created.sessionKey());
+
+            assertThatThrownBy(() -> recordingServiceV2.upload(created.sessionKey(), created.deviceToken(), "0-1",
+                    UPLOAD, audio()))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.INVALID_RECORDING_DEVICE.getMessage());
+        }
+
+        @Test
+        void 이미_끝낸_세션은_취소하지_않는다() {
+            RecordingSessionCreateResponseV2 created = create();
+            recordingServiceV2.finish(member, created.sessionKey());
+
+            recordingServiceV2.cancel(member, created.sessionKey());
+
+            assertThat(recordingV2DomainRepository.getSession(created.sessionKey()).status())
+                    .isEqualTo(RecordingSessionStatusV2.FINISHING);
+            registry.remove(created.sessionKey());
+        }
+
+        @Test
+        void 다른_회원의_세션은_취소할_수_없다() {
+            RecordingSessionCreateResponseV2 created = create();
+            Member other = memberGenerator.generate("other@email.com");
+
+            assertThatThrownBy(() -> recordingServiceV2.cancel(other, created.sessionKey()))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.RECORDING_SESSION_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
     class Get {
 
         @Test

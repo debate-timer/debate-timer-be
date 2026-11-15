@@ -25,17 +25,17 @@ public interface RecordingSessionV2Repository extends Repository<RecordingSessio
     List<RecordingSessionV2Entity> findAllByStatusAndCreatedAtBefore(RecordingSessionStatusV2 status,
                                                                      LocalDateTime createdAt);
 
-    // 녹음 중인 세션만 바꿔, 종료 요청이 겹쳐도 이미 마무리 중이거나 끝난 세션을 되돌리지 않는다
+    // 녹음 중인 세션만 바꿔, 종료·취소 요청이 겹쳐도 이미 마무리 중이거나 끝난 세션을 되돌리지 않는다
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             UPDATE RecordingSessionV2Entity s
-            SET s.status = :finishing, s.finishedAt = :finishedAt
+            SET s.status = :status, s.finishedAt = :finishedAt
             WHERE s.id = :id AND s.status = :recording
             """)
     int updateStatusIfRecording(
             @Param("id") long id,
             @Param("finishedAt") LocalDateTime finishedAt,
-            @Param("finishing") RecordingSessionStatusV2 finishing,
+            @Param("status") RecordingSessionStatusV2 status,
             @Param("recording") RecordingSessionStatusV2 recording
     );
 
