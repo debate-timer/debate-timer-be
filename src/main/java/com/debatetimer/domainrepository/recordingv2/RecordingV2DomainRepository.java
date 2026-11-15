@@ -69,9 +69,15 @@ public class RecordingV2DomainRepository {
                 .toList();
     }
 
+    /**
+     * 녹음 중인 세션을 마무리 중으로 바꾼다. 이미 마무리 중이거나 끝난 세션이면 바꾸지 않는다.
+     *
+     * @return 바꿨으면 true
+     */
     @Transactional
-    public void finishSession(long id, LocalDateTime finishedAt) {
-        sessionRepository.getById(id).finish(finishedAt);
+    public boolean finishSession(long id, LocalDateTime finishedAt) {
+        return sessionRepository.updateStatusIfRecording(id, finishedAt, RecordingSessionStatusV2.FINISHING,
+                RecordingSessionStatusV2.RECORDING) > 0;
     }
 
     @Transactional

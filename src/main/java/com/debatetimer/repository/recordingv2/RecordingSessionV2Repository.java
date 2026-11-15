@@ -7,7 +7,10 @@ import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 public interface RecordingSessionV2Repository extends Repository<RecordingSessionV2Entity, Long> {
 
@@ -21,6 +24,20 @@ public interface RecordingSessionV2Repository extends Repository<RecordingSessio
 
     List<RecordingSessionV2Entity> findAllByStatusAndCreatedAtBefore(RecordingSessionStatusV2 status,
                                                                      LocalDateTime createdAt);
+
+    // 녹음 중인 세션만 바꿔, 종료 요청이 겹쳐도 이미 마무리 중이거나 끝난 세션을 되돌리지 않는다
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE RecordingSessionV2Entity s
+            SET s.status = :finishing, s.finishedAt = :finishedAt
+            WHERE s.id = :id AND s.status = :recording
+            """)
+    int updateStatusIfRecording(
+            @Param("id") long id,
+            @Param("finishedAt") LocalDateTime finishedAt,
+            @Param("finishing") RecordingSessionStatusV2 finishing,
+            @Param("recording") RecordingSessionStatusV2 recording
+    );
 
     default RecordingSessionV2Entity getById(long id) {
         return findById(id)

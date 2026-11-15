@@ -68,11 +68,6 @@ public class RecordingSessionV2Entity extends BaseTimeEntity {
         this.status = RecordingSessionStatusV2.RECORDING;
     }
 
-    public void finish(LocalDateTime finishedAt) {
-        this.status = RecordingSessionStatusV2.FINISHING;
-        this.finishedAt = finishedAt;
-    }
-
     public void complete(long transcriptId) {
         this.status = RecordingSessionStatusV2.COMPLETED;
         this.transcriptId = transcriptId;

@@ -91,6 +91,64 @@ class RecordingV2DomainRepositoryTest extends BaseDomainRepositoryTest {
                     () -> assertThat(found.finishedAt()).isEqualTo(LocalDateTime.of(2026, 11, 12, 10, 0))
             );
         }
+        @Test
+        void 이미_끝난_세션은_종료해도_상태와_종료_시각을_되돌리지_않는다() {
+            RecordingSessionV2 created = recordingV2DomainRepository.createSession("session-key", 1L, 2L, null,
+                    "hash");
+            LocalDateTime finishedAt = LocalDateTime.of(2026, 11, 12, 10, 0);
+            recordingV2DomainRepository.finishSession(created.id(), finishedAt);
+            recordingV2DomainRepository.completeSession(created.id(), 10L);
+
+            boolean finished = recordingV2DomainRepository.finishSession(created.id(), finishedAt.plusMinutes(5));
+
+            RecordingSessionV2 found = recordingV2DomainRepository.getSession(created.id());
+            assertAll(
+                    () -> assertThat(finished).isFalse(),
+                    () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.COMPLETED),
+                    () -> assertThat(found.transcriptId()).isEqualTo(10L),
+                    () -> assertThat(found.finishedAt()).isEqualTo(finishedAt)
+            );
+        }
+
+        @Test
+        void 종료_요청이_겹치면_하나만_세션을_종료한다() throws Exception {
+            RecordingSessionV2 created = recordingV2DomainRepository.createSession("session-key", 1L, 2L, null,
+                    "hash");
+            LocalDateTime firstFinishedAt = LocalDateTime.of(2026, 11, 12, 10, 0);
+            CountDownLatch firstFinished = new CountDownLatch(1);
+            CountDownLatch releaseFirst = new CountDownLatch(1);
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+
+            boolean first;
+            boolean second;
+            try {
+                Future<Boolean> firstRequest = executor.submit(() -> transactionTemplate.execute(status -> {
+                    boolean result = recordingV2DomainRepository.finishSession(created.id(), firstFinishedAt);
+                    firstFinished.countDown();
+                    await(releaseFirst);
+                    return result;
+                }));
+                await(firstFinished);
+                Future<Boolean> secondRequest = executor.submit(() -> recordingV2DomainRepository.finishSession(
+                        created.id(), firstFinishedAt.plusMinutes(1)));
+                // 조건부 갱신이 아니면 두 번째 요청도 녹음 중으로 보고 종료 시각을 덮어쓴다.
+                Thread.sleep(300);
+                releaseFirst.countDown();
+                first = firstRequest.get(5, TimeUnit.SECONDS);
+                second = secondRequest.get(5, TimeUnit.SECONDS);
+            } finally {
+                releaseFirst.countDown();
+                executor.shutdownNow();
+            }
+
+            RecordingSessionV2 found = recordingV2DomainRepository.getSession(created.id());
+            assertAll(
+                    () -> assertThat(first).isTrue(),
+                    () -> assertThat(second).isFalse(),
+                    () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.FINISHING),
+                    () -> assertThat(found.finishedAt()).isEqualTo(firstFinishedAt)
+            );
+        }
     }
 
     @Nested
