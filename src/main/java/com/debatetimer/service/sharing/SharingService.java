@@ -3,6 +3,7 @@ package com.debatetimer.service.sharing;
 import com.debatetimer.domain.sharing.TimerEvent;
 import com.debatetimer.domain.sharing.TimerEventType;
 import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
+import com.debatetimer.dto.sharing.request.RecordingJoinRequest;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.response.RecordingJoinResponse;
 import com.debatetimer.dto.sharing.response.SharingResponse;
@@ -66,23 +67,39 @@ public class SharingService {
         TimerEvent timerEvent = request.toTimerEvent();
         sharingRoomRegistry.runExclusively(roomId, () -> {
             if (!chairmanSessionRegistry.isActive(roomId, chairmanSessionId)) {
+                logRecordingEvent(roomId, request, "not active chairman");
                 notifyActiveChairman(roomId);
                 return;
             }
             if (sharingRoomRegistry.isAborted(roomId)) {
+                logRecordingEvent(roomId, request, "aborted room");
                 return;
             }
             if (timerEvent.getEventType() == TimerEventType.ABORT && sharingRoomRegistry.isFinished(roomId)) {
                 return;
             }
             if (!sharingRoomRegistry.acceptVersion(roomId, request.version())) {
+                logRecordingEvent(roomId, request, "stale version");
                 return;
             }
 
             updateRoomStatus(roomId, timerEvent.getEventType());
             messagingTemplate.convertAndSend(ROOM_CHANNEL_PREFIX + roomId, createResponse(request, timerEvent));
+            logRecordingEvent(roomId, request, "relayed");
             recordSharingLog(roomId, timerEvent);
         });
+    }
+
+    // 웹소켓 이벤트는 요청 로그에 남지 않으므로, 다기기 녹음 참가 정보가 청중에게 갔는지 추적할 수 있게 남긴다. 참가 코드는 남기지 않는다.
+    private void logRecordingEvent(long roomId, SharingRequest request, String result) {
+        if (!request.eventType().requiresRecording()) {
+            return;
+        }
+        String sessionKey = Optional.ofNullable(request.recording())
+                .map(RecordingJoinRequest::sessionKey)
+                .orElse(null);
+        log.info("Recording sharing event {}: roomId={}, eventType={}, version={}, sessionKey={}",
+                result, roomId, request.eventType(), request.version(), sessionKey);
     }
 
     /**
