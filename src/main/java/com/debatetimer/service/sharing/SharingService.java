@@ -157,7 +157,9 @@ public class SharingService {
         TimerEventDataResponse data = Optional.ofNullable(timerEvent.getTimerEventData())
                 .map(TimerEventDataResponse::new)
                 .orElse(null);
+        // 참가 정보는 녹음 참여 이벤트에만 싣는다. 다른 이벤트에 함께 보내도 청중에게 전달하지 않는다.
         RecordingJoinResponse recording = Optional.ofNullable(request.recording())
+                .filter(ignored -> request.eventType().requiresRecording())
                 .map(RecordingJoinResponse::new)
                 .orElse(null);
         return new SharingResponse(request.eventType(), request.version(), clock.millis(), data, recording);

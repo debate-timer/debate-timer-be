@@ -404,6 +404,23 @@ class SharingWebSocketControllerTest extends BaseStompTest {
         }
 
         @Test
+        void 녹음_참여가_아닌_이벤트에_참가_정보를_실어도_청중에게는_전달하지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 1758500003000L, null,
+                    new RecordingJoinRequest("session-1", "join-code")));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.recording()).isNull()
+            );
+        }
+
+        @Test
         void 참가_정보가_없는_녹음_참여_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
             QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
             Member member = memberGenerator.generate("example@email.com");
