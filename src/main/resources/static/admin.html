@@ -1202,7 +1202,8 @@
         setMessage('organization-form-message', '');
         try {
             const created = await api('/api/admin/organizations', { method: 'POST', body: organizationFormBody() });
-            resetOrganizationForm();
+            // 요청 중에 다른 단체 수정을 시작했다면 그 입력을 지우지 않는다
+            if (state.editingOrganizationId === null) resetOrganizationForm();
             setMessage('organization-form-message', `'${created.name}' 단체를 추가했습니다 (ID ${created.id}).`, true);
             await loadOrganizations();
             $('tpl-organization').value = created.id;
@@ -1215,10 +1216,12 @@
         event.preventDefault();
         setMessage('organization-form-message', '');
         try {
-            const updated = await api(`/api/admin/organizations/${state.editingOrganizationId}`, {
+            const editingId = state.editingOrganizationId;
+            const updated = await api(`/api/admin/organizations/${editingId}`, {
                 method: 'PUT', body: organizationFormBody(),
             });
-            cancelEditOrganization();
+            // 요청 중에 다른 단체로 바꿨거나 취소했다면 편집 상태를 건드리지 않는다
+            if (state.editingOrganizationId === editingId) cancelEditOrganization();
             setMessage('organization-form-message', `'${updated.name}' 단체를 수정했습니다 (ID ${updated.id}).`, true);
             await loadOrganizations();
         } catch (error) {
