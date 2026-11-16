@@ -26,7 +26,8 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
         @Test
         void 어드민_비밀번호가_맞으면_모든_단체와_템플릿을_조회한다() {
-            OrganizationEntity korean = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            OrganizationEntity korean = organizationEntityGenerator.generate(
+                    "한앎", "한양대", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
             organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
             organizationTemplateEntityGenerator.generate(korean, "템플릿");
 
@@ -38,6 +39,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.organizations()).hasSize(2),
+                    () -> assertThat(response.organizations().get(0).category()).isEqualTo(OrganizationCategory.DEBATE_CLUB),
                     () -> assertThat(response.organizations().get(0).templates()).hasSize(1)
             );
         }
@@ -69,6 +71,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.name()).isEqualTo("한앎"),
+                    () -> assertThat(response.category()).isEqualTo(OrganizationCategory.DEBATE_CLUB),
                     () -> assertThat(response.templates()).isEmpty()
             );
         }

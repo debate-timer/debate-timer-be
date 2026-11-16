@@ -332,7 +332,7 @@
                 <div class="table-wrap">
                     <table class="data">
                         <thead>
-                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>아이콘 경로</th><th>템플릿</th><th>원본</th></tr>
+                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>분류</th><th>아이콘 경로</th><th>템플릿</th><th>원본</th></tr>
                         </thead>
                         <tbody id="organizations-body"></tbody>
                     </table>
@@ -365,6 +365,9 @@
                         </div>
                         <div class="field"><label for="org-language">언어</label>
                             <select id="org-language"><option value="KO_KR">KO_KR</option><option value="US_EN">US_EN</option></select>
+                        </div>
+                        <div class="field"><label for="org-category">분류</label>
+                            <select id="org-category"><option value="CLASSIC">CLASSIC (일반)</option><option value="DEBATE_CLUB">DEBATE_CLUB (조직 및 동아리)</option><option value="TOURNAMENT">TOURNAMENT (대회)</option></select>
                         </div>
                         <div class="field full"><button type="submit">단체 추가</button></div>
                     </form>
@@ -1054,6 +1057,7 @@
                 el('td', { class: 'wrap' }, organization.name),
                 el('td', { class: 'wrap' }, organization.affiliation || '-'),
                 el('td', {}, organization.language),
+                el('td', {}, organization.category),
                 el('td', {}, organization.iconPath),
                 el('td', { class: 'num' }, `${organization.templates.length}개`),
                 el('td', {}, el('button', {
@@ -1066,7 +1070,7 @@
             const templateRows = organization.templates.length
                 ? organization.templates.map((template) => el('tr', { class: 'templates-row' },
                     el('td', {}), el('td', { class: 'num' }, template.id),
-                    el('td', { colspan: 4, class: 'wrap' }, template.name),
+                    el('td', { colspan: 5, class: 'wrap' }, template.name),
                     el('td', { colspan: 3 }, el('button', {
                         type: 'button', class: 'secondary small', onclick: () => {
                             try {
@@ -1076,11 +1080,11 @@
                             }
                         },
                     }, '미리보기'))))
-                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 9, class: 'empty' }, '템플릿이 없습니다.'))];
+                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 10, class: 'empty' }, '템플릿이 없습니다.'))];
             return [row, ...templateRows];
         });
         $('organizations-body').replaceChildren(...(rows.length ? rows
-            : [el('tr', {}, el('td', { colspan: 9, class: 'empty' }, '단체가 없습니다.'))]));
+            : [el('tr', {}, el('td', { colspan: 10, class: 'empty' }, '단체가 없습니다.'))]));
 
         const select = $('tpl-organization');
         const previous = select.value;
@@ -1145,6 +1149,7 @@
                     affiliation: $('org-affiliation').value.trim(),
                     iconPath: $('org-icon').value,
                     language: $('org-language').value,
+                    category: $('org-category').value,
                 }),
             });
             const iconPath = $('org-icon').value;
