@@ -2,6 +2,7 @@ package com.debatetimer.dto.admin.response;
 
 import com.debatetimer.domain.organization.Language;
 import com.debatetimer.domain.organization.Organization;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import java.util.List;
 
 public record AdminOrganizationResponse(
@@ -10,6 +11,7 @@ public record AdminOrganizationResponse(
         String affiliation,
         String iconPath,
         Language language,
+        OrganizationCategory category,
         List<AdminOrganizationTemplateResponse> templates
 ) {
 
@@ -20,6 +22,7 @@ public record AdminOrganizationResponse(
                 organization.getAffiliation(),
                 organization.getIconPath(),
                 organization.getLanguage(),
+                organization.getCategory(),
                 organization.getTemplates()
                         .stream()
                         .map(AdminOrganizationTemplateResponse::new)
