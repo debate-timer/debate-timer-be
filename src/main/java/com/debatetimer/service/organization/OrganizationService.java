@@ -13,6 +13,9 @@ public class OrganizationService {
     private final OrganizationDomainRepository organizationDomainRepository;
 
     public OrganizationResponses findAll(Language language) {
+        if (language == null) {
+            return OrganizationResponses.from(organizationDomainRepository.findAll());
+        }
         return OrganizationResponses.from(organizationDomainRepository.findAllByLanguage(language));
     }
 }

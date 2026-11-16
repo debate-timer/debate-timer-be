@@ -53,6 +53,22 @@ class OrganizationServiceTest extends BaseServiceTest {
         }
 
         @Test
+        void 언어가_없으면_모든_언어의_기관_템플릿을_반환한다() {
+            OrganizationEntity korean = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            OrganizationEntity english = organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
+            organizationTemplateEntityGenerator.generate(korean, "템플릿1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(english, "template1", Language.US_EN);
+
+            OrganizationResponses response = organizationService.findAll(null);
+
+            assertAll(
+                    () -> assertThat(response.organizations()).hasSize(2),
+                    () -> assertThat(response.organizations().get(0).templates()).hasSize(1),
+                    () -> assertThat(response.organizations().get(1).templates()).hasSize(1)
+            );
+        }
+
+        @Test
         void 기관_분류를_함께_반환한다() {
             organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
 

@@ -30,7 +30,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                 .summary("기관별 템플릿 조회")
                 .queryParameter(
                         parameterWithName("language").optional()
-                                .description("조회 언어 (US_EN | KO_KR, 기본값 KO_KR)")
+                                .description("조회 언어 (US_EN | KO_KR). 생략하거나 빈 값이면 모든 언어의 템플릿을 조회")
                 );
 
         private final RestDocumentationResponse responseDocument = response()
