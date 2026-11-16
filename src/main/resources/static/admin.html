@@ -332,7 +332,7 @@
                 <div class="table-wrap">
                     <table class="data">
                         <thead>
-                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>분류</th><th>아이콘 경로</th><th>템플릿</th><th>원본</th></tr>
+                        <tr><th></th><th>ID</th><th>아이콘</th><th>이름</th><th>소속</th><th>언어</th><th>분류</th><th>아이콘 경로</th><th>템플릿</th><th>원본</th><th></th></tr>
                         </thead>
                         <tbody id="organizations-body"></tbody>
                     </table>
@@ -343,7 +343,7 @@
 
             <div class="two-col">
                 <div class="panel">
-                    <h2>단체 추가</h2>
+                    <h2 id="organization-form-title">단체 추가</h2>
                     <form id="organization-form" class="form-grid">
                         <div class="field"><label for="org-name">이름</label><input id="org-name" required maxlength="255"/></div>
                         <div class="field"><label for="org-affiliation">소속</label><input id="org-affiliation" maxlength="255" placeholder="없으면 비워두기"/></div>
@@ -369,7 +369,10 @@
                         <div class="field"><label for="org-category">분류</label>
                             <select id="org-category"><option value="CLASSIC">CLASSIC (일반)</option><option value="DEBATE_CLUB">DEBATE_CLUB (조직 및 동아리)</option><option value="TOURNAMENT">TOURNAMENT (대회)</option></select>
                         </div>
-                        <div class="field full"><button type="submit">단체 추가</button></div>
+                        <div class="field full"><div class="row">
+                            <button type="submit" id="org-submit">단체 추가</button>
+                            <button type="button" class="secondary hidden" id="org-cancel">수정 취소</button>
+                        </div></div>
                     </form>
                     <div id="organization-form-message" class="error"></div>
                 </div>
@@ -518,7 +521,7 @@
     const TRANSCRIPT_JSON_TABS = [['rawLines', 'STT 원문'], ['lines', '보정본'], ['report', '분석 보고서']];
 
     const charts = {};
-    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), modalOpener: null,
+    const state = { tab: 'tables-stats', unit: 'DAY', page: 0, sort: 'CREATED_AT', organizations: [], expanded: new Set(), editingOrganizationId: null, modalOpener: null,
         transcriptPage: 0, transcript: null, transcriptJson: 'lines', transcriptOpener: null };
 
     const $ = (id) => document.getElementById(id);
@@ -1065,13 +1068,19 @@
                         event.stopPropagation();
                         whilePending(event.currentTarget, () => downloadIcon(organization.iconPath));
                     },
-                }, '다운로드')));
+                }, '다운로드')),
+                el('td', {}, el('button', {
+                    type: 'button', class: 'secondary small', onclick: (event) => {
+                        event.stopPropagation();
+                        startEditOrganization(organization);
+                    },
+                }, '수정')));
             if (!expanded) return [row];
             const templateRows = organization.templates.length
                 ? organization.templates.map((template) => el('tr', { class: 'templates-row' },
                     el('td', {}), el('td', { class: 'num' }, template.id),
                     el('td', { colspan: 5, class: 'wrap' }, template.name),
-                    el('td', { colspan: 3 }, el('button', {
+                    el('td', { colspan: 4 }, el('button', {
                         type: 'button', class: 'secondary small', onclick: () => {
                             try {
                                 previewTemplate(template.data, [['단체', organization.name], ['템플릿 ID', template.id]]);
@@ -1080,11 +1089,11 @@
                             }
                         },
                     }, '미리보기'))))
-                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 10, class: 'empty' }, '템플릿이 없습니다.'))];
+                : [el('tr', { class: 'templates-row' }, el('td', { colspan: 11, class: 'empty' }, '템플릿이 없습니다.'))];
             return [row, ...templateRows];
         });
         $('organizations-body').replaceChildren(...(rows.length ? rows
-            : [el('tr', {}, el('td', { colspan: 10, class: 'empty' }, '단체가 없습니다.'))]));
+            : [el('tr', {}, el('td', { colspan: 11, class: 'empty' }, '단체가 없습니다.'))]));
 
         const select = $('tpl-organization');
         const previous = select.value;
@@ -1138,26 +1147,80 @@
         $(id).classList.toggle('success', success);
     }
 
+    function organizationFormBody() {
+        return JSON.stringify({
+            name: $('org-name').value.trim(),
+            affiliation: $('org-affiliation').value.trim(),
+            iconPath: $('org-icon').value,
+            language: $('org-language').value,
+            category: $('org-category').value,
+        });
+    }
+
+    function resetOrganizationForm() {
+        const iconPath = $('org-icon').value;
+        $('organization-form').reset();
+        $('org-icon').value = iconPath;
+        updateIconPreview();
+    }
+
+    function startEditOrganization(organization) {
+        state.editingOrganizationId = organization.id;
+        $('org-name').value = organization.name;
+        $('org-affiliation').value = organization.affiliation;
+        if (![...$('org-icon').options].some((option) => option.value === organization.iconPath)) {
+            $('org-icon').append(el('option', { value: organization.iconPath }, organization.iconPath));
+        }
+        $('org-icon').value = organization.iconPath;
+        updateIconPreview();
+        $('org-language').value = organization.language;
+        $('org-category').value = organization.category;
+        $('organization-form-title').textContent = `단체 수정 (ID ${organization.id})`;
+        $('org-submit').textContent = '단체 수정';
+        $('org-cancel').classList.remove('hidden');
+        setMessage('organization-form-message', '');
+        $('organization-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $('org-name').focus({ preventScroll: true });
+    }
+
+    function cancelEditOrganization() {
+        state.editingOrganizationId = null;
+        resetOrganizationForm();
+        $('organization-form-title').textContent = '단체 추가';
+        $('org-submit').textContent = '단체 추가';
+        $('org-cancel').classList.add('hidden');
+        setMessage('organization-form-message', '');
+    }
+
+    async function submitOrganization(event) {
+        if (state.editingOrganizationId !== null) return updateOrganization(event);
+        return createOrganization(event);
+    }
+
     async function createOrganization(event) {
         event.preventDefault();
         setMessage('organization-form-message', '');
         try {
-            const created = await api('/api/admin/organizations', {
-                method: 'POST',
-                body: JSON.stringify({
-                    name: $('org-name').value.trim(),
-                    affiliation: $('org-affiliation').value.trim(),
-                    iconPath: $('org-icon').value,
-                    language: $('org-language').value,
-                    category: $('org-category').value,
-                }),
-            });
-            const iconPath = $('org-icon').value;
-            $('organization-form').reset();
-            $('org-icon').value = iconPath;
+            const created = await api('/api/admin/organizations', { method: 'POST', body: organizationFormBody() });
+            resetOrganizationForm();
             setMessage('organization-form-message', `'${created.name}' 단체를 추가했습니다 (ID ${created.id}).`, true);
             await loadOrganizations();
             $('tpl-organization').value = created.id;
+        } catch (error) {
+            handleError(error, 'organization-form-message');
+        }
+    }
+
+    async function updateOrganization(event) {
+        event.preventDefault();
+        setMessage('organization-form-message', '');
+        try {
+            const updated = await api(`/api/admin/organizations/${state.editingOrganizationId}`, {
+                method: 'PUT', body: organizationFormBody(),
+            });
+            cancelEditOrganization();
+            setMessage('organization-form-message', `'${updated.name}' 단체를 수정했습니다 (ID ${updated.id}).`, true);
+            await loadOrganizations();
         } catch (error) {
             handleError(error, 'organization-form-message');
         }
@@ -1504,7 +1567,7 @@
     $('transcripts-refresh').addEventListener('click', () => whilePending($('transcripts-refresh'), loadTranscripts));
     $('organization-form').addEventListener('submit', (event) => {
         event.preventDefault();
-        whilePending($('organization-form').querySelector('button[type=submit]'), () => createOrganization(event));
+        whilePending($('organization-form').querySelector('button[type=submit]'), () => submitOrganization(event));
     });
     $('template-form').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -1517,6 +1580,7 @@
     });
     $('ff-search').addEventListener('click', () => whilePending($('ff-search'), searchMemberFeatureFlags));
     $('org-icon').addEventListener('change', updateIconPreview);
+    $('org-cancel').addEventListener('click', cancelEditOrganization);
     $('icon-upload').addEventListener('click', () => whilePending($('icon-upload'), uploadIcon));
     $('icons-download').addEventListener('click', () => whilePending($('icons-download'), downloadAllIcons));
     $('icon-file').addEventListener('change', () => {
