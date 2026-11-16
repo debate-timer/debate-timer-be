@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.organization.Language;
 import com.debatetimer.domain.organization.Organization;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.domainrepository.BaseDomainRepositoryTest;
 import com.debatetimer.entity.organization.OrganizationEntity;
@@ -86,10 +87,11 @@ class OrganizationDomainRepositoryTest extends BaseDomainRepositoryTest {
         @Test
         void 단체를_저장한다() {
             Organization saved = organizationDomainRepository.create(
-                    new Organization("한앎", "한양대", "/icon.png", Language.KO_KR));
+                    new Organization("한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB));
 
             assertAll(
                     () -> assertThat(saved.getId()).isNotNull(),
+                    () -> assertThat(saved.getCategory()).isEqualTo(OrganizationCategory.DEBATE_CLUB),
                     () -> assertThat(organizationDomainRepository.findAllByLanguage(Language.KO_KR)).hasSize(1)
             );
         }

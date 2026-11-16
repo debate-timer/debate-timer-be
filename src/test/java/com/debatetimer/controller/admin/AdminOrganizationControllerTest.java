@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.organization.Language;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import com.debatetimer.dto.admin.response.AdminOrganizationResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
@@ -56,7 +57,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 단체를_추가한다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    "한앎", "한양대", "/icon.png", Language.KO_KR);
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
 
             AdminOrganizationResponse response = given()
                     .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
@@ -75,7 +76,20 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 단체_이름이_비어_있으면_추가할_수_없다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    " ", "한양대", "/icon.png", Language.KO_KR);
+                    " ", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/admin/organizations")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 분류가_없으면_추가할_수_없다() {
+            OrganizationCreateRequest request = new OrganizationCreateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, null);
 
             given()
                     .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
@@ -88,7 +102,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_없으면_추가할_수_없다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    "한앎", "한양대", "/icon.png", Language.KO_KR);
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
 
             given()
                     .contentType(ContentType.JSON)
