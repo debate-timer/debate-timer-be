@@ -5,6 +5,7 @@ import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
+import com.debatetimer.dto.admin.request.OrganizationUpdateRequest;
 import com.debatetimer.service.admin.AdminOrganizationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,15 @@ public class AdminOrganizationController {
             @Valid @RequestBody OrganizationCreateRequest request
     ) {
         return adminOrganizationService.create(request);
+    }
+
+    @PutMapping("/api/admin/organizations/{organizationId}")
+    @ResponseStatus(HttpStatus.OK)
+    public AdminOrganizationResponse updateOrganization(
+            @PathVariable long organizationId,
+            @Valid @RequestBody OrganizationUpdateRequest request
+    ) {
+        return adminOrganizationService.update(organizationId, request);
     }
 
     @PostMapping("/api/admin/organizations/{organizationId}/templates")

@@ -59,6 +59,21 @@ public class OrganizationDomainRepository {
     }
 
     @Transactional
+    public Organization update(long organizationId, Organization organization) {
+        OrganizationEntity entity = organizationRepository.getById(organizationId);
+        entity.update(organization);
+
+        // 템플릿은 단체와 같은 언어로 조회되므로 단체의 언어가 바뀌면 함께 바꾼다
+        List<OrganizationTemplateEntity> templates =
+                organizationTemplateRepository.findAllByOrganization_IdOrderByIdAsc(organizationId);
+        templates.forEach(template -> template.updateLanguage(entity.getLanguage()));
+
+        return entity.toDomain(templates.stream()
+                .map(OrganizationTemplateEntity::toDomain)
+                .toList());
+    }
+
+    @Transactional
     public OrganizationTemplate createTemplate(long organizationId, OrganizationTemplate template) {
         OrganizationEntity organization = organizationRepository.getById(organizationId);
         return organizationTemplateRepository.save(new OrganizationTemplateEntity(organization, template))

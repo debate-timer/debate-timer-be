@@ -11,5 +11,7 @@ public interface OrganizationTemplateRepository extends Repository<OrganizationT
 
     List<OrganizationTemplateEntity> findAllByOrderByIdAsc();
 
+    List<OrganizationTemplateEntity> findAllByOrganization_IdOrderByIdAsc(long organizationId);
+
     OrganizationTemplateEntity save(OrganizationTemplateEntity entity);
 }

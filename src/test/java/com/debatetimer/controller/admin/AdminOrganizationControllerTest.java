@@ -11,6 +11,7 @@ import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
+import com.debatetimer.dto.admin.request.OrganizationUpdateRequest;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
@@ -111,6 +112,78 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/admin/organizations")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    @Nested
+    class UpdateOrganization {
+
+        @Test
+        void 단체의_모든_항목을_수정한다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "hanalm", "hanyang", "/new-icon.png", Language.US_EN, OrganizationCategory.TOURNAMENT);
+
+            AdminOrganizationResponse response = given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(AdminOrganizationResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(organization.getId()),
+                    () -> assertThat(response.name()).isEqualTo("hanalm"),
+                    () -> assertThat(response.affiliation()).isEqualTo("hanyang"),
+                    () -> assertThat(response.iconPath()).isEqualTo("/new-icon.png"),
+                    () -> assertThat(response.language()).isEqualTo(Language.US_EN),
+                    () -> assertThat(response.category()).isEqualTo(OrganizationCategory.TOURNAMENT)
+            );
+        }
+
+        @Test
+        void 분류가_없으면_수정할_수_없다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, null);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 단체가_없으면_수정할_수_없다() {
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", 999L)
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+        }
+
+        @Test
+        void 어드민_비밀번호가_없으면_수정할_수_없다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
                     .then().statusCode(HttpStatus.UNAUTHORIZED.value());
         }
     }
