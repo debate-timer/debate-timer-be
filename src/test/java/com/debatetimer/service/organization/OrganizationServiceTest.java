@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.domain.organization.Language;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import com.debatetimer.service.BaseServiceTest;
@@ -49,6 +50,15 @@ class OrganizationServiceTest extends BaseServiceTest {
                     () -> assertThat(response.organizations()).hasSize(1),
                     () -> assertThat(response.organizations().get(0).organization()).isEqualTo("english")
             );
+        }
+
+        @Test
+        void 기관_분류를_함께_반환한다() {
+            organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            OrganizationResponses response = organizationService.findAll(Language.KO_KR);
+
+            assertThat(response.organizations().get(0).category()).isEqualTo(OrganizationCategory.DEBATE_CLUB);
         }
 
         @Test

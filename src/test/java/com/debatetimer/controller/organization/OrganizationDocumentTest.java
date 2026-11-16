@@ -11,6 +11,7 @@ import com.debatetimer.controller.BaseDocumentTest;
 import com.debatetimer.controller.RestDocumentationRequest;
 import com.debatetimer.controller.RestDocumentationResponse;
 import com.debatetimer.controller.Tag;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import com.debatetimer.dto.organization.OrganizationResponse;
 import com.debatetimer.dto.organization.OrganizationResponses;
 import com.debatetimer.dto.organization.OrganizationTemplateResponse;
@@ -36,6 +37,8 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("organizations").type(ARRAY).description("기관 정보"),
                         fieldWithPath("organizations[].organization").type(STRING).description("기관 명"),
+                        fieldWithPath("organizations[].category").type(STRING)
+                                .description("기관 분류 (CLASSIC: 일반 | DEBATE_CLUB: 조직 및 동아리 | TOURNAMENT: 대회)"),
                         fieldWithPath("organizations[].affiliation").type(STRING).description("소속"),
                         fieldWithPath("organizations[].iconPath").type(STRING).description("아이콘 경로 (해당 경로로 서버 요청)"),
                         fieldWithPath("organizations[].templates").type(ARRAY).description("기관 템플릿 목록"),
@@ -48,11 +51,11 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
         @Test
         void 기관_템플릿_조회_성공() {
             OrganizationResponses response = new OrganizationResponses(List.of(
-                    new OrganizationResponse("한앎", "한양대", "/icons/icon1.png", List.of(
+                    new OrganizationResponse("한앎", OrganizationCategory.DEBATE_CLUB, "한양대", "/icons/icon1.png", List.of(
                             new OrganizationTemplateResponse("템플릿1", DEFAULT_TEMPLATE_CONTENT),
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)
                     )),
-                    new OrganizationResponse("한모름", "양한대", "/icons/icon2.png", List.of(
+                    new OrganizationResponse("한모름", OrganizationCategory.TOURNAMENT, "양한대", "/icons/icon2.png", List.of(
                             new OrganizationTemplateResponse("템플릿1", DEFAULT_TEMPLATE_CONTENT),
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)
                     ))
