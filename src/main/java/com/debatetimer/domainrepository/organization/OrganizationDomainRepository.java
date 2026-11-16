@@ -5,8 +5,12 @@ import com.debatetimer.domain.organization.Organization;
 import com.debatetimer.domain.organization.OrganizationTemplate;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import com.debatetimer.entity.organization.OrganizationTemplateEntity;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.repository.organization.OrganizationRepository;
+import com.debatetimer.repository.organization.OrganizationTemplateJdbcRepository;
 import com.debatetimer.repository.organization.OrganizationTemplateRepository;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ public class OrganizationDomainRepository {
 
     private final OrganizationRepository organizationRepository;
     private final OrganizationTemplateRepository organizationTemplateRepository;
+    private final OrganizationTemplateJdbcRepository organizationTemplateJdbcRepository;
 
     public List<Organization> findAllByLanguage(Language language) {
         Map<Long, List<OrganizationTemplate>> idToTemplatesEntity = organizationTemplateRepository.findAllByLanguage(language)
@@ -58,25 +63,34 @@ public class OrganizationDomainRepository {
                 .toDomain(Collections.emptyList());
     }
 
+    // 단체를 먼저 갱신해 템플릿 추가(INSERT ... SELECT)와 같은 단체 행에서 순서가 정해지게 한다
     @Transactional
     public Organization update(long organizationId, Organization organization) {
-        OrganizationEntity entity = organizationRepository.getById(organizationId);
-        entity.update(organization);
+        LocalDateTime now = LocalDateTime.now();
+        int updated = organizationRepository.update(organizationId, organization.getName(),
+                organization.getAffiliation(), organization.getIconPath(), organization.getLanguage(),
+                organization.getCategory(), now);
+        if (updated == 0) {
+            throw new DTClientErrorException(ClientErrorCode.ORGANIZATION_NOT_FOUND);
+        }
 
         // 템플릿은 단체와 같은 언어로 조회되므로 단체의 언어가 바뀌면 함께 바꾼다
-        List<OrganizationTemplateEntity> templates =
-                organizationTemplateRepository.findAllByOrganization_IdOrderByIdAsc(organizationId);
-        templates.forEach(template -> template.updateLanguage(entity.getLanguage()));
+        organizationTemplateRepository.updateLanguageByOrganizationId(
+                organizationId, organization.getLanguage(), now);
 
-        return entity.toDomain(templates.stream()
-                .map(OrganizationTemplateEntity::toDomain)
-                .toList());
+        List<OrganizationTemplate> templates =
+                organizationTemplateRepository.findAllByOrganization_IdOrderByIdAsc(organizationId)
+                        .stream()
+                        .map(OrganizationTemplateEntity::toDomain)
+                        .toList();
+        return organizationRepository.getById(organizationId).toDomain(templates);
     }
 
     @Transactional
     public OrganizationTemplate createTemplate(long organizationId, OrganizationTemplate template) {
-        OrganizationEntity organization = organizationRepository.getById(organizationId);
-        return organizationTemplateRepository.save(new OrganizationTemplateEntity(organization, template))
-                .toDomain();
+        long templateId = organizationTemplateJdbcRepository.insertWithOrganizationLanguage(
+                        organizationId, template.getName(), template.getData())
+                .orElseThrow(() -> new DTClientErrorException(ClientErrorCode.ORGANIZATION_NOT_FOUND));
+        return new OrganizationTemplate(templateId, template.getName(), template.getData());
     }
 }

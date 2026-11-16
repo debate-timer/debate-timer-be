@@ -54,15 +54,6 @@ public class OrganizationTemplateEntity extends BaseTimeEntity {
         this.language = language;
     }
 
-    // 템플릿은 단체와 같은 언어로 조회되므로 단체의 언어를 그대로 따른다
-    public OrganizationTemplateEntity(OrganizationEntity organization, OrganizationTemplate template) {
-        this(organization, template.getName(), template.getData(), organization.getLanguage());
-    }
-
-    public void updateLanguage(Language language) {
-        this.language = language;
-    }
-
     public OrganizationTemplate toDomain() {
         return new OrganizationTemplate(this.id, this.name, this.data);
     }
