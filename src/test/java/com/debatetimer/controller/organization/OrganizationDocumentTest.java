@@ -38,7 +38,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                         fieldWithPath("organizations").type(ARRAY).description("기관 정보"),
                         fieldWithPath("organizations[].organization").type(STRING).description("기관 명"),
                         fieldWithPath("organizations[].category").type(STRING)
-                                .description("기관 분류 (CLASSIC: 일반 | DEBATE_CLUB: 조직 및 동아리 | TOURNAMENT: 대회)"),
+                                .description("기관 분류 (GLOBAL: 일반 | DEBATE_CLUB: 조직 및 동아리 | TOURNAMENT: 대회)"),
                         fieldWithPath("organizations[].affiliation").type(STRING).description("소속"),
                         fieldWithPath("organizations[].iconPath").type(STRING).description("아이콘 경로 (해당 경로로 서버 요청)"),
                         fieldWithPath("organizations[].templates").type(ARRAY).description("기관 템플릿 목록"),
@@ -58,6 +58,9 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                     new OrganizationResponse("한모름", OrganizationCategory.TOURNAMENT, "양한대", "/icons/icon2.png", List.of(
                             new OrganizationTemplateResponse("템플릿1", DEFAULT_TEMPLATE_CONTENT),
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)
+                    )),
+                    new OrganizationResponse("WUDC", OrganizationCategory.GLOBAL, "World Universities", "/icons/icon3.png", List.of(
+                            new OrganizationTemplateResponse("Template1", DEFAULT_TEMPLATE_CONTENT)
                     ))
             ));
             doReturn(response).when(organizationService).findAll(any());

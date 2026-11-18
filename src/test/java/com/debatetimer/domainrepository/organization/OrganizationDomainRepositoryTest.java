@@ -124,7 +124,7 @@ class OrganizationDomainRepositoryTest extends BaseDomainRepositoryTest {
             organizationTemplateEntityGenerator.generate(organization, "템플릿1", Language.KO_KR);
 
             organizationDomainRepository.update(organization.getId(),
-                    new Organization("한앎", "한양대", "/icon.png", Language.US_EN, OrganizationCategory.CLASSIC));
+                    new Organization("한앎", "한양대", "/icon.png", Language.US_EN, OrganizationCategory.GLOBAL));
 
             List<Organization> englishOrganizations = organizationDomainRepository.findAllByLanguage(Language.US_EN);
             assertAll(
