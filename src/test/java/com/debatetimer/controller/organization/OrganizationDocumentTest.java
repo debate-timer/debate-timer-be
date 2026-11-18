@@ -58,6 +58,9 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                     new OrganizationResponse("한모름", OrganizationCategory.TOURNAMENT, "양한대", "/icons/icon2.png", List.of(
                             new OrganizationTemplateResponse("템플릿1", DEFAULT_TEMPLATE_CONTENT),
                             new OrganizationTemplateResponse("템플릿2", DEFAULT_TEMPLATE_CONTENT)
+                    )),
+                    new OrganizationResponse("WUDC", OrganizationCategory.GLOBAL, "World Universities", "/icons/icon3.png", List.of(
+                            new OrganizationTemplateResponse("Template1", DEFAULT_TEMPLATE_CONTENT)
                     ))
             ));
             doReturn(response).when(organizationService).findAll(any());
