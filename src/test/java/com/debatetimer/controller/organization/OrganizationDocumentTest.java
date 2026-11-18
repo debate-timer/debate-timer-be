@@ -38,7 +38,7 @@ public class OrganizationDocumentTest extends BaseDocumentTest {
                         fieldWithPath("organizations").type(ARRAY).description("기관 정보"),
                         fieldWithPath("organizations[].organization").type(STRING).description("기관 명"),
                         fieldWithPath("organizations[].category").type(STRING)
-                                .description("기관 분류 (CLASSIC: 일반 | DEBATE_CLUB: 조직 및 동아리 | TOURNAMENT: 대회)"),
+                                .description("기관 분류 (GLOBAL: 일반 | DEBATE_CLUB: 조직 및 동아리 | TOURNAMENT: 대회)"),
                         fieldWithPath("organizations[].affiliation").type(STRING).description("소속"),
                         fieldWithPath("organizations[].iconPath").type(STRING).description("아이콘 경로 (해당 경로로 서버 요청)"),
                         fieldWithPath("organizations[].templates").type(ARRAY).description("기관 템플릿 목록"),

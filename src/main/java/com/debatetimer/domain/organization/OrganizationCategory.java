@@ -1,7 +1,7 @@
 package com.debatetimer.domain.organization;
 
 public enum OrganizationCategory {
-    CLASSIC,
+    GLOBAL,
     DEBATE_CLUB,
     TOURNAMENT,
     ;

@@ -22,7 +22,7 @@ public class OrganizationEntityGenerator {
     }
 
     public OrganizationEntity generate(String name, String affiliation, Language language) {
-        return generate(name, affiliation, language, OrganizationCategory.CLASSIC);
+        return generate(name, affiliation, language, OrganizationCategory.GLOBAL);
     }
 
     public OrganizationEntity generate(String name,
