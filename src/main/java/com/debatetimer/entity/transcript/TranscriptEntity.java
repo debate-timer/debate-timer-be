@@ -140,9 +140,11 @@ public class TranscriptEntity extends BaseTimeEntity {
         this.status = TranscriptStatus.DONE;
     }
 
+    // 실패한 속기록은 더 다듬지 않으므로 다듬는 중 표시도 끈다. 다기기 녹음의 생성 중 속기록이 실패하면 목록에 생성 중으로 남지 않게 한다.
     public void fail(String errorMessage) {
         this.errorMessage = truncate(errorMessage);
         this.status = TranscriptStatus.FAILED;
+        this.refining = false;
     }
 
     public void unshare() {

@@ -170,6 +170,7 @@ class RecordingFinalizerV2Test extends BaseServiceTest {
         assertAll(
                 () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.FAILED),
                 () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.FAILED),
+                () -> assertThat(transcript.refining()).isFalse(),
                 () -> assertThat(transcript.errorMessage()).isEqualTo("전사된 발언이 없습니다.")
         );
     }
