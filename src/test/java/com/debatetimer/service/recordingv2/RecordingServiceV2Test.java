@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
@@ -35,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestPropertySource(properties = {
         "recording-v2.enabled=true",
@@ -57,6 +60,9 @@ class RecordingServiceV2Test extends BaseServiceTest {
 
     @Autowired
     private TranscriptDomainRepository transcriptDomainRepository;
+
+    @MockitoSpyBean
+    private TranscriptAssemblerV2 transcriptAssembler;
 
     // 주기 작업이 테스트 중에 턴을 닫아 전사로 넘기지 않게 막는다
     @MockitoBean
@@ -262,6 +268,22 @@ class RecordingServiceV2Test extends BaseServiceTest {
             assertThat(recordingV2DomainRepository.getSession(created.sessionKey()).transcriptId())
                     .isEqualTo(transcriptId);
             assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1);
+            registry.remove(created.sessionKey());
+        }
+
+        @Test
+        void 생성_중_속기록을_만들지_못해도_세션은_끝내고_마무리에서_속기록을_만든다() {
+            RecordingSessionCreateResponseV2 created = create();
+            doThrow(new IllegalStateException("저장 실패")).when(transcriptAssembler).preparePending(any());
+
+            assertThatCode(() -> recordingServiceV2.finish(member, created.sessionKey()))
+                    .doesNotThrowAnyException();
+
+            RecordingSessionV2 session = recordingV2DomainRepository.getSession(created.sessionKey());
+            assertAll(
+                    () -> assertThat(session.status()).isEqualTo(RecordingSessionStatusV2.FINISHING),
+                    () -> assertThat(session.transcriptId()).isNull()
+            );
             registry.remove(created.sessionKey());
         }
 

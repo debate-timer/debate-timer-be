@@ -151,7 +151,7 @@ class RecordingFinalizerV2Test extends BaseServiceTest {
                 () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.PROCESSING),
                 () -> assertThat(transcript.lines()).extracting(line -> line.text())
                         .containsExactly("발언입니다."),
-                () -> assertThat(transcript.originalLines()).extracting(line -> line.text())
+                () -> assertThat(transcript.rawLines()).extracting(line -> line.text())
                         .containsExactly("발언입니다."),
                 () -> assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1)
         );
@@ -171,6 +171,35 @@ class RecordingFinalizerV2Test extends BaseServiceTest {
                 () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.FAILED),
                 () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.FAILED),
                 () -> assertThat(transcript.errorMessage()).isEqualTo("전사된 발언이 없습니다.")
+        );
+    }
+
+    @Test
+    void 이미_속기록이_연결된_세션에는_생성_중_속기록을_더_만들지_않는다() {
+        RecordingSessionV2 session = finishedSessionWithPendingTranscript(LocalDateTime.now().minusMinutes(1));
+
+        transcriptAssembler.preparePending(session);
+
+        assertAll(
+                () -> assertThat(recordingV2DomainRepository.getSession(session.id()).transcriptId())
+                        .isEqualTo(session.transcriptId()),
+                () -> assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1)
+        );
+    }
+
+    @Test
+    void 마무리가_먼저_끝난_세션에는_생성_중_속기록을_만들지_않는다() {
+        RecordingSessionV2 session = finishedSession(LocalDateTime.now().minusMinutes(1));
+        completeTurn(session, "0-1", 0, 0L, new Utterance(0, "발언입니다."));
+        finalizer.finalizeReadySessions();
+        Long completedTranscriptId = recordingV2DomainRepository.getSession(session.id()).transcriptId();
+
+        transcriptAssembler.preparePending(session);
+
+        assertAll(
+                () -> assertThat(recordingV2DomainRepository.getSession(session.id()).transcriptId())
+                        .isEqualTo(completedTranscriptId),
+                () -> assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1)
         );
     }
 

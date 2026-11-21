@@ -1,5 +1,7 @@
 package com.debatetimer.service.recordingv2;
 
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.runQuietly;
+
 import com.debatetimer.client.recordingv2.AudioSpoolV2;
 import com.debatetimer.config.recordingv2.RecordingV2Properties;
 import com.debatetimer.domain.member.Member;
@@ -27,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 다기기 녹음 V2. 사회자가 녹음 세션을 열면 청중 기기도 참가 코드로 참가해 같은 턴을 녹음해 올린다.
@@ -143,15 +144,15 @@ public class RecordingServiceV2 {
     /**
      * 사회자가 토론을 끝낸다. 청중 기기의 마지막 턴 업로드가 늦게 도착할 수 있어 수집 창 시간만큼은 업로드를 더 받고,
      * 그 뒤 남은 턴이 모두 처리되면 속기록을 채운다. 끝내는 즉시 생성 중인 빈 속기록을 만들어 목록에 보이게 한다.
+     * 생성 중 속기록은 목록 표시를 위한 것이라 만들지 못해도 세션은 끝내고, 마무리에서 속기록을 새로 만든다.
      * 이미 끝냈거나 취소한 세션이면 그대로 둔다.
      */
-    @Transactional
     public void finish(Member member, String sessionKey) {
         validateEnabled();
         RecordingSessionV2 session = getOwnedSession(member, sessionKey);
         if (session.status().isRecording()
                 && recordingV2DomainRepository.finishSession(session.id(), LocalDateTime.now(clock))) {
-            transcriptAssembler.preparePending(session);
+            runQuietly("생성 중 속기록 준비", session.sessionKey(), () -> transcriptAssembler.preparePending(session));
         }
     }
 

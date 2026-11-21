@@ -2,6 +2,7 @@ package com.debatetimer.service.recordingv2;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnV2;
@@ -40,9 +41,14 @@ public class TranscriptAssemblerV2 {
     /**
      * 사회자가 토론을 끝낼 때 생성 중인 빈 속기록을 먼저 만들어 세션에 연결한다.
      * 턴 처리를 기다리는 동안에도 토론 기록 목록에 이번 토론이 생성 중으로 보이게 한다.
+     * 마무리 중이 아니거나 이미 속기록이 연결된 세션이면 만들지 않는다.
      */
     @Transactional
     public void preparePending(RecordingSessionV2 session) {
+        RecordingSessionV2 current = recordingV2DomainRepository.getSession(session.id());
+        if (current.status() != RecordingSessionStatusV2.FINISHING || current.transcriptId() != null) {
+            return;
+        }
         CustomizeTable table = customizeTableDomainRepository.getById(session.tableId());
         Transcript transcript = transcriptDomainRepository.create(table.getId(), session.memberId(),
                 TranscriptTableSnapshot.from(table), SttMode.SONIOX, List.of());
