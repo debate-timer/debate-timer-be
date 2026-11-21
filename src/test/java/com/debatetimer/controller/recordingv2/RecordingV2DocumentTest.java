@@ -274,7 +274,8 @@ public class RecordingV2DocumentTest extends BaseDocumentTest {
                 .summary(featureFlagSummary(FeatureFlag.MULTI_DEVICE_RECORDING, "다기기 녹음 세션 상태 조회"))
                 .description(featureFlagDescription(FeatureFlag.MULTI_DEVICE_RECORDING) + """
                         사회자가 녹음 세션과 턴별 처리 상태를 조회합니다. 끝낸 뒤 이 API를 폴링하다가 status가 COMPLETED가 되면
-                        transcriptId로 기존 속기록 조회 API를 호출합니다.
+                        transcriptId로 기존 속기록 조회 API를 호출합니다. transcriptId는 끝낸 직후(FINISHING)부터 채워지지만,
+                        그때 속기록은 발언이 없는 생성 중 상태입니다.
 
                         ### 세션 상태
                         | 상태 | 설명 |
@@ -296,7 +297,7 @@ public class RecordingV2DocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("sessionKey").type(STRING).description("녹음 세션 식별자"),
                         fieldWithPath("status").type(STRING).description("세션 상태"),
-                        fieldWithPath("transcriptId").type(NUMBER).optional().description("만든 속기록 ID"),
+                        fieldWithPath("transcriptId").type(NUMBER).optional().description("속기록 ID. 끝낸 직후부터 채워지며 COMPLETED 전에는 생성 중"),
                         fieldWithPath("errorMessage").type(STRING).optional().description("실패 사유"),
                         fieldWithPath("turns").type(ARRAY).description("마감된 턴 목록"),
                         fieldWithPath("turns[].turnKey").type(STRING).description("턴 식별자"),
@@ -338,8 +339,10 @@ public class RecordingV2DocumentTest extends BaseDocumentTest {
                 .tag(Tag.RECORDING_V2_API)
                 .summary(featureFlagSummary(FeatureFlag.MULTI_DEVICE_RECORDING, "다기기 녹음 종료"))
                 .description(featureFlagDescription(FeatureFlag.MULTI_DEVICE_RECORDING) + """
-                        사회자가 토론을 끝냅니다. 청중 기기의 마지막 턴이 늦게 도착할 수 있어 20초 동안은 업로드를 더 받고,
-                        남은 턴 처리가 모두 끝나면 서버가 속기록을 만듭니다. 이미 끝낸 세션이면 그대로 202를 응답합니다.
+                        사회자가 토론을 끝냅니다. 끝내는 즉시 생성 중(PROCESSING)인 빈 속기록을 만들어 토론 기록 목록에 보이게 합니다.
+                        청중 기기의 마지막 턴이 늦게 도착할 수 있어 20초 동안은 업로드를 더 받고,
+                        남은 턴 처리가 모두 끝나면 그 속기록에 발언을 채웁니다. 전사된 발언이 없으면 속기록을 실패(FAILED)로 남깁니다.
+                        이미 끝냈거나 취소한 세션이면 그대로 202를 응답합니다.
                         """)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")

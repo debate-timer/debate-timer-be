@@ -2,6 +2,7 @@ package com.debatetimer.service.recordingv2;
 
 import com.debatetimer.domain.customize.CustomizeTable;
 import com.debatetimer.domain.customize.CustomizeTimeBox;
+import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnV2;
@@ -38,7 +39,26 @@ public class TranscriptAssemblerV2 {
     private final SpeakerSeparator speakerSeparator = new SpeakerSeparator();
 
     /**
-     * @return 만든 속기록 ID. 전사된 발언이 없으면 비어 있다.
+     * 사회자가 토론을 끝낼 때 생성 중인 빈 속기록을 먼저 만들어 세션에 연결한다.
+     * 턴 처리를 기다리는 동안에도 토론 기록 목록에 이번 토론이 생성 중으로 보이게 한다.
+     * 마무리 중이 아니거나 이미 속기록이 연결된 세션이면 만들지 않는다.
+     */
+    @Transactional
+    public void preparePending(RecordingSessionV2 session) {
+        RecordingSessionV2 current = recordingV2DomainRepository.getSession(session.id());
+        if (current.status() != RecordingSessionStatusV2.FINISHING || current.transcriptId() != null) {
+            return;
+        }
+        CustomizeTable table = customizeTableDomainRepository.getById(session.tableId());
+        Transcript transcript = transcriptDomainRepository.create(table.getId(), session.memberId(),
+                TranscriptTableSnapshot.from(table), SttMode.SONIOX, List.of());
+        recordingV2DomainRepository.linkTranscript(session.id(), transcript.id());
+    }
+
+    /**
+     * 끝낼 때 만든 속기록이 있으면 발언을 채우고, 없으면(재시작 복구로 끝낸 세션 등) 새로 만든다.
+     *
+     * @return 속기록 ID. 전사된 발언이 없으면 비어 있다.
      */
     @Transactional
     public Optional<Long> assemble(RecordingSessionV2 session, List<RecordingTurnV2> turns) {
@@ -49,11 +69,30 @@ public class TranscriptAssemblerV2 {
             return Optional.empty();
         }
 
-        Transcript transcript = transcriptDomainRepository.create(table.getId(), session.memberId(),
-                TranscriptTableSnapshot.from(table), SttMode.SONIOX, lines);
-        recordingV2DomainRepository.completeSession(session.id(), transcript.id());
-        eventPublisher.publishEvent(new TranscriptCreatedEvent(transcript.id()));
-        return Optional.of(transcript.id());
+        long transcriptId = fillOrCreate(session, table, lines);
+        recordingV2DomainRepository.completeSession(session.id(), transcriptId);
+        eventPublisher.publishEvent(new TranscriptCreatedEvent(transcriptId));
+        return Optional.of(transcriptId);
+    }
+
+    /**
+     * 세션을 실패로 기록한다. 끝낼 때 만든 속기록이 있으면 함께 실패로 남겨 목록에 생성 중으로 남지 않게 한다.
+     */
+    @Transactional
+    public void fail(RecordingSessionV2 session, String errorMessage) {
+        recordingV2DomainRepository.failSession(session.id(), errorMessage);
+        if (session.transcriptId() != null) {
+            transcriptDomainRepository.fail(session.transcriptId(), errorMessage);
+        }
+    }
+
+    private long fillOrCreate(RecordingSessionV2 session, CustomizeTable table, List<TranscriptLine> lines) {
+        if (session.transcriptId() != null) {
+            transcriptDomainRepository.fillLines(session.transcriptId(), lines);
+            return session.transcriptId();
+        }
+        return transcriptDomainRepository.create(table.getId(), session.memberId(),
+                TranscriptTableSnapshot.from(table), SttMode.SONIOX, lines).id();
     }
 
     /**

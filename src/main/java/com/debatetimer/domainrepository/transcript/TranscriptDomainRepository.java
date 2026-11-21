@@ -70,6 +70,11 @@ public class TranscriptDomainRepository {
     }
 
     @Transactional
+    public void fillLines(long id, List<TranscriptLine> lines) {
+        transcriptRepository.getById(id).fillLines(writeLines(lines));
+    }
+
+    @Transactional
     public void refine(long id, List<TranscriptLine> refinedLines) {
         transcriptRepository.getById(id).refine(writeLines(refinedLines));
     }

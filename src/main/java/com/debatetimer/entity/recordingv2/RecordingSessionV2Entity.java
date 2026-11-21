@@ -68,6 +68,11 @@ public class RecordingSessionV2Entity extends BaseTimeEntity {
         this.status = RecordingSessionStatusV2.RECORDING;
     }
 
+    // 끝낼 때 만든 생성 중 속기록을 연결한다. 상태는 마무리 중 그대로 둔다.
+    public void linkTranscript(long transcriptId) {
+        this.transcriptId = transcriptId;
+    }
+
     public void complete(long transcriptId) {
         this.status = RecordingSessionStatusV2.COMPLETED;
         this.transcriptId = transcriptId;
