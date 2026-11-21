@@ -10,6 +10,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * 사회자가 폴링하는 녹음 세션 상태. COMPLETED가 되면 transcriptId로 기존 속기록 API를 조회한다.
+ * transcriptId는 끝낸 직후부터 채워지지만 COMPLETED 전에는 발언이 없는 생성 중 속기록이다.
  */
 public record RecordingSessionResponseV2(
         String sessionKey,

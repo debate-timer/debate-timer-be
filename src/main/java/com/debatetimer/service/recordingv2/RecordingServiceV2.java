@@ -1,5 +1,7 @@
 package com.debatetimer.service.recordingv2;
 
+import static com.debatetimer.service.recordingv2.RecordingTasksV2.runQuietly;
+
 import com.debatetimer.client.recordingv2.AudioSpoolV2;
 import com.debatetimer.config.recordingv2.RecordingV2Properties;
 import com.debatetimer.domain.member.Member;
@@ -44,6 +46,7 @@ public class RecordingServiceV2 {
     private final RecordingV2DomainRepository recordingV2DomainRepository;
     private final RecordingSessionRegistryV2 registry;
     private final AudioSpoolV2 audioSpool;
+    private final TranscriptAssemblerV2 transcriptAssembler;
     private final Clock clock;
 
     @Autowired
@@ -52,10 +55,11 @@ public class RecordingServiceV2 {
             CustomizeTableDomainRepository customizeTableDomainRepository,
             RecordingV2DomainRepository recordingV2DomainRepository,
             RecordingSessionRegistryV2 registry,
-            AudioSpoolV2 audioSpool
+            AudioSpoolV2 audioSpool,
+            TranscriptAssemblerV2 transcriptAssembler
     ) {
         this(properties, customizeTableDomainRepository, recordingV2DomainRepository, registry, audioSpool,
-                Clock.systemDefaultZone());
+                transcriptAssembler, Clock.systemDefaultZone());
     }
 
     RecordingServiceV2(
@@ -64,6 +68,7 @@ public class RecordingServiceV2 {
             RecordingV2DomainRepository recordingV2DomainRepository,
             RecordingSessionRegistryV2 registry,
             AudioSpoolV2 audioSpool,
+            TranscriptAssemblerV2 transcriptAssembler,
             Clock clock
     ) {
         this.properties = properties;
@@ -71,6 +76,7 @@ public class RecordingServiceV2 {
         this.recordingV2DomainRepository = recordingV2DomainRepository;
         this.registry = registry;
         this.audioSpool = audioSpool;
+        this.transcriptAssembler = transcriptAssembler;
         this.clock = clock;
     }
 
@@ -137,13 +143,16 @@ public class RecordingServiceV2 {
 
     /**
      * 사회자가 토론을 끝낸다. 청중 기기의 마지막 턴 업로드가 늦게 도착할 수 있어 수집 창 시간만큼은 업로드를 더 받고,
-     * 그 뒤 남은 턴이 모두 처리되면 속기록을 만든다. 이미 끝낸 세션이면 그대로 둔다.
+     * 그 뒤 남은 턴이 모두 처리되면 속기록을 채운다. 끝내는 즉시 생성 중인 빈 속기록을 만들어 목록에 보이게 한다.
+     * 생성 중 속기록은 목록 표시를 위한 것이라 만들지 못해도 세션은 끝내고, 마무리에서 속기록을 새로 만든다.
+     * 이미 끝냈거나 취소한 세션이면 그대로 둔다.
      */
     public void finish(Member member, String sessionKey) {
         validateEnabled();
         RecordingSessionV2 session = getOwnedSession(member, sessionKey);
-        if (session.status().isRecording()) {
-            recordingV2DomainRepository.finishSession(session.id(), LocalDateTime.now(clock));
+        if (session.status().isRecording()
+                && recordingV2DomainRepository.finishSession(session.id(), LocalDateTime.now(clock))) {
+            runQuietly("생성 중 속기록 준비", session.sessionKey(), () -> transcriptAssembler.preparePending(session));
         }
     }
 

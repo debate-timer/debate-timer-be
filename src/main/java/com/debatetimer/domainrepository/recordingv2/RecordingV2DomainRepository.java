@@ -92,6 +92,11 @@ public class RecordingV2DomainRepository {
     }
 
     @Transactional
+    public void linkTranscript(long id, long transcriptId) {
+        sessionRepository.getById(id).linkTranscript(transcriptId);
+    }
+
+    @Transactional
     public void completeSession(long id, long transcriptId) {
         sessionRepository.getById(id).complete(transcriptId);
     }

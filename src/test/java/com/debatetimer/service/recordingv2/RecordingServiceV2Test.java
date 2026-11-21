@@ -4,13 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 
 import com.debatetimer.domain.customize.CustomizeBoxType;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.recordingv2.ClosedTurnV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionStatusV2;
 import com.debatetimer.domain.recordingv2.RecordingSessionV2;
+import com.debatetimer.domain.transcript.Transcript;
+import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.domainrepository.recordingv2.RecordingV2DomainRepository;
+import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
 import com.debatetimer.dto.recordingv2.request.RecordingJoinRequestV2;
 import com.debatetimer.dto.recordingv2.request.RecordingSessionCreateRequestV2;
 import com.debatetimer.dto.recordingv2.request.RecordingTurnUploadRequestV2;
@@ -32,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestPropertySource(properties = {
         "recording-v2.enabled=true",
@@ -51,6 +57,12 @@ class RecordingServiceV2Test extends BaseServiceTest {
 
     @Autowired
     private RecordingV2DomainRepository recordingV2DomainRepository;
+
+    @Autowired
+    private TranscriptDomainRepository transcriptDomainRepository;
+
+    @MockitoSpyBean
+    private TranscriptAssemblerV2 transcriptAssembler;
 
     // 주기 작업이 테스트 중에 턴을 닫아 전사로 넘기지 않게 막는다
     @MockitoBean
@@ -221,6 +233,72 @@ class RecordingServiceV2Test extends BaseServiceTest {
                     UPLOAD, audio()))
                     .isInstanceOf(DTClientErrorException.class)
                     .hasMessage(ClientErrorCode.RECORDING_SESSION_CLOSED.getMessage());
+        }
+    }
+
+    @Nested
+    class Finish {
+
+        @Test
+        void 끝내면_생성_중인_빈_속기록을_먼저_만들어_세션에_연결한다() {
+            RecordingSessionCreateResponseV2 created = create();
+
+            recordingServiceV2.finish(member, created.sessionKey());
+
+            RecordingSessionV2 session = recordingV2DomainRepository.getSession(created.sessionKey());
+            Transcript transcript = transcriptDomainRepository.getById(session.transcriptId());
+            assertAll(
+                    () -> assertThat(session.status()).isEqualTo(RecordingSessionStatusV2.FINISHING),
+                    () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.PROCESSING),
+                    () -> assertThat(transcript.memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(transcript.tableId()).isEqualTo(table.getId()),
+                    () -> assertThat(transcript.lines()).isEmpty()
+            );
+            registry.remove(created.sessionKey());
+        }
+
+        @Test
+        void 이미_끝낸_세션을_다시_끝내도_속기록을_더_만들지_않는다() {
+            RecordingSessionCreateResponseV2 created = create();
+            recordingServiceV2.finish(member, created.sessionKey());
+            Long transcriptId = recordingV2DomainRepository.getSession(created.sessionKey()).transcriptId();
+
+            recordingServiceV2.finish(member, created.sessionKey());
+
+            assertThat(recordingV2DomainRepository.getSession(created.sessionKey()).transcriptId())
+                    .isEqualTo(transcriptId);
+            assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1);
+            registry.remove(created.sessionKey());
+        }
+
+        @Test
+        void 생성_중_속기록을_만들지_못해도_세션은_끝내고_마무리에서_속기록을_만든다() {
+            RecordingSessionCreateResponseV2 created = create();
+            doThrow(new IllegalStateException("저장 실패")).when(transcriptAssembler).preparePending(any());
+
+            assertThatCode(() -> recordingServiceV2.finish(member, created.sessionKey()))
+                    .doesNotThrowAnyException();
+
+            RecordingSessionV2 session = recordingV2DomainRepository.getSession(created.sessionKey());
+            assertAll(
+                    () -> assertThat(session.status()).isEqualTo(RecordingSessionStatusV2.FINISHING),
+                    () -> assertThat(session.transcriptId()).isNull()
+            );
+            registry.remove(created.sessionKey());
+        }
+
+        @Test
+        void 취소한_세션을_끝내도_속기록을_만들지_않는다() {
+            RecordingSessionCreateResponseV2 created = create();
+            recordingServiceV2.cancel(member, created.sessionKey());
+
+            recordingServiceV2.finish(member, created.sessionKey());
+
+            assertAll(
+                    () -> assertThat(recordingV2DomainRepository.getSession(created.sessionKey()).transcriptId())
+                            .isNull(),
+                    () -> assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).isEmpty()
+            );
         }
     }
 
