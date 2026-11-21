@@ -2,6 +2,7 @@ package com.debatetimer.domain.member;
 
 import com.debatetimer.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,16 +27,29 @@ public class Member extends BaseTimeEntity {
     @NotNull
     private String email;
 
+    @Embedded
+    private MemberSettings settings;
+
     public Member(long id, String email) {
         this.id = id;
         this.email = email;
+        this.settings = MemberSettings.defaults(Language.KO_KR);
     }
 
     public Member(String email) {
+        this(email, Language.KO_KR);
+    }
+
+    public Member(String email, Language language) {
         this.email = email;
+        this.settings = MemberSettings.defaults(language);
     }
 
     public boolean isSameMember(String email) {
         return this.email.equals(email);
+    }
+
+    public void updateSettings(Language language, Double volume) {
+        this.settings = settings.update(language, volume);
     }
 }

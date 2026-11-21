@@ -13,6 +13,7 @@ import com.debatetimer.domain.member.Member;
 import com.debatetimer.domain.sharing.ChairmanNoticeType;
 import com.debatetimer.domain.sharing.TimerEventType;
 import com.debatetimer.dto.sharing.request.ChairmanSharingRequest;
+import com.debatetimer.dto.sharing.request.RecordingJoinRequest;
 import com.debatetimer.dto.sharing.request.SharingRequest;
 import com.debatetimer.dto.sharing.request.TimerEventInfoRequest;
 import com.debatetimer.dto.sharing.response.SharingResponse;
@@ -321,6 +322,149 @@ class SharingWebSocketControllerTest extends BaseStompTest {
                     () -> assertThat(handler.poll(3L).version()).isEqualTo(300L),
                     () -> assertThat(sharingRoomRegistry.isFinished(ROOM_ID)).isFalse()
             );
+        }
+    }
+
+    @Nested
+    class ShareAbort {
+
+        @Test
+        void 사회자가_발생시킨_공유_중단_이벤트를_청중이_공유받고_룸이_중단_상태가_된다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 1758500001000L, null));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.version()).isEqualTo(1758500001000L),
+                    () -> assertThat(response.serverTime()).isNotNull(),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+
+        @Test
+        void 버전이_없는_공유_중단_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, null, null));
+
+            assertAll(
+                    () -> assertThat(handler.poll(2L)).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isFalse()
+            );
+        }
+
+        @Test
+        void 공유가_중단된_뒤_사회자가_보낸_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 100L, null));
+            stompSession.send(headers, normalEvent(TimerEventType.SYNC, 200L));
+
+            assertAll(
+                    () -> assertThat(handler.poll(3L).eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(handler.poll(2L)).isNull(),
+                    () -> assertThat(sharingRoomRegistry.isAborted(ROOM_ID)).isTrue()
+            );
+        }
+    }
+
+    @Nested
+    class ShareRecordingOpened {
+
+        @Test
+        void 사회자가_보낸_녹음_참여_이벤트를_참가_정보와_함께_청중이_공유받는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.RECORDING_OPENED, 1758500002000L, null,
+                    new RecordingJoinRequest("session-1", "join-code")));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.RECORDING_OPENED),
+                    () -> assertThat(response.version()).isEqualTo(1758500002000L),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> assertThat(response.recording().sessionKey()).isEqualTo("session-1"),
+                    () -> assertThat(response.recording().joinCode()).isEqualTo("join-code")
+            );
+        }
+
+        @Test
+        void 녹음_참여가_아닌_이벤트에_참가_정보를_실어도_청중에게는_전달하지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 1758500003000L, null,
+                    new RecordingJoinRequest("session-1", "join-code")));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(response.recording()).isNull()
+            );
+        }
+
+        @Test
+        void 참가_정보가_없는_녹음_참여_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.RECORDING_OPENED, 1758500002000L, null));
+
+            assertThat(handler.poll(2L)).isNull();
+        }
+    }
+
+    @Nested
+    class ShareRecordingClosed {
+
+        @Test
+        void 사회자가_보낸_녹음_종료_이벤트를_참가_정보와_함께_청중이_공유받는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.RECORDING_CLOSED, 1758500002000L, null,
+                    new RecordingJoinRequest("session-1", "join-code")));
+
+            SharingResponse response = handler.poll(3L);
+            assertAll(
+                    () -> assertThat(response.eventType()).isEqualTo(TimerEventType.RECORDING_CLOSED),
+                    () -> assertThat(response.version()).isEqualTo(1758500002000L),
+                    () -> assertThat(response.data()).isNull(),
+                    () -> assertThat(response.recording().sessionKey()).isEqualTo("session-1")
+            );
+        }
+
+        @Test
+        void 참가_정보가_없는_녹음_종료_이벤트는_청중에게_공유되지_않는다() throws InterruptedException {
+            QueueFrameHandler<SharingResponse> handler = new QueueFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            stompSession.subscribe("/room/" + ROOM_ID, handler);
+
+            stompSession.send(headers, new SharingRequest(TimerEventType.RECORDING_CLOSED, 1758500002000L, null));
+
+            assertThat(handler.poll(2L)).isNull();
         }
     }
 

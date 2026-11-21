@@ -4,6 +4,7 @@ import com.debatetimer.domain.customize.Agenda;
 import com.debatetimer.domain.customize.Bell;
 import com.debatetimer.domain.customize.TableName;
 import com.debatetimer.domain.customize.TeamName;
+import com.debatetimer.domain.member.MemberSettings;
 import com.debatetimer.domain.organization.OrganizationIcon;
 import com.debatetimer.domain.stats.StatPeriod;
 import com.debatetimer.entity.customize.CustomizeTimeBoxEntity;
@@ -68,11 +69,23 @@ public enum ClientErrorCode implements ResponseErrorCode {
     EMPTY_TRANSCRIPT(HttpStatus.BAD_REQUEST, "기록된 발언이 없습니다."),
     EMPTY_AUDIO(HttpStatus.BAD_REQUEST, "전사할 오디오가 비어 있습니다."),
     STT_TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "음성 인식 요청이 많습니다. 잠시 후 다시 시도해 주세요."),
+    RECORDING_V2_DISABLED(HttpStatus.NOT_FOUND, "사용할 수 없는 기능입니다."),
+    RECORDING_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "녹음 세션을 찾을 수 없습니다."),
+    RECORDING_SESSION_CLOSED(HttpStatus.CONFLICT, "이미 끝난 녹음 세션입니다."),
+    INVALID_RECORDING_JOIN_CODE(HttpStatus.FORBIDDEN, "녹음 참가 코드가 올바르지 않습니다."),
+    INVALID_RECORDING_DEVICE(HttpStatus.FORBIDDEN, "녹음에 참가한 기기가 아닙니다."),
+    RECORDING_DEVICE_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "녹음에 참가할 수 있는 기기 수를 넘었습니다."),
+    INVALID_RECORDING_TURN(HttpStatus.BAD_REQUEST, "잘못된 녹음 턴 정보입니다."),
+    RECORDING_TURN_CLOSED(HttpStatus.CONFLICT, "이미 마감된 녹음 턴입니다."),
+    RECORDING_BUSY(HttpStatus.TOO_MANY_REQUESTS, "녹음 업로드가 많습니다. 잠시 후 다시 시도해 주세요."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
     FEATURE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "사용 권한이 없는 기능입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 기한이 만료되었습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다"),
+    EMPTY_MEMBER_SETTINGS(HttpStatus.BAD_REQUEST, "변경할 설정 값이 없습니다"),
+    INVALID_MEMBER_VOLUME(HttpStatus.BAD_REQUEST, "음량은 %.0f 이상 %.0f 이하여야 합니다"
+            .formatted(MemberSettings.MIN_VOLUME, MemberSettings.MAX_VOLUME)),
     ORGANIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 단체가 존재하지 않습니다"),
     INVALID_ICON_FILE(HttpStatus.BAD_REQUEST, "아이콘은 PNG, JPEG, WEBP 이미지만 %dMB 이하로 업로드할 수 있습니다"
             .formatted(OrganizationIcon.MAX_SIZE_BYTES / 1024 / 1024)),
@@ -101,6 +114,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     INVALID_TIME_BASED_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 자유토론 타이머 이벤트 데이터입니다"),
     INVALID_TIMER_EVENT(HttpStatus.BAD_REQUEST, "잘못된 타이머 이벤트 데이터입니다"),
     INVALID_SYNC_TIMER_EVENT_DATA(HttpStatus.BAD_REQUEST, "잘못된 동기화 타이머 이벤트 데이터입니다"),
+    VERSION_REQUIRED_TIMER_EVENT(HttpStatus.BAD_REQUEST, "버전이 필요한 타이머 이벤트입니다"),
 
     INVALID_ADMIN_PASSWORD(HttpStatus.UNAUTHORIZED, "어드민 비밀번호가 올바르지 않습니다"),
     INVALID_STATS_PERIOD(HttpStatus.BAD_REQUEST, "조회 기간은 시작일이 종료일보다 늦을 수 없고, 최대 %d일까지 조회할 수 있습니다"

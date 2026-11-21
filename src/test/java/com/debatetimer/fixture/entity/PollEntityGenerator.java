@@ -17,6 +17,10 @@ public class PollEntityGenerator {
     }
 
     public PollEntity generate(CustomizeTableEntity customizeTableEntity, PollStatus status) {
+        return generate(customizeTableEntity, status, "주제");
+    }
+
+    public PollEntity generate(CustomizeTableEntity customizeTableEntity, PollStatus status, String agenda) {
         Poll poll = new Poll(
                 null,
                 customizeTableEntity.getId(),
@@ -24,7 +28,7 @@ public class PollEntityGenerator {
                 status,
                 "찬성",
                 "반대",
-                "주제"
+                agenda
         );
         return pollRepository.save(new PollEntity(poll));
     }

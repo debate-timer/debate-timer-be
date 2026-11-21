@@ -19,6 +19,8 @@ import com.debatetimer.service.BaseServiceTest;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class VoteServiceTest extends BaseServiceTest {
@@ -116,6 +118,52 @@ class VoteServiceTest extends BaseServiceTest {
                     () -> assertThat(response.prosCount()).isEqualTo(2L),
                     () -> assertThat(response.consCount()).isEqualTo(1L)
             );
+        }
+
+        @ParameterizedTest
+        @EnumSource(PollStatus.class)
+        void 투표자가_선거정보와_함께_시간표_정보를_조회할_수_있다(PollStatus status) {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, status);
+
+            VoterPollInfoResponse response = voteService.getVoterPollInfo(pollEntity.getId());
+
+            assertAll(
+                    () -> assertThat(response.tableInfo().id()).isEqualTo(table.getId()),
+                    () -> assertThat(response.tableInfo().name()).isEqualTo(table.getName()),
+                    () -> assertThat(response.tableInfo().agenda()).isEqualTo(pollEntity.getAgenda())
+            );
+        }
+
+        @Test
+        void 토론_주제는_선거_생성_시점의_값을_사용한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS, "선거 생성 시점 주제");
+
+            VoterPollInfoResponse response = voteService.getVoterPollInfo(pollEntity.getId());
+
+            assertThat(response.tableInfo().agenda()).isEqualTo("선거 생성 시점 주제");
+        }
+
+        @Test
+        void 시간표가_삭제된_선거는_조회할_수_없다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            customizeTableRepository.delete(table);
+
+            assertThatThrownBy(() -> voteService.getVoterPollInfo(pollEntity.getId()))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.TABLE_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_선거는_조회할_수_없다() {
+            assertThatThrownBy(() -> voteService.getVoterPollInfo(0L))
+                    .isInstanceOf(DTClientErrorException.class)
+                    .hasMessage(ClientErrorCode.POLL_NOT_FOUND.getMessage());
         }
     }
 }

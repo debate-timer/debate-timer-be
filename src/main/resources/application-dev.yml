@@ -59,6 +59,10 @@ stt-audio:
   access-key: ${secret.stt_audio.access_key:}
   secret-key: ${secret.stt_audio.secret_key:}
 
+# 다기기 녹음 V2. 사용 대상은 MULTI_DEVICE_RECORDING 기능 플래그로 제한한다. 전사는 soniox, 고른 녹음 보관은 stt-audio 설정을 함께 쓴다
+recording-v2:
+  enabled: true
+
 admin:
   password: ${secret.admin.password}
 

@@ -3,6 +3,7 @@ package com.debatetimer.service.sharing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.debatetimer.domain.sharing.TimerEventType;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -74,7 +75,96 @@ class SharingRoomRegistryTest {
     }
 
     @Nested
+    class IsAborted {
+
+        @Test
+        void 중단_처리된_룸은_중단_상태이고_종료_상태는_아니다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            assertAll(
+                    () -> assertThat(sharingRoomRegistry.isAborted(1L)).isTrue(),
+                    () -> assertThat(sharingRoomRegistry.isFinished(1L)).isFalse()
+            );
+        }
+
+        @Test
+        void 종료_처리된_룸은_중단_상태가_아니다() {
+            sharingRoomRegistry.markFinished(1L);
+
+            assertThat(sharingRoomRegistry.isAborted(1L)).isFalse();
+        }
+
+        @Test
+        void 종료_유지_시간_직전까지는_중단_상태이다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            clock.advance(SharingRoomRegistry.FINISHED_TTL.minusSeconds(1));
+
+            assertThat(sharingRoomRegistry.isAborted(1L)).isTrue();
+        }
+
+        @Test
+        void 종료_유지_시간이_지나면_중단_상태가_아니다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            clock.advance(SharingRoomRegistry.FINISHED_TTL);
+
+            assertThat(sharingRoomRegistry.isAborted(1L)).isFalse();
+        }
+    }
+
+    @Nested
+    class FindEndEvent {
+
+        @Test
+        void 종료된_룸은_종료_이벤트를_알려준다() {
+            sharingRoomRegistry.markFinished(1L);
+
+            assertThat(sharingRoomRegistry.findEndEvent(1L)).contains(TimerEventType.FINISHED);
+        }
+
+        @Test
+        void 중단된_룸은_중단_이벤트를_알려준다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            assertThat(sharingRoomRegistry.findEndEvent(1L)).contains(TimerEventType.ABORT);
+        }
+
+        @Test
+        void 끝나지_않은_룸은_알려주지_않는다() {
+            assertThat(sharingRoomRegistry.findEndEvent(1L)).isEmpty();
+        }
+
+        @Test
+        void 종료_유지_시간이_지난_룸은_알려주지_않는다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            clock.advance(SharingRoomRegistry.FINISHED_TTL);
+
+            assertThat(sharingRoomRegistry.findEndEvent(1L)).isEmpty();
+        }
+
+        @Test
+        void 마지막으로_끝난_사유를_알려준다() {
+            sharingRoomRegistry.markFinished(1L);
+
+            sharingRoomRegistry.markAborted(1L);
+
+            assertThat(sharingRoomRegistry.findEndEvent(1L)).contains(TimerEventType.ABORT);
+        }
+    }
+
+    @Nested
     class Reopen {
+
+        @Test
+        void 중단된_룸을_다시_열면_중단_상태가_아니다() {
+            sharingRoomRegistry.markAborted(1L);
+
+            sharingRoomRegistry.reopen(1L);
+
+            assertThat(sharingRoomRegistry.isAborted(1L)).isFalse();
+        }
 
         @Test
         void 종료된_룸을_다시_열면_종료_상태가_아니다() {
@@ -174,6 +264,17 @@ class SharingRoomRegistryTest {
                     () -> assertThat(sharingRoomRegistry.isFinished(1L)).isFalse(),
                     () -> assertThat(sharingRoomRegistry.isFinished(2L)).isTrue()
             );
+        }
+
+        @Test
+        void 종료_유지_시간이_지난_중단_룸도_제거한다() {
+            sharingRoomRegistry.markAborted(1L);
+            clock.advance(SharingRoomRegistry.FINISHED_TTL);
+
+            sharingRoomRegistry.removeExpired();
+            clock.advance(Duration.ofMinutes(-1)); // 제거되지 않았다면 다시 중단 상태로 보이는 시점
+
+            assertThat(sharingRoomRegistry.isAborted(1L)).isFalse();
         }
     }
 

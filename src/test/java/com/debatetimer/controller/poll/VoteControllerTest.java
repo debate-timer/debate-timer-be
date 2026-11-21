@@ -18,6 +18,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpStatus;
 
 class VoteControllerTest extends BaseControllerTest {
@@ -51,6 +52,50 @@ class VoteControllerTest extends BaseControllerTest {
                     () -> assertThat(response.prosCount()).isEqualTo(2L),
                     () -> assertThat(response.consCount()).isEqualTo(1L)
             );
+        }
+
+        @ParameterizedTest
+        @EnumSource(PollStatus.class)
+        void 투표자가_선거정보와_함께_시간표_정보를_조회할_수_있다(PollStatus status) {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, status);
+
+            VoterPollInfoResponse response = given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("pollId", pollEntity.getId())
+                    .when().get("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(VoterPollInfoResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.tableInfo().id()).isEqualTo(table.getId()),
+                    () -> assertThat(response.tableInfo().name()).isEqualTo(table.getName()),
+                    () -> assertThat(response.tableInfo().agenda()).isEqualTo(pollEntity.getAgenda())
+            );
+        }
+
+        @Test
+        void 시간표가_삭제된_선거를_조회하면_404를_응답한다() {
+            Member member = memberGenerator.generate("email@email.com");
+            CustomizeTableEntity table = customizeTableEntityGenerator.generate(member);
+            PollEntity pollEntity = pollEntityGenerator.generate(table, PollStatus.PROGRESS);
+            customizeTableRepository.delete(table);
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("pollId", pollEntity.getId())
+                    .when().get("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+        }
+
+        @Test
+        void 존재하지_않는_선거를_조회하면_404를_응답한다() {
+            given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("pollId", 0L)
+                    .when().get("/api/polls/{pollId}/votes")
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
         }
     }
 

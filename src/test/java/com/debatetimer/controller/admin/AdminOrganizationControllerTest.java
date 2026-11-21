@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.debatetimer.controller.BaseControllerTest;
 import com.debatetimer.domain.organization.Language;
+import com.debatetimer.domain.organization.OrganizationCategory;
 import com.debatetimer.dto.admin.response.AdminOrganizationResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
+import com.debatetimer.dto.admin.request.OrganizationUpdateRequest;
 import com.debatetimer.entity.organization.OrganizationEntity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +27,8 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
         @Test
         void 어드민_비밀번호가_맞으면_모든_단체와_템플릿을_조회한다() {
-            OrganizationEntity korean = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            OrganizationEntity korean = organizationEntityGenerator.generate(
+                    "한앎", "한양대", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
             organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
             organizationTemplateEntityGenerator.generate(korean, "템플릿");
 
@@ -37,6 +40,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.organizations()).hasSize(2),
+                    () -> assertThat(response.organizations().get(0).category()).isEqualTo(OrganizationCategory.DEBATE_CLUB),
                     () -> assertThat(response.organizations().get(0).templates()).hasSize(1)
             );
         }
@@ -56,7 +60,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 단체를_추가한다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    "한앎", "한양대", "/icon.png", Language.KO_KR);
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
 
             AdminOrganizationResponse response = given()
                     .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
@@ -68,6 +72,7 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.name()).isEqualTo("한앎"),
+                    () -> assertThat(response.category()).isEqualTo(OrganizationCategory.DEBATE_CLUB),
                     () -> assertThat(response.templates()).isEmpty()
             );
         }
@@ -75,7 +80,20 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 단체_이름이_비어_있으면_추가할_수_없다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    " ", "한양대", "/icon.png", Language.KO_KR);
+                    " ", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/admin/organizations")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 분류가_없으면_추가할_수_없다() {
+            OrganizationCreateRequest request = new OrganizationCreateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, null);
 
             given()
                     .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
@@ -88,12 +106,84 @@ class AdminOrganizationControllerTest extends BaseControllerTest {
         @Test
         void 어드민_비밀번호가_없으면_추가할_수_없다() {
             OrganizationCreateRequest request = new OrganizationCreateRequest(
-                    "한앎", "한양대", "/icon.png", Language.KO_KR);
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
 
             given()
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/admin/organizations")
+                    .then().statusCode(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    @Nested
+    class UpdateOrganization {
+
+        @Test
+        void 단체의_모든_항목을_수정한다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "hanalm", "hanyang", "/new-icon.png", Language.US_EN, OrganizationCategory.TOURNAMENT);
+
+            AdminOrganizationResponse response = given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(AdminOrganizationResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(organization.getId()),
+                    () -> assertThat(response.name()).isEqualTo("hanalm"),
+                    () -> assertThat(response.affiliation()).isEqualTo("hanyang"),
+                    () -> assertThat(response.iconPath()).isEqualTo("/new-icon.png"),
+                    () -> assertThat(response.language()).isEqualTo(Language.US_EN),
+                    () -> assertThat(response.category()).isEqualTo(OrganizationCategory.TOURNAMENT)
+            );
+        }
+
+        @Test
+        void 분류가_없으면_수정할_수_없다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, null);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
+        void 단체가_없으면_수정할_수_없다() {
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .header(AdminAuthInterceptor.ADMIN_PASSWORD_HEADER, PASSWORD)
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", 999L)
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+        }
+
+        @Test
+        void 어드민_비밀번호가_없으면_수정할_수_없다() {
+            OrganizationEntity organization = organizationEntityGenerator.generate("한앎", "한양대");
+            OrganizationUpdateRequest request = new OrganizationUpdateRequest(
+                    "한앎", "한양대", "/icon.png", Language.KO_KR, OrganizationCategory.DEBATE_CLUB);
+
+            given()
+                    .contentType(ContentType.JSON)
+                    .pathParam("organizationId", organization.getId())
+                    .body(request)
+                    .when().put("/api/admin/organizations/{organizationId}")
                     .then().statusCode(HttpStatus.UNAUTHORIZED.value());
         }
     }

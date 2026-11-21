@@ -6,6 +6,7 @@ import com.debatetimer.dto.admin.response.AdminOrganizationTemplateResponse;
 import com.debatetimer.dto.admin.response.AdminOrganizationsResponse;
 import com.debatetimer.dto.admin.request.OrganizationCreateRequest;
 import com.debatetimer.dto.admin.request.OrganizationTemplateCreateRequest;
+import com.debatetimer.dto.admin.request.OrganizationUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,11 @@ public class AdminOrganizationService {
 
     public AdminOrganizationResponse create(OrganizationCreateRequest request) {
         return new AdminOrganizationResponse(organizationDomainRepository.create(request.toOrganization()));
+    }
+
+    public AdminOrganizationResponse update(long organizationId, OrganizationUpdateRequest request) {
+        return new AdminOrganizationResponse(
+                organizationDomainRepository.update(organizationId, request.toOrganization()));
     }
 
     public AdminOrganizationTemplateResponse createTemplate(long organizationId,

@@ -18,13 +18,11 @@ class OrganizationControllerTest extends BaseControllerTest {
     class GetOrganizationTemplates {
 
         @Test
-        void language_파라미터가_없으면_KR_기관의_토론_템플릿을_조회한다() {
-            OrganizationEntity korean1 = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
-            OrganizationEntity korean2 = organizationEntityGenerator.generate("한모름", "양한대", Language.KO_KR);
+        void language_파라미터가_없으면_모든_언어의_기관_토론_템플릿을_조회한다() {
+            OrganizationEntity korean = organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
             OrganizationEntity english = organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
-            organizationTemplateEntityGenerator.generate(korean1, "템플릿1", Language.KO_KR);
-            organizationTemplateEntityGenerator.generate(korean1, "템플릿2", Language.KO_KR);
-            organizationTemplateEntityGenerator.generate(korean2, "릿플템1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(korean, "템플릿1", Language.KO_KR);
+            organizationTemplateEntityGenerator.generate(korean, "템플릿2", Language.KO_KR);
             organizationTemplateEntityGenerator.generate(english, "template1", Language.US_EN);
 
             OrganizationResponses response = given()
@@ -38,6 +36,21 @@ class OrganizationControllerTest extends BaseControllerTest {
                     () -> assertThat(response.organizations().get(0).templates()).hasSize(2),
                     () -> assertThat(response.organizations().get(1).templates()).hasSize(1)
             );
+        }
+
+        @Test
+        void language_파라미터가_빈_값이면_모든_언어의_기관_토론_템플릿을_조회한다() {
+            organizationEntityGenerator.generate("한앎", "한양대", Language.KO_KR);
+            organizationEntityGenerator.generate("english", "hanyang", Language.US_EN);
+
+            OrganizationResponses response = given()
+                    .contentType(ContentType.JSON)
+                    .queryParam("language", "")
+                    .when().get("/api/organizations/templates")
+                    .then().statusCode(HttpStatus.OK.value())
+                    .extract().as(OrganizationResponses.class);
+
+            assertThat(response.organizations()).hasSize(2);
         }
 
         @Test

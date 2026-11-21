@@ -183,6 +183,41 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
         }
 
         @Test
+        void 사회자가_공유를_중단한_뒤_입장한_청중은_서버로부터_공유_중단_이벤트를_받는다() throws ExecutionException, InterruptedException, TimeoutException {
+            MessageFrameHandler<SharingResponse> existingAudienceHandler = new MessageFrameHandler<>(
+                    SharingResponse.class);
+            MessageFrameHandler<SharingResponse> newAudienceHandler = new MessageFrameHandler<>(SharingResponse.class);
+            Member member = memberGenerator.generate("example@email.com");
+            StompHeaders headers = headerGenerator.generateChairmanTokenHeader("/app/event/" + ROOM_ID, member, chairmanSessionId);
+            subscribeChairman(new QueueFrameHandler<>(ChairmanSharingRequest.class));
+            stompSession.subscribe("/room/" + ROOM_ID, existingAudienceHandler);
+            stompSession.send(headers, new SharingRequest(TimerEventType.ABORT, 100L, null));
+            SharingResponse chairmanAborted = existingAudienceHandler.getCompletableFuture()
+                    .get(3L, TimeUnit.SECONDS);
+
+            stompSession.subscribe("/room/" + ROOM_ID, newAudienceHandler);
+
+            SharingResponse serverAborted = newAudienceHandler.getCompletableFuture()
+                    .get(3L, TimeUnit.SECONDS);
+            assertAll(
+                    () -> assertThat(chairmanAborted.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(chairmanAborted.version()).isEqualTo(100L),
+                    () -> assertThat(serverAborted.eventType()).isEqualTo(TimerEventType.ABORT),
+                    () -> assertThat(serverAborted.version()).isNull(),
+                    () -> assertThat(serverAborted.data()).isNull()
+            );
+        }
+
+        @Test
+        void 사회자가_구독하면_중단된_룸을_다시_진행_상태로_되돌린다() throws InterruptedException {
+            sharingRoomRegistry.markAborted(ROOM_ID);
+
+            subscribeChairman(new MessageFrameHandler<>(ChairmanSharingRequest.class));
+
+            assertThat(awaitAbortReleased(3L)).isTrue();
+        }
+
+        @Test
         void 종료된_룸을_사회자가_다시_진행하면_새로운_청중에_대해_사회자에게_정보공유_트리거를_발송한다() throws ExecutionException, InterruptedException, TimeoutException {
             MessageFrameHandler<ChairmanSharingRequest> firstChairmanHandler = new MessageFrameHandler<>(
                     ChairmanSharingRequest.class);
@@ -386,6 +421,17 @@ class RoomSubscribeInterceptorTest extends BaseStompTest {
             Thread.sleep(50L);
         }
         return false;
+    }
+
+    private boolean awaitAbortReleased(long timeoutSeconds) throws InterruptedException {
+        long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSeconds);
+        while (System.currentTimeMillis() < deadline) {
+            if (!sharingRoomRegistry.isAborted(ROOM_ID)) {
+                return true;
+            }
+            Thread.sleep(50L);
+        }
+        return !sharingRoomRegistry.isAborted(ROOM_ID);
     }
 
     private boolean awaitReopened(long timeoutSeconds) throws InterruptedException {
