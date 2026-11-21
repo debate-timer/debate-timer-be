@@ -118,6 +118,12 @@ public class TranscriptEntity extends BaseTimeEntity {
         return new TranscriptTableSnapshot(tableName, agenda, prosTeamName, consTeamName);
     }
 
+    // 다기기 녹음은 끝낼 때 빈 속기록을 먼저 만들고, 턴 처리가 끝나면 STT 원문을 채운다.
+    public void fillLines(String linesJson) {
+        this.linesJson = linesJson;
+        this.rawLinesJson = linesJson;
+    }
+
     public void refine(String refinedLinesJson) {
         this.linesJson = refinedLinesJson;
         this.refining = false;
