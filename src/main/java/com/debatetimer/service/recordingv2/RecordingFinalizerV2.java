@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * 사회자가 끝낸 녹음 세션을 속기록으로 마무리한다.
  * - 끝낸 뒤 수집 창 시간이 지나고, 모으는 중이거나 처리 중인 턴이 없으면 속기록을 만든다.
  * - 끝낸 뒤 최대 대기 시간이 지나면 처리가 끝난 턴만으로 만든다.
- * - 전사된 발언이 없거나 만들다 실패하면 세션을 실패로 기록한다.
+ * - 전사된 발언이 없거나 만들다 실패하면 세션을 실패로 기록하고, 끝낼 때 만든 속기록도 실패로 남긴다.
  */
 @Service
 public class RecordingFinalizerV2 {
@@ -63,7 +63,7 @@ public class RecordingFinalizerV2 {
         for (RecordingSessionV2 session : recordingV2DomainRepository.findSessions(RecordingSessionStatusV2.FINISHING)) {
             if (!runQuietly("세션 마무리", session.sessionKey(), () -> finalizeIfReady(session))) {
                 runQuietly("세션 실패 기록", session.sessionKey(),
-                        () -> recordingV2DomainRepository.failSession(session.id(), "속기록을 만들지 못했습니다."));
+                        () -> transcriptAssembler.fail(session, "속기록을 만들지 못했습니다."));
                 cleanUp(session);
             }
         }
@@ -76,7 +76,7 @@ public class RecordingFinalizerV2 {
         }
         Optional<Long> transcriptId = transcriptAssembler.assemble(session, turns);
         if (transcriptId.isEmpty()) {
-            recordingV2DomainRepository.failSession(session.id(), "전사된 발언이 없습니다.");
+            transcriptAssembler.fail(session, "전사된 발언이 없습니다.");
         }
         cleanUp(session);
     }

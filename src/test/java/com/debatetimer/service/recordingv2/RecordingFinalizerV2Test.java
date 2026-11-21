@@ -11,6 +11,7 @@ import com.debatetimer.domain.recordingv2.RecordingSessionV2;
 import com.debatetimer.domain.recordingv2.RecordingTurnV2;
 import com.debatetimer.domain.transcript.SttMode;
 import com.debatetimer.domain.transcript.Transcript;
+import com.debatetimer.domain.transcript.TranscriptStatus;
 import com.debatetimer.domain.transcript.Utterance;
 import com.debatetimer.domainrepository.recordingv2.RecordingV2DomainRepository;
 import com.debatetimer.domainrepository.transcript.TranscriptDomainRepository;
@@ -41,6 +42,9 @@ class RecordingFinalizerV2Test extends BaseServiceTest {
 
     @Autowired
     private TranscriptDomainRepository transcriptDomainRepository;
+
+    @Autowired
+    private TranscriptAssemblerV2 transcriptAssembler;
 
     @MockitoBean
     private RecordingV2Scheduler recordingV2Scheduler;
@@ -130,6 +134,50 @@ class RecordingFinalizerV2Test extends BaseServiceTest {
                 () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.FAILED),
                 () -> assertThat(found.transcriptId()).isNull()
         );
+    }
+
+    @Test
+    void 끝낼_때_만든_생성_중_속기록에_발언을_채우고_세션을_완료한다() {
+        RecordingSessionV2 session = finishedSessionWithPendingTranscript(LocalDateTime.now().minusMinutes(1));
+        completeTurn(session, "0-1", 0, 0L, new Utterance(1_000, "발언입니다."));
+
+        finalizer.finalizeReadySessions();
+
+        RecordingSessionV2 found = recordingV2DomainRepository.getSession(session.id());
+        Transcript transcript = transcriptDomainRepository.getById(found.transcriptId());
+        assertAll(
+                () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.COMPLETED),
+                () -> assertThat(found.transcriptId()).isEqualTo(session.transcriptId()),
+                () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.PROCESSING),
+                () -> assertThat(transcript.lines()).extracting(line -> line.text())
+                        .containsExactly("발언입니다."),
+                () -> assertThat(transcript.originalLines()).extracting(line -> line.text())
+                        .containsExactly("발언입니다."),
+                () -> assertThat(transcriptDomainRepository.findSummariesByMemberId(member.getId())).hasSize(1)
+        );
+    }
+
+    @Test
+    void 전사된_발언이_없으면_끝낼_때_만든_속기록도_실패로_남긴다() {
+        RecordingSessionV2 session = finishedSessionWithPendingTranscript(LocalDateTime.now().minusMinutes(1));
+        RecordingTurnV2 turn = recordingV2DomainRepository.createTurn(session.id(), "0-1", 0, null, 0L, 1);
+        recordingV2DomainRepository.failTurn(turn.id(), "전사 실패");
+
+        finalizer.finalizeReadySessions();
+
+        RecordingSessionV2 found = recordingV2DomainRepository.getSession(session.id());
+        Transcript transcript = transcriptDomainRepository.getById(session.transcriptId());
+        assertAll(
+                () -> assertThat(found.status()).isEqualTo(RecordingSessionStatusV2.FAILED),
+                () -> assertThat(transcript.status()).isEqualTo(TranscriptStatus.FAILED),
+                () -> assertThat(transcript.errorMessage()).isEqualTo("전사된 발언이 없습니다.")
+        );
+    }
+
+    private RecordingSessionV2 finishedSessionWithPendingTranscript(LocalDateTime finishedAt) {
+        RecordingSessionV2 session = finishedSession(finishedAt);
+        transcriptAssembler.preparePending(recordingV2DomainRepository.getSession(session.id()));
+        return recordingV2DomainRepository.getSession(session.id());
     }
 
     private RecordingSessionV2 finishedSession(LocalDateTime finishedAt) {

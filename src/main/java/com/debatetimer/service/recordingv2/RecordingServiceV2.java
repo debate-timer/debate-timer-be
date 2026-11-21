@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 다기기 녹음 V2. 사회자가 녹음 세션을 열면 청중 기기도 참가 코드로 참가해 같은 턴을 녹음해 올린다.
@@ -44,6 +45,7 @@ public class RecordingServiceV2 {
     private final RecordingV2DomainRepository recordingV2DomainRepository;
     private final RecordingSessionRegistryV2 registry;
     private final AudioSpoolV2 audioSpool;
+    private final TranscriptAssemblerV2 transcriptAssembler;
     private final Clock clock;
 
     @Autowired
@@ -52,10 +54,11 @@ public class RecordingServiceV2 {
             CustomizeTableDomainRepository customizeTableDomainRepository,
             RecordingV2DomainRepository recordingV2DomainRepository,
             RecordingSessionRegistryV2 registry,
-            AudioSpoolV2 audioSpool
+            AudioSpoolV2 audioSpool,
+            TranscriptAssemblerV2 transcriptAssembler
     ) {
         this(properties, customizeTableDomainRepository, recordingV2DomainRepository, registry, audioSpool,
-                Clock.systemDefaultZone());
+                transcriptAssembler, Clock.systemDefaultZone());
     }
 
     RecordingServiceV2(
@@ -64,6 +67,7 @@ public class RecordingServiceV2 {
             RecordingV2DomainRepository recordingV2DomainRepository,
             RecordingSessionRegistryV2 registry,
             AudioSpoolV2 audioSpool,
+            TranscriptAssemblerV2 transcriptAssembler,
             Clock clock
     ) {
         this.properties = properties;
@@ -71,6 +75,7 @@ public class RecordingServiceV2 {
         this.recordingV2DomainRepository = recordingV2DomainRepository;
         this.registry = registry;
         this.audioSpool = audioSpool;
+        this.transcriptAssembler = transcriptAssembler;
         this.clock = clock;
     }
 
@@ -137,13 +142,16 @@ public class RecordingServiceV2 {
 
     /**
      * 사회자가 토론을 끝낸다. 청중 기기의 마지막 턴 업로드가 늦게 도착할 수 있어 수집 창 시간만큼은 업로드를 더 받고,
-     * 그 뒤 남은 턴이 모두 처리되면 속기록을 만든다. 이미 끝낸 세션이면 그대로 둔다.
+     * 그 뒤 남은 턴이 모두 처리되면 속기록을 채운다. 끝내는 즉시 생성 중인 빈 속기록을 만들어 목록에 보이게 한다.
+     * 이미 끝냈거나 취소한 세션이면 그대로 둔다.
      */
+    @Transactional
     public void finish(Member member, String sessionKey) {
         validateEnabled();
         RecordingSessionV2 session = getOwnedSession(member, sessionKey);
-        if (session.status().isRecording()) {
-            recordingV2DomainRepository.finishSession(session.id(), LocalDateTime.now(clock));
+        if (session.status().isRecording()
+                && recordingV2DomainRepository.finishSession(session.id(), LocalDateTime.now(clock))) {
+            transcriptAssembler.preparePending(session);
         }
     }
 
