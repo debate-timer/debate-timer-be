@@ -17,38 +17,47 @@ jobs:
 
       - name: Set Environment Variables for Issue
         if: ${{ !github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "CONTENT=$(printf '%s\n' "$COMMENT_BODY" | base64 -w 0)" >> $GITHUB_ENV
           echo "POST_URL=${{ github.event.issue.html_url }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR=${{ github.event.comment.user.login }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR_AVATAR=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
           echo "POST_AUTHOR=${{ github.event.issue.user.login }}" >> $GITHUB_ENV
           echo "POST_AUTHOR_AVATAR=${{ github.event.issue.user.avatar_url }}" >> $GITHUB_ENV
-          echo "TITLE=${{ github.event.issue.title }}" >> $GITHUB_ENV
+          echo "TITLE=$ISSUE_TITLE" >> $GITHUB_ENV
           echo "POST_TYPE=Issue" >> $GITHUB_ENV
 
       - name: Set Environment Variables for PR Review Comments
         if: ${{ contains(github.event.review.body, '/noti') }}
+        env:
+          REVIEW_BODY: ${{ github.event.review.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo "CONTENT=$(echo '${{ github.event.review.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "CONTENT=$(printf '%s\n' "$REVIEW_BODY" | base64 -w 0)" >> $GITHUB_ENV
           echo "POST_URL=${{ github.event.pull_request._links.html.href }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR=${{ github.event.review.user.login }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR_AVATAR=${{ github.event.review.user.avatar_url }}" >> $GITHUB_ENV
           echo "POST_AUTHOR=${{ github.event.pull_request.base.user.login }}" >> $GITHUB_ENV
           echo "POST_AUTHOR_AVATAR=${{ github.event.pull_request.base.user.avatar_url }}" >> $GITHUB_ENV
-          echo "TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+          echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
           echo "POST_TYPE=Pull Request" >> $GITHUB_ENV
 
       - name: Set Environment Variables for PR Comments
         if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          echo "CONTENT=$(echo '${{ github.event.comment.body }}' | base64 -w 0)" >> $GITHUB_ENV
+          echo "CONTENT=$(printf '%s\n' "$COMMENT_BODY" | base64 -w 0)" >> $GITHUB_ENV
           echo "POST_URL=${{ github.event.issue.html_url }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR=${{ github.event.comment.user.login }}" >> $GITHUB_ENV
           echo "COMMENT_AUTHOR_AVATAR=${{ github.event.comment.user.avatar_url }}" >> $GITHUB_ENV
           echo "POST_AUTHOR=${{ github.event.issue.user.login }}" >> $GITHUB_ENV
           echo "POST_AUTHOR_AVATAR=${{ github.event.issue.user.avatar_url }}" >> $GITHUB_ENV
-          echo "TITLE=${{ github.event.issue.title }}" >> $GITHUB_ENV
+          echo "TITLE=$ISSUE_TITLE" >> $GITHUB_ENV
           echo "POST_TYPE=Pull Request" >> $GITHUB_ENV
 
       - name: Set Discord Content
