@@ -126,6 +126,7 @@ public abstract class BaseDocumentTest {
                 .maxAge(maxAge)
                 .sameSite("None")
                 .secure(true)
+                .httpOnly(true)
                 .build();
     }
 

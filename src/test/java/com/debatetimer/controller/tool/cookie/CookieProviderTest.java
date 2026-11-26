@@ -32,7 +32,9 @@ class CookieProviderTest {
 
             assertThat(cookie.toString())
                     .contains("SameSite=None")
-                    .contains("Secure");
+                    .contains("Secure")
+                    .contains("HttpOnly")
+                    .contains("Path=/");
         }
     }
 }

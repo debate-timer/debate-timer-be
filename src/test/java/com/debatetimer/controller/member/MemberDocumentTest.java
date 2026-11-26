@@ -301,6 +301,11 @@ public class MemberDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
                 .summary("토큰 갱신")
+                .description("""
+                        `refreshToken` 쿠키로 액세스 토큰과 리프레시 토큰을 재발급합니다.
+                        - `refreshToken` 쿠키가 없거나 비어 있거나, 서명·토큰 타입이 유효하지 않으면 `401 UNAUTHORIZED_MEMBER` 를 응답합니다.
+                        - `refreshToken` 이 만료되었으면 `401 EXPIRED_TOKEN` 을 응답합니다.
+                        """)
                 .requestCookie(
                         cookieWithName("refreshToken").description("리프레시 토큰")
                 );
@@ -319,14 +324,13 @@ public class MemberDocumentTest extends BaseDocumentTest {
             doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 500)).when(cookieManager)
                     .createCookie(any(), any(), any());
 
-            var document = document("member/logout", 204)
+            var document = document("member/reissue", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
 
             given(document)
-                    .headers(EXIST_MEMBER_HEADER)
-                    .cookie("refreshToken")
+                    .cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN)
                     .when().post("/api/member/reissue")
                     .then().statusCode(200);
         }
@@ -342,7 +346,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
-                    .cookie("refreshToken")
+                    .cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN)
                     .when().post("/api/member/reissue")
                     .then().statusCode(errorCode.getStatus().value());
         }
@@ -354,43 +358,36 @@ public class MemberDocumentTest extends BaseDocumentTest {
         private final RestDocumentationRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
                 .summary("로그아웃")
+                .description("""
+                        `refreshToken` 쿠키를 만료(`Max-Age=0`)시키는 `Set-Cookie` 헤더와 함께 `204 No Content` 를 응답합니다.
+                        - 서버에 별도 토큰 상태를 저장하지 않으므로, 액세스 토큰 또는 `refreshToken` 쿠키가 없거나 만료된 상태여도 항상 `204 No Content` 로 멱등 처리합니다.
+                        """)
                 .requestHeader(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰").optional()
                 )
                 .requestCookie(
-                        cookieWithName("refreshToken").description("리프레시 토큰")
+                        cookieWithName("refreshToken").description("리프레시 토큰").optional()
+                );
+
+        private final RestDocumentationResponse responseDocument = response()
+                .responseCookie(
+                        cookieWithName("refreshToken").description("만료 처리된 리프레시 토큰 (Max-Age=0)")
                 );
 
         @Test
         void 로그아웃_성공() {
-            doReturn(responseCookie(EXIST_MEMBER_REFRESH_TOKEN, 0)).when(cookieManager).createExpiredCookie(any());
+            doReturn(responseCookie("", 0)).when(cookieManager).createExpiredCookie(any());
 
             var document = document("member/logout", 204)
                     .request(requestDocument)
+                    .response(responseDocument)
                     .build();
 
             given(document)
                     .headers(EXIST_MEMBER_HEADER)
-                    .cookie("refreshToken")
+                    .cookie("refreshToken", EXIST_MEMBER_REFRESH_TOKEN)
                     .when().post("/api/member/logout")
                     .then().statusCode(204);
-        }
-
-        @EnumSource(value = ClientErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN"})
-        @ParameterizedTest
-        void 로그아웃_실패(ClientErrorCode errorCode) {
-            doThrow(new DTClientErrorException(errorCode)).when(authService).logout(any(), any());
-
-            var document = document("member/logout", errorCode)
-                    .request(requestDocument)
-                    .response(ERROR_RESPONSE)
-                    .build();
-
-            given(document)
-                    .headers(EXIST_MEMBER_HEADER)
-                    .cookie("refreshToken")
-                    .when().post("/api/member/logout")
-                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }
