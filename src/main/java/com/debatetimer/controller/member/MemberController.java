@@ -13,8 +13,6 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.MemberSettingsResponse;
 import com.debatetimer.dto.member.MemberSettingsUpdateRequest;
 import com.debatetimer.dto.member.TableResponses;
-import com.debatetimer.exception.custom.DTClientErrorException;
-import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -85,9 +83,6 @@ public class MemberController {
     public ResponseEntity<Void> reissueAccessToken(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_KEY, required = false) String refreshToken
     ) {
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
-        }
         JwtTokenResponse jwtToken = authManager.reissueToken(refreshToken);
         ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
                 jwtToken.refreshToken(), jwtToken.refreshExpiration());
