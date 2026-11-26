@@ -80,7 +80,9 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/reissue")
-    public ResponseEntity<Void> reissueAccessToken(@CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
+    public ResponseEntity<Void> reissueAccessToken(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_KEY, required = false) String refreshToken
+    ) {
         JwtTokenResponse jwtToken = authManager.reissueToken(refreshToken);
         ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
                 jwtToken.refreshToken(), jwtToken.refreshExpiration());
@@ -92,10 +94,7 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/logout")
-    public ResponseEntity<Void> logout(@AuthMember Member member,
-                                       @CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
-        String email = authManager.resolveRefreshToken(refreshToken);
-        authService.logout(member, email);
+    public ResponseEntity<Void> logout() {
         ResponseCookie expiredRefreshTokenCookie = cookieManager.createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY);
 
         return ResponseEntity.noContent()

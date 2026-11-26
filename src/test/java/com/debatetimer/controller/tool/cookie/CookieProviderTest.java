@@ -9,6 +9,11 @@ import org.springframework.http.ResponseCookie;
 
 class CookieProviderTest {
 
+    private static final String SAME_SITE_NONE_ATTRIBUTE = "SameSite=None";
+    private static final String SECURE_ATTRIBUTE = "Secure";
+    private static final String HTTP_ONLY_ATTRIBUTE = "HttpOnly";
+    private static final String ROOT_PATH_ATTRIBUTE = "Path=/";
+
     @Nested
     class CreateCookie {
 
@@ -31,8 +36,10 @@ class CookieProviderTest {
             ResponseCookie cookie = cookieProvider.createCookie("key", "value", Duration.ofHours(1));
 
             assertThat(cookie.toString())
-                    .contains("SameSite=None")
-                    .contains("Secure");
+                    .contains(SAME_SITE_NONE_ATTRIBUTE)
+                    .contains(SECURE_ATTRIBUTE)
+                    .contains(HTTP_ONLY_ATTRIBUTE)
+                    .contains(ROOT_PATH_ATTRIBUTE);
         }
     }
 }

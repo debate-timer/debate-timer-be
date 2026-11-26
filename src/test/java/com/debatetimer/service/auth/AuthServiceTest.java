@@ -58,18 +58,4 @@ class AuthServiceTest extends BaseServiceTest {
                     .doesNotThrowAnyException();
         }
     }
-
-    @Nested
-    class Logout {
-
-        @Test
-        void 이메일과_멤버의_정보가_다르면_예외를_발생시킨다() {
-            Member bito = memberGenerator.generate("bito@gmail.com");
-            String email = "default@gmail.com";
-
-            assertThatThrownBy(() -> authService.logout(bito, email))
-                    .isInstanceOf(DTClientErrorException.class)
-                    .hasMessage(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
-        }
-    }
 }

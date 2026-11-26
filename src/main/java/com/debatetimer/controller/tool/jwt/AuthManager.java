@@ -3,6 +3,8 @@ package com.debatetimer.controller.tool.jwt;
 import com.debatetimer.domain.member.Member;
 import com.debatetimer.dto.member.JwtTokenResponse;
 import com.debatetimer.dto.member.MemberInfo;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,9 @@ public class AuthManager {
     }
 
     public JwtTokenResponse reissueToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
+        }
         String email = jwtTokenResolver.resolveRefreshToken(refreshToken);
         MemberInfo memberInfo = new MemberInfo(email);
 

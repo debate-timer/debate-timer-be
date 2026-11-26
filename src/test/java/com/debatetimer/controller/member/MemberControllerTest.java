@@ -323,17 +323,66 @@ class MemberControllerTest extends BaseControllerTest {
             Member bito = memberGenerator.generate("bito@gmail.com");
             String refreshToken = tokenGenerator.generateRefreshToken(bito.getEmail());
 
-            given()
+            ValidatableResponse response = given()
                     .cookie("refreshToken", refreshToken)
                     .when().post("/api/member/reissue")
                     .then().statusCode(200);
+
+            String setCookie = response.extract().header(HttpHeaders.SET_COOKIE);
+            assertAll(
+                    () -> assertThat(response.extract().header(HttpHeaders.AUTHORIZATION)).isNotBlank(),
+                    () -> assertThat(setCookie).contains("refreshToken="),
+                    () -> assertThat(setCookie).contains("HttpOnly"),
+                    () -> assertThat(setCookie).contains("Secure"),
+                    () -> assertThat(setCookie).contains("SameSite=None"),
+                    () -> assertThat(setCookie).contains("Path=/")
+            );
         }
 
         @Test
-        void 토큰이_없을_경우_400_에러를_반환한다() {
-            given()
+        void 쿠키가_없을_경우_401_에러를_반환한다() {
+            ErrorResponse errorResponse = given()
                     .when().post("/api/member/reissue")
-                    .then().statusCode(400);
+                    .then().statusCode(401)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptyAndBlankSource
+        void 쿠키가_비어있을_경우_401_에러를_반환한다(String emptyRefreshToken) {
+            ErrorResponse errorResponse = given()
+                    .cookie("refreshToken", emptyRefreshToken)
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(401)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
+        }
+
+        @Test
+        void 만료된_토큰일_경우_401_EXPIRED_TOKEN_에러를_반환한다() {
+            String expiredToken = tokenGenerator.generateExpiredToken();
+
+            ErrorResponse errorResponse = given()
+                    .cookie("refreshToken", expiredToken)
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(401)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.EXPIRED_TOKEN.getMessage());
+        }
+
+        @Test
+        void 유효하지_않은_토큰일_경우_401_UNAUTHORIZED_MEMBER_에러를_반환한다() {
+            ErrorResponse errorResponse = given()
+                    .cookie("refreshToken", "invalid-token")
+                    .when().post("/api/member/reissue")
+                    .then().statusCode(401)
+                    .extract().as(ErrorResponse.class);
+
+            assertThat(errorResponse.message()).isEqualTo(ClientErrorCode.UNAUTHORIZED_MEMBER.getMessage());
         }
     }
 
@@ -346,22 +395,63 @@ class MemberControllerTest extends BaseControllerTest {
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
             String refreshToken = tokenGenerator.generateRefreshToken(bito.getEmail());
 
-            given()
+            String setCookie = given()
                     .cookie("refreshToken", refreshToken)
                     .headers(headers)
                     .when().post("/api/member/logout")
-                    .then().statusCode(204);
+                    .then().statusCode(204)
+                    .extract().header(HttpHeaders.SET_COOKIE);
+
+            assertExpiredRefreshTokenCookie(setCookie);
         }
 
         @Test
-        void 토큰이_없을_경우_400_에러를_반환한다() {
+        void 리프레시_토큰_쿠키가_없어도_204와_만료_쿠키를_반환한다() {
             Member bito = memberGenerator.generate("bito@gmail.com");
             Headers headers = headerGenerator.generateAccessTokenHeader(bito);
 
-            given()
+            String setCookie = given()
                     .headers(headers)
                     .when().post("/api/member/logout")
-                    .then().statusCode(400);
+                    .then().statusCode(204)
+                    .extract().header(HttpHeaders.SET_COOKIE);
+
+            assertExpiredRefreshTokenCookie(setCookie);
+        }
+
+        @Test
+        void 액세스_토큰_헤더가_없어도_204와_만료_쿠키를_반환한다() {
+            String setCookie = given()
+                    .when().post("/api/member/logout")
+                    .then().statusCode(204)
+                    .extract().header(HttpHeaders.SET_COOKIE);
+
+            assertExpiredRefreshTokenCookie(setCookie);
+        }
+
+        @Test
+        void 액세스_토큰이_만료되어도_204와_만료_쿠키를_반환한다() {
+            String expiredAccessToken = tokenGenerator.generateExpiredToken();
+
+            String setCookie = given()
+                    .header(HttpHeaders.AUTHORIZATION, expiredAccessToken)
+                    .cookie("refreshToken", expiredAccessToken)
+                    .when().post("/api/member/logout")
+                    .then().statusCode(204)
+                    .extract().header(HttpHeaders.SET_COOKIE);
+
+            assertExpiredRefreshTokenCookie(setCookie);
+        }
+
+        private void assertExpiredRefreshTokenCookie(String setCookie) {
+            assertAll(
+                    () -> assertThat(setCookie).contains("refreshToken=;"),
+                    () -> assertThat(setCookie).contains("Max-Age=0"),
+                    () -> assertThat(setCookie).contains("HttpOnly"),
+                    () -> assertThat(setCookie).contains("Secure"),
+                    () -> assertThat(setCookie).contains("SameSite=None"),
+                    () -> assertThat(setCookie).contains("Path=/")
+            );
         }
     }
 }
