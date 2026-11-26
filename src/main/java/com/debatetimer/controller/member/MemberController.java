@@ -13,6 +13,8 @@ import com.debatetimer.dto.member.MemberInfo;
 import com.debatetimer.dto.member.MemberSettingsResponse;
 import com.debatetimer.dto.member.MemberSettingsUpdateRequest;
 import com.debatetimer.dto.member.TableResponses;
+import com.debatetimer.exception.custom.DTClientErrorException;
+import com.debatetimer.exception.errorcode.ClientErrorCode;
 import com.debatetimer.service.auth.AuthService;
 import com.debatetimer.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +82,12 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/reissue")
-    public ResponseEntity<Void> reissueAccessToken(@CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
+    public ResponseEntity<Void> reissueAccessToken(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_KEY, required = false) String refreshToken
+    ) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
+        }
         JwtTokenResponse jwtToken = authManager.reissueToken(refreshToken);
         ResponseCookie refreshTokenCookie = cookieManager.createCookie(REFRESH_TOKEN_COOKIE_KEY,
                 jwtToken.refreshToken(), jwtToken.refreshExpiration());
@@ -92,10 +99,7 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/logout")
-    public ResponseEntity<Void> logout(@AuthMember Member member,
-                                       @CookieValue(REFRESH_TOKEN_COOKIE_KEY) String refreshToken) {
-        String email = authManager.resolveRefreshToken(refreshToken);
-        authService.logout(member, email);
+    public ResponseEntity<Void> logout() {
         ResponseCookie expiredRefreshTokenCookie = cookieManager.createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY);
 
         return ResponseEntity.noContent()

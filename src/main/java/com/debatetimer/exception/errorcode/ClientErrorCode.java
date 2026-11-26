@@ -62,7 +62,7 @@ public enum ClientErrorCode implements ResponseErrorCode {
     CHAIRMAN_SESSION_REQUIRED(HttpStatus.BAD_REQUEST, "사회자 세션 식별자가 필요합니다"),
 
     TABLE_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 테이블을 찾을 수 없습니다."),
-    NOT_TABLE_OWNER(HttpStatus.UNAUTHORIZED, "테이블을 소유한 회원이 아닙니다."),
+    NOT_TABLE_OWNER(HttpStatus.FORBIDDEN, "테이블을 소유한 회원이 아닙니다."),
     POLL_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다."),
     SHARING_LOG_NOT_FOUND(HttpStatus.NOT_FOUND, "공유 기록을 찾을 수 없습니다."),
     TRANSCRIPT_NOT_FOUND(HttpStatus.NOT_FOUND, "토론 기록을 찾을 수 없습니다."),

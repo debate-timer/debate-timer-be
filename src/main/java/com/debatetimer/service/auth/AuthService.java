@@ -40,10 +40,4 @@ public class AuthService {
             throw new DTClientErrorException(ClientErrorCode.FEATURE_NOT_ALLOWED);
         }
     }
-
-    public void logout(Member member, String email) {
-        if (!member.isSameMember(email)) {
-            throw new DTClientErrorException(ClientErrorCode.UNAUTHORIZED_MEMBER);
-        }
-    }
 }

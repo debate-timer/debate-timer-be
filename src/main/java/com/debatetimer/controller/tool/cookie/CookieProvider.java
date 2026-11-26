@@ -17,6 +17,7 @@ public class CookieProvider {
                 .path(PATH)
                 .sameSite(SAME_SITE)
                 .secure(true)
+                .httpOnly(true)
                 .build();
     }
 }
