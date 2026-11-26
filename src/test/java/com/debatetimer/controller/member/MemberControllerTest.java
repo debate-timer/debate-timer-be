@@ -350,7 +350,7 @@ class MemberControllerTest extends BaseControllerTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"", "   "})
+        @NullAndEmptyAndBlankSource
         void 쿠키가_비어있을_경우_401_에러를_반환한다(String emptyRefreshToken) {
             ErrorResponse errorResponse = given()
                     .cookie("refreshToken", emptyRefreshToken)
